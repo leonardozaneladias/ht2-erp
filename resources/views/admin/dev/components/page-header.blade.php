@@ -19,7 +19,7 @@
                 :breadcrumbs="[
                     ['label' => 'Admin', 'url' => route('admin.dashboard')],
                     ['label' => 'Cadastros'],
-                    ['label' => 'Contratos', 'url' => route('admin.contratos.index')],
+                    ['label' => 'Registros', 'url' => route('admin.dashboard')],
                     ['label' => 'ADM-2026-01'],
                     ['label' => 'Editar', 'current' => true],
                 ]"

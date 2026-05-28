@@ -3,33 +3,11 @@
 
     $displayUser = [
         'nome' => $user?->nome ?? config('branding.user_default_name'),
-        'perfil' => $user?->perfil?->nome ?? 'Preview local',
+        'perfil' => $user?->getRoleNames()->first() ?? config('branding.user_default_role'),
         'avatar' => $user?->avatar_url ?: asset(config('branding.avatar_default')),
     ];
 
-    $notifications = [
-        [
-            'title' => 'Parcelas vencidas aguardando ação',
-            'time' => 'há 10 minutos',
-            'icon' => 'tabler--alert-triangle',
-            'variant' => 'warning',
-            'href' => route('admin.financeiro.parcelas.index'),
-        ],
-        [
-            'title' => 'Novo contrato pronto para revisão',
-            'time' => 'há 32 minutos',
-            'icon' => 'tabler--file-text',
-            'variant' => 'primary',
-            'href' => route('admin.contratos.index'),
-        ],
-        [
-            'title' => 'Cadastro manual de formando concluído',
-            'time' => 'há 1 hora',
-            'icon' => 'tabler--user-plus',
-            'variant' => 'success',
-            'href' => route('admin.formandos.index'),
-        ],
-    ];
+    $notifications = [];
 
     $notificationCount = count($notifications);
 
@@ -48,13 +26,29 @@
             <div class="logo-topbar">
                 <a class="logo-box" href="{{ route('admin.dashboard') }}">
                     <div class="logo-light">
-                        <img class="logo-lg h-6" alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_path')) }}" />
-                        <img class="logo-sm h-6" alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_sm_path')) }}" />
+                        <img
+                            class="logo-lg h-6"
+                            alt="{{ config('app.name') }}"
+                            src="{{ asset(config('branding.logo_path')) }}"
+                        />
+                        <img
+                            class="logo-sm h-6"
+                            alt="{{ config('app.name') }}"
+                            src="{{ asset(config('branding.logo_sm_path')) }}"
+                        />
                     </div>
 
                     <div class="logo-dark">
-                        <img class="logo-lg h-6" alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_dark_path')) }}" />
-                        <img class="logo-sm h-6" alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_sm_path')) }}" />
+                        <img
+                            class="logo-lg h-6"
+                            alt="{{ config('app.name') }}"
+                            src="{{ asset(config('branding.logo_dark_path')) }}"
+                        />
+                        <img
+                            class="logo-sm h-6"
+                            alt="{{ config('app.name') }}"
+                            src="{{ asset(config('branding.logo_sm_path')) }}"
+                        />
                     </div>
                 </a>
             </div>
@@ -68,7 +62,7 @@
                 <i class="iconify tabler--menu-4 text-xl"></i>
             </button>
 
-            <form action="{{ route('admin.formandos.index') }}" class="hidden xl:flex" id="search-box" role="search">
+            <form action="{{ route('admin.dashboard') }}" class="hidden xl:flex" id="search-box" role="search">
                 <div class="input-icon-group">
                     <i class="iconify tabler--search input-icon text-lg text-(--topbar-item-color)/50!"></i>
                     <input
@@ -76,7 +70,7 @@
                         type="search"
                         name="q"
                         class="form-input w-57.5 border-(--topbar-search-border)! bg-(--topbar-search-bg)! text-(--topbar-item-color)! placeholder:opacity-50"
-                        placeholder="Buscar formandos, contratos ou parcelas..."
+                        placeholder="Buscar..."
                     />
                 </div>
             </form>
