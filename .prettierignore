@@ -1,0 +1,41 @@
+vendor/
+node_modules/
+
+# Skills e agentes — templates BMAD contêm YAML+Markdown misturados
+.agents/
+.claude/skills/
+squad-configurator.skill
+storage/
+bootstrap/cache/
+public/build/
+public/vendor/
+*.min.js
+*.min.css
+laradock/
+
+# Inspinia template assets — reference-only, nao serao formatados.
+# Nossos proprios views/CSS/JS ficam em admin/ e portal/ (a criar nas sprints).
+resources/css/
+resources/js/app.js
+resources/js/vendor.js
+resources/js/data/
+resources/js/maps/
+resources/js/pages/
+resources/views/apps/
+resources/views/auth/
+resources/views/auth-card/
+resources/views/auth-split/
+resources/views/charts/
+resources/views/dashboard/
+resources/views/error/
+resources/views/form/
+resources/views/icons/
+resources/views/index.blade.php
+resources/views/layouts/
+resources/views/maps/
+resources/views/pages/
+resources/views/plugins/
+resources/views/shared/
+resources/views/tables/
+resources/views/ui/
+resources/views/vendor/

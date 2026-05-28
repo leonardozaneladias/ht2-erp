@@ -1,0 +1,29 @@
+{
+  "agents": ["claude_code", "codex", "copilot", "opencode", "cursor"],
+  "guidelines": true,
+  "mcp": true,
+  "nightwatch_mcp": false,
+  "packages": ["spatie/laravel-activitylog", "spatie/laravel-permission", "barryvdh/laravel-debugbar"],
+  "sail": false,
+  "skills": [
+    "laravel-best-practices",
+    "configuring-horizon",
+    "pulse-development",
+    "livewire-development",
+    "pest-testing",
+    "tailwindcss-development",
+    "laravel-permission-development",
+    "debug-using-debugbar",
+    "eloquent-best-practices",
+    "fluxui-development",
+    "laravel-expert",
+    "laravel-inertia-react",
+    "laravel-patterns",
+    "laravel-routes-best-practices",
+    "laravel-security",
+    "laravel-security-audit",
+    "laravel-specialist",
+    "php-best-practices",
+    "php-pro"
+  ]
+}

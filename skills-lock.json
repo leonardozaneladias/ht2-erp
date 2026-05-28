@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "skills": {
+    "Builder": {
+      "source": "aj-geddes/claude-code-bmad-skills",
+      "sourceType": "github",
+      "computedHash": "aaf93c891d5d0643809a76a23d85d0d4ee3c9fe9cc5ec5afae7e4d7fd6543212"
+    },
+    "Developer": {
+      "source": "aj-geddes/claude-code-bmad-skills",
+      "sourceType": "github",
+      "computedHash": "cad482ee944280c95f79ed8d472d3d9e06956052313b146b5494d49e44d70987"
+    },
+    "adr-skill": {
+      "source": "skillrecordings/adr-skill",
+      "sourceType": "github",
+      "computedHash": "c6a786cb3c69478135098561e60c193953fd473d08f8e4c03dbb48b90f5c73aa"
+    },
+    "agent-management": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "ffce30fc3fe7381fd5552bb8b64c24909f31e13b744db4fdfc7ceb32ccc235af"
+    },
+    "agent-manager": {
+      "source": "fractalmind-ai/agent-manager-skill",
+      "sourceType": "github",
+      "computedHash": "ac76afc1974faf9e1bf485bec5ceeec945c144a29ac33edc912802aceeb0c485"
+    },
+    "agent-manager-skill": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "923cedf85e7d951b101ae8ad4f7cf6644760563f45ac46d59ae9fbd7f01888e2"
+    },
+    "api-design-principles": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "3316239df2bdcb41e992857b8142e0239e6964564dd5d7224e470c2ab350a03c"
+    },
+    "bmad-orchestrator": {
+      "source": "aj-geddes/claude-code-bmad-skills",
+      "sourceType": "github",
+      "computedHash": "8f16460e7626dd433b5f00388358bde940a56bf552a00b5e24b7787f74a1bc66"
+    },
+    "boost-prompt": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "2621a44fbd9fc2636953d1e6e39e5faeed995f7fb958ec12cc98a2f0576f6fa7"
+    },
+    "builder": {
+      "source": "aj-geddes/claude-code-bmad-skills",
+      "sourceType": "github",
+      "computedHash": "760a6c215d1adedea79a8a0ab3377fd5c338f463c42ead88b0b54fc56cbc480b"
+    },
+    "building-components": {
+      "source": "vercel/components.build",
+      "sourceType": "github",
+      "computedHash": "20889af7cb9b3abca1e38824f7fffaa873eb0cc4d45187967b97bd85462cf934"
+    },
+    "composio": {
+      "source": "composiohq/skills",
+      "sourceType": "github",
+      "computedHash": "11b975f122ecbf455b437e4e42ebf8f30fad84220894c3d52549eefea92a7795"
+    },
+    "developer": {
+      "source": "aj-geddes/claude-code-bmad-skills",
+      "sourceType": "github",
+      "computedHash": "0a5dfa106b592964edba69d5a64389cf205d6410b9673e68c2da7968c5a927e4"
+    },
+    "enhance-prompt": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "computedHash": "71cc23e9ec5fc6361e12453495fa8c683f6cf26f3efaf9b230b0f43e0a32cc96"
+    },
+    "interface-design": {
+      "source": "dammyjay93/interface-design",
+      "sourceType": "github",
+      "computedHash": "d004c5e5e2e7132e1d64e9c2a339db7f7aaa69053a5c19cddc210dd35dd6fff5"
+    },
+    "laravel-api": {
+      "source": "juststeveking/laravel-api-skill",
+      "sourceType": "github",
+      "computedHash": "937abbd95989ae714d1a02eb097b91fcc958e04e6733f92cd37e0a629fbb3eae"
+    },
+    "laravel-best-practices": {
+      "source": "asyrafhussin/agent-skills",
+      "sourceType": "github",
+      "computedHash": "6eb357774a2416b3e632cf4f7dec1ff9558af2d70c4b8ade802f5a65ce118fb5"
+    },
+    "laravel-owasp-security": {
+      "source": "asyrafhussin/agent-skills",
+      "sourceType": "github",
+      "computedHash": "35f74b7fb37c9b0cb1a274e7e25f7425e793dacd73620c3507c7e9462e4c9c9d"
+    },
+    "laravel-permission-development": {
+      "source": "spatie/laravel-permission",
+      "sourceType": "github",
+      "computedHash": "fd15e7b755ecded66be2fbc7a1cdc38f57f4aae1715817a4da7bdcd2c5072748"
+    },
+    "laravel-plugin-discovery": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "computedHash": "d798b5b6baa529aaf6cca1537402e2dbc189d381a67229e12888194866476215"
+    },
+    "product-manager": {
+      "source": "aj-geddes/claude-code-bmad-skills",
+      "sourceType": "github",
+      "computedHash": "b764a970e75e086ad7602bcbbf573701847d068745311ca4e4316cdccf77dc03"
+    },
+    "react": {
+      "source": "vercel-labs/json-render",
+      "sourceType": "github",
+      "computedHash": "67d6daabd85c23cc58eeabea56f25b899723932dfb69c55ddae4990b43c918d2"
+    },
+    "react-best-practices": {
+      "source": "mastra-ai/mastra",
+      "sourceType": "github",
+      "computedHash": "78115cffdf4f10d6984325376bd1ba3be93313370bf7ebe0c334b43f1f07e599"
+    },
+    "react-modernization": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "11facc88acf2a1920b9b77d88e7efa109a00577dbf37d1adefca549eb3244d6c"
+    },
+    "react-patterns": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "39efd5a63422c248827fbb98df5df13f696c9c7b877c7cafe85ac60396018280"
+    },
+    "react-state-management": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "7c63f9bf6ce2e2884b2da61e899a2701068b53ef6e87fc29e3c04a199e3092cb"
+    },
+    "react-ui-patterns": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "6cf16ff01d66cf827c99ea0fdd215e6f2a62b1999737baabc4a85fb8e28adf94"
+    },
+    "react-use": {
+      "source": "hairyf/skills",
+      "sourceType": "github",
+      "computedHash": "993175d15aef1166cd23b2c7b7988ddd07e89113f5b8c6ca134b3e5867e43bd8"
+    },
+    "react-useeffect": {
+      "source": "softaworks/agent-toolkit",
+      "sourceType": "github",
+      "computedHash": "8c24990b50f431a570f3ad1f60632dee154431861547103047f6ce80092ca734"
+    },
+    "react:components": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "computedHash": "01a94f035a1c3a1a405f611c0df212433d8973f18bf16e94540875ec58ee7b9b"
+    },
+    "scrum-master": {
+      "source": "aj-geddes/claude-code-bmad-skills",
+      "sourceType": "github",
+      "computedHash": "69ba694f8c117c04cc2dc1df7698fc8dd55183c2097b3cea130502a7d527b238"
+    },
+    "skill-creator": {
+      "source": "composiohq/skills",
+      "sourceType": "github",
+      "computedHash": "a096b9af85c9d954374ebe3f7a23b5b7737ed3f35fe2a8f5893742c4e00dba1c"
+    },
+    "tailwind-design-system": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "988d80e52c67c3692d43cc963b6a048a239895e88b272b061de55370d0f8efc3"
+    },
+    "tailwindcss-development": {
+      "source": "laravel/boost",
+      "sourceType": "github",
+      "computedHash": "f1d29fcdfb77f72e8f25b157793c2d879e0d6a87199ea976dde60e05e3146799"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "0a413bf988d06481f69bb81df2070741c3ba12dd9f1be2706d57f259c905992d"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "ca7b0c0c6e5f2750043f7f0cd72d16ac4e2abc48f9b5500d047a4b77a2506212"
+    },
+    "vercel-react-view-transitions": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "c8952fc9127fa0564d0cb71dccb4215a5608ac933b5831104f09173a97a46f85"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+    }
+  }
+}

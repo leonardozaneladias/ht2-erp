@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "bmewburn.vscode-intelephense-client",
+    "esbenp.prettier-vscode",
+    "onecentlin.laravel-blade",
+    "shufo.vscode-blade-formatter",
+    "bradlc.vscode-tailwindcss",
+    "amiralizadeh9480.laravel-extra-intellisense",
+    "calebporzio.better-phpunit",
+    "mikestead.dotenv",
+    "editorconfig.editorconfig",
+    "xdebug.php-debug",
+    "open-southeners.laravel-pint",
+    "dbaeumer.vscode-eslint",
+    "naoray.laravel-goto-components"
+  ]
+}

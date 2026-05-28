@@ -1,0 +1,28 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[php]": {
+    "editor.defaultFormatter": "open-southeners.laravel-pint"
+  },
+  "[blade]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "*.blade.php": "blade"
+  },
+  "tailwindCSS.includeLanguages": {
+    "blade": "html"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["@apply\\s+([^;]*)", "([\\w-/:]+)"],
+    ["class=\"([^\"]*?)\"", "([\\w-/:]+)"]
+  ],
+  "emmet.includeLanguages": {
+    "blade": "html"
+  },
+  "php.validate.executablePath": "",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "makefile.configureOnOpen": false
+}
