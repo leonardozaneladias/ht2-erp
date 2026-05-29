@@ -11,14 +11,14 @@ status: accepted
 
 ## Contexto e problema
 
-A aplicação envolve valores financeiros críticos: preço de produto, valor de um pedido, parcelas, pagamentos, snapshot comercial, reembolso. Representar dinheiro como `float` em PHP/Postgres gera arredondamentos imprecisos (`0.1 + 0.2 !== 0.3`), disputas em centavos e problemas em cálculo de parcelas (`1299 / 10` em float vira `129.89999...`).
+Aplicações administrativas frequentemente lidam com valores monetários críticos (totais de transação, divisões proporcionais, conciliação financeira). Representar dinheiro como `float` em PHP/Postgres gera arredondamentos imprecisos (`0.1 + 0.2 !== 0.3`), disputas em centavos e problemas em divisões com resto (`1299 / 10` em float vira `129.89999...`).
 
 ## Drivers da decisão
 
 - Exatidão: não se aceita 1 centavo errado em 10.000.
-- Cálculo de parcelamento (divisão, resto, ajuste da última parcela).
-- Auditoria: soma de parcelas deve bater com o total exato.
-- Compatibilidade com sistemas de pagamento, que normalmente esperam o valor em centavos (inteiro).
+- Operações de divisão e ajuste de resto (rateio, parcelamento).
+- Auditoria: soma de partes deve bater com o total exato.
+- Compatibilidade com gateways e sistemas de pagamento, que normalmente esperam valor em centavos (inteiro).
 - Serialização JSON estável (número inteiro é determinístico).
 
 ## Alternativas consideradas

@@ -40,6 +40,36 @@ Seeders criam `admin@example.com` / `password` (super-admin) e `gestor@example.c
 
 ---
 
+## 🆕 Iniciar projeto novo a partir deste boilerplate
+
+Use o script de inicialização para renomear marca / banco / Horizon / Pulse num único passo:
+
+```bash
+./bin/init-project.sh           # interativo
+./bin/init-project.sh --dry-run # mostra o que mudaria sem editar
+```
+
+O script pergunta nome do projeto, slug e domínio de e-mail e aplica em `composer.json`, `package.json`, `.env.example`, `.env`, `README.md`, `CLAUDE.md`, `AGENTS.md`. Depois oferece (com confirmação) reset de `CHANGELOG.md`, `.claude/memory-log.md`, `docs/superpowers/plans|specs/` e reinicialização do git history.
+
+---
+
+## Depois do setup — primeiros passos
+
+1. Acesse **`http://localhost/admin/login`** com `admin@example.com` / `password`.
+2. Confira o **módulo de referência do stack** em `/admin/usuarios`, `/admin/perfis` e `/admin/auditoria` — implementação completa de FormRequest/Service/Action/DTO/Policy/Livewire/Activity Log que serve de molde para novos módulos.
+3. Para criar seu próprio módulo, siga o passo-a-passo em [CLAUDE.md §16](CLAUDE.md#16-iniciando-um-novo-projeto-com-este-boilerplate).
+
+Arquivos-chave do módulo de referência:
+
+- `app/Services/Admin/AdminUserService.php` (Service não recebe Request)
+- `app/Actions/Admin/CreateAdminUserAction.php` (Action atômica)
+- `app/DTOs/Admin/AdminUserDTO.php` (DTO readonly)
+- `app/Policies/AdminUserPolicy.php` (Policy registrada em `AppServiceProvider`)
+- `app/Livewire/Admin/Usuarios/{Index,Form}Usuarios.php` (UI Livewire 4)
+- `tests/Feature/Admin/Usuarios/*.php` (5 testes Pest)
+
+---
+
 ## URLs locais (Docker)
 
 | O quê     | URL                      |
@@ -84,6 +114,7 @@ Mensagens de commit seguem **Conventional Commits** (`tipo(escopo): descrição 
 | [docs/template/INSPINIA/CATALOGO-COMPONENTES.md](docs/template/INSPINIA/CATALOGO-COMPONENTES.md) | Catálogo de componentes Blade (fonte de verdade) |
 | [docs/devops/conventions.md](docs/devops/conventions.md)                    | Convenções de código e Git                  |
 | [docs/devops/infra.md](docs/devops/infra.md)                                | Ambiente Docker, Makefile, URLs             |
+| [bin/init-project.sh](bin/init-project.sh)                                  | Script de inicialização para novo projeto   |
 
 ---
 

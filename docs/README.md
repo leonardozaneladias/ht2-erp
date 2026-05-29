@@ -16,3 +16,4 @@ Hub da documentação do boilerplate Laravel Admin (Inspinia + Livewire). O cont
 1. **Criar um componente/tela** → [`template/INSPINIA/CATALOGO-COMPONENTES.md`](template/INSPINIA/CATALOGO-COMPONENTES.md)
 2. **Decisões de arquitetura** → [`architecture/index.md`](architecture/index.md)
 3. **Ambiente local e operação** → [`devops/index.md`](devops/index.md)
+4. **Exemplo de referência do stack** → módulo Usuários Admin em `app/Livewire/Admin/Usuarios/`, `app/Services/Admin/AdminUserService.php`, `app/Actions/Admin/*Action.php` (mostra FormRequest + Service + Action + DTO + Policy + Livewire + Activity Log + testes Pest aplicados juntos)
