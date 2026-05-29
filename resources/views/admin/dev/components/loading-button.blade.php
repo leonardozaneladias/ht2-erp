@@ -8,7 +8,7 @@
         <x-shared.card title="Variações" subtitle="Mesmo contrato visual de x-shared.button">
             <div class="grid gap-4 md:grid-cols-2">
                 @foreach ([
-                    ['variant' => 'primary', 'label' => 'Salvar contrato', 'target' => 'salvarContrato', 'icon' => 'tabler--device-floppy'],
+                    ['variant' => 'primary', 'label' => 'Salvar registro', 'target' => 'salvarRegistro', 'icon' => 'tabler--device-floppy'],
                     ['variant' => 'danger', 'label' => 'Cancelar parcela', 'target' => 'cancelarParcela', 'icon' => 'tabler--ban'],
                     ['variant' => 'default', 'label' => 'Gerar relatório', 'target' => 'gerarRelatorio', 'icon' => 'tabler--file-export', 'appearance' => 'outline'],
                     ['variant' => 'success', 'label' => 'Aplicar reajuste', 'target' => 'aplicarReajuste', 'icon' => 'tabler--sparkles'],

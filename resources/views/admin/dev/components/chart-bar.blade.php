@@ -1,23 +1,23 @@
 @extends ('admin.dev.components.shell', [
     'title' => 'Preview • x-admin.chart-bar',
-    'description' => 'Wrapper ApexCharts horizontal para comparação entre contratos, cursos e outras categorias ranqueadas.',
+    'description' => 'Wrapper ApexCharts horizontal para comparação entre registros, categorias e outras dimensões ranqueadas.',
 ])
 
 @section ('preview')
     <div class="grid gap-6 xl:grid-cols-2">
         <x-admin.chart-bar
-            title="Top contratos por adesões"
+            title="Top equipes por adesões"
             subtitle="Comparativo horizontal com cor única"
-            :categories="['UNESP 2026', 'USP 2026', 'UNICAMP 2026', 'FMU 2025', 'FMU 2026']"
+            :categories="['Equipe Comercial', 'Equipe de Suporte', 'Equipe de Operações', 'Equipe Financeira', 'Equipe Diretoria']"
             :series="[['name' => 'Adesões', 'data' => [120, 85, 60, 40, 30]]]"
         >
             <p>Ideal para rankings curtos em dashboard e relatórios rápidos.</p>
         </x-admin.chart-bar>
 
         <x-admin.chart-bar
-            title="Cursos com maior renovação"
+            title="Categorias com maior renovação"
             subtitle="Exemplo com ação no header"
-            :categories="['Direito', 'Medicina', 'ADM', 'Engenharia', 'Odonto']"
+            :categories="['Comercial', 'Suporte', 'Operações', 'Financeiro', 'Diretoria']"
             :series="[['name' => 'Renovações', 'data' => [74, 66, 58, 49, 41]]]"
             :colors="['--color-info']"
         >

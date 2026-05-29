@@ -40,8 +40,8 @@
                 <x-shared.select
                     name="agrupamento_relatorio"
                     label="Agrupar por"
-                    :options="['contrato' => 'Contrato', 'curso' => 'Curso', 'turma' => 'Turma']"
-                    value="turma"
+                    :options="['registro' => 'Registro', 'categoria' => 'Categoria', 'equipe' => 'Equipe']"
+                    value="equipe"
                     hint="Listas longas devem migrar para x-shared.select-search no Batch 5."
                 />
             </div>

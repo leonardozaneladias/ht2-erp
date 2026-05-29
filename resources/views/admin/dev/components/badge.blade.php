@@ -20,17 +20,17 @@
         <x-shared.card title="Exemplo de listagem" subtitle="Badges em um cenário próximo ao domínio">
             <div class="space-y-3">
                 @foreach ([
-                    ['Contrato ADM-2026-01', 'Ativo', 'success'],
-                    ['Contrato ADM-2026-02', 'Sem reajuste', 'warning'],
-                    ['Contrato ADM-2026-03', 'Inativo', 'default'],
-                    ['Contrato ADM-2026-04', 'Bloqueado', 'danger'],
+                    ['Registro ADM-2026-01', 'Ativo', 'success'],
+                    ['Registro ADM-2026-02', 'Sem reajuste', 'warning'],
+                    ['Registro ADM-2026-03', 'Inativo', 'default'],
+                    ['Registro ADM-2026-04', 'Bloqueado', 'danger'],
                 ] as [$codigo, $status, $variant])
                     <div
                         class="border-default-300 bg-light/30 flex items-center justify-between rounded-lg border px-4 py-3"
                     >
                         <div>
                             <p class="text-body-color font-medium">{{ $codigo }}</p>
-                            <p class="text-default-400 text-sm">Turma de Direito • 148 formandos</p>
+                            <p class="text-default-400 text-sm">Equipe Comercial • 148 usuários</p>
                         </div>
 
                         <x-shared.badge :variant="$variant" pill> {{ $status }} </x-shared.badge>

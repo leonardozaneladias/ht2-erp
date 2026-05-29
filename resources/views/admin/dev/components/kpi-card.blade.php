@@ -7,7 +7,7 @@
     <div class="grid gap-6">
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <x-admin.kpi-card
-                label="Contratos Ativos"
+                label="Registros Ativos"
                 value="28"
                 icon="tabler--file-text"
                 color="primary"
@@ -16,7 +16,7 @@
             />
 
             <x-admin.kpi-card
-                label="Formandos Aderidos"
+                label="Usuários Aderidos"
                 value="1.284"
                 icon="tabler--users"
                 color="success"

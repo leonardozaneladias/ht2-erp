@@ -40,12 +40,12 @@
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso real do domínio" subtitle="Meta de adesão por contrato no dashboard">
+        <x-shared.card title="Caso real do domínio" subtitle="Meta de adesão por registro no dashboard">
             <div class="space-y-4">
                 @foreach ([
-                    ['codigo' => 'MED-2027', 'instituicao' => 'Univale', 'meta' => 120, 'aderidos' => 101],
-                    ['codigo' => 'ODT-2026', 'instituicao' => 'Facisa', 'meta' => 90, 'aderidos' => 48],
-                    ['codigo' => 'DIR-2028', 'instituicao' => 'Iesplan', 'meta' => 140, 'aderidos' => 39],
+                    ['codigo' => 'PED-2027', 'empresa' => 'Acme S.A.', 'meta' => 120, 'aderidos' => 101],
+                    ['codigo' => 'PED-2026', 'empresa' => 'Soluções Tech', 'meta' => 90, 'aderidos' => 48],
+                    ['codigo' => 'PED-2028', 'empresa' => 'Logix Brasil', 'meta' => 140, 'aderidos' => 39],
                 ] as $item)
                     @php
                         $pct = $item['meta'] > 0 ? ($item['aderidos'] / $item['meta']) * 100 : 0;
@@ -55,7 +55,7 @@
                     >
                         <div>
                             <p class="text-body-color text-sm font-semibold">{{ $item['codigo'] }}</p>
-                            <p class="text-default-400 text-xs">{{ $item['instituicao'] }}</p>
+                            <p class="text-default-400 text-xs">{{ $item['empresa'] }}</p>
                         </div>
                         <div>
                             <p class="text-2xs text-default-400 tracking-[0.18em] uppercase">Meta</p>

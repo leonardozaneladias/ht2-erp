@@ -10,11 +10,11 @@
                 <div class="border-default-300 bg-card rounded-2xl border border-dashed">
                     <x-shared.empty-state
                         icon="tabler--file-text"
-                        title="Nenhum contrato cadastrado"
-                        description="Comece criando seu primeiro contrato para vincular formandos e abrir o fluxo de adesão."
+                        title="Nenhum registro cadastrado"
+                        description="Comece criando seu primeiro registro para vincular usuários e abrir o fluxo de adesão."
                     >
                         <x-slot:action>
-                            <x-shared.button variant="primary" icon="tabler--plus">Novo contrato</x-shared.button>
+                            <x-shared.button variant="primary" icon="tabler--plus">Novo registro</x-shared.button>
                         </x-slot:action>
                     </x-shared.empty-state>
                 </div>
@@ -42,12 +42,12 @@
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso de domínio" subtitle="Aba vazia da ficha do formando">
+        <x-shared.card title="Caso de domínio" subtitle="Aba vazia da ficha do usuário">
             <div class="border-default-300 bg-light/40 rounded-2xl border p-4">
                 <div class="border-default-300 mb-4 flex items-center justify-between border-b pb-3">
                     <div>
                         <p class="text-body-color font-semibold">Termos aceitos</p>
-                        <p class="text-default-400 text-sm">Histórico jurídico do formando</p>
+                        <p class="text-default-400 text-sm">Histórico jurídico do usuário</p>
                     </div>
 
                     <x-shared.badge variant="default" pill>0 registros</x-shared.badge>
@@ -57,7 +57,7 @@
                     size="sm"
                     icon="tabler--file-off"
                     title="Sem termos aceitos"
-                    description="Os aceites do portal aparecerão aqui assim que o aluno concluir a assinatura digital."
+                    description="Os aceites do portal aparecerão aqui assim que o usuário concluir a assinatura digital."
                 />
             </div>
         </x-shared.card>

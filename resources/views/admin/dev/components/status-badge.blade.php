@@ -57,12 +57,12 @@
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso de domínio" subtitle="Resumo financeiro do formando">
+        <x-shared.card title="Caso de domínio" subtitle="Resumo financeiro do usuário">
             <div class="border-default-300 bg-card rounded-2xl border p-4">
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <p class="text-body-color text-lg font-semibold">Amanda Costa</p>
-                        <p class="text-default-400 text-sm">Turma ADM-2026-01</p>
+                        <p class="text-default-400 text-sm">Equipe ADM-2026-01</p>
                     </div>
 
                     <x-shared.status-badge

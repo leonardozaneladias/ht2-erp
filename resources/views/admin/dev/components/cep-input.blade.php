@@ -20,7 +20,7 @@
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso de domínio" subtitle="Instituição e endereço do formando">
+        <x-shared.card title="Caso de domínio" subtitle="Empresa e endereço do usuário">
             <div class="border-default-300 bg-light/40 rounded-2xl border p-4">
                 <x-shared.cep-input
                     name="cep_sede"

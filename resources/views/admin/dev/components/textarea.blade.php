@@ -10,11 +10,11 @@
                 <x-shared.textarea
                     name="observacoes"
                     label="Observações"
-                    hint="Use este campo para registrar combinações importantes do contrato."
+                    hint="Use este campo para registrar combinações importantes do registro."
                 />
 
                 <x-shared.textarea name="descricao_produto" label="Descrição do produto" rows="6">
-                    Pacote com cobertura fotográfica, filmagem, álbum premium e entrega escalonada por turma.
+                    Plano com cobertura completa, suporte premium e entrega escalonada por equipe.
                 </x-shared.textarea>
             </div>
         </x-shared.card>
@@ -30,8 +30,8 @@
                 />
 
                 <x-shared.textarea name="mensagem_boas_vindas" label="Mensagem de boas-vindas do portal" rows="4">
-                    Bem-vindo ao portal do formando. Aqui você acompanha pagamentos, documentos e novidades da sua
-                    turma.</x-shared.textarea
+                    Bem-vindo ao portal do cliente. Aqui você acompanha pagamentos, documentos e novidades da sua
+                    equipe.</x-shared.textarea
                 >
             </div>
         </x-shared.card>

@@ -9,13 +9,13 @@
 >
     <x-slot:actions>
         <x-shared.button variant="default" appearance="outline" icon="tabler--download"> CSV </x-shared.button>
-        <x-shared.button variant="primary" icon="tabler--plus"> Novo contrato </x-shared.button>
+        <x-shared.button variant="primary" icon="tabler--plus"> Novo registro </x-shared.button>
     </x-slot:actions>
 
     <div class="grid gap-6">
         <x-shared.card title="Breadcrumbs customizados" subtitle="Uso direto do componente">
             <x-admin.page-header
-                title="Editar contrato"
+                title="Editar registro"
                 :breadcrumbs="[
                     ['label' => 'Admin', 'url' => route('admin.dashboard')],
                     ['label' => 'Cadastros'],

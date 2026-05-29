@@ -40,15 +40,15 @@
                 class="border-default-300 bg-light/30 flex flex-col gap-4 rounded-lg border p-4 md:flex-row md:items-center md:justify-between"
             >
                 <div>
-                    <p class="text-body-color font-semibold">Contratos</p>
-                    <p class="text-default-400 text-sm">Listagem consolidada das turmas ativas e em negociação.</p>
+                    <p class="text-body-color font-semibold">Registros</p>
+                    <p class="text-default-400 text-sm">Listagem consolidada das equipes ativas e em negociação.</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2">
                     <x-shared.button variant="default" appearance="outline" icon="tabler--download">
                         CSV
                     </x-shared.button>
-                    <x-shared.button variant="primary" icon="tabler--plus"> Novo contrato </x-shared.button>
+                    <x-shared.button variant="primary" icon="tabler--plus"> Novo registro </x-shared.button>
                 </div>
             </div>
         </x-shared.card>

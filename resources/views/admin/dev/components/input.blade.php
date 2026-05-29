@@ -17,7 +17,7 @@
                 />
                 <x-shared.input
                     name="meta"
-                    label="Meta de formandos"
+                    label="Meta de usuários"
                     type="number"
                     hint="Campo opcional para acompanhamento comercial"
                 />
@@ -25,13 +25,13 @@
                     name="slug"
                     label="Slug público"
                     icon="tabler--link"
-                    placeholder="campanha-formatura-2026"
-                    value="campanha-formatura-2026"
+                    placeholder="campanha-2026"
+                    value="campanha-2026"
                 />
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso de domínio" subtitle="Cadastro de instituição">
+        <x-shared.card title="Caso de domínio" subtitle="Cadastro de empresa">
             <div class="grid gap-4 md:grid-cols-2">
                 <x-shared.input name="razao_social" label="Razão Social" value="Empresa Exemplo LTDA" required />
                 <x-shared.input name="nome_fantasia" label="Nome Fantasia" value="Sistema Admin" required />

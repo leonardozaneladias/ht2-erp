@@ -44,7 +44,7 @@
             />
         </x-shared.card>
 
-        <x-shared.card title="Estado vazio" subtitle="Fallback para contratos sem regras cadastradas">
+        <x-shared.card title="Estado vazio" subtitle="Fallback para registros sem regras cadastradas">
             <x-admin.timeline-table
                 :programacoes="[]"
                 empty-message="Nenhuma programação de valor foi configurada ainda."

@@ -8,11 +8,11 @@
         <x-shared.card title="Variações principais" subtitle="Soft, solid, com título e dismissible">
             <div class="space-y-4">
                 <x-shared.alert variant="success">
-                    Contrato criado com sucesso e pronto para receber programações.
+                    Registro criado com sucesso e pronto para receber programações.
                 </x-shared.alert>
 
                 <x-shared.alert variant="warning" title="Configuração pendente">
-                    Esta turma ainda não possui programação ativa para boleto e PIX.
+                    Esta equipe ainda não possui programação ativa para boleto e PIX.
                 </x-shared.alert>
 
                 <x-shared.alert variant="danger" dismissible>
@@ -27,8 +27,8 @@
 
         <x-shared.card title="Exemplo de domínio" subtitle="Alertas do dashboard administrativo">
             <div class="space-y-4">
-                <x-shared.alert variant="warning" title="Contratos sem programação ativa">
-                    Existem <strong>4 contratos</strong> sem programação vigente.
+                <x-shared.alert variant="warning" title="Registros sem programação ativa">
+                    Existem <strong>4 registros</strong> sem programação vigente.
                     <a href="#!">Revisar agora</a>
                 </x-shared.alert>
 

@@ -5,16 +5,16 @@
 
 @php
     $contracts = [
-        ['id' => 1, 'codigo' => 'MED-2027', 'turma' => 'Medicina 2027', 'instituicao' => 'Univale', 'conclusao' => '20/12/2027', 'aderidos' => 84, 'status' => ['label' => 'Ativo', 'variant' => 'success']],
-        ['id' => 2, 'codigo' => 'ODT-2026', 'turma' => 'Odontologia 2026', 'instituicao' => 'Facisa', 'conclusao' => '10/07/2026', 'aderidos' => 46, 'status' => ['label' => 'Em revisão', 'variant' => 'warning']],
-        ['id' => 3, 'codigo' => 'DIR-2028', 'turma' => 'Direito 2028', 'instituicao' => 'Iesplan', 'conclusao' => '15/11/2028', 'aderidos' => 118, 'status' => ['label' => 'Planejado', 'variant' => 'info']],
-        ['id' => 4, 'codigo' => 'ENG-2026', 'turma' => 'Engenharia Civil 2026', 'instituicao' => 'Unitins', 'conclusao' => '05/08/2026', 'aderidos' => 29, 'status' => ['label' => 'Inativo', 'variant' => 'default']],
+        ['id' => 1, 'codigo' => 'PED-2027', 'equipe' => 'Equipe Comercial', 'empresa' => 'Acme S.A.', 'conclusao' => '20/12/2027', 'aderidos' => 84, 'status' => ['label' => 'Ativo', 'variant' => 'success']],
+        ['id' => 2, 'codigo' => 'PED-2026', 'equipe' => 'Equipe de Suporte', 'empresa' => 'Soluções Tech', 'conclusao' => '10/07/2026', 'aderidos' => 46, 'status' => ['label' => 'Em revisão', 'variant' => 'warning']],
+        ['id' => 3, 'codigo' => 'PED-2028', 'equipe' => 'Equipe de Operações', 'empresa' => 'Logix Brasil', 'conclusao' => '15/11/2028', 'aderidos' => 118, 'status' => ['label' => 'Planejado', 'variant' => 'info']],
+        ['id' => 4, 'codigo' => 'PED-2026B', 'equipe' => 'Equipe Financeira', 'empresa' => 'Northwind', 'conclusao' => '05/08/2026', 'aderidos' => 29, 'status' => ['label' => 'Inativo', 'variant' => 'default']],
     ];
 
     $installments = [
-        ['id' => 1101, 'formando' => 'Ana Luiza Prado', 'parcela' => '03/12', 'valor' => 'R$ 420,00', 'vencimento' => '08/04/2026', 'status' => ['label' => 'Pendente', 'variant' => 'warning']],
-        ['id' => 1102, 'formando' => 'Bruno Henrique Melo', 'parcela' => '07/10', 'valor' => 'R$ 310,00', 'vencimento' => '15/04/2026', 'status' => ['label' => 'Vencida', 'variant' => 'danger']],
-        ['id' => 1103, 'formando' => 'Carolina Nunes', 'parcela' => '01/08', 'valor' => 'R$ 580,00', 'vencimento' => '22/04/2026', 'status' => ['label' => 'Paga', 'variant' => 'success']],
+        ['id' => 1101, 'usuario' => 'Ana Luiza Prado', 'parcela' => '03/12', 'valor' => 'R$ 420,00', 'vencimento' => '08/04/2026', 'status' => ['label' => 'Pendente', 'variant' => 'warning']],
+        ['id' => 1102, 'usuario' => 'Bruno Henrique Melo', 'parcela' => '07/10', 'valor' => 'R$ 310,00', 'vencimento' => '15/04/2026', 'status' => ['label' => 'Vencida', 'variant' => 'danger']],
+        ['id' => 1103, 'usuario' => 'Carolina Nunes', 'parcela' => '01/08', 'valor' => 'R$ 580,00', 'vencimento' => '22/04/2026', 'status' => ['label' => 'Paga', 'variant' => 'success']],
     ];
 @endphp
 
@@ -24,8 +24,8 @@
             <x-admin.data-table
                 :columns="[
                     ['label' => 'Código'],
-                    ['label' => 'Turma'],
-                    ['label' => 'Instituição'],
+                    ['label' => 'Equipe'],
+                    ['label' => 'Empresa'],
                     ['label' => 'Conclusão', 'type' => 'date'],
                     ['label' => 'Aderidos'],
                     ['label' => 'Status', 'searchable' => false],
@@ -36,7 +36,7 @@
                 date-range
             >
                 <x-slot:toolbar>
-                    <x-shared.badge variant="info" solid>4 contratos</x-shared.badge>
+                    <x-shared.badge variant="info" solid>4 registros</x-shared.badge>
                     <x-shared.button variant="default" appearance="outline" size="sm" icon="tabler--refresh">
                         Atualizar base
                     </x-shared.button>
@@ -45,8 +45,8 @@
                 @foreach ($contracts as $contract)
                     <tr>
                         <td>{{ $contract['codigo'] }}</td>
-                        <td>{{ $contract['turma'] }}</td>
-                        <td>{{ $contract['instituicao'] }}</td>
+                        <td>{{ $contract['equipe'] }}</td>
+                        <td>{{ $contract['empresa'] }}</td>
                         <td>{{ $contract['conclusao'] }}</td>
                         <td>{{ $contract['aderidos'] }}</td>
                         <td>
@@ -81,7 +81,7 @@
         <x-shared.card title="Seleção em lote" subtitle="Bulk actions dentro do contrato do próprio data-table">
             <x-admin.data-table
                 :columns="[
-                    ['label' => 'Formando'],
+                    ['label' => 'Usuário'],
                     ['label' => 'Parcela'],
                     ['label' => 'Valor'],
                     ['label' => 'Vencimento', 'type' => 'date'],
@@ -106,7 +106,7 @@
                                 data-af-datatable-row-select
                             />
                         </td>
-                        <td>{{ $installment['formando'] }}</td>
+                        <td>{{ $installment['usuario'] }}</td>
                         <td>{{ $installment['parcela'] }}</td>
                         <td>{{ $installment['valor'] }}</td>
                         <td>{{ $installment['vencimento'] }}</td>

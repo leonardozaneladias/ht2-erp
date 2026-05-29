@@ -8,31 +8,31 @@
         <x-shared.card title="Variações principais" subtitle="Single, grouped e multiple">
             <div class="grid gap-4 md:grid-cols-2">
                 <x-shared.select-search
-                    name="instituicao_id"
-                    label="Instituição"
+                    name="empresa_id"
+                    label="Empresa"
                     :options="[
-                        1 => 'UNESP • Engenharia 2026',
-                        2 => 'USP • Medicina 2026',
-                        3 => 'PUC • Direito 2026',
+                        1 => 'Acme S.A. • Comercial 2026',
+                        2 => 'Soluções Tech • Suporte 2026',
+                        3 => 'Logix Brasil • Operações 2026',
                     ]"
                     value="2"
                     required
                 />
 
                 <x-shared.select-search
-                    name="curso_id"
-                    label="Curso por área"
+                    name="categoria_id"
+                    label="Categoria por área"
                     :options="[
-                        'Saúde' => [
-                            ['value' => 'medicina', 'label' => 'Medicina'],
-                            ['value' => 'enfermagem', 'label' => 'Enfermagem'],
+                        'Operacional' => [
+                            ['value' => 'suporte', 'label' => 'Suporte'],
+                            ['value' => 'operacoes', 'label' => 'Operações'],
                         ],
                         'Negócios' => [
-                            ['value' => 'adm', 'label' => 'Administração'],
-                            ['value' => 'contabeis', 'label' => 'Ciências Contábeis'],
+                            ['value' => 'comercial', 'label' => 'Comercial'],
+                            ['value' => 'financeiro', 'label' => 'Financeiro'],
                         ],
                     ]"
-                    placeholder="Selecione um curso"
+                    placeholder="Selecione uma categoria"
                 />
             </div>
 
@@ -44,7 +44,7 @@
                         'adimplente' => 'Somente adimplentes',
                         'com_foto' => 'Com foto',
                         'com_portal' => 'Com acesso ao portal',
-                        'vip' => 'Pacote VIP',
+                        'vip' => 'Plano VIP',
                     ]"
                     :value="['adimplente', 'vip']"
                     hint="Útil em filtros avançados com poucas dezenas de opções."
@@ -53,15 +53,15 @@
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso de domínio" subtitle="Formandos e contratos">
+        <x-shared.card title="Caso de domínio" subtitle="Usuários e registros">
             <div class="border-default-300 bg-light/40 space-y-4 rounded-2xl border p-4">
                 <x-shared.select-search
-                    name="contrato_id"
-                    label="Contrato"
+                    name="registro_id"
+                    label="Registro"
                     :options="[
-                        11 => 'ADM-2026-01 • Administração Noturno',
-                        12 => 'DIR-2026-02 • Direito Integral',
-                        13 => 'MED-2026-03 • Medicina',
+                        11 => 'ADM-2026-01 • Comercial Noturno',
+                        12 => 'ADM-2026-02 • Suporte Integral',
+                        13 => 'ADM-2026-03 • Operações',
                     ]"
                     value="11"
                 />

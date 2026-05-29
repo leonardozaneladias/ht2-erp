@@ -17,14 +17,14 @@
 
             <div class="mt-5 grid gap-4">
                 <x-shared.tab-panel id="visao-geral" active>
-                    <x-shared.card title="Resumo do contrato" subtitle="Painel ativo por padrão">
+                    <x-shared.card title="Resumo do registro" subtitle="Painel ativo por padrão">
                         <div class="grid gap-4 md:grid-cols-3">
                             <div class="border-default-300 bg-light/40 rounded-2xl border p-4">
-                                <p class="text-default-400 text-sm">Turma</p>
+                                <p class="text-default-400 text-sm">Equipe</p>
                                 <p class="text-body-color mt-2 text-lg font-semibold">ADM-2026-01</p>
                             </div>
                             <div class="border-default-300 bg-light/40 rounded-2xl border p-4">
-                                <p class="text-default-400 text-sm">Formandos</p>
+                                <p class="text-default-400 text-sm">Usuários</p>
                                 <p class="text-body-color mt-2 text-lg font-semibold">183 confirmados</p>
                             </div>
                             <div class="border-default-300 bg-light/40 rounded-2xl border p-4">
@@ -40,13 +40,13 @@
                         size="sm"
                         icon="tabler--receipt-off"
                         title="Sem pagamentos conciliados"
-                        description="As conciliações deste contrato aparecerão aqui assim que o financeiro começar a processar as parcelas."
+                        description="As conciliações deste registro aparecerão aqui assim que o financeiro começar a processar as parcelas."
                     />
                 </x-shared.tab-panel>
 
                 <x-shared.tab-panel id="documentos">
                     <x-shared.alert variant="info" title="Snapshot documental">
-                        O termo atual, comprovantes e contratos versionados ficam centralizados nesta aba.
+                        O termo atual, comprovantes e registros versionados ficam centralizados nesta aba.
                     </x-shared.alert>
                 </x-shared.tab-panel>
 

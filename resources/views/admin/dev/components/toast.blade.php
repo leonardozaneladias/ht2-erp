@@ -23,10 +23,10 @@
         <x-shared.card title="Disparos rápidos" subtitle="As ações abaixo usam o helper real do lote">
             <div class="grid gap-4 md:grid-cols-2">
                 @foreach ([
-                    ['variant' => 'success', 'label' => 'Sucesso', 'title' => 'Contrato atualizado', 'message' => 'Os dados foram salvos e a turma foi sincronizada.'],
+                    ['variant' => 'success', 'label' => 'Sucesso', 'title' => 'Registro atualizado', 'message' => 'Os dados foram salvos e a equipe foi sincronizada.'],
                     ['variant' => 'danger', 'label' => 'Erro', 'title' => 'Falha no gateway', 'message' => 'Não foi possível reemitir o boleto agora.'],
                     ['variant' => 'warning', 'label' => 'Atenção', 'title' => 'Reajuste pendente', 'message' => 'Existem 12 parcelas aguardando confirmação.'],
-                    ['variant' => 'info', 'label' => 'Informação', 'title' => 'Importação em andamento', 'message' => 'Os novos formandos aparecerão assim que o job terminar.'],
+                    ['variant' => 'info', 'label' => 'Informação', 'title' => 'Importação em andamento', 'message' => 'Os novos usuários aparecerão assim que o job terminar.'],
                 ] as $example)
                     <div class="border-default-300 bg-light/40 rounded-2xl border p-4">
                         <p class="text-body-color mb-3 text-sm font-medium">{{ $example['title'] }}</p>

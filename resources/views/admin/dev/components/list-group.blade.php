@@ -5,7 +5,7 @@
 
 @section ('preview')
     <div class="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <x-shared.card title="Dados estruturados" subtitle="Ficha compacta do formando">
+        <x-shared.card title="Dados estruturados" subtitle="Ficha compacta do usuário">
             <x-shared.list-group>
                 <x-shared.list-group-item>
                     <div class="flex items-center justify-between gap-3">
@@ -15,8 +15,8 @@
                 </x-shared.list-group-item>
                 <x-shared.list-group-item>
                     <div class="flex items-center justify-between gap-3">
-                        <span class="text-default-400">Curso</span>
-                        <span class="text-body-color">Odontologia</span>
+                        <span class="text-default-400">Equipe</span>
+                        <span class="text-body-color">Suporte</span>
                     </div>
                 </x-shared.list-group-item>
                 <x-shared.list-group-item>

@@ -1,6 +1,6 @@
 @extends ('admin.dev.components.shell', [
     'title' => 'Preview • x-admin.chart-column',
-    'description' => 'Wrapper ApexCharts vertical para adesões por mês, receita por contrato e séries temporais com eixo X categórico.',
+    'description' => 'Wrapper ApexCharts vertical para adesões por mês, receita por registro e séries temporais com eixo X categórico.',
 ])
 
 @section ('preview')
@@ -13,8 +13,8 @@
         />
 
         <x-admin.chart-column
-            title="Receita por contrato"
-            subtitle="Top 6 contratos do trimestre"
+            title="Receita por registro"
+            subtitle="Top 6 registros do trimestre"
             :categories="['AF-001', 'AF-014', 'AF-025', 'AF-031', 'AF-040', 'AF-052']"
             :series="[['name' => 'Receita', 'data' => [42000, 38500, 36200, 31800, 27600, 24100]]]"
             :colors="['--color-warning']"

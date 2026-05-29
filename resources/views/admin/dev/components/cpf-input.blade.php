@@ -5,9 +5,9 @@
 
 @section ('preview')
     <div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <x-shared.card title="Casos comuns" subtitle="Formandos e responsáveis">
+        <x-shared.card title="Casos comuns" subtitle="Usuários e responsáveis">
             <div class="space-y-4">
-                <x-shared.cpf-input name="cpf_formando" label="CPF do formando" value="12345678901" required />
+                <x-shared.cpf-input name="cpf_usuario" label="CPF do usuário" value="12345678901" required />
                 <x-shared.cpf-input name="cpf_responsavel" label="CPF do responsável" value="98765432100" />
             </div>
         </x-shared.card>

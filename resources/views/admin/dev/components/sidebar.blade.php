@@ -18,7 +18,7 @@
         <x-shared.card title="O que validar" subtitle="Navegação lateral fixa">
             <ul class="text-default-400 space-y-2 text-sm">
                 <li>Seções em PT-BR alinhadas ao PRD e ao mapa de telas.</li>
-                <li>Accordion em 2 níveis para Contratos, Produtos, Formandos, Financeiro e Configurações.</li>
+                <li>Accordion em 2 níveis para Registros, Produtos, Usuários, Financeiro e Configurações.</li>
                 <li>Card do usuário com menu rápido e fallback visual para ambiente de preview.</li>
                 <li>Mesmo sem admin autenticado, o preview mostra a árvore completa para inspeção local.</li>
             </ul>

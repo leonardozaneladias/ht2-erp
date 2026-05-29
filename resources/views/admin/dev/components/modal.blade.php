@@ -14,7 +14,7 @@
                     Preview do termo
                 </x-shared.button>
                 <x-shared.button variant="danger" data-hs-overlay="#modal-excluir-preview">
-                    Excluir contrato
+                    Excluir registro
                 </x-shared.button>
             </div>
         </x-shared.card>
@@ -45,10 +45,10 @@
             <x-shared.loading-button variant="primary"> Salvar programação </x-shared.loading-button>
         </x-slot:footer>
     </x-shared.modal>
-    <x-shared.modal id="modal-preview-termo" title="Preview do Termo • Contrato Medicina 2027" size="xl">
+    <x-shared.modal id="modal-preview-termo" title="Preview do Termo • Registro PED-2027" size="xl">
         <div class="prose prose-sm text-body-color dark:prose-invert max-w-none">
             <h4>Cláusula 1. Objeto</h4>
-            <p>O presente termo regula a adesão do formando ao pacote contratado, incluindo cronograma, condições de pagamento e regras de cancelamento.</p>
+            <p>O presente termo regula a adesão do usuário ao plano contratado, incluindo cronograma, condições de pagamento e regras de cancelamento.</p>
             <h4>Cláusula 2. Vigência</h4>
             <p>As condições descritas entram em vigor em 15/04/2026 e permanecem válidas até eventual revisão formal de versão.</p>
         </div>
@@ -57,8 +57,8 @@
             <x-shared.button variant="default" data-hs-overlay="#modal-preview-termo"> Fechar </x-shared.button>
         </x-slot:footer>
     </x-shared.modal>
-    <x-shared.modal id="modal-excluir-preview" title="Excluir contrato" size="sm" static>
-        <p class="text-body-color text-sm">Tem certeza que deseja excluir o contrato <strong>MED-2027</strong>?</p>
+    <x-shared.modal id="modal-excluir-preview" title="Excluir registro" size="sm" static>
+        <p class="text-body-color text-sm">Tem certeza que deseja excluir o registro <strong>PED-2027</strong>?</p>
         <p class="text-default-400 mt-2 text-sm">Essa ação está aqui só para demonstrar um caso de modal contextual. Para prompts simples no sistema real, usar <code>x-shared.confirm-dialog</code>.</p>
 
         <x-slot:footer>

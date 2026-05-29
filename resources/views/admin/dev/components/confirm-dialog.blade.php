@@ -11,7 +11,7 @@
                     <p class="text-body-color mb-3 text-sm font-medium">Ação destrutiva</p>
 
                     <x-shared.button variant="danger" icon="tabler--trash" data-confirm-demo="destructive">
-                        Excluir contrato
+                        Excluir registro
                     </x-shared.button>
                 </div>
 
@@ -74,15 +74,15 @@
 
                 if (type === 'destructive') {
                     const result = await window.confirmDestructive({
-                        title: 'Excluir contrato?',
-                        text: 'Esta ação removerá o contrato e desvinculará os formandos associados.',
+                        title: 'Excluir registro?',
+                        text: 'Esta ação removerá o registro e desvinculará os usuários associados.',
                         confirmText: 'Sim, excluir',
                     });
 
                     if (result.isConfirmed) {
                         window.showToast({
                             variant: 'success',
-                            title: 'Contrato excluído',
+                            title: 'Registro excluído',
                             message: 'A ação foi confirmada com sucesso na preview.',
                         });
                     }
@@ -156,7 +156,7 @@
 
                 await window.alertSuccess({
                     title: 'Importação concluída',
-                    text: 'A planilha foi processada e os formandos já estão disponíveis para conferência.',
+                    text: 'A planilha foi processada e os usuários já estão disponíveis para conferência.',
                 });
             });
         });

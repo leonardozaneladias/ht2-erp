@@ -30,10 +30,10 @@
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso de domínio" subtitle="Contrato e reajuste">
+        <x-shared.card title="Caso de domínio" subtitle="Registro e reajuste">
             <div class="border-default-300 bg-light/40 space-y-4 rounded-2xl border p-4">
-                <x-shared.date-picker name="contrato_inicio" label="Início da vigência" default-date="2026-05-01" />
-                <x-shared.date-picker name="contrato_evento" label="Data do evento" default-date="2026-11-21" />
+                <x-shared.date-picker name="registro_inicio" label="Início da vigência" default-date="2026-05-01" />
+                <x-shared.date-picker name="registro_evento" label="Data do evento" default-date="2026-11-21" />
                 <x-shared.date-picker
                     name="indice_referencia"
                     label="Mês de referência"

@@ -27,7 +27,7 @@
             :body-padding="false"
         >
             <div class="divide-default-300 divide-y">
-                @foreach (['Contrato', 'Instituição', 'Evento'] as $coluna)
+                @foreach (['Registro', 'Empresa', 'Evento'] as $coluna)
                     <div class="grid grid-cols-3 gap-4 px-5 py-3 text-sm">
                         <span class="text-body-color font-medium">{{ $coluna }}</span>
                         <span class="text-default-400 col-span-2">Valor ilustrativo para preview</span>

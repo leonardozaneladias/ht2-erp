@@ -11,12 +11,12 @@
                 <x-shared.toggle
                     name="exige_responsavel"
                     label="Exige responsável de cadastro"
-                    hint="Ative para forçar responsável em contratos com formandos menores de idade."
+                    hint="Ative para forçar responsável em registros com usuários menores de idade."
                 />
             </div>
         </x-shared.card>
 
-        <x-shared.card title="Caso de domínio" subtitle="Preferências e regras do contrato">
+        <x-shared.card title="Caso de domínio" subtitle="Preferências e regras do registro">
             <div class="border-default-300 bg-light/40 space-y-4 rounded-2xl border p-4">
                 <x-shared.toggle name="envia_lembrete" label="Enviar lembrete de vencimento" checked />
                 <x-shared.toggle name="ajustar_fim_mes" label="Ajustar vencimento para fim do mês" checked />

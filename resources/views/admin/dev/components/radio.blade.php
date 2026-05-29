@@ -37,7 +37,7 @@
                     name="modalidade"
                     value="cartao"
                     label="Cartão de Crédito"
-                    description="Opção visual para quando o gateway estiver habilitado no contrato."
+                    description="Opção visual para quando o gateway estiver habilitado no registro."
                 />
             </x-shared.radio-group>
         </x-shared.card>
