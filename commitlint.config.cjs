@@ -56,7 +56,7 @@ module.exports = {
         },
         questions: {
             type: {
-                description: 'Tipo de mudança (portal ArtFinal):',
+                description: 'Tipo de mudança:',
                 enum: {
                     feat: {
                         description: 'Nova funcionalidade',

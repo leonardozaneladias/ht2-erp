@@ -1,11 +1,14 @@
 {
   "$schema": "https://getcomposer.org/schema.json",
-  "name": "laravel/laravel",
+  "name": "boilerplate/laravel-admin-inspinia",
   "type": "project",
-  "description": "The skeleton application for the Laravel framework.",
+  "description": "Boilerplate Laravel + Livewire + Inspinia para sistemas administrativos backoffice.",
   "keywords": [
     "laravel",
-    "framework"
+    "livewire",
+    "inspinia",
+    "admin",
+    "boilerplate"
   ],
   "license": "MIT",
   "require": {
