@@ -102,16 +102,20 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
         Route::get('/notificacoes', static fn (): Response => $placeholder('Preferências de Notificação'))->name('notificacoes');
     });
 
-    Route::prefix('usuarios')->name('usuarios.')->group(function () use ($placeholder): void {
-        Route::get('/', static fn (): Response => $placeholder('Usuários Admin'))->name('index');
+    Route::prefix('usuarios')->name('usuarios.')->group(function (): void {
+        Route::get('/', App\Livewire\Admin\Usuarios\IndexUsuarios::class)->name('index');
+        Route::get('/novo', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('create');
+        Route::get('/{usuario}/editar', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('edit');
     });
 
-    Route::prefix('perfis')->name('perfis.')->group(function () use ($placeholder): void {
-        Route::get('/', static fn (): Response => $placeholder('Perfis e Permissões'))->name('index');
+    Route::prefix('perfis')->name('perfis.')->group(function (): void {
+        Route::get('/', App\Livewire\Admin\Perfis\IndexPerfis::class)->name('index');
+        Route::get('/novo', App\Livewire\Admin\Perfis\FormPerfil::class)->name('create');
+        Route::get('/{perfil}/editar', App\Livewire\Admin\Perfis\FormPerfil::class)->name('edit');
     });
 
-    Route::prefix('auditoria')->name('auditoria.')->group(function () use ($placeholder): void {
-        Route::get('/', static fn (): Response => $placeholder('Logs de Auditoria'))->name('index');
+    Route::prefix('auditoria')->name('auditoria.')->group(function (): void {
+        Route::get('/', App\Livewire\Admin\Auditoria\IndexAuditoria::class)->name('index');
     });
 
     // Adicione aqui as rotas do seu módulo de negócio

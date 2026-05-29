@@ -7,6 +7,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Traits\HasRoles;
 
 class AdminUser extends Authenticatable
@@ -15,6 +17,7 @@ class AdminUser extends Authenticatable
     use HasFactory;
 
     use HasRoles;
+    use LogsActivity;
     use Notifiable;
 
     protected $table = 'admin_users';
@@ -33,6 +36,15 @@ class AdminUser extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nome', 'email', 'ativo'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->useLogName('admin_users');
+    }
 
     protected function casts(): array
     {

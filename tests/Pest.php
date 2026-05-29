@@ -48,23 +48,3 @@ expect()->extend('toBeOne', function () {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
-
-function draftTokenParaContrato(
-    App\Models\Contrato $contrato,
-    App\Models\Turma $turma,
-    App\Models\Pacote $pacote,
-    string $cpf = '123.456.789-09',
-): string {
-    $claims = new App\Data\Adesao\DraftTokenClaims(
-        contrato_ulid: $contrato->ulid,
-        turma_ulid: $turma->ulid,
-        pacote_ulid: $pacote->ulid,
-        tipo_solicitante: App\Enums\Adesao\TipoSolicitante::Proprio,
-        cpf_hash: App\Data\Adesao\DraftTokenClaims::hashCpf($cpf),
-        jti: Illuminate\Support\Str::uuid()->toString(),
-        iat: now()->timestamp,
-        exp: now()->addHours(48)->timestamp,
-    );
-
-    return app(App\Services\Adesao\DraftTokenService::class)->emit($claims);
-}
