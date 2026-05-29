@@ -145,16 +145,14 @@ resources/views/components/
 
 ### Componentes disponíveis
 
-**Admin (17):** `layout`, `auth-layout`, `sidebar`, `topbar`, `footer`, `page-header`, `drawer`,
-`data-table`, `timeline-table`, `sortable-list`, `chart-card`, `chart-bar`, `chart-line`,
-`chart-column`, `chart-pie`, `kpi-card`, `partials/theme-bootstrap`
+**Fonte de verdade:** [`docs/template/INSPINIA/CATALOGO-COMPONENTES.md`](docs/template/INSPINIA/CATALOGO-COMPONENTES.md). Sempre consulte o catálogo antes de escrever HTML — a lista evolui, e manter cópia inline aqui desincroniza rápido.
 
-**Shared (46):** `input`, `textarea`, `select`, `select-search`, `date-picker`, `date-range-picker`,
-`cpf-input`, `cnpj-input`, `cep-input`, `phone-input`, `money-input`, `password-input`,
-`password-strength-meter`, `file-upload`, `tags-input`, `checkbox`, `radio`, `toggle`,
-`card`, `button`, `badge`, `alert`, `modal`, `dropdown`, `tabs`, `accordion`, `list-group`,
-`breadcrumb`, `spinner`, `pagination`, `tooltip`, `collapse`, `toast`, `toast-container`,
-`loading-button`, `empty-state`, `status-badge`, `static-table`, `progress-bar`, `copy-button`
+Exemplos de uso comum:
+
+- Layout / chrome: `x-admin.layout`, `x-admin.auth-layout`, `x-admin.sidebar`, `x-admin.topbar`, `x-admin.page-header`, `x-admin.drawer`
+- Tabelas / dashboards: `x-admin.data-table`, `x-admin.kpi-card`, `x-admin.chart-*`
+- Formulários: `x-shared.input`, `x-shared.select`, `x-shared.toggle`, `x-shared.money-input`, `x-shared.cpf-input`, `x-shared.password-input`
+- Feedback: `x-shared.alert`, `x-shared.toast`, `x-shared.modal`, `x-shared.empty-state`
 
 ### Showcase interativo (só em local)
 
@@ -289,6 +287,14 @@ URLs locais: App `http://localhost`, Horizon `/horizon`, Pulse `/pulse`
 2. Verificar se o Service/Action já existe
 3. Criar o FormRequest ANTES do Controller
 4. Criar testes para Services críticos
+
+### Estratégia de execução
+
+Implementar em batches pequenos e controlados. Não componentizar tudo de uma vez. Pare e abra nova sessão de planejamento quando houver:
+
+- bloqueio transversal (a mudança força tocar em N módulos não relacionados);
+- conflito de API (uma assinatura proposta colide com convenção já existente);
+- necessidade de rever catálogo ou convenções (decisão estrutural não prevista).
 
 ---
 

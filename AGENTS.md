@@ -1,56 +1,37 @@
 # AGENTS.md
 
-## Contexto do projeto
+> Fonte de verdade: [`CLAUDE.md`](./CLAUDE.md). Leia primeiro.
 
-Boilerplate Laravel admin (Blade + Livewire + Inspinia, Tailwind CSS 4). Guard `admin` único, server-side, sem SPA. O template Inspinia é a base visual e a documentação em `docs/template/INSPINIA/` orienta a componentização Blade.
+## Projeto
 
-O trabalho típico é implementar componentes e telas reais com base no catálogo já consolidado, não reanalisar o template do zero.
+Boilerplate Laravel admin server-side. Guard `admin` único; Blade + Livewire 4 + Inspinia + Tailwind 4; PostgreSQL 16, Redis, Horizon, Pulse; ambiente via Docker (Laradock).
 
-## Fontes oficiais obrigatórias
+## Setup
 
-Antes de implementar qualquer componente ou tela do admin, consultar:
+`./docker-setup.sh` e depois `make up`. Login default: `admin@example.com` / `password`.
 
-- `docs/template/INSPINIA/CATALOGO-COMPONENTES.md` (fonte de verdade dos componentes)
-- `docs/template/INSPINIA/**/*.md`
-- `CLAUDE.md`
-- `docs/devops/conventions.md`
+## Comandos
 
-## Regras obrigatórias de componentização
+- `make test` — Pest
+- `make lint` — Pint + Prettier
+- `make quality` — Pint + PHPStan + Prettier + Pest
+- `make fresh` — `migrate:fresh --seed`
 
-1. Nunca escrever HTML reutilizável sem antes consultar o catálogo
-2. Se o componente já existir e estiver pronto, usar
-3. Se estiver parcial/em progresso, alinhar antes de expandir
-4. Se não existir, documentar e catalogar antes de escalar uso
-5. Preferir nesta ordem:
-    - reuso
-    - composição
-    - variação via props
-    - novo componente
-6. Páginas completas não são componentes
-7. Toda implementação deve considerar:
-    - dark mode
-    - responsividade
-    - consistência de API Blade
-    - dependências JS explícitas
-8. Toda implementação concluída deve atualizar:
-    - doc detalhada
-    - catálogo
-    - preview visual
+## Convenções
 
-## Skill a usar
+PT-BR para mensagens de UI, mensagens de commit e nomes de domínio. Inglês para identificadores de código. Detalhes em `CLAUDE.md` §4–§7.
 
-Para implementação de componentes Blade a partir da documentação já existente, usar a skill:
+## Quality gates
 
-- `skills/laravel-blade-componentization`
+Pint (PSR-12 + preset Laravel), PHPStan/Larastan nível 6, Prettier (Blade + JS + CSS), Pest.
 
-## Estratégia de execução
+## Catálogo de componentes
 
-Implementar em batches pequenos e controlados. Não componentizar tudo de uma vez.
-Parar quando houver:
+`docs/template/INSPINIA/CATALOGO-COMPONENTES.md`. Sempre verificar antes de escrever HTML novo.
 
-- bloqueio transversal
-- conflito de API
-- necessidade de rever catálogo ou convenções
+## Skill auxiliar
+
+`skills/laravel-blade-componentization` orienta o processo de componentizar HTML existente do Inspinia.
 
 ===
 
