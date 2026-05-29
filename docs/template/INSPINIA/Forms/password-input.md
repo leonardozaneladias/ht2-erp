@@ -81,13 +81,13 @@ Input de senha com **toggle de visibilidade** (olho/olho-cortado). Opcionalmente
 
 ## Exemplos de Uso
 
-### Login (14.1)
+### Login
 
 ```blade
 <x-shared.password-input name="password" label="Senha" wire:model="password" required />
 ```
 
-### Cadastro admin com força (14.18)
+### Cadastro com medidor de força
 
 ```blade
 <x-shared.password-input
@@ -109,23 +109,11 @@ Input de senha com **toggle de visibilidade** (olho/olho-cortado). Opcionalmente
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                  | Uso                           |
-| --------------------- | ----------------------------- |
-| 14.1 Login Admin      | Senha com toggle              |
-| 14.18 Usuários Admin  | Cadastro com medidor de força |
-| 14.18 Reset de senha  | Nova senha com meter          |
-| Portal wizard etapa 5 | Senha do portal_user          |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2 (Onda 3)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 

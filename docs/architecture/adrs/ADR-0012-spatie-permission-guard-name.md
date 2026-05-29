@@ -11,29 +11,31 @@ status: accepted
 
 ## Contexto e problema
 
-O sistema tem múltiplos guards (`web` legado, `admin` para Blade/Livewire, `sanctum` para API v1 consumindo `PortalUser`, `convite` para token público). Cada guard tem sua própria tabela de usuários (ou provider). `spatie/laravel-permission` por default assume o guard `web`; se um modelo autenticável em outro guard (ex.: `PortalUser` em `sanctum`) chamar `$user->hasRole('comissao')`, a checagem vai contra o guard `web` e **falha silenciosamente** — sempre retorna `false`, abrindo brecha de autorização.
+A autenticação do admin usa o guard `admin` (modelo `AdminUser`, tabela `admin_users`), distinto do guard `web` default do Laravel. `spatie/laravel-permission` por default assume o guard `web`; se um modelo autenticável em outro guard (ex.: `AdminUser` no guard `admin`) chamar `$user->hasRole('gestor')`, a checagem vai contra o guard `web` e **falha silenciosamente** — sempre retorna `false`, abrindo brecha de autorização.
+
+Mesmo com um único guard de aplicação (`admin`), depender do default `web` é frágil: basta criar o modelo sem declarar o guard para a ACL parar de funcionar sem erro visível.
 
 ## Drivers da decisão
 
 - Segurança: `hasRole()`/`can()` não podem falhar silenciosamente.
-- Clareza: cada modelo autenticável é vinculado a um guard específico.
-- Roles/permissions são compartilhados entre admin (Blade) e API (Sanctum) quando a regra é a mesma.
+- Clareza: o modelo autenticável é vinculado explicitamente ao guard que o autentica.
+- Consistência: roles/permissions são definidas no guard correto, não no default herdado por acaso.
 
 ## Alternativas consideradas
 
 ### Alt 1: Ignorar e usar só `web` (default)
 
 - Prós: zero configuração.
-- Contras: falha de autorização silenciosa no guard `sanctum`; brecha de segurança.
+- Contras: como o `AdminUser` autentica pelo guard `admin`, a checagem contra `web` falha silenciosamente; brecha de segurança.
 
-### Alt 2: Criar role/permission separadas por guard
+### Alt 2: Forçar o `AdminUser` a autenticar pelo guard `web`
 
-- Prós: isolamento total.
-- Contras: duplicação massiva; manutenção insuportável; "role admin" teria que existir 3×.
+- Prós: alinha com o default do Spatie sem declarar nada.
+- Contras: mistura o guard de aplicação com o default genérico; perde clareza e dificulta evoluir para outros guards no futuro.
 
 ### Alt 3: `guard_name` explícito por modelo + `guard_names` liberados em config (escolhida)
 
-- Prós: cada modelo diz a qual guard pertence; roles são únicas mas válidas no guard correto; Spatie checa corretamente.
+- Prós: o modelo diz a qual guard pertence; roles/permissions ficam válidas no guard correto; Spatie checa corretamente.
 - Contras: exige disciplina — qualquer modelo novo autenticável deve declarar `$guard_name`.
 
 ## Decisão
@@ -41,9 +43,6 @@ O sistema tem múltiplos guards (`web` legado, `admin` para Blade/Livewire, `san
 Todo modelo autenticável que usa `HasRoles` declara `$guard_name` explicitamente:
 
 ```php
-// App\Models\Acesso\PortalUser
-protected string $guard_name = 'sanctum';
-
 // App\Models\Acesso\AdminUser
 protected string $guard_name = 'admin';
 ```
@@ -51,33 +50,27 @@ protected string $guard_name = 'admin';
 `config/permission.php` libera os guards válidos:
 
 ```php
-'guard_names' => ['web', 'admin', 'sanctum'],
+'guard_names' => ['web', 'admin'],
 ```
 
 Regras adicionais:
 
-1. **Comissão nunca herda admin** (§6.5). Role Spatie `comissao` ganha permissions explícitas (`comissao.convites.view`, `comissao.rsvp.view`, `comissao.enquetes.manage`). Jamais atribuir `admin.*` a `comissao`.
-2. **Scope por evento em policies**: checagem `user->eventosAutorizados()->contains($evento->id)` para comissão.
-3. **Cache de permissions** invalidado via `PermissaoAlterada` event (§9.3) — Spatie Permission **não** dispara esse evento automaticamente; usa-se Observer em `Role` + `Permission` models + pivot listeners.
-4. Em login mobile (ADR-0003), abilities do Sanctum são derivadas de `getAllPermissions()->pluck('name')`.
+1. **Roles com permissions explícitas** — uma role recebe apenas as permissions que precisa (ex.: `gestor.usuarios.view`, `gestor.relatorios.export`). Jamais atribuir um curinga `*` para conceder tudo de uma vez.
+2. **Cache de permissions** invalidado via evento `PermissaoAlterada` — Spatie Permission **não** dispara esse evento automaticamente; usa-se Observer em `Role` + `Permission` models + pivot listeners.
 
-Arch test Pest garante que `App\Models\Acesso\*` que usa `HasRoles` declara `$guard_name`.
+Arch test Pest garante que todo modelo em `App\Models\Acesso\*` que usa `HasRoles` declara `$guard_name`.
 
 ## Consequências positivas
 
-- `hasRole()`/`can()` funciona corretamente em todos os guards.
-- Roles compartilhadas entre admin e API sem duplicação.
-- Abilities Sanctum alinhadas com permissions Spatie (um único ponto de verdade).
-- Bloqueio de escalação: comissão ≠ admin, validado por middleware + policy.
+- `hasRole()`/`can()` funciona corretamente no guard `admin`.
+- A vinculação modelo → guard fica explícita e auditável.
+- A configuração já está pronta para um eventual guard adicional sem retrabalho.
 
 ## Consequências negativas
 
-- Cache de permissions precisa de invalidação explícita via Observer (Spatie não dispara evento nativo para attach/detach de pivot). Documentado em §9.3.
+- Cache de permissions precisa de invalidação explícita via Observer (Spatie não dispara evento nativo para attach/detach de pivot).
 - Adicionar guard novo exige atualizar `guard_names` em config. Aceito.
 
 ## Ligações
 
-- §6.1, §6.5 do PLANEJAMENTO_BACKEND_APIV1.md
-- §9.3 (cache permissions + Observer)
-- ADR-0003 (Sanctum), ADR-0011 (Horizon p/ listener queued)
-- SAD arc42 seção "Segurança e autorização"
+- ADR-0011 (Horizon p/ listener queued de invalidação de cache)

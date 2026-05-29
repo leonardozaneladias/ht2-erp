@@ -1,22 +1,20 @@
 ---
-title: CI/CD — Backend API v1
+title: CI/CD
 version: 1.0.0
 date: 2026-04-18
 status: draft
-escopo: Backend API v1 — Portal ArtFinal
 stack: GitHub Actions · Envoy · Docker · Laravel Horizon
 publico: Engenharia Laravel, DevOps, SRE
 ---
 
-# CI/CD — Portal ArtFinal Backend API v1
+# CI/CD
 
-Este documento define o pipeline de Integração Contínua e Entrega Contínua para o backend API v1. Cobre workflows do GitHub Actions, secrets, ambientes, estratégia de deploy zero-downtime, rollback e diagrama do pipeline.
+Este documento define o pipeline de Integração Contínua e Entrega Contínua do projeto. Cobre workflows do GitHub Actions, secrets, ambientes, estratégia de deploy zero-downtime, rollback e diagrama do pipeline.
 
 Base normativa:
 
-- [`engineering-standards.md`](engineering-standards.md)
+- [`conventions.md`](conventions.md)
 - [`runbook-deploy.md`](runbook-deploy.md)
-- [`PLANEJAMENTO_BACKEND_APIV1.md`](../prd/PLANEJAMENTO_BACKEND_APIV1.md) §7 (Horizon), §10 (testes), §11 (segurança)
 
 ---
 
@@ -51,28 +49,27 @@ Toda PR passa por CI antes de poder ser mergeada (branch protection força statu
 
 ### 2.1 Matriz de ambientes
 
-| Ambiente  | Domínio                                 | Região    | Réplica DB    | Horizon        | Sentry |
-| --------- | --------------------------------------- | --------- | ------------- | -------------- | ------ |
-| `local`   | `http://localhost`                      | —         | —             | Sail/Laradock  | —      |
-| `staging` | `https://staging.portalartfinal.com.br` | us-east-1 | 1 leitor      | 1 supervisor   | Ativo  |
-| `prod`    | `https://portalartfinal.com.br`         | us-east-1 | 1 leitor + DR | 4 supervisores | Ativo  |
+| Ambiente  | Domínio                    | Região    | Réplica DB    | Horizon        | Sentry |
+| --------- | -------------------------- | --------- | ------------- | -------------- | ------ |
+| `local`   | `http://localhost`         | —         | —             | Sail/Laradock  | —      |
+| `staging` | `https://staging.exemplo.com.br` | us-east-1 | 1 leitor      | 1 supervisor   | Ativo  |
+| `prod`    | `https://exemplo.com.br`         | us-east-1 | 1 leitor + DR | 4 supervisores | Ativo  |
 
 ### 2.2 Diferenças de config por ambiente
 
-| Config                     | local       | staging         | prod            |
-| -------------------------- | ----------- | --------------- | --------------- |
-| `APP_ENV`                  | `local`     | `staging`       | `production`    |
-| `APP_DEBUG`                | `true`      | `false`         | `false`         |
-| `LOG_LEVEL`                | `debug`     | `info`          | `warning`       |
-| `preventLazyLoading`       | `true`      | `true`          | `false`         |
-| `SESSION_SECURE_COOKIE`    | `false`     | `true`          | `true`          |
-| `SANCTUM_STATEFUL_DOMAINS` | `localhost` | staging domains | prod domains    |
-| Horizon `maxProcesses`     | 3           | 6               | 20              |
-| Sentry sample rate         | 0           | 100% / 20% perf | 100% / 10% perf |
+| Config                  | local       | staging         | prod            |
+| ----------------------- | ----------- | --------------- | --------------- |
+| `APP_ENV`               | `local`     | `staging`       | `production`    |
+| `APP_DEBUG`             | `true`      | `false`         | `false`         |
+| `LOG_LEVEL`             | `debug`     | `info`          | `warning`       |
+| `preventLazyLoading`    | `true`      | `true`          | `false`         |
+| `SESSION_SECURE_COOKIE` | `false`     | `true`          | `true`          |
+| Horizon `maxProcesses`  | 3           | 6               | 20              |
+| Sentry sample rate      | 0           | 100% / 20% perf | 100% / 10% perf |
 
 ### 2.3 Disaster Recovery
 
-DR opcional para prod: réplica cross-AZ (us-east-1b) com failover manual. RTO 30min, RPO 5min. Ativação documentada em [`runbook-operations.md §9`](runbook-operations.md).
+DR opcional para prod: réplica cross-AZ (us-east-1b) com failover manual. RTO 30min, RPO 5min.
 
 ---
 
@@ -137,9 +134,9 @@ jobs:
             postgres:
                 image: postgres:16
                 env:
-                    POSTGRES_USER: portalartfinal
+                    POSTGRES_USER: app
                     POSTGRES_PASSWORD: secret
-                    POSTGRES_DB: portalartfinal_test
+                    POSTGRES_DB: app_test
                 ports: ['5432:5432']
                 options: >-
                     --health-cmd pg_isready
@@ -184,20 +181,8 @@ jobs:
             - run: npm ci
             - run: npx prettier --check resources/
 
-    eslint:
-        name: ESLint
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
-              with:
-                  node-version: '20'
-                  cache: 'npm'
-            - run: npm ci
-            - run: npx eslint resources/js/
-
     build:
-        name: Build React + Vite
+        name: Build (Vite)
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -212,26 +197,6 @@ jobs:
                   name: build-assets
                   path: public/build/
                   retention-days: 7
-
-    openapi:
-        name: OpenAPI Scramble validation
-        runs-on: ubuntu-latest
-        needs: [phpstan]
-        steps:
-            - uses: actions/checkout@v4
-            - uses: shivammathur/setup-php@v2
-              with:
-                  php-version: '8.4'
-                  tools: composer:v2
-            - run: composer install --prefer-dist --no-progress --no-interaction
-            - name: Generate OpenAPI
-              run: php artisan scramble:export --path=build/openapi.json
-            - name: Validate OpenAPI
-              run: npx @redocly/cli lint build/openapi.json
-            - uses: actions/upload-artifact@v4
-              with:
-                  name: openapi-spec
-                  path: build/openapi.json
 ```
 
 ### 3.2 `.github/workflows/deploy-staging.yml`
@@ -296,15 +261,13 @@ jobs:
                   username: ${{ secrets.SSH_USER_STAGING }}
                   key: ${{ secrets.SSH_KEY_STAGING }}
                   script: |
-                      cd /var/www/portalartfinal
+                      cd /var/www/app
                       ./deploy.sh staging ${{ github.sha }}
 
             - name: Smoke test
               run: |
                   set -e
-                  curl -fsS https://staging.portalartfinal.com.br/up
-                  curl -fsS https://staging.portalartfinal.com.br/api/v1/health
-                  curl -fsS -o /dev/null -w '%{http_code}' https://staging.portalartfinal.com.br/docs/api | grep 200
+                  curl -fsS https://staging.exemplo.com.br/up
 
             - name: Notify Slack
               if: always()
@@ -317,10 +280,10 @@ jobs:
 
             - name: Notify Sentry release
               run: |
-                  curl -sSf https://sentry.io/api/0/organizations/portalartfinal/releases/ \
+                  curl -sSf https://sentry.io/api/0/organizations/exemplo/releases/ \
                       -H 'Authorization: Bearer ${{ secrets.SENTRY_AUTH_TOKEN }}' \
                       -H 'Content-Type: application/json' \
-                      -d '{"version":"${{ github.sha }}","projects":["backend"],"refs":[{"repository":"portalartfinal_v2","commit":"${{ github.sha }}"}]}'
+                      -d '{"version":"${{ github.sha }}","projects":["app"],"refs":[{"repository":"app","commit":"${{ github.sha }}"}]}'
 ```
 
 ### 3.3 `.github/workflows/deploy-prod.yml`
@@ -348,7 +311,7 @@ jobs:
         runs-on: ubuntu-latest
         environment:
             name: production
-            url: https://portalartfinal.com.br
+            url: https://exemplo.com.br
         steps:
             - run: echo "Aprovado por ${{ github.actor }}"
 
@@ -363,14 +326,14 @@ jobs:
                   ref: ${{ inputs.release_sha || github.sha }}
 
             - name: Pre-deploy smoke test (staging)
-              run: curl -fsS https://staging.portalartfinal.com.br/api/v1/health
+              run: curl -fsS https://staging.exemplo.com.br/up
 
             - name: Build release (reutiliza artifact staging se existir)
               # ... mesmo bloco do staging ...
 
             - name: Create Sentry release
               run: |
-                  sentry-cli releases new -p backend ${{ inputs.release_sha || github.sha }}
+                  sentry-cli releases new -p app ${{ inputs.release_sha || github.sha }}
                   sentry-cli releases set-commits --auto ${{ inputs.release_sha || github.sha }}
               env:
                   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -382,14 +345,13 @@ jobs:
                   username: ${{ secrets.SSH_USER_PROD }}
                   key: ${{ secrets.SSH_KEY_PROD }}
                   script: |
-                      cd /var/www/portalartfinal
+                      cd /var/www/app
                       ./deploy.sh prod ${{ inputs.release_sha || github.sha }}
 
             - name: Smoke test prod
               run: |
                   set -e
-                  curl -fsS https://portalartfinal.com.br/up
-                  curl -fsS https://portalartfinal.com.br/api/v1/health
+                  curl -fsS https://exemplo.com.br/up
 
             - name: Finalize Sentry release
               run: sentry-cli releases finalize ${{ inputs.release_sha || github.sha }}
@@ -444,15 +406,15 @@ Configurados em **Settings → Secrets and variables → Actions** no GitHub. Di
 
 ### 4.1 Secrets comuns (nível repositório)
 
-| Secret                  | Descrição                                     |
-| ----------------------- | --------------------------------------------- |
-| `GITHUB_TOKEN`          | (auto — fornecido pelo runner)                |
-| `AWS_ACCESS_KEY_ID`     | IAM do usuário `deploy-ci`                    |
-| `AWS_SECRET_ACCESS_KEY` | senha do IAM                                  |
-| `AWS_RELEASES_BUCKET`   | nome do bucket S3 (`portalartfinal-releases`) |
-| `SENTRY_AUTH_TOKEN`     | token de org com escopo `project:releases`    |
-| `SLACK_BOT_TOKEN`       | bot token para postagem em canais             |
-| `SLACK_CHANNEL_DEPLOY`  | ID do canal `#deploy-notifications`           |
+| Secret                  | Descrição                                  |
+| ----------------------- | ------------------------------------------ |
+| `GITHUB_TOKEN`          | (auto — fornecido pelo runner)             |
+| `AWS_ACCESS_KEY_ID`     | IAM do usuário `deploy-ci`                 |
+| `AWS_SECRET_ACCESS_KEY` | senha do IAM                               |
+| `AWS_RELEASES_BUCKET`   | nome do bucket S3 de releases              |
+| `SENTRY_AUTH_TOKEN`     | token de org com escopo `project:releases` |
+| `SLACK_BOT_TOKEN`       | bot token para postagem em canais          |
+| `SLACK_CHANNEL_DEPLOY`  | ID do canal `#deploy-notifications`        |
 
 ### 4.2 Secrets por ambiente — staging
 
@@ -499,8 +461,6 @@ jobs:
                   aws-region: us-east-1
 ```
 
-Roadmap: migrar até Q3/2026.
-
 ---
 
 ## 5. Deploy zero-downtime
@@ -510,7 +470,7 @@ O script `deploy.sh` no servidor orquestra o deploy atômico. Baseado em Envoy (
 ### 5.1 Estrutura de diretórios no servidor
 
 ```
-/var/www/portalartfinal/
+/var/www/app/
 ├── current → releases/20260418-142335/
 ├── releases/
 │   ├── 20260418-120000/
@@ -531,10 +491,10 @@ set -euo pipefail
 
 ENV=$1          # staging | prod
 SHA=$2
-APP_DIR=/var/www/portalartfinal
+APP_DIR=/var/www/app
 RELEASE_DIR="$APP_DIR/releases/$(date +%Y%m%d-%H%M%S)-$SHA"
 SHARED_DIR="$APP_DIR/shared"
-ARTIFACT_URL="s3://portalartfinal-releases/$ENV/release-$SHA.tar.gz"
+ARTIFACT_URL="s3://app-releases/$ENV/release-$SHA.tar.gz"
 
 echo "[1/10] Baixar artefato $SHA"
 mkdir -p "$RELEASE_DIR"
@@ -552,7 +512,7 @@ php artisan route:cache  --no-interaction
 php artisan view:cache   --no-interaction
 php artisan event:cache  --no-interaction
 
-echo "[4/10] Activity log — verificar migrations pendentes"
+echo "[4/10] Verificar migrations pendentes"
 php artisan migrate:status
 
 echo "[5/10] Modo de manutenção (se migration pesada — configurável)"
@@ -575,7 +535,7 @@ sudo systemctl restart laravel-horizon
 
 echo "[10/10] Saindo de manutenção + smoke"
 # [ "$REQUIRES_MAINTENANCE" = "1" ] && php artisan up
-curl -fsS "https://${ENV}.portalartfinal.com.br/up"
+curl -fsS "https://${ENV}.exemplo.com.br/up"
 
 echo "Limpar releases antigas (manter 5)"
 ls -1dt "$APP_DIR/releases"/*/ | tail -n +6 | xargs -r rm -rf
@@ -594,7 +554,7 @@ echo "Deploy $SHA concluído."
 7. **Swap atômico** — `ln -snf` é atômico em filesystems POSIX; o próximo request já atende pela release nova.
 8. **Reload php-fpm** — sem interromper requests ativos.
 9. **Restart Horizon** — workers novos pegam a base nova.
-10. **Smoke test** — `/up` e `/api/v1/health`.
+10. **Smoke test** — `/up`.
 
 ### 5.4 Migration online (coluna pesada)
 
@@ -617,7 +577,7 @@ Decisão de rollback deve ocorrer em **≤ 15 minutos** após detecção de regr
 Symlink `current` aponta para a release anterior:
 
 ```bash
-cd /var/www/portalartfinal
+cd /var/www/app
 PREVIOUS=$(ls -1dt releases/*/ | sed -n '2p')
 ln -snf "$PREVIOUS" current
 sudo systemctl reload php8.4-fpm
@@ -653,17 +613,13 @@ flowchart TD
     CI --> Phpstan[phpstan level 6]
     CI --> Pest[pest + postgres + redis]
     CI --> Prettier[prettier --check]
-    CI --> Eslint[eslint]
     CI --> Build[npm run build]
-    CI --> Openapi[scramble + redocly]
 
     Pint --> GREEN{Todos verdes?}
     Phpstan --> GREEN
     Pest --> GREEN
     Prettier --> GREEN
-    Eslint --> GREEN
     Build --> GREEN
-    Openapi --> GREEN
 
     GREEN -- não --> BLOCK[PR bloqueada]
     GREEN -- sim --> REVIEW[Review aprovado]
@@ -686,7 +642,7 @@ flowchart TD
     classDef ok fill:#bbf7d0,stroke:#15803d
     classDef warn fill:#fde68a,stroke:#b45309
     classDef bad fill:#fecaca,stroke:#b91c1c
-    class Pint,Phpstan,Pest,Prettier,Eslint,Build,Openapi ok
+    class Pint,Phpstan,Pest,Prettier,Build ok
     class MANUAL warn
     class BLOCK bad
 ```
@@ -735,9 +691,7 @@ Configuração no GitHub:
     - `ci / phpstan`
     - `ci / pest`
     - `ci / prettier`
-    - `ci / eslint`
     - `ci / build`
-    - `ci / openapi`
 - Require branches to be up to date before merging: **✓**
 - Require conversation resolution: **✓**
 - Require linear history: **✓**
@@ -767,11 +721,9 @@ Configuração no GitHub:
 
 ## 10. Referências
 
-- [`engineering-standards.md`](engineering-standards.md) — padrões de código e commit.
+- [`conventions.md`](conventions.md) — padrões de código e commit.
 - [`runbook-deploy.md`](runbook-deploy.md) — procedimentos operacionais de deploy.
-- [`runbook-operations.md`](runbook-operations.md) — resposta a incidentes.
 - [`monitoring-alerts.md`](monitoring-alerts.md) — alertas e dashboards.
-- Planejamento backend: [`docs/prd/PLANEJAMENTO_BACKEND_APIV1.md`](../prd/PLANEJAMENTO_BACKEND_APIV1.md).
 
 ---
 

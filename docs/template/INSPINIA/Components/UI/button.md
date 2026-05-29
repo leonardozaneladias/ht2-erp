@@ -219,15 +219,15 @@ Variantes completas no template: gradient, soft, block (w-full), disabled, com �
 <x-shared.button variant="primary" icon-only icon="tabler--plus" />
 ```
 
-### Real (Form de Contratos 14.4)
+### Real (Form de Pedidos)
 
 ```blade
 <div class="flex justify-end gap-2 mt-6">
-    <x-shared.button variant="default" appearance="outline" :href="route('admin.contratos.index')">
+    <x-shared.button variant="default" appearance="outline" :href="route('admin.pedidos.index')">
         Cancelar
     </x-shared.button>
     <x-shared.loading-button variant="primary" type="submit" wire:target="salvar">
-        Salvar Contrato
+        Salvar Pedido
     </x-shared.loading-button>
 </div>
 ```
@@ -236,12 +236,12 @@ Variantes completas no template: gradient, soft, block (w-full), disabled, com �
 
 ```blade
 <x-slot:actions>
-    @can ('contratos.criar')
-        <x-shared.button variant="primary" icon="tabler--plus" :href="route('admin.contratos.create')">
-            Novo Contrato
+    @can ('pedidos.criar')
+        <x-shared.button variant="primary" icon="tabler--plus" :href="route('admin.pedidos.create')">
+            Novo Pedido
         </x-shared.button>
     @endcan
-    @can ('contratos.exportar')
+    @can ('pedidos.exportar')
         <x-shared.button variant="default" appearance="outline" icon="tabler--download" wire:click="exportarCsv">
             CSV
         </x-shared.button>
@@ -265,30 +265,11 @@ Variantes completas no template: gradient, soft, block (w-full), disabled, com �
 
 ---
 
-## Mapeamento no PRD
-
-Usado em **TODAS as 20 telas** do admin — é primitivo universal. Citações específicas:
-
-| Tela       | Uso                                          |
-| ---------- | -------------------------------------------- |
-| 14.1       | "Entrar" (loading)                           |
-| 14.2       | "Ver Ficha", "Ver Extrato"                   |
-| 14.3–14.20 | "+ Novo X", "Cancelar", "Salvar", "Exportar" |
-| 14.4 Tab 5 | "Aplicar Reajuste" (com confirmação)         |
-| 14.7       | "Adicionar Programação"                      |
-| 14.10      | "Vincular Termo", "Preview PDF"              |
-| 14.11      | "Preview"                                    |
-| 14.13      | "Dar Baixa em Lote", "Exportar Selecionadas" |
-| 14.19      | "Selecionar Todos" / "Limpar Todos"          |
-
----
-
 ## Classificação
 
 | Critério         | Valor                                   |
 | ---------------- | --------------------------------------- |
 | **Vai usar**     | 🟢 Sim (primitivo universal)            |
-| **Prioridade**   | P1 (Onda 2)                             |
 | **Complexidade** | Média (muitas props, mas código direto) |
 | **Status**       | 🟢 Concluído                            |
 

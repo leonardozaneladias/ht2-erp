@@ -113,10 +113,10 @@ Select HTML nativo — **sem JavaScript**. Usar para listas curtas (< 10 opçõe
 />
 
 <x-shared.select
-    name="mes_conclusao"
-    label="Mês de Conclusão"
+    name="mes_referencia"
+    label="Mês de Referência"
     :options="array_combine(range(1, 12), ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'])"
-    wire:model="contrato.mes_conclusao"
+    wire:model="pedido.mes_referencia"
 />
 ```
 
@@ -134,24 +134,12 @@ Select HTML nativo — **sem JavaScript**. Usar para listas curtas (< 10 opçõe
 
 ```blade
 <x-shared.select
-    name="modalidade"
-    label="Modalidade"
-    :options="collect(ModalidadePagamento::cases())->mapWithKeys(fn($e) => [$e->value => $e->label()])->toArray()"
-    wire:model="pagamento.modalidade"
+    name="status"
+    label="Status"
+    :options="collect(StatusPedido::cases())->mapWithKeys(fn($e) => [$e->value => $e->label()])->toArray()"
+    wire:model="pedido.status"
 />
 ```
-
----
-
-## Mapeamento no PRD
-
-| Tela              | Uso                                 |
-| ----------------- | ----------------------------------- |
-| 14.3 Instituições | UF                                  |
-| 14.4 Contratos    | Mês/Ano conclusão, Status           |
-| 14.7 Programações | Status                              |
-| 14.8 Condições    | Modalidade, Modalidade Complementar |
-| 14.12 Formandos   | Filtros simples                     |
 
 ---
 
@@ -160,7 +148,6 @@ Select HTML nativo — **sem JavaScript**. Usar para listas curtas (< 10 opçõe
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2 (Onda 3)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 

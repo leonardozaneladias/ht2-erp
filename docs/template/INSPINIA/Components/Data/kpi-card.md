@@ -113,26 +113,26 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
 
 ## Exemplos de Uso
 
-### Real (Dashboard 14.2 — 4 KPIs topo)
+### Real (Dashboard — 4 KPIs topo)
 
 ```blade
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
     <x-admin.kpi-card
-        label="Contratos Ativos"
-        :value="$kpis->contratosAtivos"
+        label="Pedidos Ativos"
+        :value="$kpis->pedidosAtivos"
         icon="tabler--file-text"
         color="primary"
-        :trend="$kpis->trendContratos"
-        :href="route('admin.contratos.index')"
+        :trend="$kpis->trendPedidos"
+        :href="route('admin.pedidos.index')"
     />
 
     <x-admin.kpi-card
-        label="Formandos Aderidos"
-        :value="$kpis->formandosAderidos"
+        label="Clientes Ativos"
+        :value="$kpis->clientesAtivos"
         icon="tabler--users"
         color="success"
-        :trend="$kpis->trendFormandos"
-        :href="route('admin.formandos.index')"
+        :trend="$kpis->trendClientes"
+        :href="route('admin.clientes.index')"
     />
 
     <x-admin.kpi-card
@@ -140,7 +140,7 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
         :value="MoneyHelper::format($kpis->receitaPendenteCentavos)"
         icon="tabler--cash"
         color="warning"
-        :href="route('admin.financeiro.parcelas.index', ['status' => 'pendente'])"
+        :href="route('admin.financeiro.pagamentos.index', ['status' => 'pendente'])"
     />
 
     <x-admin.kpi-card
@@ -150,12 +150,12 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
         color="danger"
         :trend="-$kpis->trendInadimplencia"
         trend-label="vs. último mês"
-        :href="route('admin.financeiro.parcelas.index', ['status' => 'vencido'])"
+        :href="route('admin.financeiro.pagamentos.index', ['status' => 'vencido'])"
     />
 </div>
 ```
 
-### Real (Totalizadores da ficha 14.12 Tab 5)
+### Real (Totalizadores da ficha)
 
 ```blade
 <div class="grid grid-cols-4 gap-4 mb-4">
@@ -186,11 +186,11 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
 </div>
 ```
 
-### Real (Relatório de Parcelas — KPIs filtrados 14.13)
+### Real (Relatório de Pagamentos — KPIs filtrados)
 
 ```blade
 <div class="grid grid-cols-5 gap-4 mb-4">
-    <x-admin.kpi-card label="Total de Parcelas" :value="$stats->total" icon="tabler--list-numbers" color="primary" />
+    <x-admin.kpi-card label="Total de Pagamentos" :value="$stats->total" icon="tabler--list-numbers" color="primary" />
     <x-admin.kpi-card
         label="Valor Total"
         :value="MoneyHelper::format($stats->valorTotal)"
@@ -222,9 +222,9 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
 
 ## Quando Usar ✅
 
-- Dashboard com métricas top-level (14.2)
-- Topo de tabs financeiras (14.12 Tab 5, 14.13)
-- Relatórios agregados (14.17)
+- Dashboard com métricas top-level
+- Topo de tabs financeiras
+- Relatórios agregados
 - Cards de stats em qualquer view que agregue dados
 
 ## Quando NÃO Usar ❌
@@ -235,23 +235,11 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                    | Seção PRD | Qtd KPIs | KPIs                                                               |
-| ----------------------- | --------- | :------: | ------------------------------------------------------------------ |
-| Dashboard               | 14.2      |    4     | Contratos Ativos, Formandos Aderidos, Receita Total, Inadimplência |
-| Formandos ficha (Tab 5) | 14.12     |    4     | Total Geral, Pago, Pendente, Vencido                               |
-| Parcelas (topo)         | 14.13     |    5     | Total, Valor Total, Recebido, A Receber, Vencidas                  |
-| Relatórios              | 14.17     | variável | Por relatório                                                      |
-
----
-
 ## Classificação
 
 | Critério         | Valor            |
 | ---------------- | ---------------- |
 | **Vai usar**     | 🟢 Sim (crítico) |
-| **Prioridade**   | P1 (Onda 2)      |
 | **Complexidade** | Simples          |
 | **Status**       | 🟢 Concluído     |
 
@@ -283,7 +271,7 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
 ### Código
 
 ```blade
-<x-admin.kpi-card label="Formandos Aderidos" value="1.284" icon="tabler--users" color="success" :trend="8.2" href="#!">
+<x-admin.kpi-card label="Clientes Ativos" value="1.284" icon="tabler--users" color="success" :trend="8.2" href="#!">
     Meta mensal já em 72% do planejado.
 </x-admin.kpi-card>
 ```
@@ -298,4 +286,4 @@ Card compacto exibindo um KPI (Key Performance Indicator): **label**, **valor pr
 4. **Trend positivo/negativo** continua controlado pelo valor recebido; para casos como inadimplência em queda, seguir invertendo manualmente o sinal na chamada
 5. **Ícone Tabler/Iconify** permanece obrigatório para manter leitura rápida dos KPIs do dashboard
 6. **Conteúdo extra** no slot final cobre observações curtas, sem abrir uma família nova de metric/widget
-7. **Sparkline** segue no parking lot e não faz parte do contrato oficial atual
+7. **Sparkline** fica reservado e não faz parte da API oficial atual

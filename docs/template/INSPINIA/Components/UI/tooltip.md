@@ -86,25 +86,25 @@ Placements alternativos: `[--placement:bottom]`, `[--placement:left]`, `[--place
 </x-shared.tooltip>
 ```
 
-### Real (Toggle do Contrato 14.4 com tooltip explicativo)
+### Real (Toggle com tooltip explicativo)
 
 ```blade
 <div class="flex items-center gap-2">
-    <x-shared.toggle wire:model="exige_responsavel_cadastro" label="Exige Responsável de Cadastro" />
+    <x-shared.toggle wire:model="exige_endereco_cobranca" label="Exige Endereço de Cobrança" />
     <x-shared.tooltip
         placement="right"
-        content="Quando ativo, formandos menores de 18 anos obrigam o cadastro de um responsável adicional."
+        content="Quando ativo, o pedido obriga o preenchimento de um endereço de cobrança adicional."
     >
         <i class="iconify tabler--info-circle text-default-400 cursor-help"></i>
     </x-shared.tooltip>
 </div>
 ```
 
-### Real (Contrato Tooltip em badge de programação 14.7)
+### Real (Tooltip em badge de vigência)
 
 ```blade
 <x-shared.tooltip
-    content="Vigente de {{ $programacao->inicio->format('d/m/Y') }} a {{ $programacao->fim->format('d/m/Y') }}"
+    content="Vigente de {{ $tabelaPreco->inicio->format('d/m/Y') }} a {{ $tabelaPreco->fim->format('d/m/Y') }}"
 >
     <x-shared.badge variant="success">ATIVA</x-shared.badge>
 </x-shared.tooltip>
@@ -114,26 +114,15 @@ Placements alternativos: `[--placement:bottom]`, `[--placement:left]`, `[--place
 
 ## Quando Usar ✅
 
-- Ícones `info-circle` ao lado de configs técnicas (14.4, 14.15)
+- Ícones `info-circle` ao lado de configs técnicas
 - Botões icon-only em tabelas (explicar ação antes do clique)
 - Abbreviações ou labels truncados
 
 ## Quando NÃO Usar ❌
 
-- Conteúdo rico (imagens, forms) → usar `<x-shared.popover>` (parking lot)
+- Conteúdo rico (imagens, forms) → usar `<x-shared.popover>`
 - Tooltips em dispositivos touch → considerar abrir modal/drawer, tooltip hover não funciona em mobile
 - Conteúdo essencial → tooltip é progressivo; informação crítica precisa estar visível
-
----
-
-## Mapeamento no PRD
-
-| Tela                             | Seção PRD | Uso                                                  |
-| -------------------------------- | --------- | ---------------------------------------------------- |
-| Contratos                        | 14.4      | Tooltip nos toggles "Exige Responsável"              |
-| Produtos                         | 14.6      | Tooltip em "Grupo Exclusivo"                         |
-| Configurações                    | 14.15     | Tooltip em "Margem de Dias" explicando comportamento |
-| Qualquer tabela com icon buttons | —         | "Editar", "Ver", "Excluir"                           |
 
 ---
 
@@ -142,7 +131,6 @@ Placements alternativos: `[--placement:bottom]`, `[--placement:left]`, `[--place
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 

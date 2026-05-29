@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Lista vertical de itens agrupados num container com bordas. Usado para exibir **informações estruturadas sem tabela** — ex: dados pessoais de um formando, detalhes de um contrato, properties de um produto. Itens podem ser simples, com badges, clicáveis, ou como grupos de navegação.
+Lista vertical de itens agrupados num container com bordas. Usado para exibir **informações estruturadas sem tabela** — ex: dados pessoais de um cliente, detalhes de um pedido, properties de um produto. Itens podem ser simples, com badges, clicáveis, ou como grupos de navegação.
 
 ---
 
@@ -100,7 +100,7 @@ Nenhuma. Apenas wrapper.
 
 ## Exemplos de Uso
 
-### Dados estruturados (ex: sidebar da ficha formando 14.12)
+### Dados estruturados (ex: sidebar da ficha de cliente)
 
 ```blade
 <x-shared.card title="Dados Pessoais">
@@ -108,25 +108,25 @@ Nenhuma. Apenas wrapper.
         <x-shared.list-group-item>
             <div class="flex items-center justify-between">
                 <span class="text-default-400">CPF</span>
-                <span class="font-mono">{{ $formando->cpf_formatado }}</span>
+                <span class="font-mono">{{ $cliente->cpf_formatado }}</span>
             </div>
         </x-shared.list-group-item>
         <x-shared.list-group-item>
             <div class="flex items-center justify-between">
                 <span class="text-default-400">Data Nasc.</span>
-                <span>{{ $formando->data_nascimento->format('d/m/Y') }}</span>
+                <span>{{ $cliente->data_nascimento->format('d/m/Y') }}</span>
             </div>
         </x-shared.list-group-item>
         <x-shared.list-group-item>
             <div class="flex items-center justify-between">
                 <span class="text-default-400">Telefone</span>
-                <span>{{ $formando->telefone_formatado }}</span>
+                <span>{{ $cliente->telefone_formatado }}</span>
             </div>
         </x-shared.list-group-item>
         <x-shared.list-group-item>
             <div class="flex items-center justify-between">
                 <span class="text-default-400">E-mail</span>
-                <a href="mailto:{{ $formando->email }}" class="text-primary">{{ $formando->email }}</a>
+                <a href="mailto:{{ $cliente->email }}" class="text-primary">{{ $cliente->email }}</a>
             </div>
         </x-shared.list-group-item>
     </x-shared.list-group>
@@ -136,7 +136,7 @@ Nenhuma. Apenas wrapper.
 ### Contadores por status (dashboard)
 
 ```blade
-<x-shared.card title="Parcelas por Status">
+<x-shared.card title="Pedidos por Status">
     <x-shared.list-group>
         <x-shared.list-group-item>
             <div class="flex items-center justify-between">
@@ -146,14 +146,14 @@ Nenhuma. Apenas wrapper.
         </x-shared.list-group-item>
         <x-shared.list-group-item>
             <div class="flex items-center justify-between">
-                <span>Pagas</span>
-                <x-shared.badge variant="success">{{ $contadores->pagas }}</x-shared.badge>
+                <span>Pagos</span>
+                <x-shared.badge variant="success">{{ $contadores->pagos }}</x-shared.badge>
             </div>
         </x-shared.list-group-item>
         <x-shared.list-group-item>
             <div class="flex items-center justify-between">
-                <span>Vencidas</span>
-                <x-shared.badge variant="danger">{{ $contadores->vencidas }}</x-shared.badge>
+                <span>Vencidos</span>
+                <x-shared.badge variant="danger">{{ $contadores->vencidos }}</x-shared.badge>
             </div>
         </x-shared.list-group-item>
     </x-shared.list-group>
@@ -183,7 +183,7 @@ Nenhuma. Apenas wrapper.
 
 ## Quando Usar ✅
 
-- **Dados key-value** de um registro (ficha do formando 14.12, detalhes do contrato)
+- **Dados key-value** de um registro (ficha do cliente, detalhes do pedido)
 - **Contadores por categoria** (dashboard)
 - **Nav lateral** em páginas de configurações de conta
 
@@ -195,22 +195,11 @@ Nenhuma. Apenas wrapper.
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                        | Seção PRD | Uso                          |
-| --------------------------- | --------- | ---------------------------- |
-| Ficha do Formando (sidebar) | 14.12     | Dados pessoais, responsáveis |
-| Dashboard (contadores)      | 14.2      | "Parcelas por status"        |
-| Configurações conta admin   | —         | Nav lateral de settings      |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 
@@ -244,7 +233,7 @@ Wrapper sem props obrigatórias. Recebe apenas `class`/atributos extras e organi
     <x-shared.list-group-item>
         <div class="flex items-center justify-between gap-3">
             <span class="text-default-400">CPF</span>
-            <span class="font-mono text-body-color">{{ $formando->cpf_formatado }}</span>
+            <span class="font-mono text-body-color">{{ $cliente->cpf_formatado }}</span>
         </div>
     </x-shared.list-group-item>
 

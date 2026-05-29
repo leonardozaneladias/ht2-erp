@@ -167,14 +167,14 @@ Modal dialog centralizado com backdrop. Usado para formulários rápidos, previe
 ### Confirmação simples
 
 ```blade
-<x-shared.button variant="danger" data-hs-overlay="#modal-excluir-contrato"> Excluir </x-shared.button>
+<x-shared.button variant="danger" data-hs-overlay="#modal-excluir-pedido"> Excluir </x-shared.button>
 
-<x-shared.modal id="modal-excluir-contrato" title="Excluir contrato" size="sm" static>
-    <p>Tem certeza que deseja excluir o contrato <strong>{{ $contrato->codigo_turma }}</strong>?</p>
+<x-shared.modal id="modal-excluir-pedido" title="Excluir pedido" size="sm" static>
+    <p>Tem certeza que deseja excluir o pedido <strong>{{ $pedido->codigo }}</strong>?</p>
     <p class="text-sm text-default-400 mt-2">Esta ação não pode ser desfeita.</p>
 
     <x-slot:footer>
-        <x-shared.button variant="default" style="outline" data-hs-overlay="#modal-excluir-contrato">
+        <x-shared.button variant="default" style="outline" data-hs-overlay="#modal-excluir-pedido">
             Cancelar
         </x-shared.button>
         <x-shared.loading-button variant="danger" wire:click="excluir"> Confirmar exclusão </x-shared.loading-button>
@@ -182,32 +182,32 @@ Modal dialog centralizado com backdrop. Usado para formulários rápidos, previe
 </x-shared.modal>
 ```
 
-### Form dentro de modal (Programação 14.7)
+### Form dentro de modal
 
 ```blade
-<x-shared.button variant="primary" icon="tabler--plus" data-hs-overlay="#modal-programacao">
-    Nova Programação
+<x-shared.button variant="primary" icon="tabler--plus" data-hs-overlay="#modal-preco">
+    Novo Preço
 </x-shared.button>
 
-<x-shared.modal id="modal-programacao" title="Nova Programação de Valor" size="lg">
+<x-shared.modal id="modal-preco" title="Nova Tabela de Preço" size="lg">
     <form wire:submit="salvar">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-shared.date-picker label="Data Início" wire:model="form.inicio" />
             <x-shared.date-picker label="Data Fim" wire:model="form.fim" />
             <x-shared.money-input label="Valor (R$)" wire:model="form.valor" />
-            <x-shared.input type="number" label="Parcelas Máximas" wire:model="form.parcelas_max" />
+            <x-shared.input type="number" label="Quantidade Máxima" wire:model="form.quantidade_max" />
         </div>
         <x-shared.input label="Descrição" wire:model="form.descricao" class="mt-4" />
 
         @if ($conflito)
             <x-shared.alert variant="warning" class="mt-4">
-                Conflito com programação de {{ $conflito->inicio->format('d/m/Y') }} a {{ $conflito->fim->format('d/m/Y') }}
+                Conflito com tabela de {{ $conflito->inicio->format('d/m/Y') }} a {{ $conflito->fim->format('d/m/Y') }}
             </x-shared.alert>
         @endif
     </form>
 
     <x-slot:footer>
-        <x-shared.button variant="default" style="outline" data-hs-overlay="#modal-programacao">
+        <x-shared.button variant="default" style="outline" data-hs-overlay="#modal-preco">
             Cancelar
         </x-shared.button>
         <x-shared.loading-button variant="primary" wire:click="salvar"> Salvar </x-shared.loading-button>
@@ -215,16 +215,16 @@ Modal dialog centralizado com backdrop. Usado para formulários rápidos, previe
 </x-shared.modal>
 ```
 
-### Preview (termo PDF 14.11)
+### Preview (documento PDF)
 
 ```blade
-<x-shared.button variant="secondary" data-hs-overlay="#modal-preview-termo"> Preview </x-shared.button>
+<x-shared.button variant="secondary" data-hs-overlay="#modal-preview-documento"> Preview </x-shared.button>
 
-<x-shared.modal id="modal-preview-termo" title="Preview do Termo — {{ $termo->nome }}" size="xl">
-    <div class="prose max-w-none">{!! $termo->renderComDadosExemplo() !!}</div>
+<x-shared.modal id="modal-preview-documento" title="Preview do Documento — {{ $documento->nome }}" size="xl">
+    <div class="prose max-w-none">{!! $documento->renderComDadosExemplo() !!}</div>
 
     <x-slot:footer>
-        <x-shared.button variant="default" data-hs-overlay="#modal-preview-termo"> Fechar </x-shared.button>
+        <x-shared.button variant="default" data-hs-overlay="#modal-preview-documento"> Fechar </x-shared.button>
     </x-slot:footer>
 </x-shared.modal>
 ```
@@ -234,8 +234,8 @@ Modal dialog centralizado com backdrop. Usado para formulários rápidos, previe
 ## Quando Usar ✅
 
 - Confirmações com contexto rico (ex: explicar impacto antes de excluir ou cancelar)
-- Forms rápidos contextuais (nova programação, nova condição)
-- Preview de conteúdo gerado (PDF, snapshot de termo)
+- Forms rápidos contextuais (novo preço, nova condição)
+- Preview de conteúdo gerado (PDF, snapshot de documento)
 - Ações que não precisam de página dedicada
 
 ## Quando NÃO Usar ❌
@@ -247,28 +247,11 @@ Modal dialog centralizado com backdrop. Usado para formulários rápidos, previe
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                     | Seção PRD   | Uso                                                                                         |
-| ------------------------ | ----------- | ------------------------------------------------------------------------------------------- |
-| Reajustes                | 14.4 Tab 5  | Modal "Novo Reajuste"                                                                       |
-| Programações             | 14.7        | Modal para criar/editar                                                                     |
-| Condições                | 14.8        | Modal                                                                                       |
-| Descontos                | 14.9        | Modal                                                                                       |
-| Termos                   | 14.11       | Modal preview                                                                               |
-| Categorias               | 14.5        | Modal (alternativa: drawer)                                                                 |
-| Formandos ficha ações    | 14.12 Tab 5 | Modal para baixa manual, reemitir boleto, cancelar parcela, alterar valor                   |
-| Formandos ficha edição   | 14.12 Tab 1 | Modal edit dados pessoais                                                                   |
-| Confirmações destrutivas | todas       | Preferir `<x-shared.confirm-dialog>`; usar modal só quando houver contexto/markup adicional |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Média        |
 | **Status**       | 🟢 Concluído |
 
@@ -299,14 +282,14 @@ Modal dialog centralizado com backdrop. Usado para formulários rápidos, previe
 ### Código
 
 ```blade
-<x-shared.modal id="modal-programacao" title="Nova Programação" size="lg">
+<x-shared.modal id="modal-preco" title="Nova Tabela de Preço" size="lg">
     <div class="grid gap-4 md:grid-cols-2">
         <x-shared.date-picker name="inicio" label="Data início" />
         <x-shared.money-input name="valor" label="Valor" />
     </div>
 
     <x-slot:footer>
-        <x-shared.button variant="default" appearance="outline" data-hs-overlay="#modal-programacao">
+        <x-shared.button variant="default" appearance="outline" data-hs-overlay="#modal-preco">
             Cancelar
         </x-shared.button>
         <x-shared.loading-button variant="primary">Salvar</x-shared.loading-button>

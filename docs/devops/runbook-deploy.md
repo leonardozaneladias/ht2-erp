@@ -1,23 +1,20 @@
 ---
-title: Runbook de Deploy — Backend API v1
+title: Runbook de Deploy
 version: 1.0.0
 date: 2026-04-18
 status: draft
-escopo: Backend API v1 — Portal ArtFinal
 stack: Laravel 13 · Horizon · PostgreSQL 16 · Envoy
 publico: DevOps, SRE, Tech Lead de plantão
 ---
 
-# Runbook de Deploy — Portal ArtFinal Backend API v1
+# Runbook de Deploy
 
 Documento operacional para execução de deploys. Toda operação aqui descrita é **passo a passo, copy/paste friendly**, com critérios de verificação explícitos em cada etapa.
 
 Contexto relacionado:
 
 - [`ci-cd.md`](ci-cd.md) — workflows automáticos
-- [`runbook-operations.md`](runbook-operations.md) — resposta a incidentes após deploy
 - [`monitoring-alerts.md`](monitoring-alerts.md) — o que observar durante/após deploy
-- [`PLANEJAMENTO_BACKEND_APIV1.md`](../prd/PLANEJAMENTO_BACKEND_APIV1.md) — base técnica
 
 ---
 
@@ -42,9 +39,9 @@ Antes de clicar em **Run workflow → deploy-prod**, o responsável pelo deploy 
 
 ### 1.1 Qualidade do código
 
-- [ ] CI do PR mergeado está **100% verde** (pint, phpstan, pest, prettier, eslint, build, openapi).
+- [ ] CI do PR mergeado está **100% verde** (pint, phpstan, pest, prettier, build).
 - [ ] Deploy staging foi executado automaticamente após merge em `main` e está **estável há ≥ 30 min**.
-- [ ] Nenhum alerta Sentry nova no staging nas últimas 30 min (verificar `sentry.io/organizations/portalartfinal/issues/?environment=staging`).
+- [ ] Nenhum alerta Sentry novo no staging nas últimas 30 min.
 - [ ] Horizon em staging sem jobs failed novos (`/horizon/failed` em staging).
 
 ### 1.2 Migrations
@@ -54,30 +51,24 @@ Antes de clicar em **Run workflow → deploy-prod**, o responsável pelo deploy 
 - [ ] Tempo estimado de lock (verificado em staging com dataset representativo).
 - [ ] Se tempo ≥ 5s em prod → usar fluxo **§4 migration pesada**.
 
-### 1.3 API e contratos
-
-- [ ] OpenAPI regenerado via Scramble (`php artisan scramble:export`) e artifact do CI disponível.
-- [ ] Nenhuma quebra de contrato não versionada (PR com breaking change exige `v2` ou deprecação prévia).
-- [ ] `docs/api/CHANGELOG.md` atualizado quando houver mudança de contrato.
-
-### 1.4 Rate limiters
+### 1.3 Rate limiters
 
 - [ ] Rate limiters novos revisados — ver `App\Providers\RateLimiterServiceProvider`.
-- [ ] Mudança de limite existente comunicada no `#dev-api` se afetar cliente externo.
+- [ ] Mudança de limite existente comunicada no `#dev` se afetar consumidor externo.
 
-### 1.5 Segurança
+### 1.4 Segurança
 
 - [ ] Não há secret commitado (verificado via `git diff` + ferramenta `gitleaks` no CI).
 - [ ] Composer `audit` sem vulnerabilidades críticas.
 - [ ] `npm audit` sem vulnerabilidades high/critical não mitigadas.
 
-### 1.6 Comunicação
+### 1.5 Comunicação
 
 - [ ] Canal `#deploy-notifications` avisado 15 min antes (template em §10.3).
 - [ ] Janela de manutenção anunciada se esperado downtime > 30s (§9).
-- [ ] Issue Plane `PAF-XXX` referenciada na mensagem Slack.
+- [ ] Issue de rastreamento referenciada na mensagem Slack.
 
-### 1.7 Comando de verificação rápida
+### 1.6 Comando de verificação rápida
 
 Use este script local (host) para validar o que for automatizável:
 
@@ -89,17 +80,11 @@ echo "[1] CI verde?"
 gh run list --workflow=ci.yml --branch=main --limit=1 --json conclusion -q '.[0].conclusion'
 
 echo "[2] Staging /up?"
-curl -fsS https://staging.portalartfinal.com.br/up | head -c 20
+curl -fsS https://staging.exemplo.com.br/up | head -c 20
 
-echo "[3] Staging /api/v1/health?"
-curl -fsS https://staging.portalartfinal.com.br/api/v1/health
-
-echo "[4] Sentry staging — issues novas últimas 30min?"
-curl -sf "https://sentry.io/api/0/projects/portalartfinal/backend/issues/?query=is:unresolved+environment:staging+age:-30m" \
+echo "[3] Sentry staging — issues novas últimas 30min?"
+curl -sf "https://sentry.io/api/0/projects/exemplo/app/issues/?query=is:unresolved+environment:staging+age:-30m" \
     -H "Authorization: Bearer $SENTRY_AUTH_TOKEN" | jq '. | length'
-
-echo "[5] OpenAPI commit-sha bate com main?"
-curl -fsS https://staging.portalartfinal.com.br/docs/api.json | jq '.info.version'
 ```
 
 ---
@@ -118,7 +103,7 @@ curl -fsS https://staging.portalartfinal.com.br/docs/api.json | jq '.info.versio
 
 ```
 GitHub UI → Squash and merge
-Commit message: seguir §7 de engineering-standards.md
+Commit message: seguir convenção de commits do projeto (conventions.md)
 ```
 
 **Passo 2** — aguardar `deploy-staging.yml` concluir:
@@ -132,8 +117,8 @@ Critério de ok: `success` e smoke test `200`.
 **Passo 3** — monitorar staging por 30 min:
 
 - Sentry staging: sem issues novas.
-- Horizon staging `/horizon`: filas processando normalmente, `pending` em `critical-seating` ≤ 5.
-- Aplicação cliente (QA time) validou fluxo crítico.
+- Horizon staging `/horizon`: filas processando normalmente, `pending` baixo.
+- QA validou fluxo crítico.
 
 **Passo 4** — trigger deploy-prod:
 
@@ -150,28 +135,23 @@ Um tech-lead ou devops com permissão aprova em **Actions → Deploy Production 
 **Passo 6** — monitorar logs em tempo real:
 
 ```bash
-ssh deploy@prod-host 'tail -f /var/log/portalartfinal/deploy.log'
+ssh deploy@prod-host 'tail -f /var/log/app/deploy.log'
 ```
 
 **Passo 7** — smoke test manual pós-deploy:
 
 ```bash
-# Home
-curl -fsS https://portalartfinal.com.br/up
-# API health
-curl -fsS https://portalartfinal.com.br/api/v1/health
-# Endpoint autenticado amostral
-curl -fsS -H "Authorization: Bearer $TEST_TOKEN" \
-     https://portalartfinal.com.br/api/v1/me
-# OpenAPI
-curl -fsS https://portalartfinal.com.br/docs/api.json | jq '.info.title'
+# Healthcheck
+curl -fsS https://exemplo.com.br/up
+# Página autenticada amostral (verificar 200/302 conforme auth)
+curl -fsS -o /dev/null -w '%{http_code}' https://exemplo.com.br/admin/dashboard
 ```
 
 **Passo 8** — monitorar produção por 15 min:
 
-- Sentry prod: `sentry.io/organizations/portalartfinal/issues/?environment=production&age:-15m`
-- Horizon prod: `/horizon` sem pending em `critical-seating`, sem failed novos
-- Pulse prod: `/pulse` — p95 /api/v1/\* ≤ 500ms
+- Sentry prod: `sentry.io/organizations/exemplo/issues/?environment=production&age:-15m`
+- Horizon prod: `/horizon` sem pending acumulando, sem failed novos
+- Pulse prod: `/pulse` — p95 ≤ 500ms
 
 **Passo 9** — postar confirmação no `#deploy-notifications`:
 
@@ -185,9 +165,7 @@ curl -fsS https://portalartfinal.com.br/docs/api.json | jq '.info.title'
 Aguardando 15min de observação antes de fechar.
 ```
 
-**Passo 10** — fechar deploy após 15 min sem regressão:
-
-Atualizar issue Plane `PAF-XXX` para `Done`.
+**Passo 10** — fechar deploy após 15 min sem regressão.
 
 ---
 
@@ -207,12 +185,12 @@ O fluxo é **idêntico ao §2**. O passo 7 do `deploy.sh` roda `migrate --force`
 ```php
 public function up(): void
 {
-    DB::statement('CREATE INDEX CONCURRENTLY idx_reservas_correlation_id ON reservas_assentos (correlation_id)');
+    DB::statement('CREATE INDEX CONCURRENTLY idx_registros_correlation_id ON registros (correlation_id)');
 }
 
 public function down(): void
 {
-    DB::statement('DROP INDEX CONCURRENTLY IF EXISTS idx_reservas_correlation_id');
+    DB::statement('DROP INDEX CONCURRENTLY IF EXISTS idx_registros_correlation_id');
 }
 ```
 
@@ -225,8 +203,8 @@ public $withinTransaction = false;
 Critério de verificação pós-migration:
 
 ```sql
-\d+ reservas_assentos  -- psql
--- esperar: "idx_reservas_correlation_id" btree (correlation_id)
+\d+ registros  -- psql
+-- esperar: "idx_registros_correlation_id" btree (correlation_id)
 ```
 
 ---
@@ -265,7 +243,7 @@ Migration:
 ```php
 public function up(): void
 {
-    Schema::table('reservas_assentos', function (Blueprint $t) {
+    Schema::table('registros', function (Blueprint $t) {
         $t->string('status', 20)->nullable()->after('status_antigo');
         $t->index('status');
     });
@@ -281,14 +259,14 @@ Deploy normal via §2.
 Job idempotente:
 
 ```php
-final class BackfillStatusReservasJob implements ShouldQueue
+final class BackfillStatusRegistrosJob implements ShouldQueue
 {
     public int $tries = 1;
     public int $timeout = 3600;
 
     public function handle(): void
     {
-        ReservaAssento::query()
+        Registro::query()
             ->whereNull('status')
             ->orderBy('id')
             ->chunkById(5000, function (Collection $chunk): void {
@@ -303,7 +281,7 @@ final class BackfillStatusReservasJob implements ShouldQueue
 Disparar via Horizon:
 
 ```bash
-docker compose exec workspace php artisan tinker --execute 'dispatch(new \App\Jobs\Bulk\BackfillStatusReservasJob())->onQueue("exports");'
+docker compose exec workspace php artisan tinker --execute 'dispatch(new \App\Jobs\Bulk\BackfillStatusRegistrosJob())->onQueue("exports");'
 ```
 
 Critério de sucesso:
@@ -311,7 +289,7 @@ Critério de sucesso:
 ```sql
 SELECT COUNT(*) FILTER (WHERE status IS NULL) AS ainda_null,
        COUNT(*)                               AS total
-  FROM reservas_assentos;
+  FROM registros;
 -- ainda_null == 0
 ```
 
@@ -322,7 +300,7 @@ Nova PR muda as Actions para lerem/escreverem `status`. Inclui migration que tor
 ```php
 public function up(): void
 {
-    Schema::table('reservas_assentos', function (Blueprint $t) {
+    Schema::table('registros', function (Blueprint $t) {
         $t->string('status', 20)->nullable(false)->change();
     });
 }
@@ -337,7 +315,7 @@ Após ≥ 48h de observação estável:
 ```php
 public function up(): void
 {
-    Schema::table('reservas_assentos', function (Blueprint $t) {
+    Schema::table('registros', function (Blueprint $t) {
         $t->dropColumn('status_antigo');
     });
 }
@@ -364,7 +342,7 @@ Quando o deploy muda `config/horizon.php` (supervisors, concurrency, novas filas
 ```bash
 # via Horizon dashboard: Pause supervisor
 # ou via artisan
-docker compose exec workspace php artisan horizon:pause-supervisor supervisor-seating
+docker compose exec workspace php artisan horizon:pause-supervisor supervisor-default
 ```
 
 **Passo 2** — aguardar drain completo:
@@ -406,7 +384,7 @@ Aplicável apenas a:
 
 - Vulnerabilidade de segurança ativamente explorada.
 - Falha crítica em produção com perda de receita ou dados.
-- Bug que impede RSVP, reserva ou pagamento em massa.
+- Bug que impede uma operação crítica de negócio em massa.
 
 Não é aceito como atalho de conveniência.
 
@@ -416,14 +394,14 @@ Não é aceito como atalho de conveniência.
 
 ```bash
 git checkout main && git pull
-git checkout -b hotfix/paf-XXX-descricao
+git checkout -b hotfix/descricao
 ```
 
 **Passo 2** — fix mínimo, com teste regressivo que falha antes do fix:
 
 ```bash
-git add -p && git commit -m 'fix(api): ...'
-git push -u origin hotfix/paf-XXX-descricao
+git add -p && git commit -m 'fix: ...'
+git push -u origin hotfix/descricao
 ```
 
 **Passo 3** — PR com label `hotfix` e aprovação de **2 revisores** (tech-lead + devops):
@@ -441,7 +419,6 @@ gh pr create --label hotfix --reviewer <tech-lead>,<devops>
 
 ```
 [HOTFIX] Deploy emergencial prod
-- Issue: PAF-XXX
 - Causa: <descrição>
 - Fix: <1 linha>
 - Bake staging: 5 min (skip justificado)
@@ -457,10 +434,10 @@ gh pr create --label hotfix --reviewer <tech-lead>,<devops>
 Se o hotfix precisa ir para prod antes de outras features que estão em `main`:
 
 ```bash
-git checkout -b hotfix/paf-XXX-descricao v1.2.3  # a partir da tag prod
+git checkout -b hotfix/descricao v1.2.3  # a partir da tag prod
 # aplicar fix
 git cherry-pick <sha-do-fix>
-git push -u origin hotfix/paf-XXX-descricao
+git push -u origin hotfix/descricao
 # deploy-prod aceita input release_sha=<hotfix-sha>
 ```
 
@@ -472,8 +449,8 @@ git push -u origin hotfix/paf-XXX-descricao
 
 Rollback deve ser decidido em ≤ 15 min quando:
 
-- Taxa de 5xx em `/api/v1/*` > 1% por 5 min contínuos.
-- Horizon `critical-seating` pending > 50 por 2 min.
+- Taxa de 5xx > 1% por 5 min contínuos.
+- Filas Horizon com pending acumulando sem processar por 2 min.
 - Sentry reporta > 20 issues novas em 10 min com mesmo fingerprint.
 - Reports massivos de usuários em `#support` (≥ 5 em 10 min).
 - Inconsistência de dados confirmada por DBA.
@@ -494,7 +471,7 @@ Rollback deve ser decidido em ≤ 15 min quando:
 
 ```bash
 ssh deploy@prod-host
-cd /var/www/portalartfinal
+cd /var/www/app
 ```
 
 **Passo 3** — identificar release anterior:
@@ -529,8 +506,7 @@ sudo systemctl restart laravel-horizon
 **Passo 5** — smoke test:
 
 ```bash
-curl -fsS https://portalartfinal.com.br/up
-curl -fsS https://portalartfinal.com.br/api/v1/health
+curl -fsS https://exemplo.com.br/up
 ```
 
 **Passo 6** — notificar conclusão:
@@ -573,18 +549,18 @@ Em caso de dúvida, **não** rollbackar — compensar via migration nova (forwar
 
 ```bash
 ssh deploy@prod-host
-cd /var/www/portalartfinal/current
+cd /var/www/app/current
 php artisan migrate:status | tail -n 20
 ```
 
 **Passo 2** — fazer dump de backup focado:
 
 ```bash
-pg_dump -h pg-prod -U portalartfinal -d portalartfinal \
+pg_dump -h pg-prod -U app -d app \
     --schema-only --no-owner > /tmp/backup-schema-$(date +%s).sql
 # backup de dados afetados também
-pg_dump -h pg-prod -U portalartfinal -d portalartfinal \
-    -t reservas_assentos --data-only > /tmp/backup-reservas-$(date +%s).sql
+pg_dump -h pg-prod -U app -d app \
+    -t registros --data-only > /tmp/backup-registros-$(date +%s).sql
 ```
 
 **Passo 3** — executar rollback:
@@ -604,7 +580,7 @@ php artisan migrate:status
 
 ```sql
 -- Exemplo: se rollback removeu coluna 'status' e restaurou 'status_antigo'
-SELECT COUNT(*) FROM reservas_assentos WHERE status_antigo IS NOT NULL;
+SELECT COUNT(*) FROM registros WHERE status_antigo IS NOT NULL;
 -- deve cobrir 100% dos registros ativos
 ```
 
@@ -615,12 +591,12 @@ SELECT COUNT(*) FROM reservas_assentos WHERE status_antigo IS NOT NULL;
 Preferir sempre uma **migration nova** que compense o problema:
 
 ```php
-// 2026_04_18_170000_corrigir_status_reservas.php
+// 2026_04_18_170000_corrigir_status_registros.php
 public function up(): void
 {
     DB::statement("
-        UPDATE reservas_assentos
-           SET status = 'confirmada'
+        UPDATE registros
+           SET status = 'confirmado'
          WHERE status IS NULL
            AND confirmado_at IS NOT NULL
     ");
@@ -642,7 +618,7 @@ Isso evita os riscos de `down()` em prod.
 ### 9.2 Comando
 
 ```bash
-cd /var/www/portalartfinal/current
+cd /var/www/app/current
 
 # Entrar em maintenance com render customizado
 php artisan down \
@@ -652,7 +628,7 @@ php artisan down \
     --refresh=15
 
 # Retorno: URL para bypass via cookie
-# https://portalartfinal.com.br/$MAINT_BYPASS_SECRET
+# https://exemplo.com.br/$MAINT_BYPASS_SECRET
 
 # ... executar operação ...
 
@@ -664,10 +640,10 @@ php artisan up
 Anunciar com 24h de antecedência para janelas planejadas. Template:
 
 ```
-[Manutenção programada] Portal ArtFinal
+[Manutenção programada] <Aplicação>
 - Data: 2026-04-20 03:00-03:30 BRT
-- Impacto: Portal indisponível por ~5 min durante swap de schema
-- Motivo: PAF-XXX (migration pesada, §4 do runbook)
+- Impacto: Aplicação indisponível por ~5 min durante swap de schema
+- Motivo: migration pesada (§4 do runbook)
 - Contato: @<devops-on-call>
 ```
 
@@ -676,7 +652,7 @@ Anunciar com 24h de antecedência para janelas planejadas. Template:
 Durante maintenance, QA pode acessar via:
 
 ```
-https://portalartfinal.com.br/<MAINT_BYPASS_SECRET>
+https://exemplo.com.br/<MAINT_BYPASS_SECRET>
 ```
 
 Cookie `laravel_maintenance` é setado e libera requests subsequentes.
@@ -695,11 +671,7 @@ Cookie `laravel_maintenance` é setado e libera requests subsequentes.
 | DevOps on-call    | Aprova deploy-prod em GitHub Environments        |
 | Tech lead on-call | Decide rollback em < 15 min                      |
 
-### 10.2 Escalação
-
-Escalação detalhada em [`runbook-operations.md §10`](runbook-operations.md).
-
-### 10.3 Template Slack pré-deploy
+### 10.2 Template Slack pré-deploy
 
 Postar em `#deploy-notifications` 15 min antes:
 
@@ -707,14 +679,13 @@ Postar em `#deploy-notifications` 15 min antes:
 📦 Deploy prod agendado
 - Release: <SHA>
 - PR: <link>
-- Issue: PAF-XXX
 - Tipo: normal / hotfix / migration
 - Driver: @<user>
 - Impacto esperado: nenhum / indisponibilidade 5 min
 - Rollback SLA: 15 min
 ```
 
-### 10.4 Template pós-deploy
+### 10.3 Template pós-deploy
 
 ```
 ✓ Deploy prod <SHA> finalizado
@@ -723,18 +694,17 @@ Postar em `#deploy-notifications` 15 min antes:
 - Smoke: OK
 - Sentry novas 15min: 0
 - Horizon: estável
-- Plane PAF-XXX → Done
 ```
 
 ---
 
 ## 11. Anexo — `deploy.sh` completo
 
-O script canônico vive em `/var/www/portalartfinal/deploy.sh`. Conteúdo de referência em [`ci-cd.md §5.2`](ci-cd.md#52-fluxo-do-deploysh).
+O script canônico vive em `/var/www/app/deploy.sh`. Conteúdo de referência em [`ci-cd.md §5.2`](ci-cd.md#52-fluxo-do-deploysh).
 
 Qualquer mudança nesse script:
 
-1. PR em repositório separado `infra/ansible-portalartfinal`.
+1. PR em repositório de infraestrutura (Ansible).
 2. Deploy do script via Ansible playbook (`site.yml → role: app-deploy`).
 3. Revisão obrigatória por 2 devops.
 
@@ -743,10 +713,8 @@ Qualquer mudança nesse script:
 ## 12. Referências
 
 - [`ci-cd.md`](ci-cd.md) — pipeline automatizado.
-- [`runbook-operations.md`](runbook-operations.md) — incidentes operacionais.
 - [`monitoring-alerts.md`](monitoring-alerts.md) — alertas e observabilidade.
 - [`security-operations.md`](security-operations.md) — rotação de segredos.
-- [`PLANEJAMENTO_BACKEND_APIV1.md`](../prd/PLANEJAMENTO_BACKEND_APIV1.md) — contexto técnico.
 
 ---
 

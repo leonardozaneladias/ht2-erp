@@ -11,16 +11,16 @@ status: accepted
 
 ## Contexto e problema
 
-O backend precisa processar, de forma assíncrona: envio de e-mails (convite, RSVP reminder, comprovante), webhooks de pagamento, expiração de holds de seating (`everyMinute`), emissão em lote de convites (500+ chunks), exports Excel/PDF, pushs mobile. Cada carga tem prioridade, concurrency e timeout distintos.
+A aplicação precisa processar, de forma assíncrona: envio de e-mails transacionais, jobs agendados (ex.: expiração de registros temporários, `everyMinute`), processamento em lote (centenas de chunks), exports Excel/PDF, notificações. Cada carga tem prioridade, concurrency e timeout distintos.
 
 Qual driver e orquestrador de filas escolher?
 
 ## Drivers da decisão
 
-- Workloads heterogêneos (latência baixa para seating vs tolerante para exports).
-- Observabilidade: precisamos ver metrics de throughput, slow jobs, failed jobs sem infra extra.
+- Workloads heterogêneos (latência baixa para operações críticas vs tolerante para exports).
+- Observabilidade: precisamos ver métricas de throughput, slow jobs e failed jobs sem infra extra.
 - Custo operacional: time pequeno, preferir gerenciar 1 Redis em vez de Redis + SQS + UI própria.
-- Laravel 13 nativo: queue workers + Horizon rodam out-of-the-box.
+- Laravel nativo: queue workers + Horizon rodam out-of-the-box.
 - SLA de entrega: at-least-once com retry exponencial.
 
 ## Alternativas consideradas
@@ -28,7 +28,7 @@ Qual driver e orquestrador de filas escolher?
 ### Alt 1: `queue:database`
 
 - Prós: zero dependência extra, usa o Postgres.
-- Contras: alta contenção em pick (`SELECT FOR UPDATE SKIP LOCKED` OK, mas concurrency baixa); aumenta load do DB principal; sem dashboard nativo; throughput insuficiente para bulk convite.
+- Contras: alta contenção em pick (`SELECT FOR UPDATE SKIP LOCKED` OK, mas concurrency baixa); aumenta load do DB principal; sem dashboard nativo; throughput insuficiente para processamento em lote.
 
 ### Alt 2: AWS SQS
 
@@ -42,31 +42,31 @@ Qual driver e orquestrador de filas escolher?
 
 ### Alt 4: Laravel Horizon + Redis (escolhida)
 
-- Prós: oficial Laravel; UI em `/horizon` com throughput, waits, failed jobs, recent; `supervisors` por workload (seating, webhooks, exports, notifications); `balance: auto` escala processos; `tags` por job rastreáveis; integração com Pulse para métricas agregadas. Redis já é dependência para cache + lock (ADR-0006).
+- Prós: oficial Laravel; UI em `/horizon` com throughput, waits, failed jobs, recent; `supervisors` por workload; `balance: auto` escala processos; `tags` por job rastreáveis; integração com Pulse para métricas agregadas. Redis já é dependência para cache + lock.
 - Contras: exige Redis em HA em produção; requer snapshot scheduled para dashboard.
 
 ## Decisão
 
-Usar **Horizon + Redis** como único stack de filas. `config/horizon.php` define supervisors por workload (§7.2):
+Usar **Horizon + Redis** como único stack de filas. `config/horizon.php` define supervisors por workload:
 
 | Supervisor            | Filas                      | Concurrency | Tries | Timeout |
 | --------------------- | -------------------------- | ----------- | ----- | ------- |
 | `supervisor-default`  | `default`, `notifications` | 3–20 auto   | 3     | 90s     |
-| `supervisor-webhooks` | `webhooks`                 | 2–6 simple  | 5     | 120s    |
+| `supervisor-emails`   | `emails`                   | 2–6 simple  | 5     | 120s    |
 | `supervisor-exports`  | `exports`                  | 1–2 simple  | 2     | 600s    |
-| `supervisor-seating`  | `critical-seating`         | 2–4 simple  | 1     | 30s     |
+| `supervisor-pdf`      | `pdf`                      | 2–4 simple  | 3     | 120s    |
 
-Scheduling de `ExpirarHoldsJob` (§5.4) roda `everyMinute` + `withoutOverlapping(5)` + `onOneServer()`. Retry policy padrão: `backoff()` exponencial `[10, 30, 90, 300, 600]s`, `failed()` log estruturado; Horizon mantém `failed_jobs` como DLQ (§7.5). Alertas Sentry quando `count > 5` falhas em 5 min por classe.
+Jobs agendados recorrentes rodam `everyMinute` + `withoutOverlapping(5)` + `onOneServer()`. Retry policy padrão: `backoff()` exponencial `[10, 30, 90, 300, 600]s`, `failed()` com log estruturado; Horizon mantém `failed_jobs` como DLQ. Alertas quando `count > 5` falhas em 5 min por classe.
 
-Dashboard Horizon protegido por gate `admin` em `/horizon`. `trim` configurado para retenção controlada de recent/completed/failed (§7.2).
+Dashboard Horizon protegido por gate `admin` em `/horizon`. `trim` configurado para retenção controlada de recent/completed/failed.
 
 ## Consequências positivas
 
 - Um único dashboard para SRE entender filas (vs CloudWatch + custom).
-- Supervisors isolam workloads — seating não degrada por export pesado.
+- Supervisors isolam workloads — operações críticas não degradam por export pesado.
 - `balance: auto` ajusta processos dinamicamente em burst.
 - Retry + backoff + DLQ nativos.
-- Redis mesma instância do cache e do lock (ADR-0006) — uma dependência, não três.
+- Redis na mesma instância do cache e do lock — uma dependência, não três.
 
 ## Consequências negativas
 
@@ -75,6 +75,4 @@ Dashboard Horizon protegido por gate `admin` em `/horizon`. `trim` configurado p
 
 ## Ligações
 
-- §0 princípio 9 (auditoria), §7.1, §7.2, §7.3, §7.4, §7.5, §5.4 do PLANEJAMENTO_BACKEND_APIV1.md
-- ADR-0006 (Redis lock), ADR-0013 (webhook job assíncrono)
-- SAD arc42 seção "Visão de runtime — Filas"
+- ADR-0005 (idempotência, retry seguro)

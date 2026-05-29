@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Navegação por abas horizontais. Crítico no Portal ArtFinal — usado em **14.4 Contratos (5 tabs)**, **14.6 Produtos (5 tabs)**, e **14.12 Ficha Formando (7 tabs)**. Preline cuida do toggle de visibilidade dos panels via classes dinâmicas.
+Navegação por abas horizontais. Comum em formulários complexos e fichas com múltiplas seções (ex: dados, relacionados, histórico). Preline cuida do toggle de visibilidade dos panels via classes dinâmicas.
 
 ---
 
@@ -133,41 +133,41 @@ Navegação por abas horizontais. Crítico no Portal ArtFinal — usado em **14.
 
 ## Exemplos de Uso
 
-### Real (Ficha Formando 14.12 — 7 tabs)
+### Real (Ficha de Cliente — 7 tabs)
 
 ```blade
 <x-shared.card>
     <x-shared.tab-nav>
         <x-shared.tab-trigger id="dados" active icon="tabler--user">Dados Pessoais</x-shared.tab-trigger>
-        <x-shared.tab-trigger id="resp" icon="tabler--users">Responsáveis</x-shared.tab-trigger>
-        <x-shared.tab-trigger id="portal" icon="tabler--device-laptop">Portal Users</x-shared.tab-trigger>
-        <x-shared.tab-trigger id="pacotes" icon="tabler--package">Pacotes</x-shared.tab-trigger>
+        <x-shared.tab-trigger id="enderecos" icon="tabler--users">Endereços</x-shared.tab-trigger>
+        <x-shared.tab-trigger id="acessos" icon="tabler--device-laptop">Acessos</x-shared.tab-trigger>
+        <x-shared.tab-trigger id="itens" icon="tabler--package">Itens</x-shared.tab-trigger>
         <x-shared.tab-trigger id="extrato" icon="tabler--cash">Extrato</x-shared.tab-trigger>
-        <x-shared.tab-trigger id="termos" icon="tabler--file-text">Termos</x-shared.tab-trigger>
+        <x-shared.tab-trigger id="documentos" icon="tabler--file-text">Documentos</x-shared.tab-trigger>
         <x-shared.tab-trigger id="auditoria" icon="tabler--history">Histórico</x-shared.tab-trigger>
     </x-shared.tab-nav>
 
     <div class="mt-5">
         <x-shared.tab-panel id="dados" active>
-            <livewire:admin.formandos.tabs.dados :formando="$formando" />
+            <livewire:admin.clientes.tabs.dados :cliente="$cliente" />
         </x-shared.tab-panel>
-        <x-shared.tab-panel id="resp">
-            <livewire:admin.formandos.tabs.responsaveis :formando="$formando" />
+        <x-shared.tab-panel id="enderecos">
+            <livewire:admin.clientes.tabs.enderecos :cliente="$cliente" />
         </x-shared.tab-panel>
-        <x-shared.tab-panel id="portal">
-            <livewire:admin.formandos.tabs.portal-users :formando="$formando" />
+        <x-shared.tab-panel id="acessos">
+            <livewire:admin.clientes.tabs.acessos :cliente="$cliente" />
         </x-shared.tab-panel>
-        <x-shared.tab-panel id="pacotes">
-            <livewire:admin.formandos.tabs.pacotes :formando="$formando" />
+        <x-shared.tab-panel id="itens">
+            <livewire:admin.clientes.tabs.itens :cliente="$cliente" />
         </x-shared.tab-panel>
         <x-shared.tab-panel id="extrato">
-            <livewire:admin.formandos.tabs.extrato :formando="$formando" />
+            <livewire:admin.clientes.tabs.extrato :cliente="$cliente" />
         </x-shared.tab-panel>
-        <x-shared.tab-panel id="termos">
-            <livewire:admin.formandos.tabs.termos :formando="$formando" />
+        <x-shared.tab-panel id="documentos">
+            <livewire:admin.clientes.tabs.documentos :cliente="$cliente" />
         </x-shared.tab-panel>
         <x-shared.tab-panel id="auditoria">
-            <livewire:admin.formandos.tabs.auditoria :formando="$formando" />
+            <livewire:admin.clientes.tabs.auditoria :cliente="$cliente" />
         </x-shared.tab-panel>
     </div>
 </x-shared.card>
@@ -177,26 +177,15 @@ Navegação por abas horizontais. Crítico no Portal ArtFinal — usado em **14.
 
 ## Quando Usar ✅
 
-- Ficha do formando (7 tabs — 14.12)
-- Form de contrato (5 tabs — 14.4)
-- Form de produto (5 tabs — 14.6)
+- Ficha de cliente com múltiplas seções
+- Formulários complexos divididos em abas
 - Configurações agrupadas
 
 ## Quando NÃO Usar ❌
 
-- Formulários longos com sections — usar `<x-shared.accordion>` (14.20 cadastro manual)
+- Formulários longos com sections — usar `<x-shared.accordion>`
 - Navegação por rota — usar sidebar
 - Apenas 2 estados — usar toggle/switch
-
----
-
-## Mapeamento no PRD
-
-| Tela           | Seção PRD | Tabs                                                              |
-| -------------- | --------- | ----------------------------------------------------------------- |
-| Contrato form  | 14.4      | 5 tabs (Dados, Responsáveis, Cursos, Períodos, Reajustes)         |
-| Produto form   | 14.6      | 5 tabs (Dados, Programações, Condições, Descontos, Termos)        |
-| Ficha Formando | 14.12     | 7 tabs (Dados, Resp, Portal, Pacotes, Extrato, Termos, Auditoria) |
 
 ---
 
@@ -205,7 +194,6 @@ Navegação por abas horizontais. Crítico no Portal ArtFinal — usado em **14.
 | Critério         | Valor                                 |
 | ---------------- | ------------------------------------- |
 | **Vai usar**     | 🟢 Sim (crítico para forms complexos) |
-| **Prioridade**   | P1 (Onda 2)                           |
 | **Complexidade** | Média                                 |
 | **Status**       | 🟢 Concluído                          |
 

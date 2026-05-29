@@ -74,7 +74,7 @@ Campo monetário oficial do projeto para valores em reais na UI e persistência 
 ## Exemplo de Uso
 
 ```blade
-<x-shared.money-input name="valor_parcela" label="Valor da parcela" wire:model.live="form.valor" required />
+<x-shared.money-input name="valor" label="Valor" wire:model.live="form.valor" required />
 ```
 
 ---
@@ -92,6 +92,5 @@ Campo monetário oficial do projeto para valores em reais na UI e persistência 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2           |
 | **Complexidade** | Média        |
 | **Status**       | 🟢 Concluído |

@@ -155,12 +155,12 @@ Pequeno chip colorido para exibir status, contagem ou tag. 8 variantes de cor (p
 <x-shared.badge variant="info" size="sm">Novo</x-shared.badge>
 ```
 
-### Real (Tabela de formandos 14.12)
+### Real (Tabela de pedidos)
 
 ```blade
 <td>
-    <x-shared.badge :variant="$formando->adimplente ? 'success' : 'danger'" pill>
-        {{ $formando->adimplente ? 'Em dia' : 'Inadimplente' }}
+    <x-shared.badge :variant="$pedido->em_dia ? 'success' : 'danger'" pill>
+        {{ $pedido->em_dia ? 'Em dia' : 'Em atraso' }}
     </x-shared.badge>
 </td>
 ```
@@ -169,9 +169,9 @@ Pequeno chip colorido para exibir status, contagem ou tag. 8 variantes de cor (p
 
 ```blade
 <li class="menu-item relative">
-    <a class="menu-link" href="{{ route('admin.financeiro.parcelas.index', ['status' => 'vencido']) }}">
+    <a class="menu-link" href="{{ route('admin.financeiro.pagamentos.index', ['status' => 'vencido']) }}">
         <span class="menu-icon"><i class="iconify tabler--alert-triangle"></i></span>
-        <span class="menu-text">Parcelas Vencidas</span>
+        <span class="menu-text">Pagamentos Vencidos</span>
         @if ($contadorVencidas > 0)
             <x-shared.badge variant="danger" pill size="sm" solid class="ms-auto">
                 {{ $contadorVencidas }}
@@ -185,10 +185,10 @@ Pequeno chip colorido para exibir status, contagem ou tag. 8 variantes de cor (p
 
 ## Quando Usar ✅
 
-- Status de linha em tabela (14.3, 14.4, 14.6, 14.12, 14.13)
+- Status de linha em tabela
 - Contador de notificações (ver `topbar.md`)
-- Tags/categorias (ex: "Grupo Exclusivo" em produtos)
-- Badges de programação ("ATIVA", "FUTURA", "EXPIRADA" — 14.7)
+- Tags/categorias (ex: "Destaque" em produtos)
+- Badges de estado ("ATIVA", "FUTURA", "EXPIRADA")
 
 ## Quando NÃO Usar ❌
 
@@ -198,28 +198,11 @@ Pequeno chip colorido para exibir status, contagem ou tag. 8 variantes de cor (p
 
 ---
 
-## Mapeamento no PRD
-
-| Tela         | Seção PRD          | Uso                                                   |
-| ------------ | ------------------ | ----------------------------------------------------- |
-| Instituições | 14.3               | Badge Ativo/Inativo, contagem contratos               |
-| Contratos    | 14.4               | Status (ativo/cancelado/concluído)                    |
-| Produtos     | 14.6               | "Grupo Exclusivo", "Disponível Adesão"                |
-| Programações | 14.7               | "ATIVA"/"FUTURA"/"EXPIRADA"                           |
-| Condições    | 14.8               | Modalidade (Boleto/Cartão/PIX)                        |
-| Formandos    | 14.12              | Adimplência (Em dia/Inadimplente)                     |
-| Parcelas     | 14.12 Tab 5, 14.13 | Status (Pendente/Pago/Vencido/Cancelado) + Modalidade |
-| Termos       | 14.11              | Versão                                                |
-| Topbar       | —                  | Contador de notificações                              |
-
----
-
 ## Classificação
 
 | Critério         | Valor                            |
 | ---------------- | -------------------------------- |
 | **Vai usar**     | 🟢 Sim (extremamente recorrente) |
-| **Prioridade**   | P1 (Onda 2)                      |
 | **Complexidade** | Trivial                          |
 | **Status**       | 🟢 Concluído                     |
 

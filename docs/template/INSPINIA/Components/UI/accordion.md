@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Grupo de seções colapsáveis onde normalmente apenas **uma seção está aberta por vez**. Diferente de `<x-shared.collapse>` (item único on/off), accordion coordena múltiplos items. Usado no **cadastro manual de formando** (14.20) com 8 sections.
+Grupo de seções colapsáveis onde normalmente apenas **uma seção está aberta por vez**. Diferente de `<x-shared.collapse>` (item único on/off), accordion coordena múltiplos items. Útil em cadastros longos com várias seções de campos.
 
 ---
 
@@ -151,59 +151,59 @@ Grupo de seções colapsáveis onde normalmente apenas **uma seção está abert
 
 ```blade
 <x-shared.accordion>
-    <x-shared.accordion-item id="sec1" title="Dados do Formando" open>
+    <x-shared.accordion-item id="sec1" title="Dados do Cliente" open>
         <p>Conteúdo da seção 1</p>
     </x-shared.accordion-item>
 
-    <x-shared.accordion-item id="sec2" title="Responsáveis">
+    <x-shared.accordion-item id="sec2" title="Endereço">
         <p>Conteúdo da seção 2</p>
     </x-shared.accordion-item>
 
-    <x-shared.accordion-item id="sec3" title="Pacotes">
+    <x-shared.accordion-item id="sec3" title="Itens">
         <p>Conteúdo da seção 3</p>
     </x-shared.accordion-item>
 </x-shared.accordion>
 ```
 
-### Real (Cadastro Manual de Formando 14.20)
+### Formulário longo com seções agrupadas
 
 ```blade
-<x-admin.layout title="Cadastro Manual de Formando">
+<x-admin.layout title="Novo Pedido">
     <form wire:submit="salvar">
         <x-shared.accordion>
-            <x-shared.accordion-item id="contrato" title="1. Contrato, Curso e Período" icon="tabler--file-text" open>
+            <x-shared.accordion-item id="categoria" title="1. Categoria e Produto" icon="tabler--file-text" open>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <x-shared.select-search label="Contrato" wire:model.live="contrato_id" :options="$contratos" />
-                    <x-shared.select-search label="Curso" wire:model.live="curso_id" :options="$cursos" />
-                    <x-shared.select-search label="Período" wire:model.live="periodo_id" :options="$periodos" />
+                    <x-shared.select-search label="Categoria" wire:model.live="categoria_id" :options="$categorias" />
+                    <x-shared.select-search label="Produto" wire:model.live="produto_id" :options="$produtos" />
+                    <x-shared.select-search label="Variação" wire:model.live="variacao_id" :options="$variacoes" />
                 </div>
             </x-shared.accordion-item>
 
-            <x-shared.accordion-item id="dados" title="2. Dados do Formando" icon="tabler--user">
+            <x-shared.accordion-item id="dados" title="2. Dados do Cliente" icon="tabler--user">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <x-shared.input label="Nome Completo" wire:model="formando.nome" />
-                    <x-shared.cpf-input label="CPF" wire:model="formando.cpf" />
+                    <x-shared.input label="Nome Completo" wire:model="cliente.nome" />
+                    <x-shared.cpf-input label="CPF" wire:model="cliente.cpf" />
                     {{-- ... --}}
                 </div>
             </x-shared.accordion-item>
 
-            @if ($contrato?->exige_responsavel_cadastro)
-                <x-shared.accordion-item id="resp-cad" title="3. Responsável de Cadastro" icon="tabler--user-plus">
+            @if ($pedido?->exige_endereco_cobranca)
+                <x-shared.accordion-item id="end-cob" title="3. Endereço de Cobrança" icon="tabler--user-plus">
                     {{-- ... --}}
                 </x-shared.accordion-item>
             @endif
 
-            @if ($contrato?->exige_responsavel_financeiro)
-                <x-shared.accordion-item id="resp-fin" title="4. Responsável Financeiro" icon="tabler--cash">
+            @if ($pedido?->exige_endereco_entrega)
+                <x-shared.accordion-item id="end-ent" title="4. Endereço de Entrega" icon="tabler--cash">
                     {{-- ... --}}
                 </x-shared.accordion-item>
             @endif
 
-            <x-shared.accordion-item id="portal" title="5. Conta do Portal" icon="tabler--device-laptop">
+            <x-shared.accordion-item id="conta" title="5. Conta de Acesso" icon="tabler--device-laptop">
                 {{-- ... --}}
             </x-shared.accordion-item>
 
-            <x-shared.accordion-item id="pacotes" title="6. Seleção de Pacotes" icon="tabler--package">
+            <x-shared.accordion-item id="itens" title="6. Seleção de Itens" icon="tabler--package">
                 {{-- ... --}}
             </x-shared.accordion-item>
 
@@ -212,16 +212,16 @@ Grupo de seções colapsáveis onde normalmente apenas **uma seção está abert
             </x-shared.accordion-item>
 
             <x-shared.accordion-item id="resumo" title="8. Resumo e Confirmação" icon="tabler--circle-check">
-                {{-- resumo da adesão --}}
+                {{-- resumo do pedido --}}
             </x-shared.accordion-item>
         </x-shared.accordion>
 
         <div class="flex justify-end gap-2 mt-6">
-            <x-shared.button variant="default" style="outline" :href="route('admin.formandos.index')">
+            <x-shared.button variant="default" style="outline" :href="route('admin.pedidos.index')">
                 Cancelar
             </x-shared.button>
             <x-shared.loading-button variant="primary" type="submit" wire:target="salvar">
-                Confirmar Adesão
+                Confirmar Pedido
             </x-shared.loading-button>
         </div>
     </form>
@@ -232,7 +232,6 @@ Grupo de seções colapsáveis onde normalmente apenas **uma seção está abert
 
 ## Quando Usar ✅
 
-- Cadastro Manual de Formando 14.20 (8 sections)
 - Formulários longos com seções agrupadas (alternativa a tabs quando vertical layout é melhor)
 - FAQ/documentação do usuário
 
@@ -244,21 +243,11 @@ Grupo de seções colapsáveis onde normalmente apenas **uma seção está abert
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                        | Seção PRD   | Uso                             |
-| --------------------------- | ----------- | ------------------------------- |
-| Cadastro Manual de Formando | 14.20       | 8 sections com campos complexos |
-| FAQ do admin (futuro)       | parking lot | Perguntas/respostas             |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 
@@ -293,7 +282,7 @@ Grupo de seções colapsáveis onde normalmente apenas **uma seção está abert
 
 ```blade
 <x-shared.accordion>
-    <x-shared.accordion-item id="dados" title="Dados do Formando" icon="tabler--user" open>
+    <x-shared.accordion-item id="dados" title="Dados do Cliente" icon="tabler--user" open>
         <x-shared.input name="nome" label="Nome completo" />
     </x-shared.accordion-item>
 

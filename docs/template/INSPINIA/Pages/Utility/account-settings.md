@@ -8,7 +8,7 @@
 
 ## Descrição
 
-Página de configurações da conta do **admin logado** — editar perfil, alterar senha, preferências de notificação. Layout com sidebar de tabs (list-group) + conteúdo à direita. Uso no ArtFinal: cada admin edita seu próprio perfil sem passar pelo CRUD completo de 14.18.
+Página de configurações da conta do **admin logado** — editar perfil, alterar senha, preferências de notificação. Layout com sidebar de tabs (list-group) + conteúdo à direita. Uso: cada admin edita seu próprio perfil sem passar pelo CRUD completo de usuários.
 
 ---
 
@@ -18,7 +18,7 @@ Inspinia mostra um layout de settings com **sidebar vertical** de seções (Prof
 
 ---
 
-## View Proposta (ArtFinal)
+## View Proposta
 
 ### Estrutura de rotas
 
@@ -157,20 +157,11 @@ class FormPerfil extends Component
 
 ---
 
-## Mapeamento no PRD
-
-| Tela              | Seção PRD             | Uso                          |
-| ----------------- | --------------------- | ---------------------------- |
-| Admin logado edit | — (derivado de 14.18) | Edit próprio perfil sem CRUD |
-
----
-
 ## Classificação
 
 | Critério         | Valor               |
 | ---------------- | ------------------- |
 | **Vai usar**     | 🟢 Sim              |
-| **Prioridade**   | P4 (Sprint 24)      |
 | **Complexidade** | Média (3 sub-forms) |
 | **Status**       | 🔴 Não iniciado     |
 
@@ -183,4 +174,4 @@ class FormPerfil extends Component
 3. **Livewire por form** — cada um independente, reseta ao navegar
 4. **Alteração de senha:** form separado com campos "senha atual + nova + confirmação"
 5. **Notificações:** array de checkboxes (qual evento dispara email para este admin) — integra com Laravel Notifications
-6. **Não confundir com 14.18** — 14.18 é CRUD de outros admins; este é "meu próprio perfil"
+6. **Não confundir com o CRUD de usuários** — o CRUD gerencia outros admins; este é "meu próprio perfil"

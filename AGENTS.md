@@ -2,49 +2,18 @@
 
 ## Contexto do projeto
 
-Este projeto utiliza o template Inspinia como base visual e possui documentação própria para orientar componentização Blade no Portal ArtFinal.
+Boilerplate Laravel admin (Blade + Livewire + Inspinia, Tailwind CSS 4). Guard `admin` único, server-side, sem SPA. O template Inspinia é a base visual e a documentação em `docs/template/INSPINIA/` orienta a componentização Blade.
 
-A análise estrutural já foi feita. O trabalho atual não é reanalisar o template do zero, e sim implementar componentes reais com base no material já consolidado.
+O trabalho típico é implementar componentes e telas reais com base no catálogo já consolidado, não reanalisar o template do zero.
 
 ## Fontes oficiais obrigatórias
 
 Antes de implementar qualquer componente ou tela do admin, consultar:
 
-- `docs/INSPINIA-CATALOGO-COMPONENTES.md`
-- `docs/INSPINIA-MAPA-TELAS-COMPONENTES.md`
-- `docs/04-TEMPLATE-MAP-AND-COMPONENTS.md`
+- `docs/template/INSPINIA/CATALOGO-COMPONENTES.md` (fonte de verdade dos componentes)
 - `docs/template/INSPINIA/**/*.md`
 - `CLAUDE.md`
-- `docs/02-CONVENTIONS.md`
-
-## Regra obrigatória de gestão no Plane
-
-O Plane é a fonte de verdade para organização e execução do trabalho.
-
-Esta regra vale para qualquer agente/IDE AI usado no projeto, incluindo Claude, Codex e ferramentas futuras.
-
-Projeto canônico no Plane para este repositório:
-
-- `Portal ArtFinal`
-- `project_id`: `c2538d40-6288-47ec-8c8d-a72576784901`
-
-Antes de iniciar trabalho relevante:
-
-- localizar ou criar a issue correta no Plane
-- garantir vínculo com module/cycle adequados
-- mover para o state correto
-
-Durante a execução:
-
-- manter comentários e status coerentes com o estado real
-- não usar checklist solta fora do Plane como fonte principal
-
-Ao concluir:
-
-- atualizar a issue no Plane para refletir o resultado real
-- deixar um resumo objetivo no próprio item do Plane sobre o que foi realizado
-- registrar bloqueios, entregas e follow-ups no próprio Plane
-- marcar como concluído apenas o que estiver realmente pronto
+- `docs/devops/conventions.md`
 
 ## Regras obrigatórias de componentização
 
@@ -76,26 +45,12 @@ Para implementação de componentes Blade a partir da documentação já existen
 
 ## Estratégia de execução
 
-Executar a Fase 6 em batches pequenos e controlados.
-Não componentizar tudo de uma vez.
+Implementar em batches pequenos e controlados. Não componentizar tudo de uma vez.
 Parar quando houver:
 
 - bloqueio transversal
 - conflito de API
 - necessidade de rever catálogo ou convenções
-
-## Batch inicial recomendado
-
-Batch 1:
-
-- `x-shared.alert`
-- `x-shared.badge`
-- `x-shared.button`
-- `x-shared.card`
-- `x-shared.breadcrumb`
-- `x-shared.dropdown`
-- `x-admin.drawer`
-- `x-shared.collapse`
 
 ===
 

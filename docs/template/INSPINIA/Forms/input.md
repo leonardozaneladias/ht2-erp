@@ -121,18 +121,12 @@ Input de texto padrão. Base de todos os demais campos de formulário (text, ema
 ### Básico
 
 ```blade
-<x-shared.input name="nome" label="Nome Completo" required wire:model="formando.nome" />
-<x-shared.input name="email" label="E-mail" type="email" icon="tabler--mail" wire:model="formando.email" />
-<x-shared.input
-    name="meta"
-    label="Meta de Formandos"
-    type="number"
-    hint="Opcional"
-    wire:model="contrato.meta_formandos"
-/>
+<x-shared.input name="nome" label="Nome Completo" required wire:model="usuario.nome" />
+<x-shared.input name="email" label="E-mail" type="email" icon="tabler--mail" wire:model="usuario.email" />
+<x-shared.input name="meta" label="Meta" type="number" hint="Opcional" wire:model="pedido.meta" />
 ```
 
-### Real (Instituições 14.3)
+### Real (cadastro)
 
 ```blade
 <x-shared.input name="razao_social" label="Razão Social" required wire:model="form.razao_social" />
@@ -154,18 +148,11 @@ Input de texto padrão. Base de todos os demais campos de formulário (text, ema
 
 ---
 
-## Mapeamento no PRD
-
-Usado em **todas as 20 telas** com formulário.
-
----
-
 ## Classificação
 
 | Critério         | Valor                        |
 | ---------------- | ---------------------------- |
 | **Vai usar**     | 🟢 Sim (primitivo universal) |
-| **Prioridade**   | P2 (Onda 3)                  |
 | **Complexidade** | Simples                      |
 | **Status**       | 🟢 Concluído                 |
 

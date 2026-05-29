@@ -10,7 +10,7 @@
 
 ## Descrição
 
-Barra superior fixa do admin. Contém: **botão toggle do sidenav** (hamburger), **logo** (visível só quando sidenav em offcanvas), **search global**, **botão dark/light**, **dropdown de notificações**, **dropdown de mensagens** (removido no ArtFinal), **botão fullscreen**, **dropdown de usuário**, **botão de customizer** (removido). Altura fixa definida pela CSS custom property `h-topbar`, fundo cor configurável via `data-topbar-color`.
+Barra superior fixa do admin. Contém: **botão toggle do sidenav** (hamburger), **logo** (visível só quando sidenav em offcanvas), **search global**, **botão dark/light**, **dropdown de notificações**, **dropdown de mensagens** (removido neste projeto), **botão fullscreen**, **dropdown de usuário**, **botão de customizer** (removido). Altura fixa definida pela CSS custom property `h-topbar`, fundo cor configurável via `data-topbar-color`.
 
 ---
 
@@ -31,12 +31,12 @@ Barra superior fixa do admin. Contém: **botão toggle do sidenav** (hamburger),
 
 1. **Hamburger toggle** (`#button-toggle-menu`) — colapsa/expande o sidenav
 2. **Logo-topbar** — só aparece quando sidenav está em offcanvas (mobile). Light/dark variants.
-3. **Topnav toggle** (modo horizontal) — não usado no ArtFinal
+3. **Topnav toggle** (modo horizontal) — não usado neste projeto
 4. **Search global** (`#search-box`, `#topbar-search`) — visível apenas em `xl:` (1280px+)
-5. **Mega menu (Header/Apps)** — showcase do Inspinia, **removido no ArtFinal**
+5. **Mega menu (Header/Apps)** — showcase do Inspinia, **removido neste projeto**
 6. **Theme toggle** (`#light-dark-mode`) — alterna `data-theme` light/dark
-7. **Apps dropdown** (`#apps-dropdown-rounded`) — grid com atalhos para apps, **parking lot**
-8. **Messages dropdown** (`#simple-messages-dropdown`) — inbox preview, **parking lot**
+7. **Apps dropdown** (`#apps-dropdown-rounded`) — grid com atalhos para apps, **reservado**
+8. **Messages dropdown** (`#simple-messages-dropdown`) — inbox preview, **reservado**
 9. **Notifications** (`#notification-dropdown-alert`) — dropdown com ícone `bell`
 10. **Fullscreen button** (`data-toggle="fullscreen"`) — toggle `.fullscreen-active`
 11. **Monochrome toggle** (`#monochrome-mode`) — tema monocromático, **removido**
@@ -143,7 +143,7 @@ O arquivo original tem **768 linhas**. Mostro apenas os blocos estruturais relev
 </header>
 ```
 
-### Recursos removidos no ArtFinal
+### Recursos removidos neste projeto
 
 - `#topnav-menu-collapse` (modo horizontal)
 - `#megamenu-header`, `#megamenu-apps` (mega menus)
@@ -189,12 +189,12 @@ Nenhum. Estrutura fixa.
             <div class="logo-topbar">
                 <a class="logo-box" href="{{ route('admin.dashboard') }}">
                     <div class="logo-light">
-                        <img class="logo-lg h-6" alt="ArtFinal" src="{{ asset('images/admin/logo.png') }}" />
-                        <img class="logo-sm h-6" alt="ArtFinal" src="{{ asset('images/admin/logo-sm.png') }}" />
+                        <img class="logo-lg h-6" alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo.png') }}" />
+                        <img class="logo-sm h-6" alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo-sm.png') }}" />
                     </div>
                     <div class="logo-dark">
-                        <img class="logo-lg h-6" alt="ArtFinal" src="{{ asset('images/admin/logo-dark.png') }}" />
-                        <img class="logo-sm h-6" alt="ArtFinal" src="{{ asset('images/admin/logo-sm-dark.png') }}" />
+                        <img class="logo-lg h-6" alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo-dark.png') }}" />
+                        <img class="logo-sm h-6" alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo-sm-dark.png') }}" />
                     </div>
                 </a>
             </div>
@@ -349,7 +349,6 @@ Nenhum. Estrutura fixa.
 ## Quando NÃO Usar ❌
 
 - Telas de auth — login não tem topbar (tela limpa)
-- Portal do formando — tem header próprio
 - Visualização de PDFs/impressão — não faz sentido
 
 ## Boas Práticas 💡
@@ -362,23 +361,11 @@ Nenhum. Estrutura fixa.
 
 ---
 
-## Mapeamento no PRD (Portal ArtFinal)
-
-| Tela                       | Seção PRD | Como É Usado                    | Sprint |
-| -------------------------- | --------- | ------------------------------- | :----: |
-| Login Admin                | 14.1      | **NÃO usa topbar** (tela limpa) |   15   |
-| Dashboard                  | 14.2      | Topbar com user, notif, theme   |   16   |
-| Todas as demais 14.3–14.20 | —         | Topbar sempre presente          | 16–24  |
-
----
-
 ## Classificação
 
 | Critério                   | Valor                                         |
 | -------------------------- | --------------------------------------------- |
 | **Vai usar no projeto**    | 🟢 Sim                                        |
-| **Prioridade**             | P0                                            |
-| **Sprint planejada**       | 16                                            |
 | **Complexidade**           | Média (vários elementos, cada um com Preline) |
 | **Status componentização** | 🟢 Concluído                                  |
 
@@ -391,7 +378,7 @@ Nenhum. Estrutura fixa.
 | **Depende de (JS)**         | Preline (hs-dropdown), Iconify tabler, fullscreen API nativa                                                                                           |
 | **Depende de (CSS)**        | Classes `.app-header`, `.topbar-*`, `.dropdown-*` do Inspinia                                                                                          |
 | **Depende de (Livewire)**   | Nenhum no código atual — a busca global e a central de notificações ficaram preparadas para futura promoção, mas o batch fecha com fallback Blade puro |
-| **Usado por (telas)**       | Todas as views admin autenticado                                                                                                                       |
+| **Usado por (views)**       | Todas as views admin autenticado                                                                                                                       |
 | **Usado por (componentes)** | `<x-admin.layout>`                                                                                                                                     |
 
 ---
@@ -399,7 +386,7 @@ Nenhum. Estrutura fixa.
 ## Notas de Adaptação
 
 1. **Remover `#megamenu-header` e `#megamenu-apps`** — showcase do Inspinia, irrelevante
-2. **Remover `#apps-dropdown-rounded` e `#simple-messages-dropdown`** — parking lot (podem voltar se/quando File Manager e Email app entrarem)
+2. **Remover `#apps-dropdown-rounded` e `#simple-messages-dropdown`** — reservados (podem voltar se/quando File Manager e Email app entrarem)
 3. **Remover `#monochrome-toggler` e `.btn-theme-setting`** — customização visual pelo usuário não faz parte do escopo
 4. **Remover `#language-selector`** — sistema PT-BR fixo
 5. **Remover toggle `#topnav-menu-collapse`** — não usamos modo horizontal
@@ -426,6 +413,6 @@ Principais ajustes aplicados no código final:
 
 ## Changelog do Componente
 
-| Data       | Descrição                  |
-| ---------- | -------------------------- |
-| 2026-04-11 | Doc criada — Fase 2 Onda 1 |
+| Data       | Descrição   |
+| ---------- | ----------- |
+| 2026-04-11 | Doc criada  |

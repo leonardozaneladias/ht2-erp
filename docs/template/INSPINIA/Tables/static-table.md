@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Tabela HTML pura — **sem JavaScript**, sem paginação, sem busca. Usada para listas curtas (< 30 linhas), sub-tabelas dentro de tabs (cursos, períodos, condições), e tabelas inline em modais/cards. Muito mais leve que `<x-admin.data-table>`.
+Tabela HTML pura — **sem JavaScript**, sem paginação, sem busca. Usada para listas curtas (< 30 linhas), sub-tabelas dentro de tabs (itens, períodos, condições), e tabelas inline em modais/cards. Muito mais leve que `<x-admin.data-table>`.
 
 ---
 
@@ -113,17 +113,17 @@ Variantes do Inspinia: `.table-bordered`, `.table-striped`, `.table-hover`, `.ta
 ### Headers via prop array
 
 ```blade
-<x-shared.static-table :headers="['Curso', 'Ativo', 'Ações']" bordered hover>
-    @foreach ($contrato->cursos as $curso)
+<x-shared.static-table :headers="['Item', 'Ativo', 'Ações']" bordered hover>
+    @foreach ($pedido->itens as $item)
         <tr>
-            <td>{{ $curso->nome }}</td>
+            <td>{{ $item->nome }}</td>
             <td>
-                <x-shared.badge :variant="$curso->ativo ? 'success' : 'default'">
-                    {{ $curso->ativo ? 'Sim' : 'Não' }}
+                <x-shared.badge :variant="$item->ativo ? 'success' : 'default'">
+                    {{ $item->ativo ? 'Sim' : 'Não' }}
                 </x-shared.badge>
             </td>
             <td>
-                <button class="btn btn-icon btn-sm" wire:click="editarCurso({{ $curso->id }})">
+                <button class="btn btn-icon btn-sm" wire:click="editarItem({{ $item->id }})">
                     <i class="iconify tabler--edit"></i>
                 </button>
             </td>
@@ -138,7 +138,7 @@ Variantes do Inspinia: `.table-bordered`, `.table-striped`, `.table-hover`, `.ta
 <x-shared.static-table striped>
     <x-slot:head>
         <tr>
-            <th colspan="2">Dados do Formando</th>
+            <th colspan="2">Dados do Cliente</th>
         </tr>
         <tr>
             <th>Campo</th>
@@ -148,11 +148,11 @@ Variantes do Inspinia: `.table-bordered`, `.table-striped`, `.table-hover`, `.ta
 
     <tr>
         <td>Nome</td>
-        <td>{{ $formando->nome_completo }}</td>
+        <td>{{ $cliente->nome_completo }}</td>
     </tr>
     <tr>
         <td>CPF</td>
-        <td>{{ $formando->cpf_formatado }}</td>
+        <td>{{ $cliente->cpf_formatado }}</td>
     </tr>
 </x-shared.static-table>
 ```
@@ -181,19 +181,17 @@ Variantes do Inspinia: `.table-bordered`, `.table-striped`, `.table-hover`, `.ta
 
 ---
 
-## Mapeamento no PRD
+## Casos de uso típicos
 
-| Tela                    | Uso                               |
-| ----------------------- | --------------------------------- |
-| 14.4 Contratos Tab 3    | Tabela de Cursos                  |
-| 14.4 Contratos Tab 4    | Tabela de Períodos                |
-| 14.8 Condições          | Listagem em card                  |
-| 14.9 Descontos          | Listagem em card                  |
-| 14.10 Termos do Produto | Lista de vínculos com drag handle |
-| 14.12 Formando Tab 3    | Portal Users vinculados           |
-| 14.12 Formando Tab 6    | Termos aceitos                    |
-| 14.14 Simulador         | Cronograma de parcelas            |
-| 14.20 Cadastro Manual   | Resumo da adesão                  |
+| Cenário                | Uso                               |
+| ---------------------- | --------------------------------- |
+| Sub-tabela em tab      | Tabela de itens                   |
+| Sub-tabela em tab      | Tabela de períodos                |
+| Listagem curta em card | Condições / descontos             |
+| Lista com drag handle  | Vínculos ordenáveis               |
+| Ficha de detalhe       | Registros vinculados              |
+| Cronograma             | Cronograma simulado               |
+| Resumo                 | Resumo de um cadastro             |
 
 ---
 
@@ -202,7 +200,6 @@ Variantes do Inspinia: `.table-bordered`, `.table-striped`, `.table-hover`, `.ta
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2 (Onda 3)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 

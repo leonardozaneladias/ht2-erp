@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Checkbox padrão. Diferente do toggle, checkbox é usado para **seleção múltipla** em listas (ACL matrix 14.19, seleção de parcelas 14.13) ou opções independentes.
+Checkbox padrão. Diferente do toggle, checkbox é usado para **seleção múltipla** em listas (matriz de permissões ACL, seleção de itens em lote) ou opções independentes.
 
 ---
 
@@ -42,13 +42,13 @@ Checkbox padrão. Diferente do toggle, checkbox é usado para **seleção múlti
 
 ## Exemplos de Uso
 
-### Lembrar-me 14.1
+### Lembrar-me
 
 ```blade
 <x-shared.checkbox name="remember" label="Lembrar-me" wire:model="remember" />
 ```
 
-### Matriz ACL 14.19
+### Matriz ACL
 
 ```blade
 <table class="table">
@@ -79,23 +79,13 @@ Checkbox padrão. Diferente do toggle, checkbox é usado para **seleção múlti
 </table>
 ```
 
-### Seleção múltipla (14.13 Baixa em lote)
+### Seleção múltipla (ações em lote)
 
 ```blade
-@foreach ($parcelas as $parcela)
-    <x-shared.checkbox :value="$parcela->id" wire:model="selecionadas" name="selecionadas[]" />
+@foreach ($itens as $item)
+    <x-shared.checkbox :value="$item->id" wire:model="selecionadas" name="selecionadas[]" />
 @endforeach
 ```
-
----
-
-## Mapeamento no PRD
-
-| Tela             | Uso                                 |
-| ---------------- | ----------------------------------- |
-| 14.1 Login       | "Lembrar-me"                        |
-| 14.13 Parcelas   | Seleção múltipla para baixa em lote |
-| 14.19 Perfis ACL | Matriz de permissões                |
 
 ---
 
@@ -104,7 +94,6 @@ Checkbox padrão. Diferente do toggle, checkbox é usado para **seleção múlti
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2 (Onda 3)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 

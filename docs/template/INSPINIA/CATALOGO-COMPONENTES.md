@@ -1,4 +1,4 @@
-# Catálogo de Componentes Inspinia × Blade — Portal ArtFinal
+# Catálogo de Componentes Inspinia × Blade
 
 > **Fonte de verdade** do catálogo de componentes derivados do template Inspinia v5.0 Tailwind.
 > Toda criação/alteração de UI no admin deve consultar este arquivo **antes** de escrever HTML.
@@ -7,9 +7,6 @@
 
 **Versão:** 1.0.0
 **Data:** 2026-04-11
-**Documento pai:** [`04-TEMPLATE-MAP-AND-COMPONENTS.md`](04-TEMPLATE-MAP-AND-COMPONENTS.md)
-**Triagem original:** [`template/INSPINIA/TRIAGEM.md`](template/INSPINIA/TRIAGEM.md)
-**Mapa tela→componente:** [`INSPINIA-MAPA-TELAS-COMPONENTES.md`](INSPINIA-MAPA-TELAS-COMPONENTES.md)
 
 ---
 
@@ -21,18 +18,18 @@
 | :-----: | ------------------------------------------------------------------------------------------- |
 |   🟢    | Confirmado — fazer sem pedir confirmação                                                    |
 |   🟡    | A validar — alinhar antes de usar (há decisão pendente, dependência externa ou ambiguidade) |
-|   🔴    | Não usar agora — parking lot ou descartado                                                  |
+|   🔴    | Não usar agora — não adotado no catálogo                                                    |
 
 ### 1.2 Legenda — Prioridade
 
 | Prioridade | Quando atacar                                                     |
 | :--------: | ----------------------------------------------------------------- |
 |   **P0**   | Pré-requisito de tudo. Sem isto nada renderiza (layout, nav).     |
-|   **P1**   | Base de UI/Feedback. Bloqueia Sprints 15–19 do admin.             |
-|   **P2**   | Formulários e tabelas. Bloqueia Sprints 17–19.                    |
-|   **P3**   | Charts/dashboards. Bloqueia Sprints 20–23.                        |
-|   **P4**   | Pages (auth, erros, settings). Distribuídos ao longo das sprints. |
-|   **P5**   | Plugins pontuais. Sprint 24+.                                     |
+|   **P1**   | Base de UI/Feedback.                                              |
+|   **P2**   | Formulários e tabelas.                                            |
+|   **P3**   | Charts/dashboards.                                                |
+|   **P4**   | Pages (auth, erros, settings).                                    |
+|   **P5**   | Plugins pontuais.                                                 |
 
 ### 1.3 Legenda — Status de implementação
 
@@ -55,8 +52,7 @@
 
 ### 1.5 Escopo
 
-Este catálogo cobre os **~62 componentes da seção "Vai Usar"** da triagem (Fase 5).
-O **Parking Lot** (~95 itens) e os **Descartados** (~30) ficam em [`template/INSPINIA/TRIAGEM.md`](template/INSPINIA/TRIAGEM.md) e são referenciados na seção 10 deste documento.
+Este catálogo cobre os **~62 componentes da seção "Vai Usar"** — os itens do Inspinia efetivamente adotados pela aplicação. Os itens não adotados ficam fora do catálogo e são listados de forma resumida na seção 10 deste documento.
 
 ---
 
@@ -75,8 +71,7 @@ O **Parking Lot** (~95 itens) e os **Descartados** (~30) ficam em [`template/INS
 **Convenção de namespaces:**
 
 - `x-admin.*` → exclusivo do backoffice (Inspinia)
-- `x-portal.*` → exclusivo do portal do formando
-- `x-shared.*` → usado por admin **e** portal
+- `x-shared.*` → componentes compartilhados
 
 ---
 
@@ -94,13 +89,13 @@ O **Parking Lot** (~95 itens) e os **Descartados** (~30) ficam em [`template/INS
 | [11. Pages (views)](#11-pages-views-p4)              | Auth, error, account settings             |     P4     |   6   |
 | [12. Plugins pontuais](#12-plugins-pontuais-p5)      | Sortable, clipboard, pass-meter           |     P5     |   3   |
 | [13. Itens a validar 🟡](#13-itens-a-validar-)       | Decisões pendentes                        |     —      |   3   |
-| [14. Parking Lot (resumo)](#14-parking-lot-resumo)   | Itens preservados do Inspinia             |     —      |  ~95  |
+| [14. Não adotados (resumo)](#14-não-adotados-resumo) | Itens não adotados do Inspinia            |     —      |   19  |
 
 ---
 
 ## 4. Layouts & Navigation (P0)
 
-> **Pré-requisito absoluto.** Sem isto nada do admin renderiza. Deve sair da Sprint 15.
+> **Pré-requisito absoluto.** Sem isto nada do admin renderiza.
 
 |  #  | Blade destino                              | Categoria      | Doc                                                                      | Vai usar | Prioridade | Status |                       Decisão                        |
 | :-: | ------------------------------------------ | -------------- | ------------------------------------------------------------------------ | :------: | :--------: | :----: | :--------------------------------------------------: |
@@ -116,7 +111,7 @@ O **Parking Lot** (~95 itens) e os **Descartados** (~30) ficam em [`template/INS
 - `app.blade.php` e `theme-bootstrap.blade.php` não são componentes — são **view/partial** consumidos via `@extends` / `@include`. Ainda assim entram no catálogo por serem referenciados pela doc.
 - `topbar` compõe `dropdown`, `badge` (notificações) e `button` — Batch 2 concluído em 2026-04-11 com essa composição efetivamente aplicada.
 - Fonte da verdade do shell admin: `<x-admin.layout>` + `<x-admin.partials.theme-bootstrap>`. Os arquivos em `admin/layouts/*` e `admin/partials/*` existem como adapters de compatibilidade.
-- `x-admin.mega-menu` não entra no catálogo do ArtFinal: o recurso foi removido do escopo oficial do topbar.
+- `x-admin.mega-menu` não entra no catálogo: o recurso foi removido do escopo oficial do topbar.
 - `x-admin.notification-bell` também não entra como componente autônomo nesta fase: o sino/notificações permanece composição interna do `x-admin.topbar`.
 
 ---
@@ -149,7 +144,7 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 
 **Notas:**
 
-- `drawer` é **admin-only** porque o portal não tem offcanvas lateral — o portal usa modal ou navegação full-page.
+- `drawer` é **admin-only**: é o offcanvas lateral usado no shell do backoffice.
 - `tooltip` foi oficializado em 2026-04-12 como `x-shared.tooltip` para conteúdo textual simples; conteúdo rico continua fora do escopo e não vira popover nesta fase.
 - `tabs`, `accordion` e `list-group` são **composições** (componente pai + item) — gerar pelo menos 2 arquivos cada.
 - `tabs` fica oficializado como família `x-shared.*`: `x-shared.tabs` continua sendo o nome guarda-chuva no catálogo/mapa, mas a API Blade final é a composição `x-shared.tab-nav` + `x-shared.tab-trigger` + `x-shared.tab-panel`. O wrapper array-driven foi descartado.
@@ -187,9 +182,9 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 
 **Notas:**
 
-- `status-badge` recebe um `BackedEnum` com métodos `label()`, `color()` e (opcional) `icon()`. É **enum-driven** — chama `x-shared.badge` internamente com os valores do Enum. Qualquer Enum novo do projeto (`StatusParcela`, `StatusContrato`, `ModalidadePagamento`, etc.) deve implementar essa interface.
+- `status-badge` recebe um `BackedEnum` com métodos `label()`, `color()` e (opcional) `icon()`. É **enum-driven** — chama `x-shared.badge` internamente com os valores do Enum. Qualquer Enum de status do projeto deve implementar essa interface.
 - Apesar de estar na categoria "Data Display", `x-shared.status-badge` entra no Batch 3 por ser o wrapper oficial de estados do sistema.
-- `kpi-card` é admin-only porque o portal usa cards diferentes (`x-portal.section-card`).
+- `kpi-card` é admin-only: é o card de indicadores usado nos dashboards do backoffice.
 
 ---
 
@@ -234,7 +229,7 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 | :-: | -------------------------------------- | --------- | -------------------------------------------------------- | :------: | :--------: | :----: | :----------------------------------------: |
 | 44  | `x-shared.file-upload`                 | Form      | [file-upload.md](template/INSPINIA/Forms/file-upload.md) |    🟢    |     P2     |   🟢   |     ✅ (modes `livewire` e `dropzone`)     |
 | 45  | — (mixin `@error` em `x-shared.input`) | Form      | [validation.md](template/INSPINIA/Forms/validation.md)   |    🟢    |     P2     |   🔴   |                 ❌ (mixin)                 |
-| 46  | `x-portal.wizard`                      | Form      | [wizard.md](template/INSPINIA/Forms/wizard.md)           |    🟢    |     P2     |   🔴   | 🧩 (stepper server-driven + `wizard-step`) |
+| 46  | `x-shared.wizard`                      | Form      | [wizard.md](template/INSPINIA/Forms/wizard.md)           |    🟢    |     P2     |   🔴   | 🧩 (stepper server-driven + `wizard-step`) |
 
 **Notas de arquitetura:**
 
@@ -243,7 +238,7 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 - `date-picker` e `date-range-picker` coexistem como componentes irmãos e compartilham a mesma base JS do Flatpickr.
 - `money-input` **nunca** deve entregar float ao backend — sempre converter para `int` centavos via `MoneyHelper::toCents()`.
 - `cep-input` faz fetch ViaCEP no `@blur` e dispara `$dispatch('cep-filled', {logradouro, bairro, cidade, uf})`.
-- `wizard` é `x-portal.*` porque é exclusivo do portal de adesão (7 etapas). O admin usa tabs, não wizard.
+- `wizard` é um stepper multi-etapas server-driven; no admin o padrão preferido para navegação por seções é `tabs`.
 - **Batch 5 concluído em 2026-04-12:** `select-search`, `tags-input`, `date-range-picker`, `cpf-input`, `cnpj-input`, `phone-input`, `money-input`, `cep-input` e `file-upload` já têm implementação real + preview visual.
 
 ---
@@ -256,7 +251,7 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 | 48  | `x-shared.static-table`  | Table     | [static-table.md](template/INSPINIA/Tables/static-table.md) |    🟢    |     P2     |   🟢   |                                                        ✅                                                         |
 | 49  | `x-admin.timeline-table` | Table     | [custom-table.md](template/INSPINIA/Tables/custom-table.md) |    🟢    |     P2     |   🟢   |                                                        ✅                                                         |
 
-**Decisão crítica registrada:** o Inspinia tem ~11 variantes de DataTables em arquivos separados; o ArtFinal usa **um único componente com props** para habilitar/desabilitar cada feature. As variantes sobrantes ficam no parking lot (ajax, child-rows, fixed-columns, fixed-header, rendering custom, etc.) e podem ser promovidas conforme o volume de dados escalar.
+**Decisão crítica registrada:** o Inspinia tem ~11 variantes de DataTables em arquivos separados; a aplicação usa **um único componente com props** para habilitar/desabilitar cada feature. As variantes sobrantes (ajax, child-rows, fixed-columns, fixed-header, rendering custom, etc.) não foram adotadas e podem ser promovidas conforme o volume de dados escalar.
 
 - **Escopo oficial do Batch 6 (2026-04-12):** entram para implementação real `x-admin.data-table` e a composição `x-shared.list-group` + `x-shared.list-group-item`. `filter-panel`, `action-dropdown`, `bulk-actions` e `export-buttons` **não** existem como componentes autônomos nas fontes oficiais: filtros avançados seguem composição com `x-admin.drawer` + forms base; ações por linha seguem `x-shared.dropdown`; exportação e seleção em massa permanecem capacidades do próprio `x-admin.data-table` via props/slots.
 - Não existe `x-admin.timeline-item` no catálogo oficial. O reuso de timeline fica limitado a `x-admin.timeline-table`; a timeline visual da aba de histórico continua sendo referência de view, não componente genérico.
@@ -273,20 +268,20 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 | 52  | `x-admin.chart-line`                   | Chart (ApexCharts) | [line.md](template/INSPINIA/Charts/ApexCharts/line.md)     |    🟢    |     P3     |   🟢   |                      🧩                       |
 | 53  | `x-admin.chart-column`                 | Chart (ApexCharts) | [column.md](template/INSPINIA/Charts/ApexCharts/column.md) |    🟢    |     P3     |   🟢   |                      🧩                       |
 | 54  | `x-admin.chart-pie`                    | Chart (ApexCharts) | [pie.md](template/INSPINIA/Charts/ApexCharts/pie.md)       |    🟢    |     P3     |   🟢   |                      🧩                       |
-| 55  | (view 14.2 dashboard — não-componente) | Dashboard          | [analytics.md](template/INSPINIA/Dashboards/analytics.md)  |    🟢    |     P3     |   🔴   |                   ❌ (view)                   |
+| 55  | (view dashboard — não-componente)      | Dashboard          | [analytics.md](template/INSPINIA/Dashboards/analytics.md)  |    🟢    |     P3     |   🔴   |                   ❌ (view)                   |
 
 **Notas:**
 
 - Os 4 charts compartilham uma **bridge JS** (`resources/js/admin/charts-bridge.js`) que escuta `Livewire.on('chart-update', …)` para atualizar datasets sem rebuild do DOM. Ver [chart-card.md](template/INSPINIA/Charts/chart-card.md) para o contrato.
-- ApexCharts é a biblioteca oficial — ECharts fica no parking lot para geo-maps (Brasil por estado).
-- **Escopo oficial do Batch 7 (2026-04-12):** entram para implementação real `x-admin.kpi-card`, `x-admin.chart-card` e `x-shared.progress-bar`. `metric`, `widget`, `formando-card` e `parcela-row` ficam fora do escopo oficial por não terem doc detalhada/catálogo próprios; por enquanto permanecem resolvidos por composição com `card`, `list-group`, `data-table` e views específicas.
+- ApexCharts é a biblioteca oficial — ECharts não foi adotado (ficaria reservado para geo-maps).
+- **Escopo oficial do Batch 7 (2026-04-12):** entram para implementação real `x-admin.kpi-card`, `x-admin.chart-card` e `x-shared.progress-bar`. `metric` e `widget` ficam fora do escopo oficial por não terem doc detalhada/catálogo próprios; por enquanto permanecem resolvidos por composição com `card`, `list-group`, `data-table` e views específicas.
 - Rodada final concluída em 2026-04-12: `x-admin.chart-bar`, `x-admin.chart-line`, `x-admin.chart-column` e `x-admin.chart-pie` agora compõem `x-admin.chart-card` sobre uma bridge única em `resources/js/admin/charts.js`.
 
 ---
 
 ## 11. Pages (views) (P4)
 
-> **Não são componentes.** São views completas. Entram no catálogo porque a doc Fase 2 cobriu cada uma.
+> **Não são componentes.** São views completas. Entram no catálogo porque a doc de referência cobriu cada uma.
 
 |  #  | View destino                       | Categoria    | Doc                                                                        | Vai usar | Prioridade | Status |        Decisão         |
 | :-: | ---------------------------------- | ------------ | -------------------------------------------------------------------------- | :------: | :--------: | :----: | :--------------------: |
@@ -325,42 +320,40 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 
 Itens com decisão pendente que **precisam ser discutidos antes** de virar componente.
 
-| Item                                     | Por quê é 🟡                                                                        | Decisão a tomar                                                      | Documento                                                           |
-| ---------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| **Editor rich text** (termos 14.11)      | Inspinia tem Quill mas **não TinyMCE**. TinyMCE self-hosted é grátis, cloud é paga. | Quill (grátis, já alinhado) **ou** TinyMCE self-host (mais features) | Parking lot seção 2.3 em [TRIAGEM.md](template/INSPINIA/TRIAGEM.md) |
-| **Slider de parcelas** (14.14 simulador) | noUiSlider está no parking; number input atende sem plugin                          | Number input simples **ou** promover noUiSlider                      | Parking lot seção 2.3 em [TRIAGEM.md](template/INSPINIA/TRIAGEM.md) |
+| Item                  | Por quê é 🟡                                                                        | Decisão a tomar                                                      |
+| --------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Editor rich text**  | Inspinia tem Quill mas **não TinyMCE**. TinyMCE self-hosted é grátis, cloud é paga. | Quill (grátis, já alinhado) **ou** TinyMCE self-host (mais features) |
+| **Slider numérico**   | noUiSlider não foi adotado; number input atende sem plugin                          | Number input simples **ou** promover noUiSlider                      |
 
 **Ação:** a decisão por cada item deve ser registrada em `docs/02-CONVENTIONS.md` seção "Decisões de UI" **antes** de iniciar o módulo que o consome.
 
 ---
 
-## 14. Parking Lot (resumo)
+## 14. Não adotados (resumo)
 
-> Lista curta dos itens **mais prováveis de serem promovidos no futuro**. Lista completa (~95 itens) em [`template/INSPINIA/TRIAGEM.md`](template/INSPINIA/TRIAGEM.md) seção 2.
+> Itens do template Inspinia **não adotados** no catálogo, mas disponíveis para promoção futura. Cada um mantém o caminho original no template.
 
-| Item                      | Caminho original                               | Cenário futuro no ArtFinal                      | Prioridade futura |
-| ------------------------- | ---------------------------------------------- | ----------------------------------------------- | :---------------: |
-| Chat                      | `apps/chat.blade.php`                          | Chat de atendimento ao formando                 |      🟢 Alto      |
-| Calendar (FullCalendar)   | `apps/calendar.blade.php`                      | Agenda de eventos de formatura                  |      🟢 Alto      |
-| File Manager              | `apps/file-manager.blade.php`                  | Gestão de documentos anexados por formando      |      🟢 Alto      |
-| Ecommerce Reviews         | `apps/ecommerce/reviews.blade.php`             | Avaliações de formandos sobre a empresa         |      🟢 Alto      |
-| Vote List                 | `apps/vote-list.blade.php`                     | Votação de fornecedores, pesquisa de satisfação |     🟡 Médio      |
-| Forum                     | `apps/forum/view.blade.php` + `post.blade.php` | Discussão turma↔coordenação                    |     🟡 Médio      |
-| Email app (inbox/compose) | `apps/email/*.blade.php`                       | Inbox de atendimento ticket-like                |     🟡 Médio      |
-| Text Diff                 | `plugins/text-diff.blade.php`                  | Comparar versões de termos (14.11)              |     🟡 Médio      |
-| PDF Viewer                | `plugins/pdf-viewer.blade.php`                 | Preview inline de termos consolidados           |     🟡 Médio      |
-| Tree View (jstree)        | `plugins/tree-view.blade.php`                  | ACL 14.19 como árvore em vez de matriz          |     🟡 Médio      |
-| Quill editor              | `form/text-editors.blade.php`                  | Editor de termos 14.11 (alt TinyMCE)            |     🟡 Médio      |
-| noUiSlider                | `form/range-slider.blade.php`                  | Simulador de parcelamento 14.14                 |     🟡 Médio      |
-| Radialbar chart           | `charts/apex/radialbar.blade.php`              | % meta de formandos em formato radial           |     🟡 Médio      |
-| Funnel chart              | `charts/apex/funnel.blade.php`                 | Funil de conversão do wizard de adesão          |     🟡 Médio      |
-| Sparklines chart          | `charts/apex/sparklines.blade.php`             | Mini-gráficos em KPI cards                      |     🟡 Médio      |
-| Vector map (Brasil)       | `maps/vector.blade.php`                        | Heatmap de formandos por estado                 |     🟡 Médio      |
-| TourGuideJS               | `plugins/tour.blade.php`                       | Onboarding de novos admins                      |     🟡 Médio      |
-| FilePond                  | `form/fileuploads.blade.php`                   | Alternativa moderna ao Dropzone                 |     🔴 Baixo      |
-| DataTables child-rows     | `tables/datatables/child-rows.blade.php`       | Expandir parcela com histórico de tentativas    |     🔴 Baixo      |
-
-**Para ver a lista completa:** abrir [TRIAGEM.md](template/INSPINIA/TRIAGEM.md) seção 2.
+| Item                      | Caminho original                               | Uso potencial                          | Prioridade futura |
+| ------------------------- | ---------------------------------------------- | -------------------------------------- | :---------------: |
+| Chat                      | `apps/chat.blade.php`                          | Chat de atendimento                    |      🟢 Alto      |
+| Calendar (FullCalendar)   | `apps/calendar.blade.php`                      | Agenda de eventos                      |      🟢 Alto      |
+| File Manager              | `apps/file-manager.blade.php`                  | Gestão de documentos                   |      🟢 Alto      |
+| Ecommerce Reviews         | `apps/ecommerce/reviews.blade.php`             | Avaliações / reviews                   |      🟢 Alto      |
+| Vote List                 | `apps/vote-list.blade.php`                     | Votações, pesquisa de satisfação       |     🟡 Médio      |
+| Forum                     | `apps/forum/view.blade.php` + `post.blade.php` | Discussão / fórum                      |     🟡 Médio      |
+| Email app (inbox/compose) | `apps/email/*.blade.php`                       | Inbox ticket-like                      |     🟡 Médio      |
+| Text Diff                 | `plugins/text-diff.blade.php`                  | Comparar versões de texto              |     🟡 Médio      |
+| PDF Viewer                | `plugins/pdf-viewer.blade.php`                 | Preview inline de PDF                  |     🟡 Médio      |
+| Tree View (jstree)        | `plugins/tree-view.blade.php`                  | Dados hierárquicos em árvore           |     🟡 Médio      |
+| Quill editor              | `form/text-editors.blade.php`                  | Editor rich text (alt TinyMCE)         |     🟡 Médio      |
+| noUiSlider                | `form/range-slider.blade.php`                  | Slider numérico                        |     🟡 Médio      |
+| Radialbar chart           | `charts/apex/radialbar.blade.php`              | Indicador em formato radial            |     🟡 Médio      |
+| Funnel chart              | `charts/apex/funnel.blade.php`                 | Funil de conversão                     |     🟡 Médio      |
+| Sparklines chart          | `charts/apex/sparklines.blade.php`             | Mini-gráficos em KPI cards             |     🟡 Médio      |
+| Vector map                | `maps/vector.blade.php`                        | Heatmap geográfico                     |     🟡 Médio      |
+| TourGuideJS               | `plugins/tour.blade.php`                       | Onboarding de novos usuários           |     🟡 Médio      |
+| FilePond                  | `form/fileuploads.blade.php`                   | Alternativa moderna ao Dropzone        |     🔴 Baixo      |
+| DataTables child-rows     | `tables/datatables/child-rows.blade.php`       | Linhas expansíveis com detalhe         |     🔴 Baixo      |
 
 ---
 
@@ -372,7 +365,7 @@ Itens com decisão pendente que **precisam ser discutidos antes** de virar compo
 4. Se está 🔴 (não iniciado) e é necessário → criar o componente **primeiro**, depois consumir. **Nunca** inlinar HTML reutilizável direto na view.
 5. Se o componente **não existe** no catálogo → abrir doc em `docs/template/INSPINIA/[Categoria]/<nome>.md`, catalogar aqui, criar o Blade em `resources/views/components/`, **depois** usar.
 6. **Ordem de preferência** para nova UI: reuso (♻️) → composição (🧩) → variação por prop (➕) → componente novo (✅).
-7. **Dark mode, responsividade e consistência de API** (namespaces `x-admin.*` / `x-portal.*` / `x-shared.*`) são requisitos, não opcionais.
+7. **Dark mode, responsividade e consistência de API** (namespaces `x-admin.*` / `x-shared.*`) são requisitos, não opcionais.
 8. Páginas completas **não** são componentes — nunca transformar `<x-admin.dashboard-14-2-page>` ou similar.
 
 ---
@@ -381,8 +374,8 @@ Itens com decisão pendente que **precisam ser discutidos antes** de virar compo
 
 | Data       | Descrição                                                                                                                                                                                                                        |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-04-11 | Catálogo criado (Fase 3) — 66 itens mapeados a partir da Fase 2; 4 itens 🟡 a validar; parking lot resumido com 19 itens de maior probabilidade                                                                                  |
+| 2026-04-11 | Catálogo criado — 66 itens mapeados a partir do inventário; 4 itens 🟡 a validar; lista de não adotados resumida com 19 itens de maior probabilidade                                                                            |
 | 2026-04-12 | Batch 5 concluído: `select-search`, `tags-input`, `date-range-picker`, `cpf-input`, `cnpj-input`, `phone-input`, `money-input`, `cep-input` e `file-upload` promovidos para 🟢; itens 🟡 a validar reduzidos para 3              |
 | 2026-04-12 | Batch 6 concluído: `x-admin.data-table` e a composição `x-shared.list-group`/`x-shared.list-group-item` promovidos para 🟢; filtros, bulk actions e export permanecem capacidades/composição, sem componentes autônomos          |
-| 2026-04-12 | Batch 7 concluído: `x-admin.kpi-card`, `x-admin.chart-card` e `x-shared.progress-bar` promovidos para 🟢; `metric`, `widget`, `formando-card` e `parcela-row` ficaram oficialmente fora do lote por falta de doc oficial própria |
+| 2026-04-12 | Batch 7 concluído: `x-admin.kpi-card`, `x-admin.chart-card` e `x-shared.progress-bar` promovidos para 🟢; `metric` e `widget` ficaram oficialmente fora do lote por falta de doc oficial própria |
 | 2026-04-12 | Batch 8 concluído: `x-shared.accordion`, `x-shared.modal`, `x-shared.tooltip` e `x-admin.sortable-list` promovidos para 🟢; `offcanvas`, `popover` e `programacao-timeline` não entraram como componentes autônomos oficiais     |

@@ -125,7 +125,7 @@ Container básico do Inspinia — **o envelope mais usado** em todas as views. T
 ### Básico
 
 ```blade
-<x-shared.card title="Meta de Formandos">
+<x-shared.card title="Meta de Vendas">
     <p>Contagem atualizada em tempo real.</p>
 </x-shared.card>
 ```
@@ -133,22 +133,22 @@ Container básico do Inspinia — **o envelope mais usado** em todas as views. T
 ### Com ações no header
 
 ```blade
-<x-shared.card title="Contratos Recentes" subtitle="Últimos 10 dias">
+<x-shared.card title="Pedidos Recentes" subtitle="Últimos 10 dias">
     <x-slot:headerActions>
-        <x-shared.button variant="primary" size="sm" icon="tabler--plus" :href="route('admin.contratos.create')">
+        <x-shared.button variant="primary" size="sm" icon="tabler--plus" :href="route('admin.pedidos.create')">
             Novo
         </x-shared.button>
     </x-slot:headerActions>
 
-    <livewire:admin.contratos.tabela :recentes="true" />
+    <livewire:admin.pedidos.tabela :recentes="true" />
 </x-shared.card>
 ```
 
 ### Sem padding (para DataTable full-width)
 
 ```blade
-<x-shared.card title="Todos os Formandos" :body-padding="false">
-    <livewire:admin.formandos.tabela />
+<x-shared.card title="Todos os Clientes" :body-padding="false">
+    <livewire:admin.clientes.tabela />
 </x-shared.card>
 ```
 
@@ -174,7 +174,7 @@ Container básico do Inspinia — **o envelope mais usado** em todas as views. T
 ## Quando Usar ✅
 
 - Envelope de qualquer section dentro de uma view (dashboard widgets, formulários, tabelas)
-- Grouping de campos em formulários longos (14.3 Instituições, 14.4 Contratos, 14.15 Configs)
+- Grouping de campos em formulários longos
 - Container de sub-views dentro de tabs
 
 ## Quando NÃO Usar ❌
@@ -185,25 +185,11 @@ Container básico do Inspinia — **o envelope mais usado** em todas as views. T
 
 ---
 
-## Mapeamento no PRD
-
-Usado em **todas as 20 telas**. Citações explícitas no PRD:
-
-| Tela                 | Uso específico                         |
-| -------------------- | -------------------------------------- |
-| 14.2 Dashboard       | KPI cards, gráfico cards, tabela cards |
-| 14.3–14.20           | Envelope de todos os formulários       |
-| 14.12 Ficha Formando | 7 tabs cada uma dentro de card         |
-| 14.15 Configurações  | Cards agrupados por seção              |
-
----
-
 ## Classificação
 
 | Critério         | Valor                        |
 | ---------------- | ---------------------------- |
 | **Vai usar**     | 🟢 Sim (primitivo universal) |
-| **Prioridade**   | P1 (Onda 2)                  |
 | **Complexidade** | Simples                      |
 | **Status**       | 🟢 Concluído                 |
 

@@ -49,7 +49,7 @@ Props herdadas da base `x-shared.input`: `name`, `label`, `hint`, `required` e d
 ## Exemplo de Uso
 
 ```blade
-<x-shared.cpf-input name="cpf_formando" label="CPF do formando" wire:model.live="form.cpf" required />
+<x-shared.cpf-input name="cpf" label="CPF" wire:model.live="form.cpf" required />
 ```
 
 ---
@@ -67,6 +67,5 @@ Props herdadas da base `x-shared.input`: `name`, `label`, `hint`, `required` e d
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2           |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |

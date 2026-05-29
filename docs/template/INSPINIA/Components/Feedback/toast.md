@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Notificação efêmera exibida em canto fixo da tela, com auto-dismiss opcional. Diferente de `<x-shared.alert>` (que fica no fluxo da página), o toast é **flutuante** e temporário. Usado para feedback de ação (salvou, excluiu, erro ao processar). No Portal ArtFinal, será disparado via Livewire events ou session flash.
+Notificação efêmera exibida em canto fixo da tela, com auto-dismiss opcional. Diferente de `<x-shared.alert>` (que fica no fluxo da página), o toast é **flutuante** e temporário. Usado para feedback de ação (salvou, excluiu, erro ao processar). É disparado via Livewire events ou session flash.
 
 > **Decisão oficial do Batch 3:** `x-shared.toast` entra como família/composição. A implementação final prevista é `x-shared.toast` + `x-shared.toast-container`, com fila gerida por helper JS leve. A proposta antiga baseada em Alpine foi descartada.
 
@@ -41,7 +41,7 @@ Notificação efêmera exibida em canto fixo da tela, com auto-dismiss opcional.
             </button>
         </div>
     </div>
-    <div class="p-3 text-sm">Contrato criado com sucesso!</div>
+    <div class="p-3 text-sm">Pedido criado com sucesso!</div>
 </div>
 ```
 
@@ -92,16 +92,16 @@ O helper JS escuta `window.dispatchEvent(new CustomEvent('toast', { detail: {...
 ### Disparar a partir de Livewire
 
 ```php
-// app/Livewire/Admin/Contratos/Form.php
+// app/Livewire/Admin/Pedidos/Form.php
 class Form extends Component
 {
     public function save(): void
     {
-        app(UpdateContratoAction::class)->execute(...);
+        app(UpdatePedidoAction::class)->execute(...);
 
         $this->dispatch('toast',
             variant: 'success',
-            title: 'Contrato atualizado',
+            title: 'Pedido atualizado',
             message: 'As alterações foram salvas com sucesso.',
             duration: 4000,
         );
@@ -155,7 +155,7 @@ window.dispatchEvent(
 
 ## Quando Usar ✅
 
-- Feedback imediato após ação Livewire (salvou, excluiu, aplicou reajuste)
+- Feedback imediato após ação Livewire (salvou, excluiu, processou)
 - Notificações push do servidor via Laravel Echo + Livewire
 - Session flash após `redirect()->route(...)->with('success', '...')`
 
@@ -167,24 +167,11 @@ window.dispatchEvent(
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                         | Seção PRD | Uso                                              |
-| ---------------------------- | --------- | ------------------------------------------------ |
-| 14.1 Login Admin             | 14.1      | Toast vermelho "Credenciais inválidas"           |
-| 14.3–14.20                   | —         | Toast após salvar/excluir (flash session)        |
-| 14.4 Tab 5 Reajustes         | 14.4      | Toast "Reajuste aplicado com sucesso"            |
-| 14.12 Tab 5 Ações de parcela | 14.12     | Toast após baixa manual, reemissão, cancelamento |
-| 14.13 Baixa em Lote          | 14.13     | Toast "N parcelas baixadas"                      |
-
----
-
 ## Classificação
 
 | Critério         | Valor                                 |
 | ---------------- | ------------------------------------- |
 | **Vai usar**     | 🟢 Sim (padrão de feedback universal) |
-| **Prioridade**   | P1 (Onda 2)                           |
 | **Complexidade** | Média (composição Blade + helper JS)  |
 | **Status**       | 🟢 Concluído                          |
 
@@ -221,5 +208,5 @@ window.dispatchEvent(
 ```blade
 <x-shared.toast-container />
 
-<x-shared.toast variant="success" title="Contrato atualizado" message="As alterações foram salvas com sucesso." />
+<x-shared.toast variant="success" title="Pedido atualizado" message="As alterações foram salvas com sucesso." />
 ```

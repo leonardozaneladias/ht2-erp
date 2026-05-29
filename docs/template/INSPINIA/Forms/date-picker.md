@@ -130,14 +130,14 @@ Seletor de data usando Flatpickr. Aplicado via `data-provider="flatpickr"`. Supo
 
 ## Exemplos de Uso
 
-### Real (Contrato 14.4)
+### Real (datas de um registro)
 
 ```blade
-<x-shared.date-picker name="data_inicio" label="Data Início" wire:model="contrato.data_inicio" required />
-<x-shared.date-picker name="data_evento" label="Data do Evento" min-date="today" wire:model="contrato.data_evento" />
+<x-shared.date-picker name="data_inicio" label="Data Início" wire:model="pedido.data_inicio" required />
+<x-shared.date-picker name="data_evento" label="Data do Evento" min-date="today" wire:model="pedido.data_evento" />
 ```
 
-### Real (Programação 14.7)
+### Real (intervalo início/fim)
 
 ```blade
 <div class="grid grid-cols-2 gap-4">
@@ -148,25 +148,11 @@ Seletor de data usando Flatpickr. Aplicado via `data-provider="flatpickr"`. Supo
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                 | Uso                      |
-| -------------------- | ------------------------ |
-| 14.4 Contratos       | Data início, Data evento |
-| 14.6 Produtos        | Data início/fim venda    |
-| 14.7 Programações    | Data início/fim          |
-| 14.9 Descontos       | Data início/fim vigência |
-| 14.14 Simulador      | Data adesão simulada     |
-| 14.4 Tab 5 Reajustes | Data aplicação           |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2 (Onda 3)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 

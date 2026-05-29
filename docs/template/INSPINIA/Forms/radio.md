@@ -96,7 +96,7 @@ Radio button para **seleção única exclusiva** entre múltiplas opções. Usad
         name="modalidade"
         value="cartao"
         label="Cartão de Crédito"
-        description="Parcelamento automático"
+        description="Cobrança recorrente automática"
         wire:model.live="modalidade"
     />
     <x-shared.radio
@@ -111,22 +111,11 @@ Radio button para **seleção única exclusiva** entre múltiplas opções. Usad
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                  | Uso                             |
-| --------------------- | ------------------------------- |
-| Portal wizard         | Escolha de modalidade (etapa 5) |
-| 14.20 Cadastro Manual | Escolha de modalidade           |
-| 14.14 Simulador       | Escolha de modalidade           |
-
----
-
 ## Classificação
 
 | Critério         | Valor                      |
 | ---------------- | -------------------------- |
 | **Vai usar**     | 🟡 Sim (casos específicos) |
-| **Prioridade**   | P2 (Onda 3)                |
 | **Complexidade** | Trivial                    |
 | **Status**       | 🟢 Concluído               |
 

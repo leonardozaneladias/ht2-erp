@@ -1,4 +1,4 @@
-# Custom Table (Timeline Programações)
+# Custom Table (Timeline de Períodos)
 
 **Categoria:** Table
 **Origem Inspinia:** `resources/views/tables/custom.blade.php` (layouts exclusivos do template)
@@ -11,15 +11,15 @@
 
 Tabela com **visual customizado** — não é DataTable nem static padrão. Usada para casos específicos onde a estrutura tabular tradicional não serve, como:
 
-- **Timeline de programações** (14.7) — barras visuais mostrando período ativo/futuro/expirado
-- **Ficha do formando sidebar** (14.12) — layout key-value em vez de rows
-- **Simulador cronograma** (14.14) — cronograma visual com destaque
+- **Timeline de períodos** — barras visuais mostrando período ativo/futuro/expirado
+- **Ficha lateral (sidebar)** — layout key-value em vez de rows
+- **Cronograma simulado** — cronograma visual com destaque
 
-Este arquivo documenta o padrão geral e dá exemplo do **timeline de programações** como caso canônico.
+Este arquivo documenta o padrão geral e dá exemplo do **timeline de períodos** como caso canônico.
 
 ---
 
-## Caso canônico: Timeline de Programações (14.7)
+## Caso canônico: Timeline de Períodos
 
 ```blade
 {{-- resources/views/components/admin/timeline-table.blade.php --}}
@@ -29,7 +29,7 @@ Este arquivo documenta o padrão geral e dá exemplo do **timeline de programaç
     <div class="grid grid-cols-12 text-xs font-semibold text-default-400 uppercase px-4 py-2">
         <div class="col-span-4">Período</div>
         <div class="col-span-2 text-end">Valor</div>
-        <div class="col-span-1 text-center">Parcelas</div>
+        <div class="col-span-1 text-center">Itens</div>
         <div class="col-span-3">Descrição</div>
         <div class="col-span-2 text-end">Ações</div>
     </div>
@@ -70,7 +70,7 @@ Este arquivo documenta o padrão geral e dá exemplo do **timeline de programaç
                 {{ MoneyHelper::format($prog->valor_centavos) }}
             </div>
 
-            <div class="col-span-1 text-center">{{ $prog->parcelas_maximas }}x</div>
+            <div class="col-span-1 text-center">{{ $prog->itens_maximos }}x</div>
 
             <div class="col-span-3 text-sm">{{ $prog->descricao ?: '—' }}</div>
 
@@ -110,18 +110,18 @@ Este arquivo documenta o padrão geral e dá exemplo do **timeline de programaç
 
 ### Sidebar de ficha (não é tabela, é key-value card)
 
-Usar `<x-shared.list-group>` (ver `list-group.md`) para dados pessoais da ficha 14.12.
+Usar `<x-shared.list-group>` (ver `list-group.md`) para dados de uma ficha de detalhe.
 
-### Cronograma de parcelas (simulador 14.14)
+### Cronograma simulado
 
 ```blade
-<x-shared.static-table :headers="['#', 'Vencimento', 'Valor', 'Modalidade']" bordered>
-    @foreach ($simulacao->parcelas as $i => $parcela)
-        <tr @class (['bg-primary/5' => $parcela['em_destaque'] ?? false])>
+<x-shared.static-table :headers="['#', 'Vencimento', 'Valor', 'Tipo']" bordered>
+    @foreach ($simulacao->itens as $i => $item)
+        <tr @class (['bg-primary/5' => $item['em_destaque'] ?? false])>
             <td class="text-center font-semibold">{{ $i + 1 }}</td>
-            <td>{{ $parcela['vencimento']->format('d/m/Y') }}</td>
-            <td class="text-end font-mono">{{ MoneyHelper::format($parcela['valor']) }}</td>
-            <td><x-shared.status-badge :enum="$parcela['modalidade']" /></td>
+            <td>{{ $item['vencimento']->format('d/m/Y') }}</td>
+            <td class="text-end font-mono">{{ MoneyHelper::format($item['valor']) }}</td>
+            <td><x-shared.status-badge :enum="$item['tipo']" /></td>
         </tr>
     @endforeach
 </x-shared.static-table>
@@ -131,13 +131,13 @@ Usa `<x-shared.static-table>` — não precisa componente novo.
 
 ---
 
-## Mapeamento no PRD
+## Quando usar cada variante
 
-| Tela                       | Componente                 | Razão                                        |
-| -------------------------- | -------------------------- | -------------------------------------------- |
-| 14.7 Programações          | `<x-admin.timeline-table>` | Visual de período ativo com barras coloridas |
-| 14.14 Simulador cronograma | `<x-shared.static-table>`  | Tabela simples — reutilizar static           |
-| 14.12 Ficha sidebar        | `<x-shared.list-group>`    | Key-value, não tabular                       |
+| Caso                | Componente                 | Razão                                        |
+| ------------------- | -------------------------- | -------------------------------------------- |
+| Timeline de períodos | `<x-admin.timeline-table>` | Visual de período ativo com barras coloridas |
+| Cronograma simulado  | `<x-shared.static-table>`  | Tabela simples — reutilizar static           |
+| Ficha lateral        | `<x-shared.list-group>`    | Key-value, não tabular                       |
 
 ---
 
@@ -145,8 +145,7 @@ Usa `<x-shared.static-table>` — não precisa componente novo.
 
 | Critério         | Valor                         |
 | ---------------- | ----------------------------- |
-| **Vai usar**     | 🟡 Sim (só timeline — 1 tela) |
-| **Prioridade**   | P2 (Onda 3)                   |
+| **Vai usar**     | 🟡 Sim (só timeline)          |
 | **Complexidade** | Média (visual custom)         |
 | **Status**       | 🟢 Concluído                  |
 
@@ -179,7 +178,7 @@ Cada item de `programacoes` pode trazer:
 
 - `inicio`, `fim`
 - `valor_formatado` ou `valor`
-- `parcelas`
+- `itens`
 - `descricao`
 - `status` opcional (`ativa`, `futura`, `expirada`)
 - `actions` opcional, como lista de botões (`label`, `icon`, `href`, `variant`, `appearance`, `attributes`)

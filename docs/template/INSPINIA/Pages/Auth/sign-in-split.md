@@ -1,15 +1,14 @@
-# Sign In — Split Layout (Login Admin 14.1)
+# Sign In — Split Layout (Login Admin)
 
 **Categoria:** Page / Auth
 **Origem Inspinia:** `resources/views/auth-split/sign-in.blade.php`
 **Plugins JS:** Nenhum (só Livewire + Preline)
-**Uso no ArtFinal:** Tela 14.1 — Login Admin
 
 ---
 
 ## Descrição
 
-Layout de login dividido em 2 colunas: **imagem** à esquerda (hero/background) e **formulário** à direita. Responsivo — em mobile a imagem esconde, só form. Uso no admin do ArtFinal conforme PRD §14.1.
+Layout de login dividido em 2 colunas: **imagem** à esquerda (hero/background) e **formulário** à direita. Responsivo — em mobile a imagem esconde, só form. Uso na tela de login do admin.
 
 ---
 
@@ -49,7 +48,7 @@ Layout de login dividido em 2 colunas: **imagem** à esquerda (hero/background) 
 
 ---
 
-## View Proposta (ArtFinal)
+## View Proposta
 
 **Não é Blade component** — é uma **view full-page** do Livewire.
 
@@ -113,7 +112,7 @@ class Login extends Component
 <html lang="pt-BR" data-theme="light" data-skin="default">
 <head>
     <meta charset="utf-8" />
-    <title>{{ $title }} | Portal ArtFinal</title>
+    <title>{{ $title }} | {{ config('app.name') }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <link rel="icon" href="{{ asset('favicon.ico') }}" />
@@ -141,8 +140,8 @@ class Login extends Component
                 class="absolute inset-0 bg-linear-to-t from-primary/80 via-primary/40 to-transparent flex items-end p-12"
             >
                 <div class="text-white">
-                    <h2 class="text-3xl font-bold mb-2">Portal ArtFinal</h2>
-                    <p class="text-white/80">Gestão completa de formaturas.</p>
+                    <h2 class="text-3xl font-bold mb-2">{{ config('app.name') }}</h2>
+                    <p class="text-white/80">Painel administrativo.</p>
                 </div>
             </div>
         </div>
@@ -154,12 +153,12 @@ class Login extends Component
             <div class="text-center">
                 <a href="{{ url('/') }}">
                     <img
-                        alt="ArtFinal"
+                        alt="{{ config('app.name') }}"
                         class="mx-auto h-12 flex dark:hidden"
                         src="{{ asset('images/admin/logo-dark.png') }}"
                     />
                     <img
-                        alt="ArtFinal"
+                        alt="{{ config('app.name') }}"
                         class="mx-auto h-12 hidden dark:flex"
                         src="{{ asset('images/admin/logo.png') }}"
                     />
@@ -199,19 +198,11 @@ class Login extends Component
                 </form>
             </div>
 
-            <p class="text-default-400 text-center text-xs">© {{ date('Y') }} Portal ArtFinal · Todos os direitos reservados.</p>
+            <p class="text-default-400 text-center text-xs">© {{ date('Y') }} {{ config('app.name') }} · Todos os direitos reservados.</p>
         </div>
     </div>
 </div>
 ```
-
----
-
-## Mapeamento no PRD
-
-| Tela        | Seção PRD |
-| ----------- | --------- |
-| Login Admin | 14.1      |
 
 ---
 
@@ -220,7 +211,6 @@ class Login extends Component
 | Critério         | Valor           |
 | ---------------- | --------------- |
 | **Vai usar**     | 🟢 Sim          |
-| **Prioridade**   | P4 (Sprint 15)  |
 | **Complexidade** | Média           |
 | **Status**       | 🔴 Não iniciado |
 
@@ -230,9 +220,9 @@ class Login extends Component
 
 1. **Layout próprio** `<x-admin.auth-layout>` — sem sidebar/topbar, diferente do `<x-admin.layout>` master
 2. **Livewire full-page** — `#[Layout('components.admin.auth-layout')]`
-3. **Throttle Laravel:** adicionar middleware `throttle:5,10` na rota de login (5 tentativas em 10 min, conforme PRD §14.1)
+3. **Throttle Laravel:** adicionar middleware `throttle:5,10` na rota de login (5 tentativas em 10 min)
 4. **`ativo = true`** obrigatório no guard attempt
 5. **`session()->regenerate()`** — previne session fixation
-6. **`last_login_at` e `last_login_ip`** — registro de auditoria (PRD §14.1)
-7. **Imagem hero** — usar foto de formatura real (gerenciado, não stock)
-8. **Sem link "Criar conta"** — admin não tem self-service; usuários criados via 14.18
+6. **`last_login_at` e `last_login_ip`** — registro de auditoria
+7. **Imagem hero** — usar imagem própria do projeto (gerenciada, não stock)
+8. **Sem link "Criar conta"** — admin não tem self-service; usuários criados via CRUD de usuários

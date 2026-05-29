@@ -20,8 +20,8 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 <button
     type="button"
     class="btn bg-primary text-white"
-    data-hs-overlay="#drawer-contrato"
-    aria-controls="drawer-contrato"
+    data-hs-overlay="#drawer-pedido"
+    aria-controls="drawer-pedido"
     aria-expanded="false"
 >
     Abrir Drawer
@@ -29,15 +29,15 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 
 <!-- O drawer -->
 <div
-    id="drawer-contrato"
+    id="drawer-pedido"
     class="hs-overlay hs-overlay-open:translate-x-0 bg-card border-default-300 fixed start-0 top-0 z-80 hidden h-full w-full max-w-sm -translate-x-full transform border-e transition-all duration-300"
     role="dialog"
     tabindex="-1"
-    aria-labelledby="drawer-contrato-label"
+    aria-labelledby="drawer-pedido-label"
 >
     <div class="flex items-center justify-between border-b p-5">
-        <h3 id="drawer-contrato-label">Título</h3>
-        <button type="button" data-hs-overlay="#drawer-contrato" aria-label="Close">
+        <h3 id="drawer-pedido-label">Título</h3>
+        <button type="button" data-hs-overlay="#drawer-pedido" aria-label="Close">
             <i class="iconify tabler--x text-xl"></i>
         </button>
     </div>
@@ -199,7 +199,7 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 </x-admin.drawer>
 ```
 
-### Real (Drawer de Filtros Avançados 14.12)
+### Real (Drawer de Filtros Avançados)
 
 ```blade
 <x-shared.button variant="default" appearance="outline" icon="tabler--filter" data-hs-overlay="#drawer-filtros">
@@ -208,14 +208,14 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 
 <x-admin.drawer id="drawer-filtros" title="Filtros Avançados" size="lg">
     <div class="space-y-4">
-        <x-shared.select-search label="Contrato" wire:model.live="filtros.contrato_id" />
-        <x-shared.select-search label="Curso" wire:model.live="filtros.curso_id" />
-        <x-shared.select-search label="Período" wire:model.live="filtros.periodo_id" />
-        <x-shared.date-range-picker label="Data Adesão" wire:model.live="filtros.data_adesao" />
-        <x-shared.select label="Adimplência" wire:model.live="filtros.adimplencia">
+        <x-shared.select-search label="Categoria" wire:model.live="filtros.categoria_id" />
+        <x-shared.select-search label="Produto" wire:model.live="filtros.produto_id" />
+        <x-shared.select-search label="Cliente" wire:model.live="filtros.cliente_id" />
+        <x-shared.date-range-picker label="Data do Pedido" wire:model.live="filtros.data_pedido" />
+        <x-shared.select label="Situação" wire:model.live="filtros.situacao">
             <option value="">Todos</option>
             <option value="em_dia">Em dia</option>
-            <option value="inadimplente">Inadimplente</option>
+            <option value="em_atraso">Em atraso</option>
         </x-shared.select>
     </div>
 
@@ -232,7 +232,7 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 
 ## Quando Usar ✅
 
-- Formulários curtos que não precisam de página dedicada (14.5 Categorias, 14.16 Índices)
+- Formulários curtos que não precisam de página dedicada
 - Filtros avançados que ocupam espaço demais inline
 - Preview de detalhes sem sair da listagem
 - Form rápido "Novo X" sem redirect
@@ -245,25 +245,11 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                | Seção PRD  | Uso                                          |
-| ------------------- | ---------- | -------------------------------------------- |
-| Categorias          | 14.5       | Drawer para CRUD rápido                      |
-| Índices de Reajuste | 14.16      | Modal/drawer para CRUD                       |
-| Usuários Admin      | 14.18      | Form em drawer                               |
-| Reajustes           | 14.4 Tab 5 | Modal para novo reajuste — pode virar drawer |
-| Formandos (filtros) | 14.12      | Filtros avançados em drawer                  |
-| Parcelas (filtros)  | 14.13      | Filtros em drawer                            |
-
----
-
 ## Classificação
 
 | Critério         | Valor                                       |
 | ---------------- | ------------------------------------------- |
 | **Vai usar**     | 🟢 Sim                                      |
-| **Prioridade**   | P1 (Onda 2)                                 |
 | **Complexidade** | Média (muitas posições, attributes Preline) |
 | **Status**       | 🟢 Concluído                                |
 

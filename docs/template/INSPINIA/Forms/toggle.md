@@ -72,28 +72,12 @@ Switch on/off estilo iOS. Alternativa a checkbox para estados booleanos (ativo/i
 <x-shared.toggle name="ativo" label="Ativo" wire:model="form.ativo" />
 
 <x-shared.toggle
-    name="exige_resp_cadastro"
-    label="Exige Responsável de Cadastro"
-    hint="Formandos menores de 18 anos precisam de responsável"
-    wire:model.live="contrato.exige_resp_cadastro"
+    name="exige_aprovacao"
+    label="Exige Aprovação"
+    hint="Registros marcados precisam de aprovação manual"
+    wire:model.live="pedido.exige_aprovacao"
 />
 ```
-
----
-
-## Mapeamento no PRD
-
-| Tela                 | Uso                          |
-| -------------------- | ---------------------------- |
-| 14.3 Instituições    | Ativo                        |
-| 14.4 Contratos Tab 2 | 4 toggles de responsáveis    |
-| 14.5 Categorias      | Ativo                        |
-| 14.6 Produtos        | Disponível na Adesão, Status |
-| 14.7 Programações    | Status                       |
-| 14.8 Condições       | Modalidade Híbrida           |
-| 14.11 Termos         | Status                       |
-| 14.15 Configurações  | Ajustar Fim de Mês           |
-| 14.18 Usuários Admin | Ativo                        |
 
 ---
 
@@ -102,7 +86,6 @@ Switch on/off estilo iOS. Alternativa a checkbox para estados booleanos (ativo/i
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2 (Onda 3)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 
@@ -141,9 +124,9 @@ Switch on/off estilo iOS. Alternativa a checkbox para estados booleanos (ativo/i
 
 ```blade
 <x-shared.toggle
-    name="exige_responsavel"
-    label="Exige responsável de cadastro"
-    hint="Ative para contratos com menores de idade."
+    name="exige_aprovacao"
+    label="Exige aprovação"
+    hint="Ative para registros que precisam de revisão manual."
     checked
 />
 ```

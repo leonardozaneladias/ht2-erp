@@ -42,7 +42,7 @@ Todos os form components seguem este padrão:
 Conforme CLAUDE.md §7.2, **toda validação fica em FormRequest**, não no Controller nem no Livewire inline. Pattern:
 
 ```php
-// app/Http/Requests/Admin/StoreInstituicaoRequest.php
+// app/Http/Requests/Admin/StoreClienteRequest.php
 declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
@@ -50,11 +50,11 @@ namespace App\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use LaravelLegends\PtBrValidator\Rules\Cnpj;
 
-final class StoreInstituicaoRequest extends FormRequest
+final class StoreClienteRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user('admin')->can('instituicoes.criar');
+        return $this->user('admin')->can('clientes.criar');
     }
 
     public function rules(): array
@@ -62,7 +62,7 @@ final class StoreInstituicaoRequest extends FormRequest
         return [
             'razao_social' => ['required', 'string', 'max:255'],
             'nome_fantasia' => ['required', 'string', 'max:255'],
-            'cnpj' => ['required', new Cnpj, 'unique:instituicoes,cnpj'],
+            'cnpj' => ['required', new Cnpj, 'unique:clientes,cnpj'],
             'cep' => ['required', 'regex:/^\d{5}-?\d{3}$/'],
             'logradouro' => ['required', 'string', 'max:255'],
             'numero' => ['required', 'string', 'max:20'],
@@ -99,26 +99,26 @@ final class StoreInstituicaoRequest extends FormRequest
 
 ## Validação em Livewire
 
-Livewire usa `#[Validate]` attributes OU `$rules` property. Padrão recomendado para o ArtFinal:
+Livewire usa `#[Validate]` attributes OU `$rules` property. Padrão recomendado:
 
 ```php
-// app/Livewire/Admin/Instituicoes/Form.php
-use App\Http\Requests\Admin\StoreInstituicaoRequest;
+// app/Livewire/Admin/Clientes/Form.php
+use App\Http\Requests\Admin\StoreClienteRequest;
 
 class Form extends Component
 {
-    public InstituicaoData $form;
+    public ClienteData $form;
 
     protected function rules(): array
     {
-        return (new StoreInstituicaoRequest)->rules();
+        return (new StoreClienteRequest)->rules();
     }
 
     public function salvar(): void
     {
         $validated = $this->validate();
-        app(CreateInstituicaoAction::class)->execute($validated);
-        $this->dispatch('toast', variant: 'success', message: 'Instituição criada.');
+        app(CreateClienteAction::class)->execute($validated);
+        $this->dispatch('toast', variant: 'success', message: 'Cliente criado.');
     }
 }
 ```
@@ -137,38 +137,20 @@ Rules disponíveis:
 - `Cnpj` — valida CNPJ
 - `Celular` / `TelefoneComDdd` — valida telefone BR
 - `FormatoCep` — valida formato `XXXXX-XXX`
-- `Placa` — placa de veículo (não usado no ArtFinal)
+- `Placa` — placa de veículo
 
 Mensagens em pt-BR vêm do pacote `laravel-lang/lang` (já em `resources/lang/pt_BR/validation.php`).
 
 ---
 
-## Checklist de validação por tela (PRD)
+## Rules customizadas
 
-| Tela                 | Validações críticas                                                                 |
-| -------------------- | ----------------------------------------------------------------------------------- |
-| 14.3 Instituições    | CNPJ único, CEP formato, email formato, logo max 2MB                                |
-| 14.4 Contratos       | Código turma único + alfanumérico maiúsculo, ano ≥ atual, data_evento > data_inicio |
-| 14.6 Produtos        | Contrato válido, categoria válida, data_fim > data_inicio, imagem max 2MB           |
-| 14.7 Programações    | Sem sobreposição (rule custom), valor > 0, parcelas ≥ 1                             |
-| 14.8 Condições       | parcela_max ≥ parcela_min, data_limite obrigatória se híbrida                       |
-| 14.9 Descontos       | parcela_ate ≥ parcela_de, percentual 0.01–100, sem sobreposição                     |
-| 14.11 Termos         | Nome único, versão obrigatória                                                      |
-| 14.12 Formandos      | CPF único + válido, data_nascimento ≥ 10 anos atrás                                 |
-| 14.15 Configurações  | Dias entre 1-31, valor_minimo_parcela > 0                                           |
-| 14.18 Usuários Admin | Email único, senha mín 8 chars + letras + números                                   |
+Rules de negócio específicas ficam em `app/Rules/*.php`. Exemplos comuns:
 
----
-
-## Rules customizadas que precisaremos criar
-
-| Rule                           | Uso                                                          |
-| ------------------------------ | ------------------------------------------------------------ |
-| `SemSobreposicaoProgramacao`   | Valida que nova programação não colide com existentes (14.7) |
-| `SemSobreposicaoDesconto`      | Idem para descontos (14.9)                                   |
-| `CodigoTurmaAlfanumericoUpper` | `/^[A-Z0-9]+$/`                                              |
-| `DataFuturaOuIgual`            | Data ≥ hoje                                                  |
-| `AnoMinimoAtual`               | Ano ≥ now()->year                                            |
+| Rule                | Uso                |
+| ------------------- | ------------------ |
+| `DataFuturaOuIgual` | Data ≥ hoje        |
+| `AnoMinimoAtual`    | Ano ≥ now()->year  |
 
 ---
 
@@ -177,7 +159,6 @@ Mensagens em pt-BR vêm do pacote `laravel-lang/lang` (já em `resources/lang/pt
 | Critério         | Valor                                  |
 | ---------------- | -------------------------------------- |
 | **Vai usar**     | 🟢 Sim (padrão)                        |
-| **Prioridade**   | P2 (Onda 3)                            |
 | **Complexidade** | Baixa (pattern já embutido nos inputs) |
 | **Status**       | 🔴 Não iniciado                        |
 
@@ -190,4 +171,4 @@ Mensagens em pt-BR vêm do pacote `laravel-lang/lang` (já em `resources/lang/pt
 3. **Livewire reusa FormRequest** via `(new XRequest)->rules()` — DRY
 4. **pt-br-validator** para CPF/CNPJ/Telefone/CEP
 5. **Mensagens em pt-BR** via `laravel-lang/lang` já instalado
-6. **Rules custom** ficam em `app/Rules/*.php` — criar conforme necessário por sprint
+6. **Rules custom** ficam em `app/Rules/*.php` — criar conforme necessário

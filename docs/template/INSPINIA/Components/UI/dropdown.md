@@ -181,29 +181,29 @@ Menu dropdown clicável (ou hover). Usado para **menu de ações por linha** em 
         </button>
     </x-slot:button>
 
-    @can ('contratos.editar')
-        <x-shared.dropdown-item icon="tabler--edit" :href="route('admin.contratos.edit', $contrato)">
+    @can ('pedidos.editar')
+        <x-shared.dropdown-item icon="tabler--edit" :href="route('admin.pedidos.edit', $pedido)">
             Editar
         </x-shared.dropdown-item>
     @endcan
 
-    <x-shared.dropdown-item icon="tabler--eye" :href="route('admin.contratos.show', $contrato)">
-        Ver Formandos
+    <x-shared.dropdown-item icon="tabler--eye" :href="route('admin.pedidos.show', $pedido)">
+        Ver Itens
     </x-shared.dropdown-item>
 
-    @can ('contratos.duplicar')
-        <x-shared.dropdown-item icon="tabler--copy" wire:click="duplicar({{ $contrato->id }})">
-            Duplicar Contrato
+    @can ('pedidos.duplicar')
+        <x-shared.dropdown-item icon="tabler--copy" wire:click="duplicar({{ $pedido->id }})">
+            Duplicar Pedido
         </x-shared.dropdown-item>
     @endcan
 
     <x-shared.dropdown-divider />
 
-    @can ('contratos.inativar')
+    @can ('pedidos.inativar')
         <x-shared.dropdown-item
             icon="tabler--ban"
             variant="danger"
-            wire:click="confirmarInativacao({{ $contrato->id }})"
+            wire:click="confirmarInativacao({{ $pedido->id }})"
         >
             Inativar
         </x-shared.dropdown-item>
@@ -238,7 +238,7 @@ Menu dropdown clicável (ou hover). Usado para **menu de ações por linha** em 
 
 ## Quando Usar ✅
 
-- Menu de ações por linha em tabelas (todas as 14.\*)
+- Menu de ações por linha em tabelas
 - User menu no topbar
 - Seletores de filtro compacto
 - Menu "mais opções" em toolbars
@@ -251,23 +251,11 @@ Menu dropdown clicável (ou hover). Usado para **menu de ações por linha** em 
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                     | Seção PRD   | Uso                                                                                 |
-| ------------------------ | ----------- | ----------------------------------------------------------------------------------- |
-| Topbar                   | —           | User menu, notificações                                                             |
-| Todas tabelas 14.3–14.13 | —           | Menu "Ações" por linha                                                              |
-| Produtos                 | 14.6        | Dropdown com 6 ações (Editar, Programações, Condições, Descontos, Termos, Inativar) |
-| Formandos                | 14.12 Tab 5 | Ações por parcela                                                                   |
-
----
-
 ## Classificação
 
 | Critério         | Valor                        |
 | ---------------- | ---------------------------- |
 | **Vai usar**     | 🟢 Sim (primitivo universal) |
-| **Prioridade**   | P1 (Onda 2)                  |
 | **Complexidade** | Média                        |
 | **Status**       | 🟢 Concluído                 |
 

@@ -166,30 +166,30 @@ public function boot(): void
 ### Livewire Component
 
 ```php
-// app/Livewire/Admin/Contratos/Tabela.php
+// app/Livewire/Admin/Pedidos/Tabela.php
 class Tabela extends Component
 {
     use WithPagination;
 
     public function render()
     {
-        $contratos = Contrato::query()->paginate(15);
-        return view('livewire.admin.contratos.tabela', ['contratos' => $contratos]);
+        $pedidos = Pedido::query()->paginate(15);
+        return view('livewire.admin.pedidos.tabela', ['pedidos' => $pedidos]);
     }
 }
 ```
 
 ```blade
-{{-- resources/views/livewire/admin/contratos/tabela.blade.php --}}
+{{-- resources/views/livewire/admin/pedidos/tabela.blade.php --}}
 <div>
     <table class="table">
-        @foreach ($contratos as $contrato)
+        @foreach ($pedidos as $pedido)
             {{-- linha --}}
         @endforeach
     </table>
 
     <div class="mt-4">
-        {{ $contratos->links() }}
+        {{ $pedidos->links() }}
         {{-- Usa vendor.pagination.inspinia automaticamente --}}
     </div>
 </div>
@@ -198,7 +198,7 @@ class Tabela extends Component
 ### Controller tradicional
 
 ```blade
-<div class="mt-4">{{ $formandos->links('vendor.pagination.inspinia') }}</div>
+<div class="mt-4">{{ $clientes->links('vendor.pagination.inspinia') }}</div>
 ```
 
 ---
@@ -210,18 +210,8 @@ class Tabela extends Component
 
 ## Quando NÃO Usar ❌
 
-- DataTables (14.3, 14.4, 14.6, 14.12, 14.13, 14.17, 14.18) — usam paginação do jQuery DataTables
+- DataTables — usam paginação do jQuery DataTables
 - Listas curtas (< 20 items) → `->get()` sem paginação
-
----
-
-## Mapeamento no PRD
-
-| Tela               | Seção PRD  |         Usa?          |
-| ------------------ | ---------- | :-------------------: |
-| DataTables (todas) | 14.3–14.13 |          ❌           |
-| Livewire tables    | —          |          ✅           |
-| Relatórios         | 14.17      | ✅ (se usar Livewire) |
 
 ---
 
@@ -230,7 +220,6 @@ class Tabela extends Component
 | Critério         | Valor                            |
 | ---------------- | -------------------------------- |
 | **Vai usar**     | 🟢 Sim                           |
-| **Prioridade**   | P1 (Onda 2)                      |
 | **Complexidade** | Média (integração com Paginator) |
 | **Status**       | 🟢 Concluído                     |
 

@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Wrapper Blade que envolve um gráfico ApexCharts em um `card` com título e slots para filtros. Padroniza a moldura visual dos 4 gráficos que o ArtFinal usa (bar, line, column, pie). O chart em si é inicializado via Livewire component filho que dispatcha configs para ApexCharts.
+Wrapper Blade que envolve um gráfico ApexCharts em um `card` com título e slots para filtros. Padroniza a moldura visual dos 4 tipos de gráfico (bar, line, column, pie). O chart em si é inicializado via Livewire component filho que dispatcha configs para ApexCharts.
 
 > **Padrão:** cada tipo de gráfico é um **Livewire component** que recebe dados do PHP, renderiza o `<div id="...">` e emite evento JS com a config — mantém os dados no servidor e o render no cliente.
 
@@ -91,12 +91,12 @@ new ApexCharts(document.querySelector('#grafico-receita'), options).render()
 ## Exemplo de Uso
 
 ```blade
-<x-admin.chart-card title="Adesões por Mês" chart-id="grafico-adesoes" :height="320">
+<x-admin.chart-card title="Pedidos por Mês" chart-id="grafico-pedidos" :height="320">
     <x-slot:headerActions>
-        <x-shared.select name="contrato_filter" :options="$contratos" wire:model.live="filtroContrato" />
+        <x-shared.select name="categoria_filter" :options="$categorias" wire:model.live="filtroCategoria" />
     </x-slot:headerActions>
 
-    <livewire:admin.dashboard.grafico-adesoes chart-id="grafico-adesoes" :filtro="$filtroContrato" />
+    <livewire:admin.dashboard.grafico-pedidos chart-id="grafico-pedidos" :filtro="$filtroCategoria" />
 </x-admin.chart-card>
 ```
 
@@ -105,8 +105,8 @@ new ApexCharts(document.querySelector('#grafico-receita'), options).render()
 ## Padrão Livewire para gráficos
 
 ```php
-// app/Livewire/Admin/Dashboard/GraficoAdesoes.php
-class GraficoAdesoes extends Component
+// app/Livewire/Admin/Dashboard/GraficoPedidos.php
+class GraficoPedidos extends Component
 {
     public string $chartId;
     public ?int $filtro = null;
@@ -115,28 +115,28 @@ class GraficoAdesoes extends Component
     public function dados(): array
     {
         $meses = collect(range(11, 0))->map(fn($i) => now()->subMonths($i));
-        $series = $meses->map(fn($m) => Adesao::whereYear('created_at', $m->year)
+        $series = $meses->map(fn($m) => Pedido::whereYear('created_at', $m->year)
             ->whereMonth('created_at', $m->month)
-            ->when($this->filtro, fn($q) => $q->where('contrato_id', $this->filtro))
+            ->when($this->filtro, fn($q) => $q->where('categoria_id', $this->filtro))
             ->count())
             ->toArray();
 
         return [
             'categories' => $meses->map->format('M/y')->toArray(),
-            'series' => [['name' => 'Adesões', 'data' => $series]],
+            'series' => [['name' => 'Pedidos', 'data' => $series]],
         ];
     }
 
     public function render()
     {
         $this->dispatch('chart-update', chartId: $this->chartId, data: $this->dados);
-        return view('livewire.admin.dashboard.grafico-adesoes');
+        return view('livewire.admin.dashboard.grafico-pedidos');
     }
 }
 ```
 
 ```blade
-{{-- resources/views/livewire/admin/dashboard/grafico-adesoes.blade.php --}}
+{{-- resources/views/livewire/admin/dashboard/grafico-pedidos.blade.php --}}
 <div></div>
 ```
 
@@ -180,14 +180,14 @@ document.addEventListener('livewire:init', () => {
 
 ---
 
-## Mapeamento no PRD
+## Casos de uso típicos
 
-| Tela             | Gráfico                                           |  Tipo  |
-| ---------------- | ------------------------------------------------- | :----: |
-| 14.2 Dashboard   | Adesões por mês (12 meses)                        |  bar   |
-| 14.2 Dashboard   | Receita x Inadimplência (12 meses, linhas duplas) |  line  |
-| 14.17 Relatórios | Receita por contrato                              | column |
-| 14.17 Relatórios | Distribuição modalidade                           |  pie   |
+| Contexto    | Gráfico                                     |  Tipo  |
+| ----------- | ------------------------------------------- | :----: |
+| Dashboard   | Registros por mês (12 meses)                |  bar   |
+| Dashboard   | Receita x despesa (12 meses, linhas duplas) |  line  |
+| Relatórios  | Receita por categoria                       | column |
+| Relatórios  | Distribuição por tipo                       |  pie   |
 
 ---
 
@@ -196,7 +196,6 @@ document.addEventListener('livewire:init', () => {
 | Critério         | Valor                                |
 | ---------------- | ------------------------------------ |
 | **Vai usar**     | 🟢 Sim                               |
-| **Prioridade**   | P3 (Onda 4)                          |
 | **Complexidade** | Média (bridge Livewire + ApexCharts) |
 | **Status**       | 🟢 Concluído                         |
 
@@ -227,13 +226,13 @@ document.addEventListener('livewire:init', () => {
 ### Código
 
 ```blade
-<x-admin.chart-card title="Adesões por mês" subtitle="Últimos 12 meses" chart-id="grafico-adesoes" :height="320">
+<x-admin.chart-card title="Pedidos por mês" subtitle="Últimos 12 meses" chart-id="grafico-pedidos" :height="320">
     <x-slot:headerActions>
         <x-shared.select name="periodo" :options="['30d' => '30 dias', '12m' => '12 meses']" selected="12m" />
     </x-slot:headerActions>
 
     <x-slot:chart>
-        <div id="grafico-adesoes" class="h-80" wire:ignore></div>
+        <div id="grafico-pedidos" class="h-80" wire:ignore></div>
     </x-slot:chart>
 </x-admin.chart-card>
 ```

@@ -22,13 +22,13 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
     <div class="bg-default-100 mb-4 flex size-20 items-center justify-center rounded-full">
         <i class="iconify tabler--inbox text-default-400 text-4xl"></i>
     </div>
-    <h3 class="mb-2 text-lg font-semibold">Nenhum contrato cadastrado</h3>
+    <h3 class="mb-2 text-lg font-semibold">Nenhum pedido cadastrado</h3>
     <p class="text-default-400 mb-6 max-w-sm">
-        Comece criando seu primeiro contrato para vincular formandos e iniciar o fluxo de adesão.
+        Comece criando seu primeiro pedido para vincular clientes e iniciar o fluxo de vendas.
     </p>
-    <a href="/admin/contratos/create" class="btn bg-primary text-white">
+    <a href="/admin/pedidos/create" class="btn bg-primary text-white">
         <i class="iconify tabler--plus"></i>
-        Novo Contrato
+        Novo Pedido
     </a>
 </div>
 ```
@@ -54,7 +54,7 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
 
 | Slot              | Descrição                                     |
 | ----------------- | --------------------------------------------- |
-| `$action`         | Botão CTA (ex: "Novo Contrato")               |
+| `$action`         | Botão CTA (ex: "Novo Pedido")                 |
 | `$slot` (default) | Se usado, substitui `description` (HTML rico) |
 
 ### Código
@@ -104,20 +104,20 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
 
 ```blade
 <x-shared.card :body-padding="false">
-    @if ($contratos->isEmpty())
+    @if ($pedidos->isEmpty())
         <x-shared.empty-state
             icon="tabler--file-text"
-            title="Nenhum contrato cadastrado"
-            description="Comece criando seu primeiro contrato para vincular formandos e iniciar o fluxo de adesão."
+            title="Nenhum pedido cadastrado"
+            description="Comece criando seu primeiro pedido para vincular clientes e iniciar o fluxo de vendas."
         >
             <x-slot:action>
-                <x-shared.button variant="primary" icon="tabler--plus" :href="route('admin.contratos.create')">
-                    Novo Contrato
+                <x-shared.button variant="primary" icon="tabler--plus" :href="route('admin.pedidos.create')">
+                    Novo Pedido
                 </x-shared.button>
             </x-slot:action>
         </x-shared.empty-state>
     @else
-        <livewire:admin.contratos.tabela :contratos="$contratos" />
+        <livewire:admin.pedidos.tabela :pedidos="$pedidos" />
     @endif
 </x-shared.card>
 ```
@@ -125,10 +125,10 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
 ### Busca sem resultado
 
 ```blade
-@if (empty($formandos) && !empty($busca))
+@if (empty($clientes) && !empty($busca))
     <x-shared.empty-state
         icon="tabler--search-off"
-        title="Nenhum formando encontrado"
+        title="Nenhum cliente encontrado"
         description="Tente ajustar os filtros ou revisar o termo de busca."
     >
         <x-slot:action>
@@ -153,19 +153,19 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
 @endcannot
 ```
 
-### Aba vazia na ficha do formando
+### Aba vazia na ficha do cliente
 
 ```blade
 <x-shared.tab-panel id="auditoria">
-    @if ($formando->auditLogs->isEmpty())
+    @if ($cliente->auditLogs->isEmpty())
         <x-shared.empty-state
             icon="tabler--history"
             title="Sem histórico"
-            description="Ações realizadas sobre este formando aparecerão aqui."
+            description="Ações realizadas sobre este cliente aparecerão aqui."
             size="sm"
         />
     @else
-        <livewire:admin.formandos.tabs.auditoria :formando="$formando" />
+        <livewire:admin.clientes.tabs.auditoria :cliente="$cliente" />
     @endif
 </x-shared.tab-panel>
 ```
@@ -176,7 +176,7 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
 
 - Listagens (DataTable, Livewire) quando retornarem 0 itens
 - Busca/filtro sem resultado
-- Tabs sem dados vinculados (termos, auditoria, parcelas)
+- Tabs sem dados vinculados (documentos, auditoria, itens)
 - Seções sem permissão
 
 ## Quando NÃO Usar ❌
@@ -188,29 +188,11 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                                 | Seção PRD | Cenário empty                  |
-| ------------------------------------ | --------- | ------------------------------ |
-| Instituições                         | 14.3      | Nenhuma instituição cadastrada |
-| Contratos                            | 14.4      | Nenhum contrato ainda          |
-| Produtos                             | 14.6      | Sem produtos                   |
-| Termos                               | 14.11     | Sem termos cadastrados         |
-| Formandos                            | 14.12     | Filtro sem resultado           |
-| Parcelas                             | 14.13     | Filtro sem resultado           |
-| Formandos ficha Tab 3 (Portal users) | 14.12     | Nenhum portal_user vinculado   |
-| Formandos ficha Tab 6 (Termos)       | 14.12     | Sem termos aceitos             |
-| Formandos ficha Tab 7 (Auditoria)    | 14.12     | Sem histórico                  |
-| Relatórios                           | 14.17     | Período sem dados              |
-
----
-
 ## Classificação
 
 | Critério         | Valor               |
 | ---------------- | ------------------- |
 | **Vai usar**     | 🟢 Sim (recorrente) |
-| **Prioridade**   | P1 (Onda 2)         |
 | **Complexidade** | Trivial             |
 | **Status**       | 🟢 Concluído        |
 
@@ -249,7 +231,7 @@ Mensagem exibida quando uma listagem está vazia (sem dados, sem resultados de b
 ```blade
 <x-shared.empty-state
     icon="tabler--search-off"
-    title="Nenhum formando encontrado"
+    title="Nenhum cliente encontrado"
     description="Tente ajustar os filtros ou revisar o termo informado."
 >
     <x-slot:action>

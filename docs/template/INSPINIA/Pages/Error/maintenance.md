@@ -21,7 +21,7 @@ Página exibida quando o Laravel está em **maintenance mode** (`php artisan dow
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Manutenção | Portal ArtFinal</title>
+    <title>Manutenção | {{ config('app.name') }}</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" />
     <x-admin.partials.theme-bootstrap />
     @vite (['resources/css/admin.css'])
@@ -49,7 +49,7 @@ Página exibida quando o Laravel está em **maintenance mode** (`php artisan dow
 
                     <p class="text-default-400 text-xs mt-6">
                         Urgente? Contate
-                        <a href="mailto:suporte@artfinal.com.br" class="text-primary">suporte@artfinal.com.br</a>
+                        <a href="mailto:{{ config('mail.support') }}" class="text-primary">{{ config('mail.support') }}</a>
                     </p>
                 </div>
             </div>
@@ -81,7 +81,6 @@ php artisan up
 | Critério         | Valor           |
 | ---------------- | --------------- |
 | **Vai usar**     | 🟢 Sim          |
-| **Prioridade**   | P4              |
 | **Complexidade** | Trivial         |
 | **Status**       | 🔴 Não iniciado |
 

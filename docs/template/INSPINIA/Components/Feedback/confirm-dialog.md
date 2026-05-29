@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Modal de confirmação estilizado para ações destrutivas ou importantes. Diferente de `<x-shared.modal>` (flexível, custom), o confirm-dialog usa **SweetAlert2** para um prompt padronizado Yes/No com ícone, título, mensagem. Usado em confirmações antes de excluir, cancelar, inativar, aplicar reajustes.
+Modal de confirmação estilizado para ações destrutivas ou importantes. Diferente de `<x-shared.modal>` (flexível, custom), o confirm-dialog usa **SweetAlert2** para um prompt padronizado Yes/No com ícone, título, mensagem. Usado em confirmações antes de excluir, cancelar ou inativar registros.
 
 > **Decisão oficial do Batch 3:** `x-shared.confirm-dialog` permanece no lote, mas como helper JS/bridge Livewire. Não existe arquivo Blade próprio para ele e não existe `x-admin.confirm-modal` na fonte oficial.
 
@@ -21,7 +21,7 @@ Modal de confirmação estilizado para ações destrutivas ou importantes. Difer
 import Swal from 'sweetalert2';
 
 Swal.fire({
-    title: 'Excluir contrato?',
+    title: 'Excluir pedido?',
     text: 'Esta ação não pode ser desfeita.',
     icon: 'warning',
     showCancelButton: true,
@@ -40,7 +40,7 @@ Icons disponíveis: `success`, `error`, `warning`, `info`, `question`.
 
 ---
 
-## Abordagem ArtFinal: helper JS + dispatch Livewire
+## Abordagem do projeto: helper JS + dispatch Livewire
 
 Em vez de chamar `Swal.fire()` diretamente em cada lugar, criar um **helper JS global** + um **bridge Livewire** para disparar confirmações via eventos.
 
@@ -127,30 +127,30 @@ document.addEventListener('livewire:init', () => {
 ### Via Livewire dispatch (padrão recomendado)
 
 ```php
-// app/Livewire/Admin/Contratos/Tabela.php
+// app/Livewire/Admin/Pedidos/Tabela.php
 class Tabela extends Component
 {
-    public function confirmarInativacao(int $contratoId): void
+    public function confirmarInativacao(int $pedidoId): void
     {
-        $contrato = Contrato::findOrFail($contratoId);
-        $adesoes = $contrato->adesoes()->ativas()->count();
+        $pedido = Pedido::findOrFail($pedidoId);
+        $itens = $pedido->itens()->ativos()->count();
 
         $this->dispatch('confirm',
             destructive: true,
-            title: 'Inativar contrato?',
-            text: $adesoes > 0
-                ? "Este contrato possui {$adesoes} formandos aderidos. Tem certeza?"
+            title: 'Inativar pedido?',
+            text: $itens > 0
+                ? "Este pedido possui {$itens} itens vinculados. Tem certeza?"
                 : 'Esta ação pode ser revertida depois.',
             confirmText: 'Sim, inativar',
             onConfirm: 'inativar',
-            params: ['id' => $contratoId],
+            params: ['id' => $pedidoId],
         );
     }
 
     public function inativar(int $id): void
     {
-        Contrato::findOrFail($id)->update(['ativo' => false]);
-        $this->dispatch('toast', variant: 'success', message: 'Contrato inativado.');
+        Pedido::findOrFail($id)->update(['ativo' => false]);
+        $this->dispatch('toast', variant: 'success', message: 'Pedido inativado.');
     }
 }
 ```
@@ -162,11 +162,11 @@ class Tabela extends Component
     type="button"
     @click="
             const result = await window.confirmDestructive({
-                title: 'Excluir formando?',
+                title: 'Excluir cliente?',
                 text: 'Esta ação removerá todo o histórico.',
                 confirmText: 'Sim, excluir'
             })
-            if (result.isConfirmed) $wire.excluir({{ $formando->id }})
+            if (result.isConfirmed) $wire.excluir({{ $cliente->id }})
         "
     class="btn btn-danger"
 >
@@ -179,8 +179,8 @@ class Tabela extends Component
 ```php
 $this->dispatch('alert',
     type: 'success',
-    title: 'Reajuste aplicado',
-    text: 'As parcelas em aberto foram recalculadas.',
+    title: 'Operação concluída',
+    text: 'Os valores em aberto foram recalculados.',
 );
 ```
 
@@ -189,7 +189,7 @@ $this->dispatch('alert',
 ## Quando Usar ✅
 
 - **Confirmação antes de ação destrutiva** (excluir, cancelar, inativar)
-- **Confirmação antes de ação irreversível** (aplicar reajuste — PRD 14.4 Tab 5)
+- **Confirmação antes de ação irreversível** (operações que recalculam ou migram dados)
 - **Sucesso crítico** que merece mais destaque que toast (operações bancárias, migrações)
 - **Erros críticos** que precisam de atenção do usuário
 
@@ -202,26 +202,11 @@ $this->dispatch('alert',
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                 | Seção PRD | Uso                                                             |
-| -------------------- | --------- | --------------------------------------------------------------- |
-| 14.3 Instituições    | 14.3      | Confirm "Esta instituição possui X contratos" antes de inativar |
-| 14.4 Contratos       | 14.4      | Confirm antes de duplicar, inativar                             |
-| 14.4 Tab 5 Reajustes | 14.4      | **Confirm antes de aplicar reajuste** (recalcula parcelas)      |
-| 14.11 Termos         | 14.11     | Confirm incremento de versão ao editar termo com aceites        |
-| 14.12 Tab 5 Parcelas | 14.12     | Confirm antes de cancelar parcela ou alterar valor              |
-| 14.13 Baixa em Lote  | 14.13     | Confirm "Baixar N parcelas?"                                    |
-| 14.18 Usuários       | 14.18     | Confirm antes de resetar senha                                  |
-
----
-
 ## Classificação
 
 | Critério         | Valor                      |
 | ---------------- | -------------------------- |
 | **Vai usar**     | 🟢 Sim                     |
-| **Prioridade**   | P1 (Onda 2)                |
 | **Complexidade** | Média (bridge JS + helper) |
 | **Status**       | 🟢 Concluído               |
 
@@ -259,7 +244,7 @@ $this->dispatch('alert',
 
 ```js
 const result = await window.confirmDestructive({
-    title: 'Excluir contrato?',
+    title: 'Excluir pedido?',
     text: 'Esta ação não pode ser desfeita.',
     confirmText: 'Sim, excluir',
 });

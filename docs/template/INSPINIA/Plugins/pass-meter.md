@@ -3,7 +3,7 @@
 **Categoria:** Plugin
 **Origem Inspinia:** `resources/views/plugins/pass-meter.blade.php`
 **Plugins JS:** Nenhum (implementação Alpine custom)
-**Uso no ArtFinal:** 14.18 Usuários Admin — medidor visual de força de senha
+**Uso típico:** Cadastro/edição de usuários — medidor visual de força de senha
 
 ---
 
@@ -13,7 +13,7 @@ Medidor visual de força de senha — barra de progresso colorida + label ("Frac
 
 ---
 
-## Abordagem ArtFinal: Alpine puro
+## Abordagem: Alpine puro
 
 O Inspinia usa biblioteca externa; vamos implementar direto em Alpine para evitar dependência.
 
@@ -146,13 +146,12 @@ public function rules(): array
 
 ---
 
-## Mapeamento no PRD
+## Onde Se Aplica
 
-| Tela                  | Uso                       |
-| --------------------- | ------------------------- |
-| 14.18 Usuários Admin  | Cadastro e reset de senha |
-| Portal wizard etapa 5 | Senha do portal_user      |
-| Account Settings      | Alterar senha             |
+| Contexto         | Uso                       |
+| ---------------- | ------------------------- |
+| Usuários         | Cadastro e reset de senha |
+| Account Settings | Alterar senha             |
 
 ---
 
@@ -161,7 +160,6 @@ public function rules(): array
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P5 (Onda 6)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 

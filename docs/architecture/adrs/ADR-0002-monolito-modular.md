@@ -11,60 +11,57 @@ status: accepted
 
 ## Contexto e problema
 
-O Portal ArtFinal tem domínio coeso (adesão → convite → RSVP → seating → extras → pagamento) com fortes invariantes transacionais entre contextos. O time fundador é pequeno (engenharia core < 6 devs) e o SLA alvo é 99,5% (PLANEJAMENTO §Apêndice B pergunta 5).
+A aplicação tem domínio coeso, com fortes invariantes transacionais entre contextos. O time é pequeno e o SLA alvo é alto.
 
-A decisão em aberto é: começar com microservices (um serviço por bounded context) ou monólito modular Laravel 13 com fronteiras internas explícitas?
+A decisão em aberto é: começar com microservices (um serviço por bounded context) ou monólito modular Laravel com fronteiras internas explícitas?
 
 ## Drivers da decisão
 
 - Custo operacional de infra e observabilidade distribuída vs tamanho do time.
-- Transações cross-context (ex.: `ConfirmarPagamentoExtraAction` → `EmitirLoteConvitesAction`) precisam ser atômicas no MVP.
-- Time-to-market de F1 → F5 (marco MVP executivo) é de poucos meses.
-- Necessidade de evitar retrabalho se um contexto (ex.: pagamentos) precisar extrair no futuro.
+- Transações cross-context (ex.: confirmar um pagamento → emitir os registros derivados) precisam ser atômicas.
+- Time-to-market curto.
+- Necessidade de evitar retrabalho se um contexto precisar ser extraído no futuro.
 
 ## Alternativas consideradas
 
-### Alt 1: Microservices por bounded context desde o MVP
+### Alt 1: Microservices por bounded context desde o início
 
 - Prós: escalabilidade independente, isolamento de falha, stacks heterogêneas possíveis.
-- Contras: operação distribuída (tracing, SAGA, eventual consistency) com time pequeno; reserva de assento exige locks globais via infra externa (Redis cluster + lock distribuído); 6× mais ambientes, pipelines, segredos.
+- Contras: operação distribuída (tracing, SAGA, eventual consistency) com time pequeno; invariantes transacionais exigem coordenação via infra externa; muito mais ambientes, pipelines e segredos.
 
 ### Alt 2: Monólito "big-ball-of-mud" sem fronteiras
 
 - Prós: velocidade inicial ainda maior.
-- Contras: acoplamento cresce sem freio; extrair pagamentos ou seating no futuro exige reescrita.
+- Contras: acoplamento cresce sem freio; extrair qualquer contexto no futuro exige reescrita.
 
 ### Alt 3: Monólito modular Laravel com bounded contexts explícitos (escolhida)
 
-- Prós: velocidade de monólito + fronteiras semânticas claras (`Actions/<Contexto>`, `Data/<Contexto>`, `Models/<Contexto>`, `Events/<Contexto>`). Arch tests Pest garantem acoplamento controlado. Transações `DB::transaction` naturais. Observabilidade nativa com Horizon + Pulse + Sentry. Estrada clara para extrair módulos futuros como serviços.
-- Contras: escalabilidade por contexto só chega com extração (aceitável no MVP).
+- Prós: velocidade de monólito + fronteiras semânticas claras (`Actions/<Contexto>`, `Data/<Contexto>`, `Models/<Contexto>`, `Events/<Contexto>`). Arch tests Pest garantem acoplamento controlado. Transações `DB::transaction` naturais. Observabilidade nativa com Horizon + Pulse. Estrada clara para extrair módulos futuros como serviços.
+- Contras: escalabilidade por contexto só chega com extração (aceitável).
 
 ## Decisão
 
-Adotar monólito modular Laravel 13 com fronteiras por bounded context (Adesão, Convites, RSVP, Seating, Extras, Pagamentos, Enquetes, Acesso, Cadastro, Comunicação). Cada contexto encapsula suas Actions, Data, Enums, Events, Exceptions, Models, Jobs, Listeners e Policies. Controllers de `Http\Api\V1`, `Http\Web\Admin` e Livewire consomem **apenas Actions**, nunca regras espalhadas.
+Adotar monólito modular Laravel com fronteiras por bounded context. Cada contexto encapsula suas Actions, Data, Enums, Events, Exceptions, Models, Jobs, Listeners e Policies. Controllers e componentes Livewire consomem **apenas Actions**, nunca regras espalhadas.
 
-Pest Architecture Tests (§1.3) fazem cumprir:
+Pest Architecture Tests fazem cumprir:
 
 - `App\Actions` não pode usar `Illuminate\Http\*`.
 - `App\Models` não pode importar `App\Actions`.
-- Controllers só podem usar Actions, Data, Requests, Resources, Policies, Enums.
+- Controllers só podem usar Actions, Data, Requests, Policies, Enums.
 
-Comunicação entre contextos é por Events/Listeners ou chamada direta entre Actions quando a orquestração exige transação única (ex.: `ConfirmarPagamentoExtraAction` → `EmitirLoteConvitesAction`).
+Comunicação entre contextos é por Events/Listeners ou chamada direta entre Actions quando a orquestração exige transação única (ex.: uma Action de confirmação dispara a Action que cria os registros derivados).
 
 ## Consequências positivas
 
 - Transações cross-context ACID com `DB::transaction`.
-- Deploy, observabilidade e ambientes unificados; SRE operável por time pequeno.
+- Deploy, observabilidade e ambientes unificados; operável por time pequeno.
 - Custo de extração futuro é baixo porque as fronteiras já estão codificadas em namespaces e validadas por arch tests.
-- Mesmo pacote de regras serve admin (Blade/Livewire) e API v1 (PLANEJAMENTO §Apêndice D item 8).
 
 ## Consequências negativas
 
-- Escalabilidade horizontal única até extração. Mitigação: Redis para locks/queues escala separadamente; Horizon permite supervisor por tipo de workload (§7.2).
-- Um bug em contexto X pode, em teoria, derrubar o monólito inteiro. Mitigação: Pest cobre paths críticos; Horizon isola workers por fila; circuit breaker no gateway externo.
+- Escalabilidade horizontal única até extração. Mitigação: Redis para locks/queues escala separadamente; Horizon permite supervisor por tipo de workload.
+- Um bug em contexto X pode, em teoria, derrubar o monólito inteiro. Mitigação: Pest cobre paths críticos; Horizon isola workers por fila.
 
 ## Ligações
 
-- §0, §1.1, §1.2, §1.3 do PLANEJAMENTO_BACKEND_APIV1.md
-- ADR-0001 (API-first), ADR-0011 (Horizon), ADR-0010 (Enums)
-- SAD arc42 seções "Visão de blocos" e "Decisões arquiteturais"
+- ADR-0011 (Horizon), ADR-0010 (Enums)

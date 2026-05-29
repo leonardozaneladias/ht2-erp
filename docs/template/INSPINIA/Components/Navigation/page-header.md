@@ -10,7 +10,7 @@
 
 ## Descrição
 
-Cabeçalho de página com **título** grande à esquerda, **breadcrumb** à direita (visível apenas em `md+`), e opcional **área de ações** (botões como "Novo Contrato", "Exportar", etc.). Aparece logo abaixo da topbar, no início de cada página. No Portal ArtFinal, será renderizado automaticamente pelo `<x-admin.layout>` quando uma página recebe `title` e opcionalmente `subtitle`.
+Cabeçalho de página com **título** grande à esquerda, **breadcrumb** à direita (visível apenas em `md+`), e opcional **área de ações** (botões como "Novo Pedido", "Exportar", etc.). Aparece logo abaixo da topbar, no início de cada página. É renderizado automaticamente pelo `<x-admin.layout>` quando uma página recebe `title` e opcionalmente `subtitle`.
 
 ---
 
@@ -19,9 +19,9 @@ Cabeçalho de página com **título** grande à esquerda, **breadcrumb** à dire
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                                                                  │
-│   Contratos                            Admin → Gestão → Contratos│
+│   Pedidos                              Admin → Gestão → Pedidos  │
 │                                                                  │
-│                                        [+ Novo Contrato] [⬇ CSV] │
+│                                        [+ Novo Pedido] [⬇ CSV]   │
 │                                                                  │
 ├──────────────────────────────────────────────────────────────────┤
 │   (conteúdo da página)                                           │
@@ -51,7 +51,7 @@ Cabeçalho de página com **título** grande à esquerda, **breadcrumb** à dire
 <!-- Page Title End -->
 ```
 
-O original suporta apenas 2 níveis hard-coded ("Inspinia → subtitle → title"). Para o ArtFinal vamos generalizar para N níveis via array.
+O original suporta apenas 2 níveis hard-coded ("Inspinia → subtitle → title"). Neste projeto vamos generalizar para N níveis via array.
 
 ---
 
@@ -128,32 +128,32 @@ O original suporta apenas 2 níveis hard-coded ("Inspinia → subtitle → title
 ### Exemplo 1: Uso automático via layout master
 
 ```blade
-{{-- resources/views/admin/contratos/index.blade.php --}}
-<x-admin.layout title="Contratos" subtitle="Cadastros">
+{{-- resources/views/admin/pedidos/index.blade.php --}}
+<x-admin.layout title="Pedidos" subtitle="Cadastros">
     {{-- conteúdo da página --}}
 </x-admin.layout>
 ```
 
-Resultado do breadcrumb: `Admin → Cadastros → Contratos`
+Resultado do breadcrumb: `Admin → Cadastros → Pedidos`
 
 ### Exemplo 2: Com botões de ação
 
 ```blade
-<x-admin.layout title="Contratos" subtitle="Cadastros">
+<x-admin.layout title="Pedidos" subtitle="Cadastros">
     <x-slot:actions>
-        @can ('contratos.criar')
-            <a href="{{ route('admin.contratos.create') }}" class="btn btn-primary">
-                <i class="iconify tabler--plus"></i> Novo Contrato
+        @can ('pedidos.criar')
+            <a href="{{ route('admin.pedidos.create') }}" class="btn btn-primary">
+                <i class="iconify tabler--plus"></i> Novo Pedido
             </a>
         @endcan
-        @can ('contratos.exportar')
+        @can ('pedidos.exportar')
             <x-shared.button variant="secondary" wire:click="exportarCsv">
                 <i class="iconify tabler--download"></i> CSV
             </x-shared.button>
         @endcan
     </x-slot:actions>
 
-    <livewire:admin.contratos.tabela />
+    <livewire:admin.pedidos.tabela />
 </x-admin.layout>
 ```
 
@@ -162,39 +162,39 @@ Porém: como `<x-admin.page-header>` é renderizado **dentro** do layout via `<x
 ### Exemplo 3: Breadcrumb customizado (mais de 2 níveis)
 
 ```blade
-<x-admin.layout title="Editar Contrato">
+<x-admin.layout title="Editar Pedido">
     <x-admin.page-header
-        title="Editar Contrato"
+        title="Editar Pedido"
         :breadcrumbs="[
             ['label' => 'Admin', 'url' => route('admin.dashboard')],
             ['label' => 'Cadastros', 'url' => null],
-            ['label' => 'Contratos', 'url' => route('admin.contratos.index')],
-            ['label' => $contrato->codigo_turma, 'url' => route('admin.contratos.show', $contrato)],
+            ['label' => 'Pedidos', 'url' => route('admin.pedidos.index')],
+            ['label' => $pedido->codigo, 'url' => route('admin.pedidos.show', $pedido)],
             ['label' => 'Editar', 'url' => null, 'current' => true],
         ]"
     />
 
-    <livewire:admin.contratos.form :contrato="$contrato" />
+    <livewire:admin.pedidos.form :pedido="$pedido" />
 </x-admin.layout>
 ```
 
-Resultado: `Admin → Cadastros → Contratos → 2026-ENG-NOT → Editar`
+Resultado: `Admin → Cadastros → Pedidos → PED-2026-001 → Editar`
 
-### Exemplo 4: Ficha do Formando (14.12)
+### Exemplo 4: Ficha do Cliente
 
 ```blade
 <x-admin.layout>
     <x-admin.page-header
-        :title="$formando->nome_completo"
+        :title="$cliente->nome_completo"
         :breadcrumbs="[
             ['label' => 'Admin', 'url' => route('admin.dashboard')],
-            ['label' => 'Formandos', 'url' => route('admin.formandos.index')],
-            ['label' => $formando->nome_completo, 'url' => null, 'current' => true],
+            ['label' => 'Clientes', 'url' => route('admin.clientes.index')],
+            ['label' => $cliente->nome_completo, 'url' => null, 'current' => true],
         ]"
     >
         <x-slot:actions>
-            <x-shared.badge :variant="$formando->adimplente ? 'success' : 'danger'">
-                {{ $formando->adimplente ? 'Em dia' : 'Inadimplente' }}
+            <x-shared.badge :variant="$cliente->em_dia ? 'success' : 'danger'">
+                {{ $cliente->em_dia ? 'Em dia' : 'Em atraso' }}
             </x-shared.badge>
             <x-shared.button variant="secondary" wire:click="editar">
                 <i class="iconify tabler--edit"></i> Editar Dados
@@ -202,7 +202,7 @@ Resultado: `Admin → Cadastros → Contratos → 2026-ENG-NOT → Editar`
         </x-slot:actions>
     </x-admin.page-header>
 
-    <livewire:admin.formandos.ficha :formando="$formando" />
+    <livewire:admin.clientes.ficha :cliente="$cliente" />
 </x-admin.layout>
 ```
 
@@ -210,7 +210,7 @@ Resultado: `Admin → Cadastros → Contratos → 2026-ENG-NOT → Editar`
 
 ## Quando Usar ✅
 
-- Em todas as views do admin que precisam de título + breadcrumb (20 telas do 14.\*)
+- Em todas as views do admin que precisam de título + breadcrumb
 - Acima de tabelas de listagem com botão "+ Novo X" via slot `$actions`
 - Em telas de edição/show com breadcrumbs de 3+ níveis (passar `:breadcrumbs` explícito)
 
@@ -231,34 +231,11 @@ Resultado: `Admin → Cadastros → Contratos → 2026-ENG-NOT → Editar`
 
 ---
 
-## Mapeamento no PRD (Portal ArtFinal)
-
-| Tela                | Seção PRD | Breadcrumb sugerido                           | Ações no header                       | Sprint |
-| ------------------- | --------- | --------------------------------------------- | ------------------------------------- | :----: |
-| Dashboard           | 14.2      | `Admin → Dashboard` (ou omitir)               | —                                     |   16   |
-| Instituições (list) | 14.3      | `Admin → Cadastros → Instituições`            | `+ Nova Instituição`, `CSV`           |   17   |
-| Contratos (list)    | 14.4      | `Admin → Cadastros → Contratos`               | `+ Novo Contrato`, `CSV`              |   17   |
-| Contratos (edit)    | 14.4      | `Admin → ... → Contratos → [código] → Editar` | `Cancelar`, `Salvar` (também no form) |   17   |
-| Produtos (list)     | 14.6      | `Admin → Cadastros → Produtos`                | `+ Novo Produto`                      |   18   |
-| Termos (list)       | 14.11     | `Admin → Cadastros → Termos`                  | `+ Novo Termo`                        |   19   |
-| Formandos (list)    | 14.12     | `Admin → Gestão → Formandos`                  | `+ Cadastro Manual`, `Exportar`       |   20   |
-| Formandos (ficha)   | 14.12     | `Admin → Gestão → Formandos → [nome]`         | Badge status, `Editar`                |   20   |
-| Parcelas            | 14.13     | `Admin → Financeiro → Parcelas`               | `Exportar`, `Baixa em Lote`           |   21   |
-| Simulador           | 14.14     | `Admin → Financeiro → Simulador`              | —                                     |   22   |
-| Configurações       | 14.15     | `Admin → Configurações → Globais`             | `Salvar`                              |   23   |
-| Relatórios          | 14.17     | `Admin → Financeiro → Relatórios`             | Filtros                               |   22   |
-| Usuários Admin      | 14.18     | `Admin → Configurações → Usuários`            | `+ Novo Usuário`                      |   24   |
-| Perfis ACL          | 14.19     | `Admin → Configurações → Perfis`              | `+ Novo Perfil`                       |   24   |
-
----
-
 ## Classificação
 
 | Critério                   | Valor                  |
 | -------------------------- | ---------------------- |
 | **Vai usar no projeto**    | 🟢 Sim                 |
-| **Prioridade**             | P0                     |
-| **Sprint planejada**       | 16                     |
 | **Complexidade**           | Simples (props + loop) |
 | **Status componentização** | 🟢 Concluído           |
 
@@ -271,7 +248,7 @@ Resultado: `Admin → Cadastros → Contratos → 2026-ENG-NOT → Editar`
 | **Depende de (JS)**         | Nenhum                                                     |
 | **Depende de (CSS)**        | Classes `.page-title-head`, `.page-main-title` do Inspinia |
 | **Depende de (Iconify)**    | `tabler--chevron-right`                                    |
-| **Usado por (telas)**       | Todas as 20 telas admin (exceto auth e 404)                |
+| **Usado por (views)**       | Todas as views admin (exceto auth e 404)                   |
 | **Usado por (componentes)** | `<x-admin.layout>` (render automático)                     |
 
 ---
@@ -295,7 +272,7 @@ Resultado: `Admin → Cadastros → Contratos → 2026-ENG-NOT → Editar`
 4. **Substituir ícone via Iconify `tabler--chevron-right`** — já está OK, manter
 5. **`rtl:rotate-180`:** manter para futuro suporte RTL (mesmo que hoje seja PT-BR LTR)
 6. **Título dinâmico via Livewire:** quando Livewire component full-page emite `dispatch('title-updated', ...)`, poderíamos recalcular o page-header. **Decisão:** não implementar agora — título vem apenas como prop server-side
-7. **Considerar versão "hero":** algumas páginas (14.2 Dashboard) podem querer uma variante maior com ícone/descrição. **Criar depois** se surgir necessidade — `<x-admin.page-hero>` separado
+7. **Considerar versão "hero":** algumas páginas (ex: Dashboard) podem querer uma variante maior com ícone/descrição. **Criar depois** se surgir necessidade — `<x-admin.page-hero>` separado
 
 ## Código Final Blade
 
@@ -311,6 +288,6 @@ Principais ajustes aplicados no código final:
 
 ## Changelog do Componente
 
-| Data       | Descrição                  |
-| ---------- | -------------------------- |
-| 2026-04-11 | Doc criada — Fase 2 Onda 1 |
+| Data       | Descrição   |
+| ---------- | ----------- |
+| 2026-04-11 | Doc criada  |

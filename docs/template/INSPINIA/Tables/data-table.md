@@ -131,33 +131,33 @@ $('#datatable-basic').DataTable({
 
 ## Exemplos de Uso
 
-### Real (Listagem de Contratos 14.4)
+### Listagem com exportação e busca por coluna
 
 ```blade
-<x-shared.card title="Todos os Contratos" :body-padding="false">
+<x-shared.card title="Todos os Pedidos" :body-padding="false">
     <x-admin.data-table
         :columns="[
             ['label' => 'Código', 'searchable' => true],
-            ['label' => 'Nome da Turma'],
-            ['label' => 'Instituição'],
-            ['label' => 'Conclusão'],
-            ['label' => 'Meta', 'orderable' => false],
-            ['label' => 'Aderidos', 'orderable' => false],
+            ['label' => 'Cliente'],
+            ['label' => 'Categoria'],
+            ['label' => 'Data'],
+            ['label' => 'Total', 'orderable' => false],
+            ['label' => 'Itens', 'orderable' => false],
             ['label' => 'Status'],
             ['label' => 'Ações', 'orderable' => false, 'searchable' => false],
         ]"
         exportable
         column-search
     >
-        @foreach ($contratos as $contrato)
+        @foreach ($pedidos as $pedido)
             <tr>
-                <td>{{ $contrato->codigo_turma }}</td>
-                <td>{{ $contrato->nome_turma }}</td>
-                <td>{{ $contrato->instituicao->nome_fantasia }}</td>
-                <td>{{ sprintf('%02d/%d', $contrato->mes_conclusao, $contrato->ano_conclusao) }}</td>
-                <td>{{ $contrato->meta_formandos }}</td>
-                <td>{{ $contrato->adesoes_ativas_count }}</td>
-                <td><x-shared.status-badge :enum="$contrato->status" /></td>
+                <td>{{ $pedido->codigo }}</td>
+                <td>{{ $pedido->cliente->nome }}</td>
+                <td>{{ $pedido->categoria->nome }}</td>
+                <td>{{ $pedido->created_at->format('d/m/Y') }}</td>
+                <td>{{ MoneyHelper::format($pedido->total_centavos) }}</td>
+                <td>{{ $pedido->itens_count }}</td>
+                <td><x-shared.status-badge :enum="$pedido->status" /></td>
                 <td>
                     <x-shared.dropdown placement="bottom-end">
                         <x-slot:button>
@@ -165,17 +165,17 @@ $('#datatable-basic').DataTable({
                                 <i class="iconify tabler--dots-vertical"></i>
                             </button>
                         </x-slot:button>
-                        <x-shared.dropdown-item icon="tabler--edit" :href="route('admin.contratos.edit', $contrato)">
+                        <x-shared.dropdown-item icon="tabler--edit" :href="route('admin.pedidos.edit', $pedido)">
                             Editar
                         </x-shared.dropdown-item>
-                        <x-shared.dropdown-item icon="tabler--copy" wire:click="duplicar({{ $contrato->id }})">
+                        <x-shared.dropdown-item icon="tabler--copy" wire:click="duplicar({{ $pedido->id }})">
                             Duplicar
                         </x-shared.dropdown-item>
                         <x-shared.dropdown-divider />
                         <x-shared.dropdown-item
                             icon="tabler--ban"
                             variant="danger"
-                            wire:click="confirmarInativacao({{ $contrato->id }})"
+                            wire:click="confirmarInativacao({{ $pedido->id }})"
                         >
                             Inativar
                         </x-shared.dropdown-item>
@@ -187,16 +187,16 @@ $('#datatable-basic').DataTable({
 </x-shared.card>
 ```
 
-### Real (Parcelas com seleção 14.13)
+### Listagem com seleção múltipla
 
 ```blade
 <x-admin.data-table
     :columns="[
-        ['label' => 'Formando'],
-        ['label' => 'Contrato'],
-        ['label' => 'Parcela'],
+        ['label' => 'Cliente'],
+        ['label' => 'Pedido'],
+        ['label' => 'Item'],
         ['label' => 'Valor'],
-        ['label' => 'Vencimento'],
+        ['label' => 'Data'],
         ['label' => 'Status'],
         ['label' => 'Ações', 'orderable' => false],
     ]"
@@ -252,18 +252,11 @@ document.addEventListener('livewire:init', () => {
 
 ---
 
-## Mapeamento no PRD
-
-Usado em **todas as telas de listagem** (14.3–14.13, 14.17, 14.18).
-
----
-
 ## Classificação
 
 | Critério         | Valor            |
 | ---------------- | ---------------- |
 | **Vai usar**     | 🟢 Sim (crítico) |
-| **Prioridade**   | P2 (Onda 3)      |
 | **Complexidade** | Alta             |
 | **Status**       | 🟢 Concluído     |
 
@@ -308,9 +301,9 @@ Usado em **todas as telas de listagem** (14.3–14.13, 14.17, 14.18).
 <x-admin.data-table
     :columns="[
         ['label' => 'Código'],
-        ['label' => 'Turma'],
-        ['label' => 'Instituição'],
-        ['label' => 'Conclusão', 'type' => 'date'],
+        ['label' => 'Cliente'],
+        ['label' => 'Categoria'],
+        ['label' => 'Data', 'type' => 'date'],
         ['label' => 'Status', 'searchable' => false],
         ['label' => 'Ações', 'orderable' => false, 'searchable' => false],
     ]"
@@ -319,16 +312,16 @@ Usado em **todas as telas de listagem** (14.3–14.13, 14.17, 14.18).
     date-range
 >
     <x-slot:toolbar>
-        <x-shared.badge variant="info" solid>4 contratos</x-shared.badge>
+        <x-shared.badge variant="info" solid>4 pedidos</x-shared.badge>
     </x-slot:toolbar>
 
-    @foreach ($contratos as $contrato)
+    @foreach ($pedidos as $pedido)
         <tr>
-            <td>{{ $contrato->codigo_turma }}</td>
-            <td>{{ $contrato->nome_turma }}</td>
-            <td>{{ $contrato->instituicao->nome_fantasia }}</td>
-            <td>{{ $contrato->data_conclusao->format('d/m/Y') }}</td>
-            <td><x-shared.status-badge :enum="$contrato->status" /></td>
+            <td>{{ $pedido->codigo }}</td>
+            <td>{{ $pedido->cliente->nome }}</td>
+            <td>{{ $pedido->categoria->nome }}</td>
+            <td>{{ $pedido->created_at->format('d/m/Y') }}</td>
+            <td><x-shared.status-badge :enum="$pedido->status" /></td>
             <td>
                 <x-shared.dropdown placement="bottom-end">
                     <x-slot:button>
@@ -355,6 +348,6 @@ Usado em **todas as telas de listagem** (14.3–14.13, 14.17, 14.18).
 3. **Bridge JS própria** em `resources/js/admin/data-table.js`, com reinit por `MutationObserver` e `livewire:navigated`
 4. **Localização pt-BR inline** no helper JS, sem depender de arquivo externo em `public/`
 5. **`dateRange`** filtra pela primeira coluna marcada como `type => 'date'`, evitando configuração duplicada no preview e nas telas reais
-6. **Seleção em lote** usa checkboxes reais no slot das linhas (`data-af-datatable-row-select`) e expõe `datatable-selection-change`
+6. **Seleção em lote** usa checkboxes reais no slot das linhas (`data-datatable-row-select`) e expõe `datatable-selection-change`
 7. **Export PDF/Excel** depende de `pdfmake` + `jszip`, já integrados ao build
-8. **Parking lot mantido fora do lote**: ajax, child-rows, fixed-columns, fixed-header e variantes muito específicas continuam fora da API principal
+8. **Fora do escopo principal**: ajax, child-rows, fixed-columns, fixed-header e variantes muito específicas continuam fora da API principal

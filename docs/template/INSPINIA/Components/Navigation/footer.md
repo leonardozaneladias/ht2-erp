@@ -22,7 +22,7 @@ Rodapé simples do admin, fixo no fim da área `content-page`. Grid 2 colunas re
 │   content-page area                                      │
 │                                                          │
 ├──────────────────────────────────────────────────────────┤
-│ © 2026 Portal ArtFinal          v1.0.0 · Made by ArtFinal│
+│ © 2026 {{ config('app.name') }}        v1.0.0 · Todos direitos │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -86,14 +86,14 @@ Nenhum.
     <div class="container-fluid">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-base">
             <div class="text-center md:text-start">
-                © {{ date('Y') }} Portal ArtFinal · Todos os direitos reservados.
+                © {{ date('Y') }} {{ config('app.name') }} · Todos os direitos reservados.
             </div>
             <div class="md:text-end hidden md:block">
                 <span class="text-default-500">v{{ config('app.version', '1.0.0') }}</span>
                 <span class="mx-2 text-default-300">·</span>
                 <span
-                    >Feito com <i class="iconify tabler--heart-filled text-danger text-sm"></i> pela equipe
-                    ArtFinal</span
+                    >Feito com <i class="iconify tabler--heart-filled text-danger text-sm"></i> pela
+                    equipe</span
                 >
             </div>
         </div>
@@ -138,7 +138,6 @@ Incluído automaticamente dentro de `<div class="content-page">` pelo `<x-admin.
 ## Quando NÃO Usar ❌
 
 - Telas de auth (login, 404) — sem rodapé para manter foco no formulário
-- Portal do formando — tem footer próprio com identidade/LGPD/links úteis
 - Modais e drawers — sem rodapé dentro de modais
 - PDFs gerados — não faz sentido
 
@@ -147,17 +146,7 @@ Incluído automaticamente dentro de `<div class="content-page">` pelo `<x-admin.
 - **`date('Y')` no servidor:** evita `document.write`, melhora performance e é i18n-friendly
 - **`config('app.version')`:** expor a versão ajuda o suporte a identificar bugs por versão
 - **Não transformar em "mega footer":** se precisar de links/contatos/políticas, criar variante `<x-admin.footer-full>` em vez de complicar este. KISS.
-- **Não colocar links de LGPD/Termos aqui:** admin não precisa — essas páginas são do portal do formando
-
----
-
-## Mapeamento no PRD (Portal ArtFinal)
-
-| Tela                       | Seção PRD  | Como É Usado         | Sprint |
-| -------------------------- | ---------- | -------------------- | :----: |
-| Todas as 20 telas do admin | 14.2–14.20 | Footer fixo em todas |   16   |
-
-PRD não menciona footer explicitamente — é inferência do padrão de layout.
+- **Não colocar links de LGPD/Termos aqui:** o admin não precisa desse tipo de link no rodapé
 
 ---
 
@@ -166,8 +155,6 @@ PRD não menciona footer explicitamente — é inferência do padrão de layout.
 | Critério                   | Valor        |
 | -------------------------- | ------------ |
 | **Vai usar no projeto**    | 🟢 Sim       |
-| **Prioridade**             | P0           |
-| **Sprint planejada**       | 16           |
 | **Complexidade**           | Trivial      |
 | **Status componentização** | 🟢 Concluído |
 
@@ -180,7 +167,7 @@ PRD não menciona footer explicitamente — é inferência do padrão de layout.
 | **Depende de (JS)**         | Nenhum                                                            |
 | **Depende de (CSS)**        | Classe `.footer` do Inspinia (define padding, borda superior, bg) |
 | **Depende de (Laravel)**    | `config('app.version')` opcional                                  |
-| **Usado por (telas)**       | Todas as views admin                                              |
+| **Usado por (views)**       | Todas as views admin                                              |
 | **Usado por (componentes)** | `<x-admin.layout>`                                                |
 
 ---
@@ -189,7 +176,7 @@ PRD não menciona footer explicitamente — é inferência do padrão de layout.
 
 1. **Substituir `document.write`** por `{{ date('Y') }}` server-side
 2. **Remover "10GB of 250GB Free"** — frase sem sentido do template
-3. **Substituir `Inspinia - By WebAppLayers`** por `Portal ArtFinal · Todos os direitos reservados`
+3. **Substituir `Inspinia - By WebAppLayers`** por `{{ config('app.name') }} · Todos os direitos reservados`
 4. **Adicionar versão da app** à direita — útil para suporte
 5. **`gap-base`** é uma classe custom do Inspinia (equivale a `gap-4` ou `gap-6` do Tailwind puro). Confirmar valor em `config/_root.css`
 6. **Dark mode:** a classe `.footer` do Inspinia já tem variante dark — não precisamos adicionar classes `dark:` manuais
@@ -209,6 +196,6 @@ Principais ajustes aplicados no código final:
 
 ## Changelog do Componente
 
-| Data       | Descrição                  |
-| ---------- | -------------------------- |
-| 2026-04-11 | Doc criada — Fase 2 Onda 1 |
+| Data       | Descrição   |
+| ---------- | ----------- |
+| 2026-04-11 | Doc criada  |

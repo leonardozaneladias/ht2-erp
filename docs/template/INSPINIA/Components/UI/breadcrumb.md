@@ -131,21 +131,21 @@ Variantes no template: com ícones nos crumbs, em card colored, com dividers alt
 <x-shared.breadcrumb
     :items="[
     ['label' => 'Admin', 'url' => route('admin.dashboard'), 'icon' => 'tabler--home'],
-    ['label' => 'Contratos', 'url' => route('admin.contratos.index')],
+    ['label' => 'Pedidos', 'url' => route('admin.pedidos.index')],
     ['label' => 'Editar'],
 ]"
 />
 ```
 
-### Real (Portal ArtFinal — dentro de um card de ficha do formando)
+### Real (dentro de um card de ficha de cliente)
 
 ```blade
 <x-shared.card>
     <x-shared.breadcrumb
         :items="[
-        ['label' => 'Formandos', 'url' => route('admin.formandos.index')],
-        ['label' => $formando->contrato->codigo_turma, 'url' => route('admin.contratos.show', $formando->contrato)],
-        ['label' => $formando->nome_completo],
+        ['label' => 'Clientes', 'url' => route('admin.clientes.index')],
+        ['label' => $cliente->categoria->nome, 'url' => route('admin.categorias.show', $cliente->categoria)],
+        ['label' => $cliente->nome_completo],
     ]"
     />
     {{-- demais campos da ficha --}}
@@ -168,20 +168,11 @@ Variantes no template: com ícones nos crumbs, em card colored, com dividers alt
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                  | Seção PRD | Como É Usado                                                    |
-| --------------------- | --------- | --------------------------------------------------------------- |
-| Todas via page-header | 14.\*     | Por tabela em `page-header.md` — este componente é complementar |
-
----
-
 ## Classificação
 
 | Critério         | Valor                   |
 | ---------------- | ----------------------- |
 | **Vai usar**     | 🟢 Sim (uso secundário) |
-| **Prioridade**   | P1 (Onda 2)             |
 | **Complexidade** | Simples                 |
 | **Status**       | 🟢 Concluído            |
 

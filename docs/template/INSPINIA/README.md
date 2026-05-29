@@ -1,19 +1,19 @@
-# Inspinia v5.0 — Inventário Mestre (Fase 1)
+# Inspinia v5.0 — Inventário Mestre
 
 > **Template:** Inspinia v5.0 — Laravel + Tailwind CSS 4
 > **Path:** `~/Projects/Templates/Laravel/INSPINIA_v5.0/Tailwind CSS/Laravel/inspinia`
 > **Doc oficial:** `~/Projects/Templates/Laravel/INSPINIA_v5.0/Tailwind CSS/Laravel/Docs/index.html`
-> **Análise gerada em:** 2026-04-11 (Fase 1 do prompt `docs/prompts/PROMPT-ANALISE-INSPINIA.md`)
+> **Análise gerada em:** 2026-04-11
 
-Este documento é o **ponto de entrada** para toda a documentação granular do Inspinia no Portal ArtFinal. Ele contém:
+Este documento é o **ponto de entrada** para toda a documentação granular do template Inspinia. Ele contém:
 
 1. Visão geral do template e versões detectadas
 2. Inventário quantitativo (páginas, apps, componentes)
 3. Checklist de specs validada (✅/❌)
 4. Plugins JS/CSS confirmados
-5. Skin recomendada para o projeto
+5. Skin recomendada
 6. Itens não encontrados ou desatualizados
-7. Índice para a documentação granular (a ser criada nas Fases 2–6)
+7. Índice para a documentação granular
 
 ---
 
@@ -33,7 +33,7 @@ Inspinia é um admin dashboard multiúso distribuído pela WebAppLayers. A vers�
 | jQuery          | jquery                                                                               | `3.7.1` (requerido por DataTables/Select2/Typeahead/Daterangepicker) |
 | Package manager | Bun                                                                                  | (recomendado pela doc oficial)                                       |
 
-> **Importante:** A dependência oficial em Preline significa que TODOS os componentes interativos "nativos" do Inspinia (dropdowns, accordions, modals, offcanvas, tabs, tooltips, popovers, tabs, stepper) usam `data-hs-*` attributes e JS do Preline. Ao portar para o Portal ArtFinal precisamos decidir: manter Preline, ou reescrever em Alpine.js/Livewire. **Recomendação:** manter Preline para economizar trabalho — ele é compatível com Tailwind 4 e Laravel.
+> **Importante:** A dependência oficial em Preline significa que TODOS os componentes interativos "nativos" do Inspinia (dropdowns, accordions, modals, offcanvas, tabs, tooltips, popovers, tabs, stepper) usam `data-hs-*` attributes e JS do Preline. Ao portar para a aplicação é preciso decidir: manter Preline, ou reescrever em Alpine.js/Livewire. **Recomendação:** manter Preline para economizar trabalho — ele é compatível com Tailwind 4 e Laravel.
 
 ---
 
@@ -292,7 +292,7 @@ area, bar, candlestick, gauge, geo-map, heatmap, line, `other`, pie, radar, scat
 
 ---
 
-## 5. Skin Recomendada para o Portal ArtFinal
+## 5. Skin Recomendada
 
 O Inspinia v5.0 oferece **11 skins**:
 
@@ -305,9 +305,9 @@ galaxy, luxe, retro, neon, pixel
 
 **Justificativa:**
 
-1. É a skin sobre a qual todas as screenshots do PRD v3.1 foram pensadas (linhagem direta do Inspinia clássico)
+1. Linhagem direta do Inspinia clássico
 2. Maior cobertura de componentes testados — os outros skins herdam do default e sobrescrevem
-3. Paleta neutra compatível com a identidade "ArtFinal" (sem forçar cores de SaaS startup)
+3. Paleta neutra (sem forçar cores de SaaS startup)
 4. Dark mode estável
 5. Compatibilidade futura: skins decorativas (galaxy/luxe/retro/neon/pixel) são exóticas e podem ser removidas em versões futuras
 
@@ -351,48 +351,31 @@ Itens onde o prompt `PROMPT-ANALISE-INSPINIA.md` usa informações desatualizada
 
 ---
 
-## 7. Plano de Skin × Sprint do Portal ArtFinal
+## 7. Ondas de Componentização (ordem de trabalho)
 
-O mapeamento prático entre sprints do PRD v3.1.0 e itens do Inspinia a componentizar:
+| Onda | Prioridade | Categoria                                                                                                                                  | Esforço relativo |
+| :--: | :--------: | ------------------------------------------------------------------------------------------------------------------------------------------ | :--------------: |
+|  1   |   **P0**   | Layouts + Navigation (vertical, sidebar default+colors, topbar, breadcrumb, footer, page-header)                                           |      Médio       |
+|  2   |   **P1**   | Data + Feedback (KPI card, alert, toast, modal, button, loading button, status badge, empty state, confirm dialog, drawer, tabs)           |       Alto       |
+|  3   |   **P2**   | Forms + Tables (inputs, selects, datepickers, masked inputs, file upload, wizard, data-table, filter panel, action dropdown, bulk actions) |    Muito alto    |
+|  4   |   **P3**   | Charts + Dashboards (ApexCharts 20 tipos → usar 5–8, ECharts opcional, chart-card wrapper, dashboards de referência)                       |      Médio       |
+|  5   |   **P4**   | Pages (auth split, error pages, profile, account-settings, FAQ, coming-soon)                                                              |      Médio       |
+|  6   |   **P5**   | Plugins (sortable, tree-view, SweetAlert2, clipboard, tour opcional, animate opcional)                                                     |      Baixo       |
 
-| Sprint (PRD) | Fase             | Precisa do Inspinia                                                                                                              |     Onda     |
-| :----------: | ---------------- | -------------------------------------------------------------------------------------------------------------------------------- | :----------: |
-|     1–3      | Fundação         | Nada visual (só infra/migrations)                                                                                                |      —       |
-|     4–9      | Portal Adesão    | **Portal usa skin própria (Preline puro ou Tailwind puro)**. Pode reusar primitivas (input, button, alert, stepper) do Inspinia. |     2–3      |
-|    10–11     | Portal Área      | Portal continua com sua identidade.                                                                                              |     2–3      |
-|      15      | Admin Auth       | `auth-split/sign-in.blade.php` + layout auth                                                                                     |  **Onda 1**  |
-|      16      | Admin Layout     | `layouts/vertical` + sidebar default + topbar light                                                                              |  **Onda 1**  |
-|    17–19     | Admin CRUDs base | DataTables + forms (input, select, datepicker) + modals + drawer                                                                 | **Onda 2–3** |
-|    20–23     | Admin Financeiro | KPI cards + ApexCharts (bar, line, pie) + DataTables com filtros                                                                 | **Onda 2–4** |
-|      24      | Admin Final      | Tree view, timeline, sortable (termos)                                                                                           | **Onda 4–6** |
+**Ondas 5 e 6 são seletivas** — muitas páginas do Inspinia (ex: E-commerce com 23 telas, Forum, Blog, Pin Board) **não serão usadas**. A triagem inicial marca o que descartar.
 
 ---
 
-## 8. Ondas de Componentização (ordem de trabalho Fase 2–6)
+## 8. Índice da Documentação Granular
 
-| Onda | Prioridade | Categoria                                                                                                                                  | Esforço relativo | Sprint-alvo |
-| :--: | :--------: | ------------------------------------------------------------------------------------------------------------------------------------------ | :--------------: | :---------: |
-|  1   |   **P0**   | Layouts + Navigation (vertical, sidebar default+colors, topbar, breadcrumb, footer, page-header)                                           |      Médio       |    15–16    |
-|  2   |   **P1**   | Data + Feedback (KPI card, alert, toast, modal, button, loading button, status badge, empty state, confirm dialog, drawer, tabs)           |       Alto       |    15–19    |
-|  3   |   **P2**   | Forms + Tables (inputs, selects, datepickers, masked inputs, file upload, wizard, data-table, filter panel, action dropdown, bulk actions) |    Muito alto    |    17–19    |
-|  4   |   **P3**   | Charts + Dashboards (ApexCharts 20 tipos → usar 5–8, ECharts opcional, chart-card wrapper, dashboards de referência)                       |      Médio       |    20–23    |
-|  5   |   **P4**   | Pages (auth split, error pages, profile, account-settings, pricing não, FAQ, coming-soon)                                                  |      Médio       |    15–24    |
-|  6   |   **P5**   | Plugins (sortable para termos, tree-view para permissões, SweetAlert2, clipboard, tour opcional, animate opcional)                         |      Baixo       |     24+     |
-
-**Ondas 5 e 6 são seletivas** — muitas páginas do Inspinia (ex: E-commerce com 23 telas, Forum, Blog, Pin Board) **não serão usadas** no Portal ArtFinal. A triagem da Fase 5 vai marcar o que descartar.
-
----
-
-## 9. Índice da Documentação Granular (Fase 2 em diante)
-
-Os arquivos abaixo serão criados durante as Fases 2–6. Esta seção funciona como **mapa do que vai existir**, não como índice de algo que já existe.
+Esta seção funciona como **mapa** da documentação granular do template.
 
 ```
 docs/template/INSPINIA/
 │
-├── README.md                           ← (este arquivo — Fase 1)
+├── README.md                           ← (este arquivo)
 │
-├── Layouts/                            ← Fase 2 Onda 1
+├── Layouts/
 │   ├── vertical.md
 │   ├── horizontal.md
 │   ├── boxed.md
@@ -401,7 +384,7 @@ docs/template/INSPINIA/
 │   ├── compact.md
 │   └── skins.md
 │
-├── Components/                         ← Fase 2 Onda 2
+├── Components/
 │   ├── Navigation/
 │   │   ├── sidebar.md                  (6 sizes × 5 colors)
 │   │   ├── topbar.md                   (4 colors)
@@ -445,7 +428,7 @@ docs/template/INSPINIA/
 │       ├── empty-state.md
 │       └── confirm-dialog.md
 │
-├── Forms/                              ← Fase 2 Onda 3
+├── Forms/
 │   ├── elements.md
 │   ├── layout.md
 │   ├── select-choices.md
@@ -462,7 +445,7 @@ docs/template/INSPINIA/
 │   ├── validation.md
 │   └── text-editor-quill.md
 │
-├── Tables/                             ← Fase 2 Onda 3
+├── Tables/
 │   ├── static.md
 │   ├── custom.md
 │   └── DataTables/
@@ -482,7 +465,7 @@ docs/template/INSPINIA/
 │       ├── rows-add.md
 │       └── checkbox-select.md
 │
-├── Charts/                             ← Fase 2 Onda 4
+├── Charts/
 │   ├── ApexCharts/
 │   │   ├── area.md, bar.md, bubble.md, candlestick.md, column.md
 │   │   ├── heatmap.md, line.md, mixed.md, pie.md, radar.md
@@ -494,7 +477,7 @@ docs/template/INSPINIA/
 │       ├── heatmap.md, line.md, pie.md, radar.md, scatter.md
 │       └── other.md
 │
-├── Dashboards/                         ← Fase 2 Onda 4
+├── Dashboards/
 │   ├── analytics.md
 │   └── ecommerce.md
 │
@@ -508,7 +491,7 @@ docs/template/INSPINIA/
 │   ├── vector-jsvectormap.md
 │   └── google.md                       (flag: "verificar se existe SDK")
 │
-├── Pages/                              ← Fase 2 Onda 5
+├── Pages/
 │   ├── Auth/
 │   │   ├── sign-in-basic.md, sign-in-card.md, sign-in-split.md
 │   │   ├── sign-up-*.md (3 estilos)
@@ -525,9 +508,9 @@ docs/template/INSPINIA/
 │   │   ├── terms-conditions.md, privacy-policy.md, sitemap.md
 │   │   ├── gallery.md, empty.md
 │   └── Apps/
-│       (triagem na Fase 5 — muitas não serão usadas)
+│       (triagem inicial — muitas não serão usadas)
 │
-└── Plugins/                            ← Fase 2 Onda 6
+└── Plugins/
     ├── sortable.md, clipboard.md, tree-view.md, tour.md
     ├── animation.md, masonry.md, video-player-plyr.md
     ├── idle-timer.md, live-favicon-tinycon.md, text-diff.md
@@ -539,9 +522,9 @@ docs/template/INSPINIA/
 
 ---
 
-## 10. Status da Fase 1
+## 9. Status do Inventário
 
-| Item da Fase 1                           |         Status         |
+| Item                                     |         Status         |
 | ---------------------------------------- | :--------------------: |
 | Percorrer estrutura do template          |           ✅           |
 | Ler documentação oficial                 | ✅ (`Docs/index.html`) |
@@ -551,12 +534,10 @@ docs/template/INSPINIA/
 | Listar plugins JS                        |      ✅ (seção 4)      |
 | Criar `docs/template/INSPINIA/README.md` |   ✅ (este arquivo)    |
 
-**Fase 1 CONCLUÍDA. Aguardando aprovação para iniciar Fase 2.**
-
 ---
 
 ## Changelog
 
 | Data       | Descrição                                                        |
 | ---------- | ---------------------------------------------------------------- |
-| 2026-04-11 | Documento criado — Fase 1 do prompt `PROMPT-ANALISE-INSPINIA.md` |
+| 2026-04-11 | Documento criado — inventário do template Inspinia v5.0 |

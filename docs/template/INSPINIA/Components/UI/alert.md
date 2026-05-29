@@ -181,33 +181,33 @@ Banner colorido para mensagens informativas/de status dentro da página. Diferen
 ### Básico
 
 ```blade
-<x-shared.alert variant="success"> Contrato criado com sucesso. </x-shared.alert>
+<x-shared.alert variant="success"> Pedido criado com sucesso. </x-shared.alert>
 
-<x-shared.alert variant="warning" title="Atenção"> Esta instituição possui 5 contratos vinculados. </x-shared.alert>
+<x-shared.alert variant="warning" title="Atenção"> Este cliente possui 5 pedidos vinculados. </x-shared.alert>
 
 <x-shared.alert variant="danger" dismissible> Erro ao processar pagamento. Tente novamente. </x-shared.alert>
 ```
 
-### Real (Dashboard 14.2 — Seção Alertas do Sistema)
+### Real (Dashboard — Seção Alertas do Sistema)
 
 ```blade
-@if ($alertas->contratosSemProgramacao > 0)
-    <x-shared.alert variant="warning" title="Contratos sem programação ativa">
-        Existem <strong>{{ $alertas->contratosSemProgramacao }}</strong> contratos sem programação ativa.
-        <a href="{{ route('admin.contratos.index', ['filter' => 'sem-programacao']) }}" class="font-bold">Revisar</a>
+@if ($alertas->pedidosSemProcessamento > 0)
+    <x-shared.alert variant="warning" title="Pedidos sem processamento">
+        Existem <strong>{{ $alertas->pedidosSemProcessamento }}</strong> pedidos sem processamento.
+        <a href="{{ route('admin.pedidos.index', ['filter' => 'sem-processamento']) }}" class="font-bold">Revisar</a>
     </x-shared.alert>
 @endif
 
-@if ($alertas->programacoesVencendo15Dias > 0)
-    <x-shared.alert variant="info" title="Programações vencendo">
-        <strong>{{ $alertas->programacoesVencendo15Dias }}</strong> programações vencem nos próximos 15 dias.
+@if ($alertas->prazosVencendo15Dias > 0)
+    <x-shared.alert variant="info" title="Prazos vencendo">
+        <strong>{{ $alertas->prazosVencendo15Dias }}</strong> prazos vencem nos próximos 15 dias.
     </x-shared.alert>
 @endif
 
-@if ($alertas->parcelasVencidas > 0)
-    <x-shared.alert variant="danger" title="Parcelas vencidas sem tratamento">
-        <strong>{{ $alertas->parcelasVencidas }}</strong> parcelas vencidas aguardando ação.
-        <a href="{{ route('admin.financeiro.parcelas.index', ['status' => 'vencido']) }}" class="font-bold"
+@if ($alertas->pagamentosVencidos > 0)
+    <x-shared.alert variant="danger" title="Pagamentos vencidos sem tratamento">
+        <strong>{{ $alertas->pagamentosVencidos }}</strong> pagamentos vencidos aguardando ação.
+        <a href="{{ route('admin.financeiro.pagamentos.index', ['status' => 'vencido']) }}" class="font-bold"
             >Ver todas</a
         >
     </x-shared.alert>
@@ -219,7 +219,7 @@ Banner colorido para mensagens informativas/de status dentro da página. Diferen
 ## Quando Usar ✅
 
 - Feedback persistente dentro de uma página (após uma ação)
-- Alertas do sistema no dashboard (14.2)
+- Alertas do sistema no dashboard
 - Avisos contextuais em formulários ("Esta ação é irreversível")
 - Sessão flash messages (`session()->flash('success', '...')` renderizado como alert no topo)
 
@@ -231,26 +231,11 @@ Banner colorido para mensagens informativas/de status dentro da página. Diferen
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                | Seção PRD     | Uso                                                               |
-| ------------------- | ------------- | ----------------------------------------------------------------- |
-| Dashboard           | 14.2          | Seção "Alertas do Sistema" com 4 tipos de aviso                   |
-| Contratos (form)    | 14.4          | Alerta se mudar config de responsáveis "Com esta configuração..." |
-| Programações (form) | 14.7          | Alerta de sobreposição de datas                                   |
-| Descontos (form)    | 14.9          | Alerta de sobreposição                                            |
-| Configurações       | 14.15         | Preview dinâmico das configs                                      |
-| Reajustes           | 14.4 Tab 5    | Confirmação antes de aplicar                                      |
-| Qualquer view       | session flash | Mensagens success/error após redirect                             |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 

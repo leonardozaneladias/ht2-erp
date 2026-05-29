@@ -26,7 +26,7 @@ Indicador de carregamento circular (border spinner). Usa `animate-spin` do Tailw
 </div>
 ```
 
-O template tem também variantes "grow spinner" (não-border, pulsante) — menos usadas, parking lot.
+O template tem também variantes "grow spinner" (não-border, pulsante) — menos usadas.
 
 ---
 
@@ -118,17 +118,7 @@ O template tem também variantes "grow spinner" (não-border, pulsante) — meno
 
 - Substituto de progress bar para operações determinísticas (upload, etc.) → usar `<x-shared.progress-bar>`
 - Dentro de botão de submit → usar `<x-shared.loading-button>` (tem animação Ladda integrada)
-- Loading de página inteira → usar skeleton (parking lot: `ui/placeholders.blade.php`)
-
----
-
-## Mapeamento no PRD
-
-| Tela              | Seção PRD | Uso                      |
-| ----------------- | --------- | ------------------------ |
-| Qualquer Livewire | —         | `wire:loading` indicator |
-| 14.2 Dashboard    | 14.2      | Gráficos durante fetch   |
-| 14.3–14.13        | —         | Listagens durante filtro |
+- Loading de página inteira → usar skeleton (`ui/placeholders.blade.php`)
 
 ---
 
@@ -137,7 +127,6 @@ O template tem também variantes "grow spinner" (não-border, pulsante) — meno
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 
@@ -148,7 +137,7 @@ O template tem também variantes "grow spinner" (não-border, pulsante) — meno
 1. **`border-[3px]`** é Tailwind arbitrary — alternativa é adicionar `border-3` ao config
 2. **Mapa explícito de variantes** — a implementação final usa um mapa fixo de classes (`primary`, `success`, `danger`, etc.) para evitar dependência de safelist dinâmica
 3. **`sr-only`** obrigatório para screen readers
-4. **Variante "grow"** (pulsing circle) do Inspinia vai para parking lot — border é mais usado e elegante
+4. **Variante "grow"** (pulsing circle) do Inspinia fica reservada — border é mais usado e elegante
 5. **Não confundir com `loading-button`** — este é só o visual, sem interatividade
 
 ---

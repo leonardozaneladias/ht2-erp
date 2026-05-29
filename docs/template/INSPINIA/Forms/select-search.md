@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Wrapper oficial de select com busca para o ArtFinal. O componente suporta seleção simples, múltipla, grupos (`optgroup`), placeholder, criação opcional de itens e sincronização com Livewire porque o `<select>` nativo continua sendo a fonte de verdade.
+Wrapper oficial de select com busca. O componente suporta seleção simples, múltipla, grupos (`optgroup`), placeholder, criação opcional de itens e sincronização com Livewire porque o `<select>` nativo continua sendo a fonte de verdade.
 
 `x-shared.tags-input` foi consolidado como wrapper semântico sobre esta mesma base.
 
@@ -105,10 +105,10 @@ Wrapper oficial de select com busca para o ArtFinal. O componente suporta seleç
 
 ```blade
 <x-shared.select-search
-    name="instituicao_id"
-    label="Instituição"
-    :options="$instituicoes"
-    wire:model.live="form.instituicao_id"
+    name="cliente_id"
+    label="Cliente"
+    :options="$clientes"
+    wire:model.live="form.cliente_id"
     required
 />
 ```
@@ -118,7 +118,7 @@ Wrapper oficial de select com busca para o ArtFinal. O componente suporta seleç
     name="produto_id"
     label="Produto"
     :options="$produtosAgrupados"
-    placeholder="Escolha um produto"
+    placeholder="Selecione um produto"
 />
 ```
 
@@ -149,6 +149,5 @@ Wrapper oficial de select com busca para o ArtFinal. O componente suporta seleç
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2           |
 | **Complexidade** | Média        |
 | **Status**       | 🟢 Concluído |

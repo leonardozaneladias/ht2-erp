@@ -18,7 +18,7 @@ Menu lateral de navegação do admin. Contém logo da empresa no topo, card opci
 
 ```
 ┌──────────────────────┐
-│  [LOGO ARTFINAL]     │  ← logo-box (logo-lg + logo-sm variants)
+│  [LOGO]              │  ← logo-box (logo-lg + logo-sm variants)
 ├──────────────────────┤
 │                      │
 │  [👤 Admin Nome]     │  ← sidenav-user (opcional, com dropdown de settings)
@@ -28,20 +28,15 @@ Menu lateral de navegação do admin. Contém logo da empresa no topo, card opci
 │  🏠 Dashboard        │  ← menu-item (link direto)
 │                      │
 │  CADASTROS           │
-│  🏢 Instituições     │
-│  📄 Contratos     ▾  │  ← menu-item.hs-accordion (com submenu)
+│  📄 Pedidos       ▾  │  ← menu-item.hs-accordion (com submenu)
 │    Todos             │
 │    Novo              │
 │  📦 Produtos      ▾  │
 │    Todos             │
 │    Categorias        │
-│    Termos            │
-│                      │
-│  GESTÃO              │
-│  👨‍🎓 Formandos    ▾  │
-│  💰 Financeiro    ▾  │
 │                      │
 │  CONFIGURAÇÕES       │
+│  👤 Usuários         │
 │  ⚙ Configurações  ▾  │
 │  📋 Auditoria        │
 └──────────────────────┘
@@ -154,7 +149,7 @@ Menu lateral de navegação do admin. Contém logo da empresa no topo, card opci
 </aside>
 ```
 
-O arquivo original tem **1600+ linhas** com 6 seções de menu-title (Main, Apps, Custom Pages, Layouts, Components, Menu Items) e dezenas de itens — é showcase do template. **Nenhum desses menus aplica ao ArtFinal** — vamos extrair apenas a estrutura.
+O arquivo original tem **1600+ linhas** com 6 seções de menu-title (Main, Apps, Custom Pages, Layouts, Components, Menu Items) e dezenas de itens — é showcase do template. **Nenhum desses menus aplica ao projeto** — vamos extrair apenas a estrutura.
 
 ---
 
@@ -167,7 +162,7 @@ O arquivo original tem **1600+ linhas** com 6 seções de menu-title (Main, Apps
 
 ### Props
 
-Nenhuma. O menu do ArtFinal é fixo por enquanto (não vem de banco). Se no futuro quisermos menu dinâmico baseado em permissões, promover para class-based com `@inject`.
+Nenhuma. O menu é fixo por enquanto (não vem de banco). Se no futuro quisermos menu dinâmico baseado em permissões, promover para class-based com `@inject`.
 
 ### Slots
 
@@ -179,7 +174,7 @@ Nenhum. Toda a estrutura interna é hardcoded no componente.
 {{-- resources/views/components/admin/sidebar.blade.php --}}
 
 @php
-    // Cada item do menu do ArtFinal — gate por permissão Spatie
+    // Cada item do menu — gate por permissão Spatie
     $user = auth('admin')->user();
 @endphp
 
@@ -188,18 +183,18 @@ Nenhum. Toda a estrutura interna é hardcoded no componente.
     <a class="logo-box" href="{{ route('admin.dashboard') }}">
         <span class="logo logo-light">
             <span class="logo-lg">
-                <img alt="ArtFinal" src="{{ asset('images/admin/logo.png') }}" />
+                <img alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo.png') }}" />
             </span>
             <span class="logo-sm">
-                <img alt="ArtFinal" src="{{ asset('images/admin/logo-sm.png') }}" />
+                <img alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo-sm.png') }}" />
             </span>
         </span>
         <span class="logo logo-dark">
             <span class="logo-lg">
-                <img alt="ArtFinal" src="{{ asset('images/admin/logo-dark.png') }}" />
+                <img alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo-dark.png') }}" />
             </span>
             <span class="logo-sm">
-                <img alt="ArtFinal" src="{{ asset('images/admin/logo-sm-dark.png') }}" />
+                <img alt="{{ config('app.name') }}" src="{{ asset('images/admin/logo-sm-dark.png') }}" />
             </span>
         </span>
     </a>
@@ -274,45 +269,33 @@ Nenhum. Toda a estrutura interna é hardcoded no componente.
                     {{-- CADASTROS --}}
                     <li class="menu-title"><span>Cadastros</span></li>
 
-                    @can ('instituicoes.listar')
-                        <li class="menu-item">
-                            <a
-                                class="menu-link {{ request()->routeIs('admin.instituicoes.*') ? 'active' : '' }}"
-                                href="{{ route('admin.instituicoes.index') }}"
-                            >
-                                <span class="menu-icon"><i class="iconify tabler--building"></i></span>
-                                <span class="menu-text">Instituições</span>
-                            </a>
-                        </li>
-                    @endcan
-
-                    @can ('contratos.listar')
+                    @can ('pedidos.listar')
                         <li
-                            class="menu-item hs-accordion {{ request()->routeIs('admin.contratos.*') ? 'active' : '' }}"
+                            class="menu-item hs-accordion {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}"
                         >
                             <a
                                 class="hs-accordion-toggle menu-link"
                                 href="javascript:void(0)"
-                                aria-controls="menu-contratos"
-                                aria-expanded="{{ request()->routeIs('admin.contratos.*') ? 'true' : 'false' }}"
+                                aria-controls="menu-pedidos"
+                                aria-expanded="{{ request()->routeIs('admin.pedidos.*') ? 'true' : 'false' }}"
                             >
                                 <span class="menu-icon"><i class="iconify tabler--file-text"></i></span>
-                                <span class="menu-text">Contratos</span>
+                                <span class="menu-text">Pedidos</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul
-                                class="sub-menu hs-accordion-content hs-accordion-group {{ request()->routeIs('admin.contratos.*') ? '' : 'hidden' }}"
-                                id="menu-contratos"
+                                class="sub-menu hs-accordion-content hs-accordion-group {{ request()->routeIs('admin.pedidos.*') ? '' : 'hidden' }}"
+                                id="menu-pedidos"
                             >
                                 <li class="menu-item">
-                                    <a class="menu-link" href="{{ route('admin.contratos.index') }}">
-                                        <span class="menu-text">Todos os Contratos</span>
+                                    <a class="menu-link" href="{{ route('admin.pedidos.index') }}">
+                                        <span class="menu-text">Todos os Pedidos</span>
                                     </a>
                                 </li>
-                                @can ('contratos.criar')
+                                @can ('pedidos.criar')
                                     <li class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.contratos.create') }}">
-                                            <span class="menu-text">Novo Contrato</span>
+                                        <a class="menu-link" href="{{ route('admin.pedidos.create') }}">
+                                            <span class="menu-text">Novo Pedido</span>
                                         </a>
                                     </li>
                                 @endcan
@@ -322,7 +305,7 @@ Nenhum. Toda a estrutura interna é hardcoded no componente.
 
                     @can ('produtos.listar')
                         <li
-                            class="menu-item hs-accordion {{ request()->routeIs('admin.produtos.*', 'admin.categorias.*', 'admin.termos.*') ? 'active' : '' }}"
+                            class="menu-item hs-accordion {{ request()->routeIs('admin.produtos.*', 'admin.categorias.*') ? 'active' : '' }}"
                         >
                             <a
                                 class="hs-accordion-toggle menu-link"
@@ -331,7 +314,7 @@ Nenhum. Toda a estrutura interna é hardcoded no componente.
                                 aria-expanded="false"
                             >
                                 <span class="menu-icon"><i class="iconify tabler--package"></i></span>
-                                <span class="menu-text">Pacotes &amp; Produtos</span>
+                                <span class="menu-text">Produtos</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul class="sub-menu hs-accordion-content hs-accordion-group hidden" id="menu-produtos">
@@ -345,85 +328,24 @@ Nenhum. Toda a estrutura interna é hardcoded no componente.
                                         <span class="menu-text">Categorias</span>
                                     </a>
                                 </li>
-                                <li class="menu-item">
-                                    <a class="menu-link" href="{{ route('admin.termos.index') }}">
-                                        <span class="menu-text">Termos de Adesão</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    @endcan
-
-                    {{-- GESTÃO --}}
-                    <li class="menu-title"><span>Gestão</span></li>
-
-                    @can ('formandos.listar')
-                        <li
-                            class="menu-item hs-accordion {{ request()->routeIs('admin.formandos.*') ? 'active' : '' }}"
-                        >
-                            <a
-                                class="hs-accordion-toggle menu-link"
-                                href="javascript:void(0)"
-                                aria-controls="menu-formandos"
-                                aria-expanded="false"
-                            >
-                                <span class="menu-icon"><i class="iconify tabler--users"></i></span>
-                                <span class="menu-text">Formandos</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul class="sub-menu hs-accordion-content hs-accordion-group hidden" id="menu-formandos">
-                                <li class="menu-item">
-                                    <a class="menu-link" href="{{ route('admin.formandos.index') }}">
-                                        <span class="menu-text">Todos os Formandos</span>
-                                    </a>
-                                </li>
-                                @can ('formandos.criar')
-                                    <li class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.formandos.create') }}">
-                                            <span class="menu-text">Cadastro Manual</span>
-                                        </a>
-                                    </li>
-                                @endcan
-                            </ul>
-                        </li>
-                    @endcan
-
-                    @can ('financeiro.listar')
-                        <li
-                            class="menu-item hs-accordion {{ request()->routeIs('admin.financeiro.*') ? 'active' : '' }}"
-                        >
-                            <a
-                                class="hs-accordion-toggle menu-link"
-                                href="javascript:void(0)"
-                                aria-controls="menu-financeiro"
-                                aria-expanded="false"
-                            >
-                                <span class="menu-icon"><i class="iconify tabler--cash"></i></span>
-                                <span class="menu-text">Financeiro</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul class="sub-menu hs-accordion-content hs-accordion-group hidden" id="menu-financeiro">
-                                <li class="menu-item">
-                                    <a class="menu-link" href="{{ route('admin.financeiro.parcelas.index') }}">
-                                        <span class="menu-text">Parcelas</span>
-                                    </a>
-                                </li>
-                                <li class="menu-item">
-                                    <a class="menu-link" href="{{ route('admin.financeiro.simulador') }}">
-                                        <span class="menu-text">Simulador</span>
-                                    </a>
-                                </li>
-                                <li class="menu-item">
-                                    <a class="menu-link" href="{{ route('admin.relatorios.index') }}">
-                                        <span class="menu-text">Relatórios</span>
-                                    </a>
-                                </li>
                             </ul>
                         </li>
                     @endcan
 
                     {{-- CONFIGURAÇÕES --}}
                     <li class="menu-title"><span>Configurações</span></li>
+
+                    @can ('usuarios.listar')
+                        <li class="menu-item">
+                            <a
+                                class="menu-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}"
+                                href="{{ route('admin.usuarios.index') }}"
+                            >
+                                <span class="menu-icon"><i class="iconify tabler--users"></i></span>
+                                <span class="menu-text">Usuários</span>
+                            </a>
+                        </li>
+                    @endcan
 
                     @can ('configuracoes.editar')
                         <li class="menu-item hs-accordion">
@@ -443,18 +365,6 @@ Nenhum. Toda a estrutura interna é hardcoded no componente.
                                         <span class="menu-text">Configurações Globais</span>
                                     </a>
                                 </li>
-                                <li class="menu-item">
-                                    <a class="menu-link" href="{{ route('admin.indices-reajuste.index') }}">
-                                        <span class="menu-text">Índices de Reajuste</span>
-                                    </a>
-                                </li>
-                                @can ('usuarios.listar')
-                                    <li class="menu-item">
-                                        <a class="menu-link" href="{{ route('admin.usuarios.index') }}">
-                                            <span class="menu-text">Usuários Admin</span>
-                                        </a>
-                                    </li>
-                                @endcan
                                 @can ('perfis.listar')
                                     <li class="menu-item">
                                         <a class="menu-link" href="{{ route('admin.perfis.index') }}">
@@ -510,36 +420,15 @@ Não há uso direto — é sempre via layout.
 ## Quando NÃO Usar ❌
 
 - Telas de auth (login, 404, 500) — usar layout mínimo sem sidebar
-- Portal do formando — tem navegação própria (sem sidebar, mobile-first)
-- Modal de preview (termos) — contexto sem navegação
+- Modal de preview — contexto sem navegação
 
 ## Boas Práticas 💡
 
-- **Estado ativo:** usar `request()->routeIs('admin.contratos.*')` para aplicar `.active` em qualquer rota dentro do namespace
+- **Estado ativo:** usar `request()->routeIs('admin.pedidos.*')` para aplicar `.active` em qualquer rota dentro do namespace
 - **Submenus iniciam fechados** EXCETO se a rota atual estiver dentro deles — remover `hidden` condicionalmente
-- **Spatie `@can`:** cada item raiz deve ser gated por permissão. Usuários sem `contratos.listar` nem veem o menu
+- **Spatie `@can`:** cada item raiz deve ser gated por permissão. Usuários sem `pedidos.listar` nem veem o menu
 - **Não passar ícones via prop** — defini-los no componente mantém consistência. Se precisar mudar, editar aqui
 - **Não criar sub-components** (`<x-admin.sidebar.item>`, etc.) por enquanto — o ganho de abstração não compensa a complexidade para um menu fixo. Promover apenas se virar 30+ itens com regras complexas
-
----
-
-## Mapeamento no PRD (Portal ArtFinal)
-
-| Tela                             | Seção PRD    | Como É Usado                           | Sprint |
-| -------------------------------- | ------------ | -------------------------------------- | :----: |
-| Navegação Admin completa         | 14.21        | Sidebar com menu fixo hardcoded        |   16   |
-| Dashboard                        | 14.2         | Item "Dashboard" ativo                 |   16   |
-| Instituições                     | 14.3         | Item "Instituições" ativo              |   17   |
-| Contratos (list + create)        | 14.4         | Submenu "Contratos" ativo              |   17   |
-| Produtos/Categorias/Termos       | 14.5–14.11   | Submenu "Pacotes & Produtos" ativo     |   18   |
-| Formandos                        | 14.12, 14.20 | Submenu "Formandos" ativo              |   20   |
-| Financeiro (parcelas, simulador) | 14.13, 14.14 | Submenu "Financeiro" ativo             | 21–22  |
-| Relatórios                       | 14.17        | Item "Relatórios" dentro de Financeiro |   22   |
-| Configurações Globais            | 14.15        | Submenu "Configurações" ativo          |   23   |
-| Índices de Reajuste              | 14.16        | Item dentro de Configurações           |   23   |
-| Usuários Admin                   | 14.18        | Item dentro de Configurações           |   24   |
-| Perfis/Permissões                | 14.19        | Item dentro de Configurações           |   24   |
-| Logs de Auditoria                | —            | Item raiz (fora de Configurações)      |   24   |
 
 ---
 
@@ -548,9 +437,7 @@ Não há uso direto — é sempre via layout.
 | Critério                   | Valor                                                         |
 | -------------------------- | ------------------------------------------------------------- |
 | **Vai usar no projeto**    | 🟢 Sim                                                        |
-| **Prioridade**             | P0                                                            |
-| **Sprint planejada**       | 16                                                            |
-| **Complexidade**           | Média-alta (menu com 20+ itens + gates Spatie + estado ativo) |
+| **Complexidade**           | Média-alta (menu com vários itens + gates Spatie + estado ativo) |
 | **Status componentização** | 🟢 Concluído                                                  |
 
 ---
@@ -562,24 +449,24 @@ Não há uso direto — é sempre via layout.
 | **Depende de (JS)**         | Preline (accordion), Simplebar (scroll), Iconify tabler                   |
 | **Depende de (CSS)**        | Classes do Inspinia: `.app-menu`, `.side-nav`, `.menu-*`, `.sidenav-user` |
 | **Depende de (Laravel)**    | Spatie Permissions (`@can`), rotas nomeadas `admin.*`, guard `admin`      |
-| **Usado por (telas)**       | Todas as views do admin autenticado (20 telas)                            |
+| **Usado por (views)**       | Todas as views do admin autenticado                                       |
 | **Usado por (componentes)** | `<x-admin.layout>`                                                        |
 
 ---
 
 ## Notas de Adaptação
 
-1. **Menu hardcoded em PT-BR:** os menus originais do Inspinia (Dashboards, Apps, Custom Pages, Layouts, Components, Menu Items) são totalmente descartados — substituídos pelo menu do PRD §14.21
+1. **Menu hardcoded em PT-BR:** os menus originais do Inspinia (Dashboards, Apps, Custom Pages, Layouts, Components, Menu Items) são totalmente descartados — substituídos pelo menu do projeto
 2. **Remover atributos `data-lang`:** o Inspinia usa `data-lang="main"` para i18n via JS. Como o admin é PT-BR fixo, remover
 3. **Logos:** substituir `/images/logo.png` → `asset('images/admin/logo.png')`. Providenciar 4 variants (light/dark × lg/sm)
 4. **User card:** remover `bg-[url(/images/user-bg-pattern.svg)]` ou providenciar pattern próprio. Substituir `Damian D.` → `{{ $user->nome }}`. Remover link para "Lock Screen" (não temos).
 5. **Logout por POST:** o Inspinia usa link direto para logout — inseguro. Trocar por `<form method="POST" action="{{ route('admin.logout') }}">`
 6. **Estado ativo:** Inspinia usa JS para marcar o item ativo (loop pelo `pathname`). **Trocar por Blade server-side** com `request()->routeIs('...')` — mais confiável, funciona antes do JS carregar
-7. **Spatie `@can`:** cada item do menu precisa de gate por permissão. Os nomes das permissões virão da Sprint 19 (Admin Auth + ACL)
-8. **Submenu auto-open na rota ativa:** ao entrar em `/admin/contratos/123`, o accordion "Contratos" deve abrir automaticamente. Conseguido via `aria-expanded="true"` + remover `hidden` condicionalmente
-9. **Ícones Tabler:** os nomes `tabler--dashboard`, `tabler--building`, `tabler--file-text`, etc. vêm do Iconify. Confirmar que todos existem na versão instalada
-10. **Sem showcase de submenus 3+ níveis:** o Inspinia mostra submenus aninhados em 3 níveis. ArtFinal só precisa de 2 níveis (raiz + filhos)
-11. **Mega menu ignorado:** o topbar do Inspinia tem mega menu (ver `topbar.md`). No ArtFinal não usamos — a navegação é toda via sidebar
+7. **Spatie `@can`:** cada item do menu precisa de gate por permissão. Os nomes das permissões vêm do módulo de Admin Auth + ACL
+8. **Submenu auto-open na rota ativa:** ao entrar em `/admin/pedidos/123`, o accordion "Pedidos" deve abrir automaticamente. Conseguido via `aria-expanded="true"` + remover `hidden` condicionalmente
+9. **Ícones Tabler:** os nomes `tabler--dashboard`, `tabler--package`, `tabler--file-text`, etc. vêm do Iconify. Confirmar que todos existem na versão instalada
+10. **Sem showcase de submenus 3+ níveis:** o Inspinia mostra submenus aninhados em 3 níveis. O projeto só precisa de 2 níveis (raiz + filhos)
+11. **Mega menu ignorado:** o topbar do Inspinia tem mega menu (ver `topbar.md`). Aqui não usamos — a navegação é toda via sidebar
 
 ## Código Final Blade
 
@@ -596,6 +483,6 @@ Principais ajustes aplicados no código final:
 
 ## Changelog do Componente
 
-| Data       | Descrição                  |
-| ---------- | -------------------------- |
-| 2026-04-11 | Doc criada — Fase 2 Onda 1 |
+| Data       | Descrição   |
+| ---------- | ----------- |
+| 2026-04-11 | Doc criada  |

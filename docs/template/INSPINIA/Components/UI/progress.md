@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Barra horizontal de progresso. Usa `role="progressbar"` + `aria-valuenow`/`aria-valuemin`/`aria-valuemax`. Suporta variantes de cor, espessura (sm, md, lg), label interno (`25%`), animação striped e uso em stacks. Usado no dashboard para meta de formandos por contrato (14.2) e no simulador de parcelamento.
+Barra horizontal de progresso. Usa `role="progressbar"` + `aria-valuenow`/`aria-valuemin`/`aria-valuemax`. Suporta variantes de cor, espessura (sm, md, lg), label interno (`25%`), animação striped e uso em stacks. Usado no dashboard para indicadores de meta e em barras de etapa de wizard.
 
 ---
 
@@ -140,33 +140,33 @@ Variantes no template: thin/thick, multi-color stack, label acima da barra, com 
 <x-shared.progress-bar :value="85" striped animated />
 ```
 
-### Real (Dashboard 14.2 — Meta de Formandos por Contrato)
+### Real (Dashboard — Meta de Vendas por Categoria)
 
 ```blade
 <table class="table">
     <thead>
         <tr>
-            <th>Contrato</th>
+            <th>Categoria</th>
             <th>Meta</th>
-            <th>Aderidos</th>
+            <th>Realizado</th>
             <th>% Atingido</th>
             <th>Status</th>
         </tr>
     </thead>
     <tbody>
-        @foreach ($contratos as $contrato)
-            @php $pct = $contrato->meta_formandos > 0
-                ? ($contrato->adesoes_ativas / $contrato->meta_formandos) * 100
+        @foreach ($categorias as $categoria)
+            @php $pct = $categoria->meta_vendas > 0
+                ? ($categoria->vendas_ativas / $categoria->meta_vendas) * 100
                 : 0; @endphp
             <tr>
-                <td>{{ $contrato->codigo_turma }} — {{ $contrato->instituicao->nome_fantasia }}</td>
-                <td>{{ $contrato->meta_formandos }}</td>
-                <td>{{ $contrato->adesoes_ativas }}</td>
+                <td>{{ $categoria->codigo }} — {{ $categoria->nome }}</td>
+                <td>{{ $categoria->meta_vendas }}</td>
+                <td>{{ $categoria->vendas_ativas }}</td>
                 <td>
                     <x-shared.progress-bar :value="$pct" auto-color label size="lg" />
                 </td>
                 <td>
-                    <x-shared.status-badge :enum="$contrato->statusMeta()" />
+                    <x-shared.status-badge :enum="$categoria->statusMeta()" />
                 </td>
             </tr>
         @endforeach
@@ -174,7 +174,7 @@ Variantes no template: thin/thick, multi-color stack, label acima da barra, com 
 </table>
 ```
 
-### Real (Wizard do Portal — barra 7 etapas)
+### Real (Wizard — barra de 7 etapas)
 
 ```blade
 @php $pct = ($etapaAtual / 7) * 100; @endphp
@@ -185,8 +185,8 @@ Variantes no template: thin/thick, multi-color stack, label acima da barra, com 
 
 ## Quando Usar ✅
 
-- Meta de formandos por contrato (14.2)
-- Wizard progress do portal (7 etapas)
+- Indicadores de meta no dashboard
+- Wizard progress (etapas)
 - Loading determinístico (upload em progresso)
 - % de uso de quota (ex: espaço em uploads)
 
@@ -198,22 +198,11 @@ Variantes no template: thin/thick, multi-color stack, label acima da barra, com 
 
 ---
 
-## Mapeamento no PRD
-
-| Tela          | Seção PRD         | Uso                                           |
-| ------------- | ----------------- | --------------------------------------------- |
-| Dashboard     | 14.2              | Meta de formandos por contrato — `auto-color` |
-| Portal Wizard | Portal            | Progresso 7 etapas                            |
-| Uploads       | 14.3, 14.6, 14.12 | Progresso de upload de imagem                 |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 

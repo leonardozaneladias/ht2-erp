@@ -9,7 +9,7 @@
 
 ## Descrição
 
-Formulário multi-etapas com navegação progressiva. **Usado no portal do formando** (adesão com 7 etapas). No admin, o cadastro manual (14.20) usa **accordion** em vez de wizard. Este componente é primariamente **portal**, documentado aqui para referência e eventual reuso.
+Formulário multi-etapas com navegação progressiva. Útil para fluxos longos com validação por etapa. Para forms de cadastro mais densos, considere **accordion** em vez de wizard. Documentado aqui para referência e eventual reuso.
 
 ---
 
@@ -23,7 +23,7 @@ Formulário multi-etapas com navegação progressiva. **Usado no portal do forma
             <li class="relative flex-1">
                 <div class="step active">
                     <div class="step-number">1</div>
-                    <div class="step-label">Contrato</div>
+                    <div class="step-label">Etapa 1</div>
                 </div>
             </li>
             <li class="relative flex-1">
@@ -51,7 +51,7 @@ Formulário multi-etapas com navegação progressiva. **Usado no portal do forma
 
 ## Componente Blade Proposto
 
-**Nome:** `<x-portal.wizard>` + `<x-portal.wizard-step>`
+**Nome:** `<x-shared.wizard>` + `<x-shared.wizard-step>`
 **Arquivos:**
 
 - `resources/views/components/portal/wizard.blade.php`
@@ -59,10 +59,10 @@ Formulário multi-etapas com navegação progressiva. **Usado no portal do forma
 
 ### Props — `wizard`
 
-| Prop      | Tipo    | Default | Descrição                                                                        |
-| --------- | ------- | ------- | -------------------------------------------------------------------------------- |
-| `steps`   | `array` | —       | `[['id' => '1', 'label' => 'Contrato'], ['id' => '2', 'label' => 'Dados'], ...]` |
-| `current` | `int`   | `1`     | Etapa atual (1-indexed)                                                          |
+| Prop      | Tipo    | Default | Descrição                                                                     |
+| --------- | ------- | ------- | ----------------------------------------------------------------------------- |
+| `steps`   | `array` | —       | `[['id' => '1', 'label' => 'Dados'], ['id' => '2', 'label' => 'Endereço'], ...]` |
+| `current` | `int`   | `1`     | Etapa atual (1-indexed)                                                       |
 
 ### Código (wizard container)
 
@@ -127,28 +127,24 @@ Formulário multi-etapas com navegação progressiva. **Usado no portal do forma
 
 ## Exemplos de Uso
 
-### Real (Portal — Wizard de Adesão 7 etapas)
+### Exemplo (Wizard de 3 etapas)
 
 ```php
-// app/Livewire/Portal/Wizard/Index.php
+// app/Livewire/Admin/Wizard/Index.php
 class Index extends Component
 {
     public int $etapa = 1;
 
     public array $steps = [
-        ['id' => '1', 'label' => 'Contrato'],
-        ['id' => '2', 'label' => 'Formando'],
-        ['id' => '3', 'label' => 'Responsáveis'],
-        ['id' => '4', 'label' => 'Portal'],
-        ['id' => '5', 'label' => 'Pacotes'],
-        ['id' => '6', 'label' => 'Pagamento'],
-        ['id' => '7', 'label' => 'Confirmação'],
+        ['id' => '1', 'label' => 'Dados'],
+        ['id' => '2', 'label' => 'Endereço'],
+        ['id' => '3', 'label' => 'Confirmação'],
     ];
 
     public function proxima(): void
     {
         $this->validate($this->rulesEtapaAtual());
-        if ($this->etapa < 7) $this->etapa++;
+        if ($this->etapa < 3) $this->etapa++;
     }
 
     public function anterior(): void
@@ -159,14 +155,14 @@ class Index extends Component
 ```
 
 ```blade
-<x-portal.layout title="Adesão">
-    <x-portal.wizard :steps="$steps" :current="$etapa">
+<x-admin.layout title="Cadastro">
+    <x-shared.wizard :steps="$steps" :current="$etapa">
         @switch ($etapa)
             @case (1)
-                <livewire:portal.wizard.etapas.contrato />
+                <livewire:admin.wizard.etapas.dados />
                 @break
             @case (2)
-                <livewire:portal.wizard.etapas.formando />
+                <livewire:admin.wizard.etapas.endereco />
                 @break
                 {{-- ... --}}
         @endswitch
@@ -176,52 +172,40 @@ class Index extends Component
                 Voltar
             </x-shared.button>
             <x-shared.loading-button variant="primary" wire:click="proxima">
-                {{ $etapa === 7 ? 'Confirmar' : 'Próximo' }}
+                {{ $etapa === 3 ? 'Confirmar' : 'Próximo' }}
             </x-shared.loading-button>
         </div>
-    </x-portal.wizard>
-</x-portal.layout>
+    </x-shared.wizard>
+</x-admin.layout>
 ```
 
 ---
 
 ## Quando Usar ✅
 
-- **Portal** — wizard de adesão (7 etapas)
 - Processos longos onde usuário precisa saber onde está
 - Fluxos com validação por etapa
 
 ## Quando NÃO Usar ❌
 
-- **Admin** — usar `<x-shared.accordion>` ou `<x-shared.tab-nav>`
+- Forms de cadastro densos → preferir `<x-shared.accordion>` ou `<x-shared.tab-nav>`
 - Forms simples (1-3 campos) → página única
-
----
-
-## Mapeamento no PRD
-
-| Tela                  | Uso                    |
-| --------------------- | ---------------------- |
-| Portal adesão         | Wizard 7 etapas        |
-| 14.20 Cadastro Manual | Accordion (NÃO wizard) |
 
 ---
 
 ## Classificação
 
-| Critério         | Valor                  |
-| ---------------- | ---------------------- |
-| **Vai usar**     | 🟢 Sim (apenas portal) |
-| **Prioridade**   | P1 (Sprint portal)     |
-| **Complexidade** | Média                  |
-| **Status**       | 🔴 Não iniciado        |
+| Critério         | Valor           |
+| ---------------- | --------------- |
+| **Vai usar**     | 🟢 Sim          |
+| **Complexidade** | Média           |
+| **Status**       | 🔴 Não iniciado |
 
 ---
 
 ## Notas de Adaptação
 
-1. **Namespace `portal`** — não é `shared` nem `admin`. Exclusivo do portal
-2. **Stepper server-driven** — estado vem do Livewire, não JS
-3. **Validação por etapa** — `rulesEtapaAtual()` retorna regras específicas
-4. **Mobile fallback** — progress bar em vez de stepper horizontal (ocupa menos espaço)
-5. **Não usar preline stepper** — queremos controle total do Livewire sobre a etapa atual
+1. **Stepper server-driven** — estado vem do Livewire, não JS
+2. **Validação por etapa** — `rulesEtapaAtual()` retorna regras específicas
+3. **Mobile fallback** — progress bar em vez de stepper horizontal (ocupa menos espaço)
+4. **Não usar preline stepper** — queremos controle total do Livewire sobre a etapa atual

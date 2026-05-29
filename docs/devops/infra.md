@@ -1,4 +1,4 @@
-# Infraestrutura Local — Portal ArtFinal
+# Infraestrutura Local
 
 **Stack:** Docker (Laradock) · PHP 8.4 · PostgreSQL 16 · Redis · Nginx · Horizon · Pulse · pgAdmin · Mailpit
 
@@ -74,8 +74,8 @@ O script executa 6 passos:
 
 - Host: `postgres` (interno) ou `localhost` (externo)
 - Porta: `5432`
-- Database: `portalartfinal`
-- User: `portalartfinal`
+- Database: `app` (ajuste conforme o `.env`)
+- User: `app` (ajuste conforme o `.env`)
 - Password: `secret`
 
 **Redis:**
@@ -142,7 +142,7 @@ Para testar a partir do workspace:
 
 ```bash
 docker compose exec workspace bash -c \
-  "PGPASSWORD=secret psql -h postgres -U portalartfinal -d portalartfinal -c '\\l'"
+  "PGPASSWORD=secret psql -h postgres -U app -d app -c '\\l'"
 ```
 
 ### Redis fica em restart loop

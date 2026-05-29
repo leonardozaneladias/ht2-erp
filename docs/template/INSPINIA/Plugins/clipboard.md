@@ -3,7 +3,7 @@
 **Categoria:** Plugin
 **Origem Inspinia:** `resources/views/plugins/clipboard.blade.php`
 **Plugins JS:** `clipboard.js` 2.0.11 (ou `navigator.clipboard` nativo)
-**Uso no ArtFinal:** Copiar CPF, código de turma, link de adesão, ID de formando
+**Uso típico:** Copiar CPF, código, link público, ID de registro
 
 ---
 
@@ -13,7 +13,7 @@ Permite copiar valores para a área de transferência do usuário. Podemos usar 
 
 ---
 
-## Abordagem ArtFinal: helper Alpine reusável
+## Abordagem: helper Alpine reusável
 
 Em vez de depender da biblioteca, criar um helper Alpine que usa `navigator.clipboard.writeText()` + feedback visual.
 
@@ -65,47 +65,37 @@ Em vez de depender da biblioteca, criar um helper Alpine que usa `navigator.clip
 
 ## Exemplos de Uso
 
-### CPF copiável na ficha do formando 14.12
+### CPF copiável na ficha do usuário
 
 ```blade
 <div class="flex items-center gap-2">
-    <span class="font-mono">{{ $formando->cpf_formatado }}</span>
-    <x-shared.copy-button :value="$formando->cpf_formatado" />
+    <span class="font-mono">{{ $usuario->cpf_formatado }}</span>
+    <x-shared.copy-button :value="$usuario->cpf_formatado" />
 </div>
 ```
 
-### Código da turma
+### Código do registro
 
 ```blade
 <div class="flex items-center gap-2">
-    <code class="bg-default-100 px-2 py-1 rounded">{{ $contrato->codigo_turma }}</code>
-    <x-shared.copy-button :value="$contrato->codigo_turma" label="Copiar" />
+    <code class="bg-default-100 px-2 py-1 rounded">{{ $registro->codigo }}</code>
+    <x-shared.copy-button :value="$registro->codigo" label="Copiar" />
 </div>
 ```
 
-### Link de adesão pública
+### Link público
 
 ```blade
 <div class="flex items-center gap-2 p-3 border rounded">
     <input
         type="text"
-        value="{{ route('portal.adesao', $contrato->slug) }}"
+        value="{{ route('registro.publico', $registro->slug) }}"
         class="form-input form-input-sm grow bg-default-50"
         readonly
     />
-    <x-shared.copy-button :value="route('portal.adesao', $contrato->slug)" label="Copiar Link" />
+    <x-shared.copy-button :value="route('registro.publico', $registro->slug)" label="Copiar Link" />
 </div>
 ```
-
----
-
-## Mapeamento no PRD
-
-| Tela                 | Uso                                    |
-| -------------------- | -------------------------------------- |
-| 14.4 Contratos       | Copiar código da turma, link de adesão |
-| 14.12 Ficha Formando | Copiar CPF, e-mail                     |
-| 14.13 Parcelas       | Copiar ID da parcela, código de boleto |
 
 ---
 
@@ -114,7 +104,6 @@ Em vez de depender da biblioteca, criar um helper Alpine que usa `navigator.clip
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P5 (Onda 6)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 
@@ -123,7 +112,7 @@ Em vez de depender da biblioteca, criar um helper Alpine que usa `navigator.clip
 ## Notas de Adaptação
 
 1. **`navigator.clipboard` nativo** — disponível em todos os browsers modernos (precisa HTTPS em produção)
-2. **Clipboard.js fica no parking lot** — fallback para contextos não-HTTPS
+2. **Clipboard.js fica como alternativa** — fallback para contextos não-HTTPS
 3. **Feedback visual:** ícone muda para check por 1.5s, label muda para "Copiado!"
 4. **Tratamento de erro:** toast se falhar (permissão negada, contexto inseguro)
 5. **Helper JS leve** em vez de Alpine inline — sem dependência externa, reutilizável

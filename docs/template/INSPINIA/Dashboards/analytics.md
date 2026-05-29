@@ -8,7 +8,7 @@
 
 ## Descrição
 
-**Não é um componente** — é um showcase do Inspinia que serve como **referência visual e estrutural** para construir o Dashboard 14.2 do Portal ArtFinal. A view real do ArtFinal é `resources/views/admin/dashboard/index.blade.php`.
+**Não é um componente** — é um showcase do Inspinia que serve como **referência visual e estrutural** para construir o dashboard administrativo da aplicação. A view real fica em `resources/views/admin/dashboard/index.blade.php`.
 
 ---
 
@@ -27,20 +27,20 @@
 
 ---
 
-## Tradução para o Dashboard 14.2
+## Tradução para o dashboard administrativo
 
-Conforme PRD §14.2, a estrutura do Dashboard ArtFinal é:
+Estrutura típica de um dashboard gerencial:
 
-1. **KPIs (grid 4):** Contratos Ativos, Formandos Aderidos, Receita a Receber, Inadimplência
-2. **Gráficos (grid 2):** Adesões por mês (column), Receita x Inadimplência (line dual)
-3. **Meta de Formandos por Contrato:** tabela resumida com progress bar
-4. **Últimas Adesões:** tabela 10 registros
-5. **Parcelas Vencendo nos próximos 7 dias:** tabela 10 registros
+1. **KPIs (grid 4):** Registros Ativos, Clientes, Receita a Receber, Pendências
+2. **Gráficos (grid 2):** Pedidos por mês (column), Receita x Despesa (line dual)
+3. **Meta por Categoria:** tabela resumida com progress bar
+4. **Últimos Registros:** tabela 10 registros
+5. **Itens a Vencer nos próximos 7 dias:** tabela 10 registros
 6. **Alertas do Sistema:** alerts de diferentes severidades
 
 ---
 
-## View proposta (ArtFinal)
+## View proposta
 
 ```blade
 {{-- resources/views/admin/dashboard/index.blade.php --}}
@@ -48,18 +48,18 @@ Conforme PRD §14.2, a estrutura do Dashboard ArtFinal é:
     {{-- 1. KPIs --}}
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <x-admin.kpi-card
-            label="Contratos Ativos"
-            :value="$kpis->contratosAtivos"
+            label="Pedidos Ativos"
+            :value="$kpis->pedidosAtivos"
             icon="tabler--file-text"
             color="primary"
-            :href="route('admin.contratos.index')"
+            :href="route('admin.pedidos.index')"
         />
         <x-admin.kpi-card
-            label="Formandos Aderidos"
-            :value="$kpis->formandosAderidos"
+            label="Clientes"
+            :value="$kpis->clientes"
             icon="tabler--users"
             color="success"
-            :href="route('admin.formandos.index')"
+            :href="route('admin.clientes.index')"
         />
         <x-admin.kpi-card
             label="Receita a Receber"
@@ -68,8 +68,8 @@ Conforme PRD §14.2, a estrutura do Dashboard ArtFinal é:
             color="warning"
         />
         <x-admin.kpi-card
-            label="Inadimplência"
-            :value="number_format($kpis->inadimplenciaPct, 1, ',', '.').'%'"
+            label="Pendências"
+            :value="number_format($kpis->pendenciasPct, 1, ',', '.').'%'"
             icon="tabler--alert-triangle"
             color="danger"
         />
@@ -77,28 +77,28 @@ Conforme PRD §14.2, a estrutura do Dashboard ArtFinal é:
 
     {{-- 2. Gráficos --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <x-admin.chart-card title="Adesões por Mês (12 meses)" chart-id="adesoes-mes">
-            <livewire:admin.dashboard.grafico-adesoes-mensais chart-id="adesoes-mes" />
+        <x-admin.chart-card title="Pedidos por Mês (12 meses)" chart-id="pedidos-mes">
+            <livewire:admin.dashboard.grafico-pedidos-mensais chart-id="pedidos-mes" />
         </x-admin.chart-card>
 
-        <x-admin.chart-card title="Receita x Inadimplência" chart-id="rec-inad">
-            <livewire:admin.dashboard.grafico-receita-inadimplencia chart-id="rec-inad" />
+        <x-admin.chart-card title="Receita x Despesa" chart-id="rec-desp">
+            <livewire:admin.dashboard.grafico-receita-despesa chart-id="rec-desp" />
         </x-admin.chart-card>
     </div>
 
-    {{-- 3. Meta de Formandos por Contrato --}}
-    <x-shared.card title="Meta de Formandos por Contrato" class="mb-6">
-        <livewire:admin.dashboard.tabela-meta-contratos />
+    {{-- 3. Meta por Categoria --}}
+    <x-shared.card title="Meta por Categoria" class="mb-6">
+        <livewire:admin.dashboard.tabela-meta-categorias />
     </x-shared.card>
 
-    {{-- 4 + 5. Últimas Adesões + Parcelas Vencendo --}}
+    {{-- 4 + 5. Últimos Registros + Itens a Vencer --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <x-shared.card title="Últimas Adesões">
-            <livewire:admin.dashboard.tabela-ultimas-adesoes />
+        <x-shared.card title="Últimos Registros">
+            <livewire:admin.dashboard.tabela-ultimos-registros />
         </x-shared.card>
 
-        <x-shared.card title="Parcelas Vencendo (7 dias)">
-            <livewire:admin.dashboard.tabela-parcelas-vencendo />
+        <x-shared.card title="Itens a Vencer (7 dias)">
+            <livewire:admin.dashboard.tabela-itens-a-vencer />
         </x-shared.card>
     </div>
 
@@ -120,9 +120,9 @@ Conforme PRD §14.2, a estrutura do Dashboard ArtFinal é:
 
 ---
 
-## Mapeamento no PRD
+## Onde se aplica
 
-**Tela 14.2 — Dashboard Administrativo** (entrada principal após login).
+Dashboard administrativo (entrada principal após login).
 
 ---
 
@@ -131,7 +131,6 @@ Conforme PRD §14.2, a estrutura do Dashboard ArtFinal é:
 | Critério         | Valor                      |
 | ---------------- | -------------------------- |
 | **Vai usar**     | 🟢 Sim (referência visual) |
-| **Prioridade**   | P3 (Sprint 16)             |
 | **Complexidade** | Média (composição)         |
 | **Status**       | 🔴 Não iniciado            |
 
@@ -141,6 +140,6 @@ Conforme PRD §14.2, a estrutura do Dashboard ArtFinal é:
 
 1. **Não é componente** — é uma view do admin composta pelos demais componentes
 2. **Livewire full-page** recomendado para o dashboard — cada bloco é Livewire independente para permitir refresh isolado
-3. **Cache de KPIs** — valores agregados devem ser cached (Redis) por 1-5min, invalidados em eventos (adesão criada, pagamento baixado)
+3. **Cache de KPIs** — valores agregados devem ser cached (Redis) por 1-5min, invalidados em eventos (registro criado, pagamento baixado)
 4. **Layout responsive:** grid 1 col mobile, 2 tablets, 4 KPIs desktop
-5. **Alertas dinâmicos** — computed via queries que verificam conditions do PRD (contratos sem programação, programações vencendo, parcelas vencidas)
+5. **Alertas dinâmicos** — computed via queries que verificam condições do domínio (registros pendentes, itens vencendo, prazos vencidos)

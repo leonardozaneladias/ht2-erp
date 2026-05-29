@@ -3,7 +3,7 @@
 **Categoria:** Chart
 **Origem Inspinia:** `resources/views/charts/apex/column.blade.php`
 **Plugins JS:** ApexCharts 5.3.5
-**Uso no ArtFinal:** Dashboard 14.2 — "Adesões por Mês"; Relatórios 14.17
+**Uso típico:** Dashboard — "Registros por Mês"; Relatórios
 
 ---
 
@@ -30,7 +30,7 @@ const options = {
             borderRadiusApplication: 'end',
         },
     },
-    series: [{ name: 'Adesões', data: [45, 52, 68, 74, 80, 95, 110, 98, 105, 115, 130, 142] }],
+    series: [{ name: 'Pedidos', data: [45, 52, 68, 74, 80, 95, 110, 98, 105, 115, 130, 142] }],
     xaxis: {
         categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
     },
@@ -43,36 +43,36 @@ new ApexCharts(document.querySelector('#chart-column'), options).render();
 
 ---
 
-## Exemplo de Uso (Dashboard 14.2 — Adesões por Mês)
+## Exemplo de Uso (Dashboard — Pedidos por Mês)
 
 ```blade
-<x-admin.chart-card title="Adesões por Mês (últimos 12 meses)" chart-id="adesoes-mes" :height="320">
+<x-admin.chart-card title="Pedidos por Mês (últimos 12 meses)" chart-id="pedidos-mes" :height="320">
     <x-slot:headerActions>
         <x-shared.select
-            name="filtro_contrato"
-            :options="['' => 'Todos os contratos'] + $contratos->pluck('codigo_turma', 'id')->toArray()"
-            wire:model.live="filtroContrato"
+            name="filtro_categoria"
+            :options="['' => 'Todas as categorias'] + $categorias->pluck('nome', 'id')->toArray()"
+            wire:model.live="filtroCategoria"
         />
     </x-slot:headerActions>
 
-    <livewire:admin.dashboard.grafico-adesoes-mensais chart-id="adesoes-mes" :filtro-contrato="$filtroContrato" />
+    <livewire:admin.dashboard.grafico-pedidos-mensais chart-id="pedidos-mes" :filtro-categoria="$filtroCategoria" />
 </x-admin.chart-card>
 ```
 
 ```php
-class GraficoAdesoesMensais extends Component
+class GraficoPedidosMensais extends Component
 {
     public string $chartId;
-    public ?int $filtroContrato = null;
+    public ?int $filtroCategoria = null;
 
     public function render()
     {
         $meses = collect(range(11, 0))->map(fn($i) => now()->subMonths($i));
 
-        $adesoes = $meses->map(fn($m) => Adesao::ativas()
+        $pedidos = $meses->map(fn($m) => Pedido::ativos()
             ->whereYear('created_at', $m->year)
             ->whereMonth('created_at', $m->month)
-            ->when($this->filtroContrato, fn($q) => $q->where('contrato_id', $this->filtroContrato))
+            ->when($this->filtroCategoria, fn($q) => $q->where('categoria_id', $this->filtroCategoria))
             ->count()
         )->toArray();
 
@@ -80,24 +80,24 @@ class GraficoAdesoesMensais extends Component
             chartId: $this->chartId,
             type: 'column',  // bridge JS mapeia para 'bar' horizontal: false
             data: [
-                'series' => [['name' => 'Adesões', 'data' => $adesoes]],
+                'series' => [['name' => 'Pedidos', 'data' => $pedidos]],
                 'categories' => $meses->map->format('M/y')->toArray(),
             ]
         );
 
-        return view('livewire.admin.dashboard.grafico-adesoes-mensais');
+        return view('livewire.admin.dashboard.grafico-pedidos-mensais');
     }
 }
 ```
 
 ---
 
-## Mapeamento no PRD
+## Casos de uso típicos
 
-| Tela             | Uso                                                           |
-| ---------------- | ------------------------------------------------------------- |
-| 14.2 Dashboard   | **"Adesões por Mês" (últimos 12 meses, filtro por contrato)** |
-| 14.17 Relatórios | Receita por contrato (bar agrupado)                           |
+| Contexto    | Uso                                                            |
+| ----------- | -------------------------------------------------------------- |
+| Dashboard   | **"Registros por Mês" (últimos 12 meses, filtro por categoria)** |
+| Relatórios  | Receita por categoria (bar agrupado)                          |
 
 ---
 
@@ -106,7 +106,6 @@ class GraficoAdesoesMensais extends Component
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P3 (Onda 4)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 
@@ -146,4 +145,4 @@ class GraficoAdesoesMensais extends Component
 ### Observações de implementação
 
 - o backend continua falando `column`, e a bridge JS traduz isso para ApexCharts `bar` com `horizontal: false`
-- o preview cobre adesões por mês e receita por contrato
+- o preview cobre registros por mês e receita por categoria

@@ -47,7 +47,7 @@ Variação da base `x-shared.input` para CNPJ brasileiro. Mantém a mesma ergono
 ## Exemplo de Uso
 
 ```blade
-<x-shared.cnpj-input name="cnpj" label="CNPJ" wire:model.live="instituicao.cnpj" required />
+<x-shared.cnpj-input name="cnpj" label="CNPJ" wire:model.live="cliente.cnpj" required />
 ```
 
 ---
@@ -64,6 +64,5 @@ Variação da base `x-shared.input` para CNPJ brasileiro. Mantém a mesma ergono
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2           |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |

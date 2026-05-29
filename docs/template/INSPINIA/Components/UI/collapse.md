@@ -11,7 +11,7 @@
 
 Componente de collapse/expand controlado pelo Preline. Um botão com `data-hs-collapse="#id"` alterna a visibilidade de um container `.hs-collapse`. Suporta labels dinâmicos (ex: "Read more" / "Read less") via classes utilitárias `hs-collapse-open:hidden` e `hs-collapse-open:block`.
 
-> Usado principalmente para **filtros collapsáveis** (14.12 Formandos, 14.13 Parcelas) e **descrições "Read more"** em textos longos.
+> Usado principalmente para **filtros collapsáveis** em listagens e **descrições "Read more"** em textos longos.
 
 ---
 
@@ -106,14 +106,14 @@ Componente de collapse/expand controlado pelo Preline. Um botão com `data-hs-co
 ### Básico com trigger interno
 
 ```blade
-<x-shared.collapse id="detalhes-parcela">
+<x-shared.collapse id="detalhes-pedido">
     <x-slot:trigger>
         <x-shared.button
             class="hs-collapse-toggle"
             variant="default"
             appearance="ghost"
-            data-hs-collapse="#detalhes-parcela"
-            aria-controls="detalhes-parcela"
+            data-hs-collapse="#detalhes-pedido"
+            aria-controls="detalhes-pedido"
             aria-expanded="false"
         >
             Ver detalhes
@@ -122,36 +122,36 @@ Componente de collapse/expand controlado pelo Preline. Um botão com `data-hs-co
     </x-slot:trigger>
 
     <div class="card border border-dashed card-body mt-2">
-        <p>Histórico de tentativas de cobrança, boletos gerados, e-mails enviados.</p>
+        <p>Histórico de tentativas de cobrança, faturas geradas, e-mails enviados.</p>
     </div>
 </x-shared.collapse>
 ```
 
-### Real (Portal ArtFinal — Filtros avançados 14.12)
+### Real (Filtros avançados em listagem)
 
 ```blade
 <div class="mb-4">
     <button
         class="hs-collapse-toggle btn bg-primary text-white hover:bg-primary-hover"
-        data-hs-collapse="#filtros-formandos"
-        aria-controls="filtros-formandos"
+        data-hs-collapse="#filtros-pedidos"
+        aria-controls="filtros-pedidos"
     >
         <i class="iconify tabler--filter"></i> Filtros Avançados
         <i class="iconify tabler--chevron-down hs-collapse-open:rotate-180"></i>
     </button>
 </div>
 
-<x-shared.collapse id="filtros-formandos">
+<x-shared.collapse id="filtros-pedidos">
     <x-shared.card>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <x-shared.select-search label="Contrato" wire:model.live="filtro.contrato_id" />
-            <x-shared.select-search label="Curso" wire:model.live="filtro.curso_id" />
-            <x-shared.select-search label="Período" wire:model.live="filtro.periodo_id" />
-            <x-shared.date-range-picker label="Data Adesão" wire:model.live="filtro.data_adesao" />
-            <x-shared.select label="Adimplência" wire:model.live="filtro.adimplencia">
+            <x-shared.select-search label="Categoria" wire:model.live="filtro.categoria_id" />
+            <x-shared.select-search label="Produto" wire:model.live="filtro.produto_id" />
+            <x-shared.select-search label="Cliente" wire:model.live="filtro.cliente_id" />
+            <x-shared.date-range-picker label="Data do Pedido" wire:model.live="filtro.data_pedido" />
+            <x-shared.select label="Situação" wire:model.live="filtro.situacao">
                 <option value="">Todos</option>
                 <option value="em_dia">Em dia</option>
-                <option value="inadimplente">Inadimplente</option>
+                <option value="em_atraso">Em atraso</option>
             </x-shared.select>
         </div>
     </x-shared.card>
@@ -162,7 +162,7 @@ Componente de collapse/expand controlado pelo Preline. Um botão com `data-hs-co
 
 ## Quando Usar ✅
 
-- Filtros avançados colapsáveis (14.12, 14.13)
+- Filtros avançados colapsáveis em listagens
 - Seções de "Detalhes" ou "Ver mais" em cards
 - Descrições longas que precisam ocultar/mostrar
 
@@ -174,22 +174,11 @@ Componente de collapse/expand controlado pelo Preline. Um botão com `data-hs-co
 
 ---
 
-## Mapeamento no PRD
-
-| Tela                                | Seção PRD   | Uso                           |
-| ----------------------------------- | ----------- | ----------------------------- |
-| Gestão Formandos (filtros)          | 14.12       | Filtros avançados colapsáveis |
-| Gestão Financeira (filtros)         | 14.13       | Filtros collapsáveis no topo  |
-| Ficha Formando (detalhes auditoria) | 14.12 Tab 7 | Expandir JSON before/after    |
-
----
-
 ## Classificação
 
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P1 (Onda 2)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 
@@ -197,7 +186,7 @@ Componente de collapse/expand controlado pelo Preline. Um botão com `data-hs-co
 
 ## Notas de Adaptação
 
-1. **Preline obrigatório** — `hs-collapse-toggle`, `data-hs-collapse` e a classe `.hs-collapse` continuam sendo o contrato oficial
+1. **Preline obrigatório** — `hs-collapse-toggle`, `data-hs-collapse` e a classe `.hs-collapse` continuam sendo o padrão oficial
 2. **Attributes forwarding** agora é aplicado via `ComponentAttributeBag`, mantendo `class`, `wire:*` e `data-*` no painel expandível
 3. **`id` único obrigatório** — segue sendo a base para o acoplamento entre trigger e painel
 4. **O slot `trigger` não ganha wrapper extra** na implementação final, evitando espaçamento inesperado em toolbars e headers

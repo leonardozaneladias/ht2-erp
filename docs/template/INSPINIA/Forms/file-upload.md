@@ -86,9 +86,9 @@ Assim preservamos as duas necessidades sem criar dois componentes concorrentes.
 ```blade
 <x-shared.file-upload
     name="logo"
-    label="Logo da instituição"
+    label="Logo"
     accept="image/png,image/jpeg"
-    :preview="$instituicao?->logo_url"
+    :preview="$cliente?->logo_url"
     wire:model="logo"
 />
 ```
@@ -121,6 +121,5 @@ Assim preservamos as duas necessidades sem criar dois componentes concorrentes.
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2           |
 | **Complexidade** | Média        |
 | **Status**       | 🟢 Concluído |

@@ -1,29 +1,26 @@
 ---
-title: Operações de Segurança — Backend API v1
+title: Operações de Segurança
 version: 1.0.0
 date: 2026-04-18
 status: draft
-escopo: Backend API v1 — Portal ArtFinal
-stack: Laravel 13 · Sanctum · Spatie Permission · PostgreSQL · AWS
+stack: Laravel 13 · Spatie Permission · PostgreSQL · AWS
 publico: DevOps, SRE, Security, DPO
 ---
 
-# Operações de Segurança — Portal ArtFinal Backend API v1
+# Operações de Segurança
 
-Documento operacional de segurança. Cobre checklist periódico, rotação de segredos, auditoria de permissões, revisão de audit_log, gestão de acesso, patching de dependências, resposta a incidente de segurança e conformidade LGPD.
+Documento operacional de segurança. Cobre checklist periódico, rotação de segredos, auditoria de permissões, revisão de `activity_log`, gestão de acesso, patching de dependências, resposta a incidente de segurança e conformidade LGPD.
 
 Base normativa:
 
-- [`PLANEJAMENTO_BACKEND_APIV1.md`](../prd/PLANEJAMENTO_BACKEND_APIV1.md) §11 (checklist executável)
-- [`runbook-operations.md`](runbook-operations.md) — §7 LGPD
-- [`engineering-standards.md`](engineering-standards.md) — padrões de código seguros
+- [`conventions.md`](conventions.md) — padrões de código seguros
 - [`ci-cd.md`](ci-cd.md) — secrets do pipeline
 
 ---
 
 ## Sumário
 
-1. Checklist periódico §11 do planejamento
+1. Checklist periódico de segurança
 2. Inventário de segredos
 3. Rotação de segredos (frequência, responsável, comandos)
 4. Auditoria mensal de permissões (Spatie)
@@ -35,82 +32,63 @@ Base normativa:
 
 ---
 
-## 1. Checklist periódico §11 do planejamento
+## 1. Checklist periódico de segurança
 
-Cada item do checklist §11 do planejamento (entrada, SQL, autenticação, rate limiting, webhooks, tokens de convite, uploads, logs, headers, LGPD) deve ser verificado periodicamente. Tabela consolidada com frequência:
+Cada item abaixo (entrada, SQL, autenticação, rate limiting, uploads, logs, headers, LGPD) deve ser verificado periodicamente. Tabela consolidada com frequência:
 
-### 1.1 Entrada (§11.1)
+### 1.1 Entrada
 
 | Item                                   | Frequência | Responsável | Evidência                                                 |
 | -------------------------------------- | ---------- | ----------- | --------------------------------------------------------- |
 | `FormRequest` em 100% das rotas        | Trimestral | Tech lead   | `grep -r 'function.*Request' routes/` diff vs controllers |
-| `$request->validated()` em updates     | CI         | PR reviewer | ESLint-like custom rule (roadmap)                         |
+| `$request->validated()` em updates     | CI         | PR reviewer | Regra custom (roadmap)                                    |
 | `Rule::enum` em campos enumerados      | Trimestral | Arquitetura | Grep `Rule::in\(` → substituir                            |
-| `max`, `decimal:2`, `integer` em money | PR         | PR reviewer | Review checklist §9                                       |
+| `max`, `decimal:2`, `integer` em money | PR         | PR reviewer | Review checklist                                         |
 
-### 1.2 SQL (§11.2)
+### 1.2 SQL
 
 | Item                                         | Frequência | Responsável | Evidência                |
 | -------------------------------------------- | ---------- | ----------- | ------------------------ |
 | Eloquent / Query Builder em 100% das queries | Trimestral | Tech lead   | Grep `DB::raw\|whereRaw` |
-| Bindings explícitos em `whereRaw`            | PR         | PR reviewer | Review checklist §2      |
+| Bindings explícitos em `whereRaw`            | PR         | PR reviewer | Review checklist         |
 
-### 1.3 Autenticação e autorização (§11.3)
+### 1.3 Autenticação e autorização
 
-| Item                                               | Frequência    | Responsável |
-| -------------------------------------------------- | ------------- | ----------- |
-| 4 guards configurados                              | Anual         | Arquitetura |
-| `SANCTUM_STATEFUL_DOMAINS` correto em prod         | A cada deploy | DevOps      |
-| Policies em recursos expostos                      | Trimestral    | Tech lead   |
-| Middleware `role:`/`permission:` em rotas críticas | Trimestral    | Tech lead   |
+| Item                                               | Frequência | Responsável |
+| -------------------------------------------------- | ---------- | ----------- |
+| Guard `admin` configurado corretamente             | Anual      | Arquitetura |
+| Policies em recursos expostos                      | Trimestral | Tech lead   |
+| Middleware `role:`/`permission:` em rotas críticas | Trimestral | Tech lead   |
 
-### 1.4 Rate limiting (§11.4)
+### 1.4 Rate limiting
 
 | Limiter      | Limite             | Verificação |
 | ------------ | ------------------ | ----------- |
 | `login`      | 5/min por email+IP | Logs ≥ 429  |
-| `convite`    | 10/min por IP      | Logs        |
-| `seating`    | 5/min por user     | Logs        |
-| `voto`       | 3/min por user     | Logs        |
-| `webhook`    | 600/min por IP     | Logs        |
-| `api` global | 120/min por ator   | Logs        |
+| global       | 120/min por ator   | Logs        |
 
 Config em `App\Providers\RateLimiterServiceProvider`. Revisão trimestral.
 
-### 1.5 Webhooks (§11.5)
-
-- [ ] HMAC validada antes de persistir
-- [ ] `unique(provider, gateway_reference)` em `webhook_eventos`
-- [ ] Replay protection (descartar `recebido_at < now()-24h`)
-- [ ] Efeito aplicado em job pós-commit
-
-### 1.6 Tokens de convite (§11.6)
-
-- [ ] `bin2hex(random_bytes(32))` — verificar em `EmitirConviteAction`
-- [ ] Apenas `sha256(token)` persistido
-- [ ] Token revogável via status
-- [ ] Nunca em logs, responses, URLs de erro — verificar `SensitiveDataMasker`
-
-### 1.7 Uploads (§11.7)
+### 1.5 Uploads
 
 - [ ] MIME real validado (`ext/mime_type`)
 - [ ] Nome server-side (ULID + ext)
 - [ ] Storage privado S3 + URL assinada TTL ≤ 5 min
 - [ ] Tamanho máximo por tipo
 
-### 1.8 Logs (§11.8)
+### 1.6 Logs
 
-- [ ] Mascaramento de tokens, CPF, cartão
+- [ ] Mascaramento de tokens, CPF, dados sensíveis
 - [ ] Formato JSON com `request_id`, `actor_*`, `correlation_id`
 - [ ] Níveis adequados (info/warning/error)
 
-### 1.9 Headers HTTP (§11.9)
+### 1.7 Headers HTTP
 
 Middleware `SetSecurityHeaders` aplica:
 
 ```php
 $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-$response->headers->set('Content-Security-Policy',   "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.portalartfinal.com.br; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.portalartfinal.com.br; frame-ancestors 'none';");
+$response->headers->set('Content-Security-Policy',   "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none';");
 $response->headers->set('X-Frame-Options',           'DENY');
 $response->headers->set('X-Content-Type-Options',    'nosniff');
 $response->headers->set('Referrer-Policy',           'strict-origin-when-cross-origin');
@@ -120,10 +98,10 @@ $response->headers->set('Permissions-Policy',        'geolocation=(), camera=(),
 Verificação pós-deploy:
 
 ```bash
-curl -sI https://portalartfinal.com.br | grep -E '^(strict|content|x-frame|x-content|referrer|permissions)'
+curl -sI https://exemplo.com.br | grep -E '^(strict|content|x-frame|x-content|referrer|permissions)'
 ```
 
-### 1.10 LGPD (§11.10)
+### 1.8 LGPD
 
 Detalhes em §9 deste documento.
 
@@ -133,23 +111,20 @@ Detalhes em §9 deste documento.
 
 ### 2.1 Lista canônica
 
-| Segredo                       | Onde vive                     | Acesso                           | Rotação       |
-| ----------------------------- | ----------------------------- | -------------------------------- | ------------- |
-| `APP_KEY`                     | `.env` prod                   | deploy user                      | Nunca¹        |
-| `DB_PASSWORD`                 | `.env` prod, RDS IAM          | deploy user, DBA                 | 180 dias      |
-| `REDIS_PASSWORD`              | `.env` prod                   | deploy user                      | 180 dias      |
-| `SESSION_DRIVER` related keys | `.env` prod                   | deploy user                      | Junto APP_KEY |
-| `SANCTUM_STATEFUL_DOMAINS`    | `.env` prod                   | (não é segredo — mas verificado) | —             |
-| `GATEWAY_ITAU_TOKEN`          | `.env` prod / Secrets Manager | DevOps senior                    | 90 dias       |
-| `GATEWAY_ITAU_WEBHOOK_SECRET` | `.env` prod / Secrets Manager | DevOps senior                    | 90 dias       |
-| `AWS_ACCESS_KEY_ID/SECRET`    | CI secrets (roadmap OIDC)     | CI                               | 60 dias       |
-| `SENTRY_LARAVEL_DSN`          | `.env` prod                   | DevOps                           | 180 dias      |
-| `SENTRY_AUTH_TOKEN`           | GitHub Secrets                | CI                               | 180 dias      |
-| `MAILGUN_SECRET` / SMTP       | `.env` prod                   | DevOps                           | 180 dias      |
-| `SLACK_WEBHOOK_*`             | `.env` prod + GitHub Secrets  | DevOps                           | Após leak     |
-| `PAGERDUTY_INTEGRATION_KEY`   | `.env` prod                   | DevOps                           | Após leak     |
-| `S3_BUCKET_KEY_PRIVATE`       | Secrets Manager               | app via IAM role                 | 180 dias      |
-| `SSH_KEY_STAGING/PROD`        | GitHub Secrets                | CI                               | 90 dias       |
+| Segredo                       | Onde vive                    | Acesso           | Rotação       |
+| ----------------------------- | ---------------------------- | ---------------- | ------------- |
+| `APP_KEY`                     | `.env` prod                  | deploy user      | Nunca¹        |
+| `DB_PASSWORD`                 | `.env` prod, RDS IAM         | deploy user, DBA | 180 dias      |
+| `REDIS_PASSWORD`              | `.env` prod                  | deploy user      | 180 dias      |
+| `SESSION_DRIVER` related keys | `.env` prod                  | deploy user      | Junto APP_KEY |
+| `AWS_ACCESS_KEY_ID/SECRET`    | CI secrets (roadmap OIDC)    | CI               | 60 dias       |
+| `SENTRY_LARAVEL_DSN`          | `.env` prod                  | DevOps           | 180 dias      |
+| `SENTRY_AUTH_TOKEN`           | GitHub Secrets               | CI               | 180 dias      |
+| `MAILGUN_SECRET` / SMTP       | `.env` prod                  | DevOps           | 180 dias      |
+| `SLACK_WEBHOOK_*`             | `.env` prod + GitHub Secrets | DevOps           | Após leak     |
+| `PAGERDUTY_INTEGRATION_KEY`   | `.env` prod                  | DevOps           | Após leak     |
+| `S3_BUCKET_KEY_PRIVATE`       | Secrets Manager              | app via IAM role | 180 dias      |
+| `SSH_KEY_STAGING/PROD`        | GitHub Secrets               | CI               | 90 dias       |
 
 ¹ `APP_KEY` só é rotacionado em janela de manutenção com migração de dados encriptados — ver §3.1.
 
@@ -157,13 +132,13 @@ Detalhes em §9 deste documento.
 
 Produção:
 
-- **AWS Secrets Manager** como fonte de verdade para segredos sensíveis (gateway, DB).
+- **AWS Secrets Manager** como fonte de verdade para segredos sensíveis (DB, etc.).
 - `.env` em produção é gerado no deploy via `aws secretsmanager get-secret-value` (cache local 5min).
 - **Nunca** commitar `.env` — apenas `.env.example` em git.
 
 Staging:
 
-- Mesma estrutura — Secrets Manager separado `portalartfinal/staging/*`.
+- Mesma estrutura — Secrets Manager separado `app/staging/*`.
 
 ---
 
@@ -184,49 +159,15 @@ php artisan down --secret="$MAINT_BYPASS"
 # 2. Gerar nova chave (não aplicar ainda)
 php artisan key:generate --show  # copiar output
 
-# 3. Script que re-encripta dados:
+# 3. Script que re-encripta dados (comando custom):
 php artisan encrypt:rotate --from=$OLD_KEY --to=$NEW_KEY --dry-run
-# (comando custom — roadmap PAF-500)
 
 # 4. Atualizar .env com nova chave
 # 5. Rodar rotação real
 # 6. artisan up
 ```
 
-### 3.2 Gateway webhook secret (Itaú) — 90 dias
-
-```bash
-# 1. Gerar novo segredo
-NEW_SECRET=$(openssl rand -hex 32)
-
-# 2. Cadastrar no painel do gateway, solicitando período de coexistência (24h)
-# Gateway sinaliza via header X-Signature-Version qual versão da chave usou
-
-# 3. Código aceita ambos durante coexistência
-final readonly class ItauGateway implements PaymentGatewayContract
-{
-    public function assinaturaValida(string $payload, string $sig): bool
-    {
-        foreach ([config('gateway.itau.webhook_secret'), config('gateway.itau.webhook_secret_old')] as $secret) {
-            if ($secret && hash_equals(hash_hmac('sha256', $payload, $secret), $sig)) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
-# 4. Deploy com ambas chaves
-# 5. Monitorar por 48h — se nenhum webhook veio com chave antiga, remover config `webhook_secret_old`
-# 6. Deploy de cleanup
-
-# 7. Atualizar Secrets Manager
-aws secretsmanager update-secret \
-    --secret-id portalartfinal/prod/gateway/itau \
-    --secret-string "{\"webhook_secret\":\"$NEW_SECRET\"}"
-```
-
-### 3.3 AWS access keys → OIDC (roadmap Q3/2026)
+### 3.2 AWS access keys → OIDC (roadmap)
 
 Hoje rotaciona manualmente a cada 60 dias:
 
@@ -245,7 +186,7 @@ aws iam delete-access-key --access-key-id AKIA_OLD
 
 Roadmap: migrar para OIDC federado (ver [`ci-cd.md §4.5`](ci-cd.md#45-migração-recomendada-para-oidc-aws)).
 
-### 3.4 Sentry DSN e auth token
+### 3.3 Sentry DSN e auth token
 
 ```bash
 # 1. Sentry UI → Settings → Client Keys → Create New Key
@@ -257,7 +198,7 @@ php artisan tinker --execute 'throw new \RuntimeException("teste rotação sentr
 # 6. Revogar DSN antigo em 48h
 ```
 
-### 3.5 SSH keys (staging/prod)
+### 3.4 SSH keys (staging/prod)
 
 ```bash
 # 1. Gerar par novo localmente
@@ -274,18 +215,18 @@ ssh deploy@host 'sed -i "/<fingerprint-antigo>/d" ~/.ssh/authorized_keys'
 shred -u ~/keys/deploy_old
 ```
 
-### 3.6 DB password
+### 3.5 DB password
 
 ```bash
 # 1. Gerar nova senha
 NEW_PWD=$(openssl rand -base64 32)
 
 # 2. Atualizar no PG
-psql -h pg-prod -U postgres -c "ALTER USER portalartfinal WITH PASSWORD '$NEW_PWD';"
+psql -h pg-prod -U postgres -c "ALTER USER app WITH PASSWORD '$NEW_PWD';"
 
 # 3. Atualizar Secrets Manager
 aws secretsmanager update-secret \
-    --secret-id portalartfinal/prod/db \
+    --secret-id app/prod/db \
     --secret-string "{\"password\":\"$NEW_PWD\"}"
 
 # 4. Redeploy app (força reload de .env)
@@ -295,13 +236,12 @@ gh workflow run deploy-prod.yml
 php artisan tinker --execute 'DB::select("SELECT 1"); echo "ok";'
 ```
 
-### 3.7 Cronograma consolidado
+### 3.6 Cronograma consolidado
 
 | Quando               | Responsável | Segredos rotacionados                            |
 | -------------------- | ----------- | ------------------------------------------------ |
 | 1º dia útil do mês   | DevOps      | Revisão geral (quem expira nos próximos 15d)     |
 | 60 dias              | DevOps      | AWS keys                                         |
-| 90 dias              | DevOps sr   | Gateway Itaú token + webhook                     |
 | 90 dias              | DevOps      | SSH keys staging/prod                            |
 | 180 dias             | DevOps      | DB password, Redis password, Sentry tokens, SMTP |
 | Após leak confirmado | Security    | Imediatamente — qualquer segredo afetado         |
@@ -319,7 +259,7 @@ Garantir que ninguém tem permissão acima do necessário (princípio do menor p
 **Passo 1** — exportar snapshot:
 
 ```bash
-ssh deploy@prod-host 'cd /var/www/portalartfinal/current && \
+ssh deploy@prod-host 'cd /var/www/app/current && \
     php artisan permission:audit-export --output=/tmp/permissions-$(date +%Y%m).json'
 ```
 
@@ -347,24 +287,24 @@ diff <(jq '.' /tmp/permissions-202603.json) \
 - **Executor**: @devops
 - **Data**: 2026-04-01
 - **Usuários ativos**: N (+X vs mês anterior)
-- **Roles**: 5 (admin, comissao, formando, suporte, dba)
+- **Roles**: super-admin, gestor, suporte
 - **Permissões órfãs** (sem role): 0
 
 ## Alterações aprovadas
 
-- @fulano — promovido de `suporte` para `devops` (PAF-XXX)
-- @beltrano — role `comissao` revogada (desligado)
+- @fulano — promovido de `suporte` para `devops`
+- @beltrano — role `gestor` revogada (desligado)
 
 ## Ações
 
-- [ ] Remover permission `admin.seating.manage` de @fulano (já não usa — PAF-YYY)
+- [ ] Remover permission `admin.relatorios.manage` de @fulano (já não usa)
 ```
 
 **Passo 5** — executar ações:
 
 ```bash
 php artisan tinker --execute '
-    \App\Models\Acesso\AdminUser::find($id)->revokePermissionTo("admin.seating.manage");
+    \App\Models\AdminUser::find($id)->revokePermissionTo("admin.relatorios.manage");
 '
 ```
 
@@ -372,13 +312,11 @@ php artisan tinker --execute '
 
 Documentar em `docs/devops/role-matrix.md` (snapshot inicial):
 
-| Role     | Permissões principais                                                      |
-| -------- | -------------------------------------------------------------------------- |
-| admin    | `admin.*` (wildcard)                                                       |
-| comissao | `comissao.convites.view`, `comissao.rsvp.view`, `comissao.enquetes.manage` |
-| formando | `portal.adesao.view`, `portal.convites.emit`, `portal.seating.reserve`     |
-| suporte  | `admin.relatorios.view` (read-only)                                        |
-| dba      | `admin.db.view`, `admin.pghero.view`                                       |
+| Role        | Permissões principais             |
+| ----------- | --------------------------------- |
+| super-admin | `admin.*` (wildcard)              |
+| gestor      | `admin.relatorios.*`, gestão de módulos |
+| suporte     | `admin.relatorios.view` (read-only) |
 
 ---
 
@@ -389,7 +327,7 @@ Documentar em `docs/devops/role-matrix.md` (snapshot inicial):
 Detectar:
 
 - Operações atípicas (deleção em massa, escalonamento de permissões).
-- Violações de acesso (usuário operando em evento que não é seu).
+- Violações de acesso.
 - Possível uso indevido de credenciais.
 
 ### 5.2 Queries padrão
@@ -416,9 +354,6 @@ SELECT subject_type, description, causer_id, created_at
  WHERE event = 'deleted'
    AND created_at > now() - interval '90 days'
  ORDER BY created_at DESC;
-
--- 4. Ações em eventos não pertencentes ao causer
--- (requer join com formandos.evento_id e activity_log.properties->evento_id)
 ```
 
 ### 5.3 Relatório
@@ -432,9 +367,9 @@ SELECT subject_type, description, causer_id, created_at
 
 ### 5.4 Retenção
 
-`activity_log` mantido por **2 anos online**. Arquivo em S3 parquet após esse prazo (job `activitylog:clean --keep-days=730` em §5 de [`runbook-operations.md`](runbook-operations.md)).
+`activity_log` mantido por **2 anos online**. Arquivo em S3 parquet após esse prazo (job `activitylog:clean --keep-days=730`).
 
-**Nunca deletar** antes de 2 anos (append-only por princípio §0.9 do planejamento).
+**Nunca deletar** antes de 2 anos (append-only por princípio).
 
 ---
 
@@ -444,10 +379,10 @@ SELECT subject_type, description, causer_id, created_at
 
 **Dia 1:**
 
-- [ ] GitHub: convite para `portalartfinal` org.
-- [ ] Slack: `#dev`, `#deploy-notifications`, `#alerts-backend`.
+- [ ] GitHub: convite para a org do projeto.
+- [ ] Slack: `#dev`, `#deploy-notifications`, `#alerts`.
 - [ ] Sentry: convite como `Member`.
-- [ ] Plane: convite com role `Member` no projeto.
+- [ ] Gestor de tarefas: convite com role `Member` no projeto.
 - [ ] Acesso ao Laradock (leitura do repo).
 - [ ] Ler CLAUDE.md + docs/devops/.
 - [ ] Setup local (dev-setup.md) funcionando em ≤ 1 dia.
@@ -471,7 +406,7 @@ Adicionalmente ao do engenheiro:
 - [ ] AWS IAM user com permissões mínimas (read-only por padrão).
 - [ ] PagerDuty — entra na rotation em 30 dias de observação.
 - [ ] Secrets Manager — grupo `devops-senior` após 90 dias.
-- [ ] SSH key em staging (apenas) — prod após aprovação CTO.
+- [ ] SSH key em staging (apenas) — prod após aprovação.
 
 ### 6.3 Offboarding (imediato no dia do desligamento)
 
@@ -480,13 +415,12 @@ Checklist executado em ordem:
 - [ ] GitHub: remover da org.
 - [ ] Slack: desativar conta.
 - [ ] Sentry: remover do projeto.
-- [ ] Plane: remover acesso.
+- [ ] Gestor de tarefas: remover acesso.
 - [ ] AWS IAM: desativar user + keys.
 - [ ] SSH: remover public key de `authorized_keys` em todos servidores.
 - [ ] PagerDuty: remover da rotation.
 - [ ] Spatie permissions: `$user->syncRoles([]); $user->syncPermissions([]);`.
 - [ ] 2FA/SSO: revogar sessões.
-- [ ] Sanctum tokens: `$user->tokens()->delete();`.
 - [ ] Google Workspace: suspender (pelo RH).
 
 Documentar em `docs/devops/offboarding/YYYY-MM-DD-<iniciais>.md` com checklist.
@@ -494,10 +428,9 @@ Documentar em `docs/devops/offboarding/YYYY-MM-DD-<iniciais>.md` com checklist.
 ### 6.4 Senhas e MFA
 
 - **Admin users**: MFA obrigatório (TOTP via `pragmarx/google2fa-laravel`).
-- **Portal users**: MFA opcional, recomendado.
 - **Senhas**: Argon2id via Laravel default.
 - **Reset de senha**: link com TTL 30 min.
-- **Login**: rate limit 5/min por email+IP (§11.4 do planejamento).
+- **Login**: rate limit 5/min por email+IP.
 
 ---
 
@@ -523,7 +456,7 @@ docker compose exec workspace composer outdated --direct
 docker compose exec workspace composer audit --format=plain
 
 # 3. Criar branch chore
-git checkout -b chore/paf-XXX-bump-deps-YYYY-MM
+git checkout -b chore/bump-deps-YYYY-MM
 
 # 4. Atualizar
 docker compose exec workspace composer update --with-all-dependencies <pacotes>
@@ -541,7 +474,7 @@ docker compose exec workspace composer quality
 - `composer audit`
 - `npm audit --audit-level=high`
 
-Falha envia alerta Slack `#alerts-backend`.
+Falha envia alerta Slack `#alerts`.
 
 ### 7.4 Dependabot
 
@@ -589,8 +522,8 @@ flowchart LR
 
 Sinais:
 
-- Alerta A11 (crash-free < 99%).
-- Alerta A13 (login anômalo).
+- Alerta de crash-free < 99%.
+- Alerta de login anômalo.
 - Sentry issue com stack trace sugerindo injection/XSS.
 - Relato externo (pesquisador, usuário).
 - `activity_log` mostra ações suspeitas.
@@ -604,14 +537,14 @@ Sinais:
 - Se usuário comprometido: forçar logout e reset de senha.
 
 ```bash
-# Revogar todos os tokens Sanctum de um usuário
+# Forçar logout (revogar sessões) de um usuário
 php artisan tinker --execute '
-    \App\Models\Acesso\PortalUser::find($id)->tokens()->delete();
+    \App\Models\AdminUser::find($id)->update(["remember_token" => null]);
 '
 
 # Revogar role crítica
 php artisan tinker --execute '
-    \App\Models\Acesso\AdminUser::find($id)->removeRole("admin");
+    \App\Models\AdminUser::find($id)->removeRole("super-admin");
 '
 ```
 
@@ -619,14 +552,14 @@ php artisan tinker --execute '
 
 ```bash
 # Snapshot de logs
-ssh deploy@prod-host 'cp /var/log/portalartfinal/*.log /tmp/incident-$(date +%s)/'
+ssh deploy@prod-host 'cp /var/log/app/*.log /tmp/incident-$(date +%s)/'
 
 # Snapshot de DB (schema + dados afetados)
-pg_dump -h pg-prod -U portalartfinal -d portalartfinal -t activity_log -t sessions \
+pg_dump -h pg-prod -U app -d app -t activity_log -t sessions \
     > /tmp/incident-dump-$(date +%s).sql
 ```
 
-**Passo 3** — comunicar `#security` + CTO em ≤ 15 min.
+**Passo 3** — comunicar `#security` + liderança em ≤ 15 min.
 
 ### 8.4 Erradicação
 
@@ -645,7 +578,7 @@ pg_dump -h pg-prod -U portalartfinal -d portalartfinal -t activity_log -t sessio
 **Interno (72h):**
 
 - Pós-mortem em `docs/postmortems/YYYY-MM-DD-security-<nome>.md`.
-- Itens de ação rastreados no Plane.
+- Itens de ação rastreados no gestor de tarefas.
 
 **Externo (se dados pessoais vazaram):**
 
@@ -684,7 +617,7 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 ### 9.1 DPO (Encarregado de Proteção de Dados)
 
 - **Nome**: definido no ato societário da empresa
-- **Contato oficial**: `dpo@portalartfinal.com.br`
+- **Contato oficial**: `dpo@exemplo.com.br`
 - **Responsabilidades** (LGPD art. 41):
     - Atender titulares
     - Orientar funcionários
@@ -693,14 +626,14 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 
 ### 9.2 Requisições de titular — SLA
 
-| Tipo                      | SLA máximo | Procedimento                                       |
-| ------------------------- | ---------- | -------------------------------------------------- |
-| Confirmação de tratamento | 15 dias    | Email com detalhes                                 |
-| Acesso a dados            | 15 dias    | Export pseudonimizado (runbook-operations.md §7.2) |
-| Correção                  | 15 dias    | Orientar uso do portal                             |
-| Anonimização/exclusão     | 15 dias    | Action `ExcluirContaAction`                        |
-| Portabilidade             | 15 dias    | Export estruturado JSON                            |
-| Informação sobre uso      | 15 dias    | Política de privacidade + resposta customizada     |
+| Tipo                      | SLA máximo | Procedimento                                   |
+| ------------------------- | ---------- | ---------------------------------------------- |
+| Confirmação de tratamento | 15 dias    | Email com detalhes                             |
+| Acesso a dados            | 15 dias    | Export pseudonimizado                          |
+| Correção                  | 15 dias    | Orientar uso da aplicação                      |
+| Anonimização/exclusão     | 15 dias    | Action `ExcluirContaAction`                    |
+| Portabilidade             | 15 dias    | Export estruturado JSON                        |
+| Informação sobre uso      | 15 dias    | Política de privacidade + resposta customizada |
 
 ### 9.3 Registro de requisições
 
@@ -723,16 +656,14 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 - **Comunicação aos titulares**: ≤ 72h se risco alto.
 - **Responsável por ambas**: DPO.
 
-### 9.5 Retenção e anonimização automatizadas
+### 9.5 Retenção e anonimização
 
-Implementadas em `AnonimizarDadosPosEventoJob` (ver [`runbook-operations.md §7.3`](runbook-operations.md#73-anonimização-pós-evento)).
+Definir política de retenção por tipo de dado e implementar a anonimização em job dedicado. Referência mínima:
 
-| Dado                       | Retenção padrão    | Ação                       |
-| -------------------------- | ------------------ | -------------------------- |
-| `activity_log`             | 2 anos             | Arquivar S3 + truncar      |
-| `webhook_eventos`          | 1 ano              | Arquivar S3 + truncar      |
-| Convidado (dados pessoais) | 90 dias pós-evento | Anonimizar                 |
-| Pagamentos/adesões         | 5 anos             | Mantém (compliance fiscal) |
+| Dado                    | Retenção padrão | Ação                  |
+| ----------------------- | --------------- | --------------------- |
+| `activity_log`          | 2 anos          | Arquivar S3 + truncar |
+| Dados pessoais inativos | conforme base legal | Anonimizar        |
 
 ---
 
@@ -742,7 +673,7 @@ Todo janeiro:
 
 - [ ] Revisão completa dos segredos (§2) — todos rotacionados ao menos 1× no ano?
 - [ ] Penetration test externo (empresa contratada).
-- [ ] Revisão do CSP e headers HTTP (§1.9).
+- [ ] Revisão do CSP e headers HTTP (§1.7).
 - [ ] Revisão do backup/restore test mensal — 12/12 passaram?
 - [ ] DR drill trimestral — 4/4 executados?
 - [ ] Auditoria Spatie — 12/12 executadas?
@@ -751,17 +682,15 @@ Todo janeiro:
 - [ ] Política de privacidade atualizada vs últimas mudanças de produto?
 - [ ] DPO ativo e capacitado?
 
-Relatório consolidado ao CTO + conselho.
+Relatório consolidado à liderança.
 
 ---
 
 ## 11. Referências
 
-- [`runbook-operations.md`](runbook-operations.md) — operações do dia a dia.
 - [`runbook-deploy.md`](runbook-deploy.md) — procedimentos de deploy.
 - [`monitoring-alerts.md`](monitoring-alerts.md) — alertas relacionados.
-- [`engineering-standards.md`](engineering-standards.md) — padrões de código seguros.
-- [`PLANEJAMENTO_BACKEND_APIV1.md`](../prd/PLANEJAMENTO_BACKEND_APIV1.md) §11.
+- [`conventions.md`](conventions.md) — padrões de código seguros.
 
 ---
 

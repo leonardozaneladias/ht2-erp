@@ -3,13 +3,13 @@
 **Categoria:** Chart
 **Origem Inspinia:** `resources/views/charts/apex/pie.blade.php`
 **Plugins JS:** ApexCharts 5.3.5
-**Uso no ArtFinal:** 14.17 Relatórios — distribuição por modalidade de pagamento
+**Uso típico:** Relatórios — distribuição por forma de pagamento
 
 ---
 
 ## Descrição
 
-Gráfico de pizza ou donut (pizza com buraco no centro). Usado para mostrar **proporção** entre categorias (percentual de cada modalidade, status de parcelas, etc.).
+Gráfico de pizza ou donut (pizza com buraco no centro). Usado para mostrar **proporção** entre categorias (percentual de cada forma de pagamento, status de pedidos, etc.).
 
 ---
 
@@ -51,50 +51,50 @@ new ApexCharts(document.querySelector('#chart-pie'), options).render();
 
 ---
 
-## Exemplo de Uso (Relatório 14.17)
+## Exemplo de Uso (Relatórios)
 
 ```blade
-<x-admin.chart-card title="Distribuição por Modalidade" chart-id="dist-modalidade" :height="320">
-    <livewire:admin.relatorios.grafico-distribuicao-modalidade chart-id="dist-modalidade" />
+<x-admin.chart-card title="Distribuição por Forma de Pagamento" chart-id="dist-pagamento" :height="320">
+    <livewire:admin.relatorios.grafico-distribuicao-pagamento chart-id="dist-pagamento" />
 </x-admin.chart-card>
 ```
 
 ```php
-class GraficoDistribuicaoModalidade extends Component
+class GraficoDistribuicaoPagamento extends Component
 {
     public string $chartId;
 
     public function render()
     {
-        $dados = Parcela::query()
-            ->selectRaw('modalidade, COUNT(*) as total')
-            ->groupBy('modalidade')
-            ->pluck('total', 'modalidade');
+        $dados = Pedido::query()
+            ->selectRaw('forma_pagamento, COUNT(*) as total')
+            ->groupBy('forma_pagamento')
+            ->pluck('total', 'forma_pagamento');
 
         $this->dispatch('chart-update',
             chartId: $this->chartId,
             type: 'donut',
             data: [
                 'series' => $dados->values()->toArray(),
-                'labels' => $dados->keys()->map(fn($m) => ModalidadePagamento::from($m)->label())->toArray(),
+                'labels' => $dados->keys()->map(fn($m) => FormaPagamento::from($m)->label())->toArray(),
                 'colors' => ['#5B73E8', '#10B981', '#F59E0B', '#8B5CF6'],
             ]
         );
 
-        return view('livewire.admin.relatorios.grafico-distribuicao-modalidade');
+        return view('livewire.admin.relatorios.grafico-distribuicao-pagamento');
     }
 }
 ```
 
 ---
 
-## Mapeamento no PRD
+## Casos de uso típicos
 
-| Tela               | Uso                                      |
+| Contexto           | Uso                                      |
 | ------------------ | ---------------------------------------- |
-| 14.17 Relatórios   | Distribuição de modalidades de pagamento |
-| 14.17 Relatórios   | Distribuição de formandos por curso      |
-| Dashboard (futuro) | Distribuição de parcelas por status      |
+| Relatórios         | Distribuição de formas de pagamento      |
+| Relatórios         | Distribuição de registros por categoria  |
+| Dashboard (futuro) | Distribuição de pedidos por status       |
 
 ---
 
@@ -103,7 +103,6 @@ class GraficoDistribuicaoModalidade extends Component
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P3 (Onda 4)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 
@@ -145,4 +144,4 @@ class GraficoDistribuicaoModalidade extends Component
 
 - o wrapper final aceita `type="donut"` e `type="pie"` sem mudar a API principal
 - a bridge ativa total central apenas para donut
-- o preview cobre distribuição por modalidade e status das parcelas
+- o preview cobre distribuição por forma de pagamento e status dos pedidos

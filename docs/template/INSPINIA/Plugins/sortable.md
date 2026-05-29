@@ -3,13 +3,13 @@
 **Categoria:** Plugin
 **Origem Inspinia:** `resources/views/plugins/sortable.blade.php`
 **Plugins JS:** SortableJS 1.15.6
-**Uso no ArtFinal:** 14.10 — Drag-and-drop de termos do produto
+**Uso típico:** Drag-and-drop para reordenar itens de uma lista
 
 ---
 
 ## Descrição
 
-Biblioteca para reordenar listas por drag-and-drop. Usado no **14.10 Termos do Produto** para permitir que o admin arraste e solte os termos, atualizando a ordem de exibição (`produto_termos.ordem`).
+Biblioteca para reordenar listas por drag-and-drop. Permite que o admin arraste e solte os itens, atualizando a ordem de exibição (campo `ordem`).
 
 ---
 
@@ -17,9 +17,9 @@ Biblioteca para reordenar listas por drag-and-drop. Usado no **14.10 Termos do P
 
 ```html
 <ul id="sortable-list">
-    <li data-id="1">Termo Geral</li>
-    <li data-id="2">Termo de Pagamento</li>
-    <li data-id="3">Termo de Privacidade</li>
+    <li data-id="1">Item 1</li>
+    <li data-id="2">Item 2</li>
+    <li data-id="3">Item 3</li>
 </ul>
 
 <script>
@@ -82,22 +82,22 @@ Biblioteca para reordenar listas por drag-and-drop. Usado no **14.10 Termos do P
 
 ## Exemplo de Uso
 
-### Real (14.10 Reordenar termos do produto)
+### Real (Reordenar itens de um registro)
 
 ```blade
-<x-shared.card title="Termos Vinculados">
-    <x-admin.sortable-list target="atualizarOrdemTermos">
-        @foreach ($produto->termos()->orderBy('ordem')->get() as $termo)
+<x-shared.card title="Itens Vinculados">
+    <x-admin.sortable-list target="atualizarOrdemItens">
+        @foreach ($registro->itens()->orderBy('ordem')->get() as $item)
             <div
-                data-id="{{ $termo->id }}"
+                data-id="{{ $item->id }}"
                 class="flex items-center gap-3 p-3 border-b last:border-b-0 bg-card hover:bg-default-50"
             >
                 <i class="iconify tabler--grip-vertical drag-handle cursor-move text-default-400"></i>
                 <span class="grow">
-                    <strong>{{ $termo->nome }}</strong>
-                    <span class="text-xs text-default-400 ms-2">v{{ $termo->versao }}</span>
+                    <strong>{{ $item->nome }}</strong>
+                    <span class="text-xs text-default-400 ms-2">v{{ $item->versao }}</span>
                 </span>
-                <button wire:click="desvincular({{ $termo->id }})" class="btn btn-icon btn-sm text-danger">
+                <button wire:click="desvincular({{ $item->id }})" class="btn btn-icon btn-sm text-danger">
                     <i class="iconify tabler--x"></i>
                 </button>
             </div>
@@ -107,35 +107,26 @@ Biblioteca para reordenar listas por drag-and-drop. Usado no **14.10 Termos do P
 ```
 
 ```php
-// app/Livewire/Admin/Produtos/Termos.php
-class Termos extends Component
+// app/Livewire/Admin/Registros/Itens.php
+class Itens extends Component
 {
-    public Produto $produto;
+    public Registro $registro;
 
-    public function atualizarOrdemTermos(array $ids): void
+    public function atualizarOrdemItens(array $ids): void
     {
-        foreach ($ids as $ordem => $termoId) {
-            ProdutoTermo::where('produto_id', $this->produto->id)
-                ->where('termo_id', $termoId)
+        foreach ($ids as $ordem => $itemId) {
+            RegistroItem::where('registro_id', $this->registro->id)
+                ->where('item_id', $itemId)
                 ->update(['ordem' => $ordem + 1]);
         }
 
         $this->dispatch('toast',
             variant: 'success',
-            message: 'Ordem dos termos atualizada.'
+            message: 'Ordem dos itens atualizada.'
         );
     }
 }
 ```
-
----
-
-## Mapeamento no PRD
-
-| Tela                    | Seção PRD | Uso                                                |
-| ----------------------- | --------- | -------------------------------------------------- |
-| 14.10 Termos do Produto | 14.10     | Reordenar via drag-and-drop                        |
-| Parking lot             | —         | Reordenar qualquer lista (menus, categorias, etc.) |
 
 ---
 
@@ -144,7 +135,6 @@ class Termos extends Component
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P5 (Onda 6)  |
 | **Complexidade** | Simples      |
 | **Status**       | 🟢 Concluído |
 
@@ -169,13 +159,13 @@ class Termos extends Component
 ### Código
 
 ```blade
-<x-admin.sortable-list target="atualizarOrdemTermos">
-    @foreach ($produto->termos as $termo)
-        <div data-id="{{ $termo->id }}" class="flex items-center gap-3 border-b px-4 py-3 last:border-b-0">
+<x-admin.sortable-list target="atualizarOrdemItens">
+    @foreach ($registro->itens as $item)
+        <div data-id="{{ $item->id }}" class="flex items-center gap-3 border-b px-4 py-3 last:border-b-0">
             <i class="iconify tabler--grip-vertical drag-handle cursor-grab text-xl text-default-400"></i>
             <div class="grow">
-                <p class="font-semibold">{{ $termo->nome }}</p>
-                <p class="text-xs text-default-400">v{{ $termo->versao }}</p>
+                <p class="font-semibold">{{ $item->nome }}</p>
+                <p class="text-xs text-default-400">v{{ $item->versao }}</p>
             </div>
         </div>
     @endforeach

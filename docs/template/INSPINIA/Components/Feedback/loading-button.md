@@ -9,9 +9,9 @@
 
 ## Descrição
 
-Botão que mostra indicador de loading durante submissão/processamento. Inspinia usa **Ladda** (jQuery plugin com animações expand/zoom/slide). Para o Portal ArtFinal, **vamos usar abordagem pure Livewire + Tailwind** em vez de Ladda — porque Livewire já oferece `wire:loading` e `wire:target` nativamente sem dependência de jQuery.
+Botão que mostra indicador de loading durante submissão/processamento. Inspinia usa **Ladda** (jQuery plugin com animações expand/zoom/slide). Neste projeto, **vamos usar abordagem pure Livewire + Tailwind** em vez de Ladda — porque Livewire já oferece `wire:loading` e `wire:target` nativamente sem dependência de jQuery.
 
-> **Decisão arquitetural:** Ladda vai para o parking lot. Nosso `<x-shared.loading-button>` é um `<x-shared.button>` com integração `wire:loading` e spinner inline.
+> **Decisão arquitetural:** Ladda fica reservado. Nosso `<x-shared.loading-button>` é um `<x-shared.button>` com integração `wire:loading` e spinner inline.
 >
 > **Decisão oficial do Batch 3:** permanece como componente Blade anônimo em `x-shared.*`; não existe variante `x-admin.loading-button`.
 
@@ -131,7 +131,7 @@ Herda todas as props de `<x-shared.button>` + :
 ```blade
 <form wire:submit="salvar">
     {{-- campos --}}
-    <x-shared.loading-button variant="primary" type="submit" target="salvar"> Salvar Contrato </x-shared.loading-button>
+    <x-shared.loading-button variant="primary" type="submit" target="salvar"> Salvar Pedido </x-shared.loading-button>
 </form>
 ```
 
@@ -147,7 +147,7 @@ Herda todas as props de `<x-shared.button>` + :
 
 ```blade
 <x-shared.loading-button variant="danger" type="button" target="excluir" wire:click="excluir">
-    Excluir Contrato
+    Excluir Pedido
 </x-shared.loading-button>
 ```
 
@@ -184,28 +184,11 @@ Herda todas as props de `<x-shared.button>` + :
 
 ---
 
-## Mapeamento no PRD
-
-| Tela              | Seção PRD   | Uso                                                       |
-| ----------------- | ----------- | --------------------------------------------------------- |
-| Login             | 14.1        | "Entrar" com loading durante auth                         |
-| Instituições form | 14.3        | "Salvar"                                                  |
-| Contratos form    | 14.4        | "Salvar" em cada tab                                      |
-| Produtos form     | 14.6        | "Salvar"                                                  |
-| Termos form       | 14.11       | "Salvar" + "Preview"                                      |
-| Formandos ficha   | 14.12 Tab 5 | "Dar Baixa Manual", "Reemitir Boleto", "Cancelar Parcela" |
-| Parcelas          | 14.13       | "Dar Baixa em Lote"                                       |
-| Configurações     | 14.15       | "Salvar Configurações"                                    |
-| Reajustes         | 14.4 Tab 5  | "Aplicar Reajuste"                                        |
-
----
-
 ## Classificação
 
 | Critério         | Valor                       |
 | ---------------- | --------------------------- |
 | **Vai usar**     | 🟢 Sim                      |
-| **Prioridade**   | P1 (Onda 2)                 |
 | **Complexidade** | Média (integração Livewire) |
 | **Status**       | 🟢 Concluído                |
 
@@ -220,7 +203,7 @@ Herda todas as props de `<x-shared.button>` + :
 5. **`wire:loading.remove`** esconde o estado idle durante loading
 6. **Fallback Alpine** — para casos sem Livewire, `x-show` com estado local
 7. **Não usar `disabled` prop diretamente** — o Livewire aplica via `wire:loading.attr`
-8. **Rollback de Ladda no parking lot:** se aparecer algum form sem Livewire que precise de loading, Ladda ainda está disponível
+8. **Rollback de Ladda reservado:** se aparecer algum form sem Livewire que precise de loading, Ladda ainda está disponível
 
 ---
 
@@ -240,6 +223,6 @@ Herda todas as props de `<x-shared.button>` + :
 
 ```blade
 <x-shared.loading-button variant="primary" type="submit" target="salvar" loading-text="Salvando...">
-    Salvar contrato
+    Salvar pedido
 </x-shared.loading-button>
 ```

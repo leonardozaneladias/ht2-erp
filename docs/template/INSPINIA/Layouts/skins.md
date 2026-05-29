@@ -24,7 +24,7 @@ Todos os aspectos visuais são **data-attributes** no `<html>`:
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | `dir`                  | `ltr` \| `rtl`                                                                                                             | Direção do layout                         |
 | `data-theme`           | `light` \| `dark` \| `system`                                                                                              | Modo claro/escuro                         |
-| `data-skin`            | `default` \| `minimal` \| `modern` \| `material` \| `saas` \| `flat` \| `galaxy` \| `luxe` \| `retro` \| `neon` \| `pixel` | 11 skins (Portal ArtFinal usa `default`)  |
+| `data-skin`            | `default` \| `minimal` \| `modern` \| `material` \| `saas` \| `flat` \| `galaxy` \| `luxe` \| `retro` \| `neon` \| `pixel` | 11 skins (o projeto usa `default`)        |
 | `data-layout-width`    | `fluid` \| `boxed`                                                                                                         | Largura do container                      |
 | `data-layout-position` | `fixed` \| `scrollable`                                                                                                    | Topbar/sidenav fixos ou scrolláveis       |
 | `data-topbar-color`    | `light` \| `dark` \| `gray` \| `gradient`                                                                                  | Cor da topbar                             |
@@ -149,7 +149,7 @@ Nenhuma. O script é auto-contido e lê dos atributos do `<html>` já renderizad
 <script>
     (function () {
         const html = document.documentElement;
-        const storageKey = '__ARTFINAL_ADMIN_THEME__';
+        const storageKey = '__ADMIN_THEME__';
         const savedConfig = sessionStorage.getItem(storageKey);
 
         const defaultConfig = {
@@ -234,7 +234,7 @@ export function toggleTheme() {
     const next = current === 'dark' ? 'light' : 'dark';
     window.config.theme = next;
     document.documentElement.setAttribute('data-theme', next);
-    sessionStorage.setItem('__ARTFINAL_ADMIN_THEME__', JSON.stringify(window.config));
+    sessionStorage.setItem('__ADMIN_THEME__', JSON.stringify(window.config));
 }
 
 // Bind no botão da topbar
@@ -275,7 +275,6 @@ O script detecta `system`, lê `window.matchMedia('(prefers-color-scheme: dark)'
 
 - No `<head>` do layout master do admin (`<x-admin.layout>`), **ANTES** do `@vite` de CSS
 - No `<head>` do layout de auth do admin (`<x-admin.auth-layout>`) se quisermos tema persistente nas telas de login
-- No `<head>` do layout do portal do formando SE quisermos dark mode lá (decisão pendente)
 
 ## Quando NÃO Usar ❌
 
@@ -285,19 +284,10 @@ O script detecta `system`, lê `window.matchMedia('(prefers-color-scheme: dark)'
 
 ## Boas Práticas 💡
 
-- **storageKey único por aplicação:** usamos `__ARTFINAL_ADMIN_THEME__` em vez de `__THEME_CONFIG__` para não conflitar com outros apps no mesmo domínio
+- **storageKey único por aplicação:** usamos `__ADMIN_THEME__` em vez de `__THEME_CONFIG__` para não conflitar com outros apps no mesmo domínio
 - **Nunca definir `data-theme` no servidor via PHP** — o script no cliente sobrescreve. Deixar o `<html>` com o `data-theme` padrão e deixar o script cuidar da persistência
 - **Debounce em toggles rápidos:** alternar tema 10x em 1s pode causar flicker. Debounce no click do botão
 - **Migrate sessão → localStorage** se quisermos persistência entre abas/janelas (atualmente é por aba)
-
----
-
-## Mapeamento no PRD (Portal ArtFinal)
-
-| Tela                    | Seção PRD | Como É Usado                                                       | Sprint |
-| ----------------------- | --------- | ------------------------------------------------------------------ | :----: |
-| Todas as telas do admin | 14.\*     | Aplicado no layout master via `<x-admin.partials.theme-bootstrap>` | 15–16  |
-| Login Admin             | 14.1      | Se usar layout auth com tema, incluir aqui também                  |   15   |
 
 ---
 
@@ -306,8 +296,6 @@ O script detecta `system`, lê `window.matchMedia('(prefers-color-scheme: dark)'
 | Critério                   | Valor                        |
 | -------------------------- | ---------------------------- |
 | **Vai usar no projeto**    | 🟢 Sim                       |
-| **Prioridade**             | P0 (pré-requisito do layout) |
-| **Sprint planejada**       | 15–16                        |
 | **Complexidade**           | Simples (copiar/adaptar)     |
 | **Status componentização** | 🟢 Concluído                 |
 
@@ -327,12 +315,11 @@ O script detecta `system`, lê `window.matchMedia('(prefers-color-scheme: dark)'
 ## Notas de Adaptação
 
 1. **storageKey:** mantido como `__THEME_CONFIG__` para permanecer compatível com o `LayoutCustomizer` já existente em `resources/js/app.js`
-2. **Skins expostos:** Portal ArtFinal usa apenas `default`. Os demais 10 skins ficam no parking lot — o CSS deles pode ser removido do bundle final para reduzir payload
+2. **Skins expostos:** o projeto usa apenas `default`. O CSS dos demais 10 skins pode ser removido do bundle final para reduzir payload
 3. **Apenas vertical orientation:** `data-layout-orientation="horizontal"` não será suportado — o CSS relacionado pode ser removido
-4. **Remover exposição ao usuário final:** o admin do ArtFinal não terá customizer visível. Usuário não pode trocar skin nem cores, só alternar dark/light via botão simples da topbar
+4. **Remover exposição ao usuário final:** o admin não terá customizer visível. Usuário não pode trocar skin nem cores, só alternar dark/light via botão simples da topbar
 5. **CSS custom properties:** o script apenas seta atributos — o **CSS correspondente** (em `config/_root.css` + `structure/*.css` do Inspinia) é quem transforma os atributos em cores reais. **CRITICAL:** copiar esses CSS para `resources/css/admin/` ou manter sob `resources/vendor/inspinia/css/`
 6. **Fallback 1140px:** o breakpoint está hardcoded — se o projeto mudar breakpoints do Tailwind (ex: `xl: 1280px`), considerar unificar
-7. **Dark mode do portal:** decisão pendente — portal do formando é mobile-first com identidade própria. Não usar este script lá; fazer um `<x-portal.partials.theme-bootstrap>` simplificado se necessário
 
 ---
 
@@ -340,7 +327,7 @@ O script detecta `system`, lê `window.matchMedia('(prefers-color-scheme: dark)'
 
 | Data       | Descrição                                                                                                                        |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-04-11 | Doc criada — Fase 2 Onda 1                                                                                                       |
+| 2026-04-11 | Doc criada                                                                                                                       |
 | 2026-04-11 | Implementação concluída — partial compatível com `resources/js/admin.js` e adapter em `admin/partials/theme-bootstrap.blade.php` |
 
 ## Código Final Blade

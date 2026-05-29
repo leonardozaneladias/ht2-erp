@@ -85,19 +85,9 @@ Campo de texto multi-linha. Versão textarea do `<x-shared.input>` — mesma est
 ## Exemplos de Uso
 
 ```blade
-<x-shared.textarea name="observacoes" label="Observações" rows="6" wire:model="contrato.observacoes" />
+<x-shared.textarea name="observacoes" label="Observações" rows="6" wire:model="pedido.observacoes" />
 <x-shared.textarea name="descricao" label="Descrição" hint="Máx 500 caracteres" wire:model="produto.descricao" />
 ```
-
----
-
-## Mapeamento no PRD
-
-| Tela                | Uso           |
-| ------------------- | ------------- |
-| 14.4 Contratos      | Observações   |
-| 14.6 Produtos       | Descrição     |
-| 14.15 Configurações | Textos livres |
 
 ---
 
@@ -106,7 +96,6 @@ Campo de texto multi-linha. Versão textarea do `<x-shared.input>` — mesma est
 | Critério         | Valor        |
 | ---------------- | ------------ |
 | **Vai usar**     | 🟢 Sim       |
-| **Prioridade**   | P2 (Onda 3)  |
 | **Complexidade** | Trivial      |
 | **Status**       | 🟢 Concluído |
 
@@ -116,7 +105,7 @@ Campo de texto multi-linha. Versão textarea do `<x-shared.input>` — mesma est
 
 1. **Slot para valor inicial** — permite `<x-shared.textarea>{{ $old }}</x-shared.textarea>` sem Livewire
 2. **Com Livewire:** usar `wire:model` no slot vazio
-3. **Sem auto-resize** — para auto-resize, envolver com Alpine `x-data` + `$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'` (parking lot: rich textarea)
+3. **Sem auto-resize** — para auto-resize, envolver com Alpine `x-data` + `$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'`
 
 ---
 

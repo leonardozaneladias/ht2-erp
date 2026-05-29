@@ -10,7 +10,7 @@
 
 ## Descrição
 
-Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com `<html>` + `<head>` (com script crítico de tema) + `<body>` contendo o wrapper de 3 áreas: **topbar** fixa no topo, **sidenav** fixa à esquerda, **content-page** rolável no centro. Padrão "vertical orientation" do Inspinia, com posição `fixed` e width `fluid`.
+Layout master do admin. Envolve toda view administrativa com `<html>` + `<head>` (com script crítico de tema) + `<body>` contendo o wrapper de 3 áreas: **topbar** fixa no topo, **sidenav** fixa à esquerda, **content-page** rolável no centro. Padrão "vertical orientation" do Inspinia, com posição `fixed` e width `fluid`.
 
 ---
 
@@ -44,7 +44,7 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
 ### Características
 
 - **3 regiões fixas:** topbar no topo (`h-topbar`), sidenav à esquerda (`.app-menu`), content-page ocupa o restante com scroll próprio
-- **Width fluid:** sem containers max-width (Portal ArtFinal optou por fluid)
+- **Width fluid:** sem containers max-width (o projeto optou por fluid)
 - **Position fixed:** topbar e sidenav ficam fixos, apenas `content-page` rola
 - **Responsividade:** abaixo de 1140px, o script no `head-css.blade.php` força automaticamente `sidenav-size=offcanvas` (sidenav vira drawer mobile)
 - **Dark mode:** aplicado via `<html data-theme="dark">` — todas as seções respeitam
@@ -151,8 +151,8 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ $title }} | Portal ArtFinal</title>
-    <meta name="description" content="Sistema de gerenciamento de formaturas — Portal ArtFinal" />
+    <title>{{ $title }} | {{ config('app.name') }}</title>
+    <meta name="description" content="Painel administrativo" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <link rel="icon" href="{{ asset('favicon.ico') }}" />
 
@@ -199,7 +199,7 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
 </x-admin.layout>
 ```
 
-### Exemplo Real (Portal ArtFinal — Tela 14.2 Dashboard)
+### Exemplo Real (Dashboard)
 
 ```blade
 {{-- resources/views/admin/dashboard/index.blade.php --}}
@@ -207,14 +207,14 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
     {{-- KPI Cards (topo, grid 4) --}}
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <x-admin.kpi-card
-            label="Contratos Ativos"
-            :value="$kpis->contratosAtivos"
+            label="Registros Ativos"
+            :value="$kpis->registrosAtivos"
             icon="tabler--file-text"
             color="primary"
         />
         <x-admin.kpi-card
-            label="Formandos Aderidos"
-            :value="$kpis->formandosAderidos"
+            label="Usuários"
+            :value="$kpis->usuarios"
             icon="tabler--users"
             color="success"
         />
@@ -225,8 +225,8 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
             color="warning"
         />
         <x-admin.kpi-card
-            label="Inadimplência"
-            :value="$kpis->percentualInadimplencia . '%'"
+            label="Pendências"
+            :value="$kpis->percentualPendencias . '%'"
             icon="tabler--alert-triangle"
             color="danger"
         />
@@ -234,13 +234,13 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
 
     {{-- Gráficos (grid 2) --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <livewire:admin.dashboard.grafico-adesoes-mensais />
-        <livewire:admin.dashboard.grafico-receita-inadimplencia />
+        <livewire:admin.dashboard.grafico-registros-mensais />
+        <livewire:admin.dashboard.grafico-receita />
     </div>
 
-    {{-- Meta por contrato --}}
-    <x-admin.card title="Meta de Formandos por Contrato">
-        <livewire:admin.dashboard.tabela-meta-contratos />
+    {{-- Tabela resumo --}}
+    <x-admin.card title="Resumo por Categoria">
+        <livewire:admin.dashboard.tabela-resumo />
     </x-admin.card>
 </x-admin.layout>
 ```
@@ -274,7 +274,6 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
 ## Quando NÃO Usar ❌
 
 - **Telas de auth do admin** (login, reset, 404, 500) — usar layout mínimo `<x-admin.auth-layout>` baseado em `shared/base.blade.php` (sem sidenav/topbar)
-- **Portal do formando** (`/portal/*`) — usar `<x-portal.layout>` próprio com identidade visual diferente (mobile-first, sem sidenav)
 - **Documentos impressos/PDFs** — usar layout nu para DomPDF
 
 ## Boas Práticas 💡
@@ -286,29 +285,11 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
 
 ---
 
-## Mapeamento no PRD (Portal ArtFinal)
-
-| Tela                                  | Seção PRD | Como É Usado                     | Sprint |
-| ------------------------------------- | --------- | -------------------------------- | :----: |
-| Dashboard Administrativo              | 14.2      | Envolve KPIs, gráficos e tabelas |   16   |
-| Gestão de Instituições                | 14.3      | Envolve DataTable + form         |   17   |
-| Gestão de Contratos                   | 14.4      | Envolve DataTable + form tabs    |   17   |
-| Gestão de Produtos                    | 14.6      | Envolve DataTable + form tabs    |   18   |
-| Gestão de Formandos                   | 14.12     | Envolve DataTable + ficha tabs   |   20   |
-| Gestão Financeira                     | 14.13     | Envolve filtros + DataTable      |   21   |
-| Simulador                             | 14.14     | Envolve form + card resultado    |   22   |
-| Configurações Globais                 | 14.15     | Envolve form agrupado            |   23   |
-| **Todas as 20 telas** de 14.2 a 14.20 | —         | Layout master único              | 15–24  |
-
----
-
 ## Classificação
 
 | Critério                   | Valor                                    |
 | -------------------------- | ---------------------------------------- |
 | **Vai usar no projeto**    | 🟢 Sim (pré-requisito absoluto)          |
-| **Prioridade**             | P0 (Sprint 15–16)                        |
-| **Sprint planejada**       | 16 (finalização do shell admin)          |
 | **Complexidade**           | Média (compõe múltiplos sub-componentes) |
 | **Status componentização** | 🟢 Concluído                             |
 
@@ -320,22 +301,22 @@ Layout master do admin do Portal ArtFinal. Envolve toda view administrativa com 
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **Depende de (JS)**          | Preline 4.0.1, Simplebar 6.3.3, Iconify (tabler icons)                                                           |
 | **Depende de (componentes)** | `x-admin.topbar`, `x-admin.sidebar`, `x-admin.footer`, `x-admin.page-header`, `x-admin.partials.theme-bootstrap` |
-| **Usado por (telas)**        | TODAS as views do admin (20 telas)                                                                               |
+| **Usado por (telas)**        | TODAS as views do admin                                                                                          |
 | **Usado por (componentes)**  | Nenhum — é o layout raiz                                                                                         |
 
 ---
 
 ## Notas de Adaptação
 
-Diferenças entre o Inspinia original e o que usaremos no Portal ArtFinal:
+Diferenças entre o Inspinia original e o que usaremos no projeto:
 
-1. **Remoção do `@include("shared.partials/customizer")`** — o customizer é um painel lateral de customização visual do template (alterna skins, cores, size). Para o admin do ArtFinal é sobra de template; o skin será fixo (`default`) e não exporemos ao usuário. **Remover completamente**.
+1. **Remoção do `@include("shared.partials/customizer")`** — o customizer é um painel lateral de customização visual do template (alterna skins, cores, size). Para o admin é sobra de template; o skin será fixo (`default`) e não exporemos ao usuário. **Remover completamente**.
 2. **Remoção do `@include("shared.partials/title-meta")`** — descrições/keywords específicas do Inspinia não aplicam. Colocar meta tags inline no layout.
 3. **`lang="en"` → `lang="pt-BR"`** — localização do projeto.
-4. **`@vite(['resources/js/vendor.js', 'resources/js/app.js'])` → `@vite(['resources/css/admin.css', 'resources/js/admin.js'])`** — entry points próprios do ArtFinal conforme `vite.config.js` do projeto (dois entries admin + portal, ver `CLAUDE.md` §5.2).
+4. **`@vite(['resources/js/vendor.js', 'resources/js/app.js'])` → `@vite(['resources/css/admin.css', 'resources/js/admin.js'])`** — entry points próprios do projeto conforme `vite.config.js` (ver `CLAUDE.md` §3.2).
 5. **Livewire integration** — adicionar `@livewireStyles` no `<head>` e `@livewireScripts` antes de `</body>`.
 6. **CSRF token meta** — `<meta name="csrf-token" content="{{ csrf_token() }}">` para chamadas Livewire/Axios.
-7. **Favicon** — substituir `/images/favicon.ico` por `asset('favicon.ico')` próprio do ArtFinal.
+7. **Favicon** — substituir `/images/favicon.ico` por `asset('favicon.ico')` próprio do projeto.
 8. **Page-header dentro do container-fluid** — o Inspinia chama `page-title` manualmente em cada view. Vamos incluir automaticamente via prop `$title` para reduzir boilerplate.
 9. **Classes `.wrapper`, `.content-page`, `.container-fluid`, `.footer`** — permanecem vindo do starter CSS do Inspinia. A implementação atual usa `resources/css/admin.css` como entrypoint dedicado, importando `app.css` como base do shell admin.
 
@@ -360,4 +341,4 @@ Principais ajustes aplicados no código final:
 
 | Data       | Descrição                  |
 | ---------- | -------------------------- |
-| 2026-04-11 | Doc criada — Fase 2 Onda 1 |
+| 2026-04-11 | Doc criada |
