@@ -25,6 +25,7 @@ class IndexPerfis extends Component
         return view('livewire.admin.perfis.index-perfis', [
             'perfis' => Role::where('guard_name', 'admin')
                 ->withCount(['permissions', 'users'])
+                ->orderByDesc('nivel')
                 ->orderBy('name')
                 ->get(),
             'podeCriar' => Auth::guard('admin')->user()?->can('create', Role::class) ?? false,

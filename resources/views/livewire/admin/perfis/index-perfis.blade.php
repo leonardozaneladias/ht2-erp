@@ -17,6 +17,7 @@
                     <thead>
                         <tr>
                             <th>Perfil</th>
+                            <th>Nível</th>
                             <th class="text-end">Permissões</th>
                             <th class="text-end">Usuários</th>
                             <th class="text-end">Ações</th>
@@ -25,7 +26,13 @@
                     <tbody>
                         @forelse ($perfis as $perfil)
                             <tr wire:key="perfil-{{ $perfil->id }}">
-                                <td>{{ $perfil->name }}</td>
+                                <td>
+                                    <div class="font-medium">{{ $perfil->name }}</div>
+                                    @if ($perfil->descricao)
+                                        <div class="text-default-500 text-xs">{{ $perfil->descricao }}</div>
+                                    @endif
+                                </td>
+                                <td><x-shared.badge variant="neutral">{{ $perfil->nivel }}</x-shared.badge></td>
                                 <td class="text-end">{{ $perfil->permissions_count }}</td>
                                 <td class="text-end">{{ $perfil->users_count }}</td>
                                 <td class="text-end">
