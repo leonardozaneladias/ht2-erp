@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Perfis;
 
+use App\Actions\Admin\SalvarPerfilAction;
+use App\DTOs\Admin\PerfilDTO;
+use App\Exceptions\AccessException;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -22,6 +24,10 @@ class FormPerfil extends Component
 
     public string $name = '';
 
+    public int $nivel = 10;
+
+    public string $descricao = '';
+
     /** @var array<int, string> */
     public array $permissions = [];
 
@@ -32,6 +38,8 @@ class FormPerfil extends Component
             $this->authorize('update', $alvo);
             $this->perfilId = $alvo->id;
             $this->name = $alvo->name;
+            $this->nivel = (int) $alvo->getAttribute('nivel');
+            $this->descricao = (string) ($alvo->getAttribute('descricao') ?? '');
             $this->permissions = $alvo->permissions->pluck('name')->all();
 
             return;
@@ -40,44 +48,44 @@ class FormPerfil extends Component
         $this->authorize('create', Role::class);
     }
 
-    public function salvar(): void
+    public function marcarModulo(string $modulo): void
+    {
+        $this->permissions = array_values(array_unique([...$this->permissions, ...$this->permissoesDoModulo($modulo)]));
+    }
+
+    public function limparModulo(string $modulo): void
+    {
+        $this->permissions = array_values(array_diff($this->permissions, $this->permissoesDoModulo($modulo)));
+    }
+
+    public function salvar(SalvarPerfilAction $action): void
     {
         $dados = $this->validate();
 
-        $alvo = $this->perfilId !== null
-            ? Role::where('guard_name', 'admin')->findOrFail($this->perfilId)
-            : Role::create(['name' => $dados['name'], 'guard_name' => 'admin']);
+        try {
+            $action->execute(PerfilDTO::fromArray([
+                'roleId' => $this->perfilId,
+                'nome' => $dados['name'],
+                'nivel' => $dados['nivel'],
+                'descricao' => $this->descricao !== '' ? $this->descricao : null,
+                'permissoes' => array_values($this->permissions),
+            ]), Auth::guard('admin')->user());
+        } catch (AccessException $e) {
+            session()->flash('toast.error', $e->getMessage());
 
-        if ($this->perfilId !== null) {
-            $alvo->update(['name' => $dados['name']]);
+            return;
         }
 
-        $alvo->syncPermissions($dados['permissions']);
-
-        /** @var Model $perfilModel */
-        $perfilModel = $alvo;
-        activity('roles')
-            ->performedOn($perfilModel)
-            ->causedBy(Auth::guard('admin')->user())
-            ->withProperties(['permissions' => $dados['permissions']])
-            ->event($this->perfilId === null ? 'created' : 'updated')
-            ->log($this->perfilId === null ? 'Perfil criado' : 'Perfil atualizado');
-
-        session()->flash(
-            'toast.success',
-            $this->perfilId === null ? 'Perfil criado.' : 'Perfil atualizado.',
-        );
-
+        session()->flash('toast.success', $this->perfilId === null ? 'Perfil criado.' : 'Perfil atualizado.');
         $this->redirect(route('admin.perfis.index'), navigate: true);
     }
 
     public function render(): View
     {
         $permissoesAgrupadas = Permission::where('guard_name', 'admin')
-            ->orderBy('name')
+            ->orderBy('label')
             ->get()
-            ->groupBy(fn (Permission $p) => explode('.', $p->name, 2)[0])
-            ->sortKeys();
+            ->groupBy(fn (Permission $permissao): string => (string) ($permissao->getAttribute('modulo') ?? 'outros'));
 
         return view('livewire.admin.perfis.form-perfil', [
             'permissoesAgrupadas' => $permissoesAgrupadas,
@@ -94,11 +102,27 @@ class FormPerfil extends Component
             'name' => [
                 'required', 'string', 'min:3', 'max:80',
                 Rule::unique('roles', 'name')
-                    ->where(fn ($q) => $q->where('guard_name', 'admin'))
+                    ->where(fn ($query) => $query->where('guard_name', 'admin'))
                     ->ignore($this->perfilId),
             ],
+            'nivel' => ['required', 'integer', 'min:1', 'max:999'],
+            'descricao' => ['nullable', 'string', 'max:255'],
             'permissions' => ['array'],
             'permissions.*' => ['string', Rule::exists('permissions', 'name')->where('guard_name', 'admin')],
         ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function permissoesDoModulo(string $modulo): array
+    {
+        /** @var list<string> $nomes */
+        $nomes = Permission::where('guard_name', 'admin')
+            ->where('modulo', $modulo)
+            ->pluck('name')
+            ->all();
+
+        return $nomes;
     }
 }

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\AdminUser;
+use App\Models\PermissionGrant;
 use App\Policies\AdminUserPolicy;
+use App\Policies\PermissionGrantPolicy;
 use App\Policies\RolePolicy;
 use App\Services\Admin\AccessResolver;
 use Illuminate\Database\Eloquent\Model;
