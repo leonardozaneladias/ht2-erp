@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::policy(AdminUser::class, AdminUserPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(PermissionGrant::class, PermissionGrantPolicy::class);
 
         // Resolução central de acesso: super-admin > deny > grant > role.
         // Abilities não-nomeadas (ex.: 'create') recebem null e caem nas Policies.

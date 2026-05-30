@@ -11,10 +11,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Permission\Models\Permission;
 
 /**
+ * @property int $id
+ * @property int $admin_user_id
+ * @property int $permission_id
  * @property TipoConcessao $type
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property \Illuminate\Support\Carbon|null $revoked_at
  * @property string $reason
+ * @property int|null $granted_by
  */
 class PermissionGrant extends Model
 {
