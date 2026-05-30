@@ -38,9 +38,21 @@ class IndexUsuarios extends Component
 
     public string $dir = 'asc';
 
+    /** @var array<int, int> IDs selecionados para ações em massa. */
+    public array $selecionados = [];
+
+    public bool $selecionarPagina = false;
+
+    public string $perfilEmMassa = '';
+
     public function mount(): void
     {
         $this->authorize('viewAny', AdminUser::class);
+    }
+
+    public function updatedSelecionarPagina(bool $valor): void
+    {
+        $this->selecionados = $valor ? $this->idsDaPagina() : [];
     }
 
     public function updatingBusca(): void
@@ -91,6 +103,56 @@ class IndexUsuarios extends Component
         $this->resetPage();
     }
 
+    public function limparSelecao(): void
+    {
+        $this->reset(['selecionados', 'selecionarPagina', 'perfilEmMassa']);
+    }
+
+    public function atribuirPerfilEmMassa(AtribuirPerfilEmMassaAction $action): void
+    {
+        $this->authorize('create', AdminUser::class);
+
+        if ($this->selecionados === [] || $this->perfilEmMassa === '') {
+            session()->flash('toast.error', 'Selecione usuários e um perfil.');
+
+            return;
+        }
+
+        try {
+            $total = $action->execute(AtribuicaoPerfilMassaDTO::fromArray([
+                'adminUserIds' => array_map('intval', $this->selecionados),
+                'roles' => [$this->perfilEmMassa],
+            ]), Auth::guard('admin')->user());
+        } catch (AccessException $e) {
+            session()->flash('toast.error', $e->getMessage());
+
+            return;
+        }
+
+        $this->limparSelecao();
+        session()->flash('toast.success', "Perfil atribuído a {$total} usuário(s).");
+    }
+
+    public function alternarStatusEmMassa(bool $ativo, BulkUserStatusAction $action): void
+    {
+        $this->authorize('create', AdminUser::class);
+
+        if ($this->selecionados === []) {
+            return;
+        }
+
+        try {
+            $total = $action->execute(array_map('intval', $this->selecionados), $ativo, Auth::guard('admin')->user());
+        } catch (AccessException $e) {
+            session()->flash('toast.error', $e->getMessage());
+
+            return;
+        }
+
+        $this->limparSelecao();
+        session()->flash('toast.success', ($ativo ? 'Reativados' : 'Desativados') . " {$total} usuário(s).");
+    }
+
     /**
      * @return list<string>
      */
@@ -100,6 +162,26 @@ class IndexUsuarios extends Component
         return Role::where('guard_name', 'admin')
             ->orderBy('name')
             ->pluck('name')
+            ->all();
+    }
+
+    /**
+     * Perfis que o ator pode atribuir (abaixo da sua hierarquia).
+     *
+     * @return list<array{value: string, label: string}>
+     */
+    #[Computed]
+    public function perfisAtribuiveis(): array
+    {
+        $ator = Auth::guard('admin')->user();
+
+        if (! $ator instanceof AdminUser) {
+            return [];
+        }
+
+        return app(HierarchyResolver::class)->rolesGerenciaveis($ator)
+            ->map(static fn (Role $role): array => ['value' => $role->name, 'label' => $role->name])
+            ->values()
             ->all();
     }
 
@@ -117,5 +199,23 @@ class IndexUsuarios extends Component
             'usuarios' => $usuarios,
             'podeCriar' => Auth::guard('admin')->user()?->can('create', AdminUser::class) ?? false,
         ]);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    protected function idsDaPagina(): array
+    {
+        return app(AdminUserService::class)
+            ->listarPaginado([
+                'busca' => $this->busca,
+                'status' => $this->status,
+                'role' => $this->role,
+                'sort' => $this->sort,
+                'dir' => $this->dir,
+            ])
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
     }
 }

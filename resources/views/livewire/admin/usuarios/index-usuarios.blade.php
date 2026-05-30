@@ -45,10 +45,62 @@
                 </div>
             </div>
 
+            @if (count($selecionados) > 0)
+                <div
+                    class="border-primary/25 bg-primary/8 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3"
+                >
+                    <span class="text-sm font-medium"> {{ count($selecionados) }} selecionado(s) </span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="w-48">
+                            <x-shared.select
+                                name="perfilEmMassa"
+                                :options="array_merge([['value' => '', 'label' => 'Atribuir perfil...']], $this->perfisAtribuiveis)"
+                                wire:model="perfilEmMassa"
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            wire:click="atribuirPerfilEmMassa"
+                            wire:confirm="Atribuir o perfil aos usuários selecionados?"
+                        >
+                            Aplicar perfil
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-success"
+                            wire:click="alternarStatusEmMassa(true)"
+                            wire:confirm="Reativar os usuários selecionados?"
+                        >
+                            Reativar
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-warning"
+                            wire:click="alternarStatusEmMassa(false)"
+                            wire:confirm="Desativar os usuários selecionados?"
+                        >
+                            Desativar
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" wire:click="limparSelecao">
+                            Limpar seleção
+                        </button>
+                    </div>
+                </div>
+            @endif
+
             <div class="overflow-x-auto">
                 <table class="table w-full" data-testid="tabela-usuarios">
                     <thead>
                         <tr>
+                            <th class="w-10">
+                                <input
+                                    type="checkbox"
+                                    class="checkbox checkbox-primary"
+                                    wire:model.live="selecionarPagina"
+                                    aria-label="Selecionar página"
+                                />
+                            </th>
                             <th>
                                 <button type="button" class="link" wire:click="ordenarPor('nome')">Nome</button>
                             </th>
@@ -68,6 +120,15 @@
                     <tbody>
                         @forelse ($usuarios as $usuario)
                             <tr wire:key="usuario-{{ $usuario->id }}">
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        class="checkbox checkbox-primary"
+                                        value="{{ $usuario->id }}"
+                                        wire:model.live="selecionados"
+                                        aria-label="Selecionar {{ $usuario->nome }}"
+                                    />
+                                </td>
                                 <td>{{ $usuario->nome }}</td>
                                 <td>{{ $usuario->email }}</td>
                                 <td>
@@ -108,7 +169,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6">
+                                <td colspan="7">
                                     <x-shared.empty-state
                                         icon="tabler--users"
                                         title="Nenhum usuário admin encontrado"
