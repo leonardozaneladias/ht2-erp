@@ -5,36 +5,42 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // Adicione aqui as permissões do seu domínio
-        $permissions = [
-            'dashboard.view',
-            'usuarios.listar', 'usuarios.criar', 'usuarios.editar', 'usuarios.deletar',
-            'perfis.listar', 'perfis.gerenciar',
-            'configuracoes.editar',
-            'auditoria.visualizar',
-        ];
+        // Catálogo de permissões: fonte de verdade em config/access.php.
+        Artisan::call('access:sync');
 
-        foreach ($permissions as $name) {
-            Permission::findOrCreate($name, 'admin');
-        }
+        $this->seedRoles();
 
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
 
-        Role::findOrCreate('super-admin', 'admin');
+    private function seedRoles(): void
+    {
+        /** @var array<string, int> $niveis */
+        $niveis = config('access.role_levels', []);
+
+        /** @var string $superAdminRole */
+        $superAdminRole = config('access.super_admin_role', 'super-admin');
+
+        $superAdmin = Role::findOrCreate($superAdminRole, 'admin');
+        DB::table('roles')
+            ->where('id', $superAdmin->getKey())
+            ->update(['nivel' => $niveis[$superAdminRole] ?? 100]);
 
         $gestor = Role::findOrCreate('gestor', 'admin');
-        $gestor->syncPermissions([
-            'dashboard.view',
-            'usuarios.listar',
-        ]);
+        DB::table('roles')
+            ->where('id', $gestor->getKey())
+            ->update(['nivel' => $niveis['gestor'] ?? 50]);
+        $gestor->syncPermissions(['dashboard.view', 'usuarios.listar']);
     }
 }
