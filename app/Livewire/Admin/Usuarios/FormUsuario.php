@@ -4,16 +4,27 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Usuarios;
 
+use App\Actions\Admin\ConcederAcessoDiretoAction;
 use App\Actions\Admin\CreateAdminUserAction;
+use App\Actions\Admin\RevogarAcessoDiretoAction;
 use App\Actions\Admin\UpdateAdminUserAction;
 use App\DTOs\Admin\AdminUserDTO;
+use App\DTOs\Admin\ConcessaoAcessoDTO;
+use App\Enums\ModuloAcesso;
+use App\Enums\TipoConcessao;
+use App\Exceptions\AccessException;
 use App\Models\AdminUser;
+use App\Models\PermissionGrant;
+use App\Services\Admin\HierarchyResolver;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 #[Layout('components.admin.layout', ['withLivewire' => true])]
 class FormUsuario extends Component
@@ -32,12 +43,22 @@ class FormUsuario extends Component
     /** @var array<int, string> */
     public array $roles = [];
 
+    // Painel de concessão de acesso extra (grant/deny direto).
+    public bool $mostrarFormAcesso = false;
+
+    public string $novoTipo = 'grant';
+
+    public string $novaPermissao = '';
+
+    public string $novaValidade = '';
+
+    public string $novoMotivo = '';
+
     public function mount(?int $usuario = null): void
     {
         if ($usuario !== null) {
             $alvo = AdminUser::with('roles')->findOrFail($usuario);
             $this->authorize('update', $alvo);
-
             $this->usuarioId = $alvo->id;
             $this->nome = $alvo->nome;
             $this->email = $alvo->email;
@@ -54,7 +75,6 @@ class FormUsuario extends Component
     {
         $dados = $this->validate();
         $dto = AdminUserDTO::fromArray($dados);
-
         $alvo = $this->resolverUsuario();
 
         if ($alvo === null) {
@@ -68,12 +88,138 @@ class FormUsuario extends Component
         $this->redirect(route('admin.usuarios.index'), navigate: true);
     }
 
-    public function render(): View
+    public function abrirFormAcesso(): void
     {
+        $this->reset(['novoTipo', 'novaPermissao', 'novaValidade', 'novoMotivo']);
+        $this->resetValidation();
+        $this->mostrarFormAcesso = true;
+    }
+
+    public function cancelarFormAcesso(): void
+    {
+        $this->mostrarFormAcesso = false;
+        $this->reset(['novoTipo', 'novaPermissao', 'novaValidade', 'novoMotivo']);
+        $this->resetValidation();
+    }
+
+    public function concederAcessoExtra(ConcederAcessoDiretoAction $action): void
+    {
+        if ($this->usuarioId === null) {
+            return;
+        }
+
+        $alvo = AdminUser::findOrFail($this->usuarioId);
+        $this->authorize('gerenciarAcessos', $alvo);
+
+        $dados = $this->validate([
+            'novoTipo' => ['required', Rule::enum(TipoConcessao::class)],
+            'novaPermissao' => ['required', 'string', Rule::exists('permissions', 'name')->where('guard_name', 'admin')],
+            'novaValidade' => ['nullable', 'date', 'after:now'],
+            'novoMotivo' => ['required', 'string', 'min:3', 'max:255'],
+        ], attributes: [
+            'novoTipo' => 'tipo',
+            'novaPermissao' => 'permissão',
+            'novaValidade' => 'validade',
+            'novoMotivo' => 'motivo',
+        ]);
+
+        try {
+            $action->execute(ConcessaoAcessoDTO::fromArray([
+                'adminUserId' => $this->usuarioId,
+                'permissao' => $dados['novaPermissao'],
+                'tipo' => TipoConcessao::from($dados['novoTipo']),
+                'motivo' => $dados['novoMotivo'],
+                'expiraEm' => $dados['novaValidade'] !== '' ? $dados['novaValidade'] : null,
+            ]), Auth::guard('admin')->user());
+        } catch (AccessException $e) {
+            session()->flash('toast.error', $e->getMessage());
+
+            return;
+        }
+
+        unset($this->acessosExtras);
+        $this->cancelarFormAcesso();
+        session()->flash('toast.success', 'Acesso registrado.');
+    }
+
+    public function revogarAcessoExtra(int $grantId, RevogarAcessoDiretoAction $action): void
+    {
+        if ($this->usuarioId === null) {
+            return;
+        }
+
+        $alvo = AdminUser::findOrFail($this->usuarioId);
+        $this->authorize('gerenciarAcessos', $alvo);
+
+        $grant = PermissionGrant::where('admin_user_id', $this->usuarioId)->findOrFail($grantId);
+        $action->execute($grant, 'Revogado pela tela de edição do usuário.', Auth::guard('admin')->user());
+
+        unset($this->acessosExtras);
+        session()->flash('toast.success', 'Acesso revogado.');
+    }
+
+    /**
+     * Concessões/negações diretas vigentes do usuário.
+     *
+     * @return Collection<int, PermissionGrant>
+     */
+    #[Computed]
+    public function acessosExtras(): Collection
+    {
+        if ($this->usuarioId === null) {
+            return collect();
+        }
+
+        return PermissionGrant::query()
+            ->where('admin_user_id', $this->usuarioId)
+            ->vigentes()
+            ->with('permission')
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+    /**
+     * Permissões do catálogo para o seletor (rotuladas por módulo).
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    #[Computed]
+    public function permissoesParaSelect(): array
+    {
+        return Permission::query()
+            ->where('guard_name', 'admin')
+            ->orderBy('modulo')
+            ->orderBy('label')
+            ->get()
+            ->map(static function (Permission $permissao): array {
+                $modulo = $permissao->getAttribute('modulo');
+                $moduloLabel = is_string($modulo) ? (ModuloAcesso::tryFrom($modulo)?->label() ?? $modulo) : null;
+                $label = $permissao->getAttribute('label') ?? $permissao->name;
+
+                return [
+                    'value' => $permissao->name,
+                    'label' => $moduloLabel !== null ? "[{$moduloLabel}] {$label}" : $label,
+                ];
+            })
+            ->all();
+    }
+
+    public function render(HierarchyResolver $hierarchy): View
+    {
+        $ator = Auth::guard('admin')->user();
+        $rolesDisponiveis = $ator instanceof AdminUser
+            ? $hierarchy->rolesGerenciaveis($ator)
+            : collect();
+
         return view('livewire.admin.usuarios.form-usuario', [
-            'rolesDisponiveis' => Role::where('guard_name', 'admin')->orderBy('name')->get(),
+            'rolesDisponiveis' => $rolesDisponiveis,
             'modo' => $this->usuarioId === null ? 'criar' : 'editar',
         ]);
+    }
+
+    protected function resolverUsuario(): ?AdminUser
+    {
+        return $this->usuarioId !== null ? AdminUser::find($this->usuarioId) : null;
     }
 
     /**
@@ -85,18 +231,18 @@ class FormUsuario extends Component
             ? ['required', 'string', 'min:8', 'max:191']
             : ['nullable', 'string', 'min:8', 'max:191'];
 
+        $ator = Auth::guard('admin')->user();
+        $gerenciaveis = $ator instanceof AdminUser
+            ? app(HierarchyResolver::class)->rolesGerenciaveis($ator)->pluck('name')->all()
+            : [];
+
         return [
             'nome' => ['required', 'string', 'min:3', 'max:120'],
             'email' => ['required', 'string', 'email:rfc', 'max:191', Rule::unique('admin_users', 'email')->ignore($this->usuarioId)],
             'password' => $senhaRegra,
             'ativo' => ['boolean'],
             'roles' => ['array'],
-            'roles.*' => ['string', Rule::exists('roles', 'name')->where('guard_name', 'admin')],
+            'roles.*' => ['string', Rule::in($gerenciaveis)],
         ];
-    }
-
-    protected function resolverUsuario(): ?AdminUser
-    {
-        return $this->usuarioId !== null ? AdminUser::findOrFail($this->usuarioId) : null;
     }
 }
