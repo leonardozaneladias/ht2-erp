@@ -2,49 +2,55 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Enums\TipoConcessao;
+use App\Models\AdminUser;
+use App\Models\PermissionGrant;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "pest()" function to bind a different classes or traits.
-|
-*/
-
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
     ->in('Feature');
 
 pest()->extend(TestCase::class)
     ->in('Unit');
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Functions
-|--------------------------------------------------------------------------
-|
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
-|
-*/
+/**
+ * Cria um AdminUser de teste.
+ */
+function criarAdminUser(string $email = 'user@teste.com', bool $ativo = true): AdminUser
+{
+    return AdminUser::create([
+        'nome' => 'Usuário Teste',
+        'email' => $email,
+        'password' => Hash::make('password'),
+        'ativo' => $ativo,
+    ]);
+}
+
+/**
+ * Cria uma concessão ou negação direta de permissão para um usuário (guard admin).
+ */
+function concederAcessoDireto(
+    AdminUser $user,
+    string $permissao,
+    TipoConcessao $tipo,
+    ?string $expiraEm = null,
+): PermissionGrant {
+    $permission = Permission::query()
+        ->where('name', $permissao)
+        ->where('guard_name', 'admin')
+        ->firstOrFail();
+
+    return PermissionGrant::create([
+        'admin_user_id' => $user->id,
+        'permission_id' => $permission->id,
+        'type' => $tipo,
+        'reason' => 'teste',
+        'expires_at' => $expiraEm,
+    ]);
+}

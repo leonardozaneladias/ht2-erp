@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class AdminUser extends Authenticatable
@@ -30,6 +33,7 @@ class AdminUser extends Authenticatable
         'ativo',
         'last_login_at',
         'last_login_ip',
+        'perfil_ativo_role_id',
     ];
 
     protected $hidden = [
@@ -44,6 +48,24 @@ class AdminUser extends Authenticatable
             ->logOnlyDirty()
             ->dontLogEmptyChanges()
             ->useLogName('admin_users');
+    }
+
+    /**
+     * @return HasMany<PermissionGrant, $this>
+     */
+    public function permissionGrants(): HasMany
+    {
+        return $this->hasMany(PermissionGrant::class, 'admin_user_id');
+    }
+
+    /**
+     * Perfil (role) ativo opcional — lente de atuação do usuário.
+     *
+     * @return BelongsTo<Role, $this>
+     */
+    public function perfilAtivo(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'perfil_ativo_role_id');
     }
 
     protected function casts(): array
