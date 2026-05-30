@@ -114,6 +114,12 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
         Route::get('/{perfil}/editar', App\Livewire\Admin\Perfis\FormPerfil::class)->name('edit');
     });
 
+    Route::prefix('acesso')->name('acesso.')->group(function (): void {
+        Route::get('/matriz', App\Livewire\Admin\Acesso\MatrizPermissoes::class)->name('matriz');
+        Route::get('/simulador', App\Livewire\Admin\Acesso\SimuladorAcesso::class)->name('simulador');
+        Route::get('/historico', App\Livewire\Admin\Acesso\HistoricoAcesso::class)->name('historico');
+    });
+
     Route::prefix('auditoria')->name('auditoria.')->group(function (): void {
         Route::get('/', App\Livewire\Admin\Auditoria\IndexAuditoria::class)->name('index');
     });
