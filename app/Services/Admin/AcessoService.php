@@ -23,12 +23,17 @@ final class AcessoService
      */
     public function permissoesPorModulo(): Collection
     {
-        return Permission::query()
+        /** @var Collection<int, Permission> $permissoes */
+        $permissoes = Permission::query()
             ->where('guard_name', 'admin')
             ->orderBy('modulo')
             ->orderBy('label')
             ->get()
-            ->groupBy(fn (Permission $permissao): string => (string) ($permissao->getAttribute('modulo') ?? 'outros'));
+            ->values();
+
+        return $permissoes->groupBy(
+            fn (Permission $permissao): string => (string) ($permissao->getAttribute('modulo') ?? 'outros'),
+        );
     }
 
     /**

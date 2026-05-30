@@ -26,9 +26,6 @@ use Spatie\Permission\Models\Role;
  */
 final class AccessResolver
 {
-    /** @var array<int, ?string> */
-    private array $perfilAtivoMemo = [];
-
     public function __construct(
         private readonly AccessCache $cache,
         private readonly PermissionRegistry $registry,
@@ -183,23 +180,14 @@ final class AccessResolver
      *
      * @param  list<string>  $rolesDoUsuario
      */
+    /**
+     * Nome da role ativa (lente). Lido da sessão a cada chamada para refletir a
+     * troca de chapéu no mesmo request. Só vale para o próprio usuário logado.
+     *
+     * @param  list<string>  $rolesDoUsuario
+     */
     private function perfilAtivoNome(AdminUser $user, array $rolesDoUsuario): ?string
     {
-        $uid = (int) $user->getKey();
-
-        if (! array_key_exists($uid, $this->perfilAtivoMemo)) {
-            $this->perfilAtivoMemo[$uid] = $this->resolverPerfilAtivoNome($user);
-        }
-
-        $nome = $this->perfilAtivoMemo[$uid];
-
-        return $nome !== null && in_array($nome, $rolesDoUsuario, true) ? $nome : null;
-    }
-
-    private function resolverPerfilAtivoNome(AdminUser $user): ?string
-    {
-        // A lente de perfil ativo só se aplica ao próprio usuário logado.
-        // Em console/sem login, Auth retorna null e não há restrição.
         $logadoId = Auth::guard('admin')->id();
 
         if ($logadoId === null || (int) $user->getKey() !== (int) $logadoId) {
@@ -217,7 +205,7 @@ final class AccessResolver
             ->where('guard_name', 'admin')
             ->value('name');
 
-        return is_string($nome) ? $nome : null;
+        return is_string($nome) && in_array($nome, $rolesDoUsuario, true) ? $nome : null;
     }
 
     private function grantDecisor(AdminUser $user, string $ability, TipoConcessao $tipo): ?PermissionGrant

@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Usuarios;
 
+use App\Actions\Admin\AtribuirPerfilEmMassaAction;
+use App\Actions\Admin\BulkUserStatusAction;
 use App\Actions\Admin\ToggleAdminUserStatusAction;
+use App\DTOs\Admin\AtribuicaoPerfilMassaDTO;
+use App\Exceptions\AccessException;
 use App\Models\AdminUser;
 use App\Services\Admin\AdminUserService;
+use App\Services\Admin\HierarchyResolver;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -50,11 +55,6 @@ class IndexUsuarios extends Component
         $this->authorize('viewAny', AdminUser::class);
     }
 
-    public function updatedSelecionarPagina(bool $valor): void
-    {
-        $this->selecionados = $valor ? $this->idsDaPagina() : [];
-    }
-
     public function updatingBusca(): void
     {
         $this->resetPage();
@@ -68,6 +68,11 @@ class IndexUsuarios extends Component
     public function updatingRole(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedSelecionarPagina(bool $valor): void
+    {
+        $this->selecionados = $valor ? $this->idsDaPagina() : [];
     }
 
     public function ordenarPor(string $coluna): void
@@ -206,16 +211,16 @@ class IndexUsuarios extends Component
      */
     protected function idsDaPagina(): array
     {
-        return app(AdminUserService::class)
-            ->listarPaginado([
-                'busca' => $this->busca,
-                'status' => $this->status,
-                'role' => $this->role,
-                'sort' => $this->sort,
-                'dir' => $this->dir,
-            ])
-            ->pluck('id')
-            ->map(static fn ($id): int => (int) $id)
+        $paginator = app(AdminUserService::class)->listarPaginado([
+            'busca' => $this->busca,
+            'status' => $this->status,
+            'role' => $this->role,
+            'sort' => $this->sort,
+            'dir' => $this->dir,
+        ]);
+
+        return collect($paginator->items())
+            ->map(static fn (AdminUser $usuario): int => (int) $usuario->getKey())
             ->all();
     }
 }

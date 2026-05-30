@@ -78,9 +78,11 @@ it('perfisAtribuiveis exclui a role super-admin para um gestor', function () {
     $gestor->assignRole('gestor');
 
     $component = Livewire::actingAs($gestor, 'admin')->test(IndexUsuarios::class);
-    $valores = collect($component->get('perfisAtribuiveis'))->pluck('value')->all();
+    $perfis = $component->get('perfisAtribuiveis');
+    $valores = array_column(is_array($perfis) ? $perfis : [], 'value');
 
     expect($valores)->toContain('analista');
     expect($valores)->not->toContain('super-admin');
+    expect($valores)->not->toContain('gestor');
     expect($valores)->not->toContain('gestor');
 });

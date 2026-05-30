@@ -49,7 +49,7 @@
                 <div
                     class="border-primary/25 bg-primary/8 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3"
                 >
-                    <span class="text-sm font-medium"> {{ count($selecionados) }} selecionado(s) </span>
+                    <span class="text-sm font-medium">{{ count($selecionados) }} selecionado(s)</span>
                     <div class="flex flex-wrap items-center gap-2">
                         <div class="w-48">
                             <x-shared.select
