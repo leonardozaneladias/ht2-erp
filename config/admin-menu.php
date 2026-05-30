@@ -15,7 +15,7 @@ return [
         ],
     ],
     [
-        'title' => 'Configurações',
+        'title' => 'Controle de Acesso',
         'items' => [
             [
                 'label' => 'Usuários admin',

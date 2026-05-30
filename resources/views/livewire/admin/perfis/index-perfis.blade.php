@@ -42,7 +42,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4">
+                                <td colspan="5">
                                     <x-shared.empty-state
                                         icon="tabler--shield-lock"
                                         title="Nenhum perfil cadastrado"
