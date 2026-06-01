@@ -48,20 +48,22 @@
         <x-admin.topbar />
         <x-admin.sidebar />
 
-        <div class="content-page">
-            <div class="container-fluid">
-                @if (filled($title))
-                    <x-admin.page-header :title="$title" :subtitle="$subtitle" :breadcrumbs="$breadcrumbs">
-                        @isset ($actions)
-                            <x-slot:actions>
-                                {{ $actions }}
-                            </x-slot:actions>
-                        @endisset
-                    </x-admin.page-header>
-                @endif
+        <div class="page-content">
+            <main>
+                <div class="container-fluid">
+                    @if (filled($title))
+                        <x-admin.page-header :title="$title" :subtitle="$subtitle" :breadcrumbs="$breadcrumbs">
+                            @isset ($actions)
+                                <x-slot:actions>
+                                    {{ $actions }}
+                                </x-slot:actions>
+                            @endisset
+                        </x-admin.page-header>
+                    @endif
 
-                {{ $slot }}
-            </div>
+                    {{ $slot }}
+                </div>
+            </main>
 
             <x-admin.footer />
         </div>
