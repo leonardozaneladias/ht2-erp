@@ -27,6 +27,15 @@ final class Login extends Component
     {
         if (Auth::guard('admin')->check()) {
             $this->redirect(route('admin.dashboard'), navigate: true);
+
+            return;
+        }
+
+        // Conveniência de desenvolvimento: pré-preenche o login do super-admin
+        // semeado. Restrito ao ambiente local — nunca em produção.
+        if (app()->isLocal()) {
+            $this->email = 'admin@example.com';
+            $this->password = 'password';
         }
     }
 
