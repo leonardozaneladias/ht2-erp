@@ -19,7 +19,7 @@
 @endphp
 
 <div class="mb-4">
-    <label class="inline-flex cursor-pointer items-start gap-3">
+    <label class="group inline-flex cursor-pointer items-start gap-3">
         <input
             id="{{ $fieldId }}"
             name="{{ $name }}"
@@ -27,7 +27,8 @@
             value="{{ $value }}"
             {{
 $attributes->class([
-                'form-checkbox mt-0.5 rounded text-primary focus:ring-primary',
+                'form-checkbox mt-0.5 rounded transition-all duration-150 ease-out',
+                'hover:border-default-500 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-card',
                 'border-danger!' => $hasError,
             ])
 }}
@@ -38,7 +39,13 @@ $attributes->class([
 
         @if ($label)
             <span class="min-w-0">
-                <span class="text-body-color block text-sm font-medium">{{ $label }}</span>
+                <span
+                    class="text-body-color group-hover:text-default-900 block text-sm font-medium select-none"
+                    >{{ $label }}</span
+                >
+                @if ($hint)
+                    <small class="text-default-400 mt-0.5 block text-xs" id="{{ $hintId }}">{{ $hint }}</small>
+                @endif
             </span>
         @endif
     </label>
@@ -47,7 +54,7 @@ $attributes->class([
         <small class="text-danger mt-1 block text-xs" id="{{ $errorId }}">{{ $viewErrors->first($errorKey) }}</small>
     @endif
 
-    @if ($hint)
+    @if ($hint && ! $label)
         <small class="text-default-400 mt-1 block text-xs" id="{{ $hintId }}">{{ $hint }}</small>
     @endif
 </div>

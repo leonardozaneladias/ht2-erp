@@ -59,7 +59,8 @@
         name="{{ $name }}"
         {{
 $attributes->class([
-            'form-input',
+            'form-select cursor-pointer transition-all duration-150 ease-out',
+            'focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1 focus-visible:ring-offset-card',
             'border-danger!' => $hasError,
         ])
 }}
