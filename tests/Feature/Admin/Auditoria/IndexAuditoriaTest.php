@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Actions\Admin\CreateAdminUserAction;
 use App\DTOs\Admin\AdminUserDTO;
+use App\Livewire\Admin\Auditoria\AuditoriaTable;
 use App\Livewire\Admin\Auditoria\IndexAuditoria;
 use App\Models\AdminUser;
 use Database\Seeders\RolePermissionSeeder;
@@ -35,7 +36,7 @@ it('lista eventos do activity log para super-admin', function () {
         password: 'senhaforte',
     ));
 
-    Livewire::test(IndexAuditoria::class)
+    Livewire::test(AuditoriaTable::class)
         ->assertOk()
         ->assertSee('admin_users')
         ->assertSee('created');

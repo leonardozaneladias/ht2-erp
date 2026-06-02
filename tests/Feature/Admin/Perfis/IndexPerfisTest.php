@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Perfis\IndexPerfis;
+use App\Livewire\Admin\Perfis\PerfisTable;
 use App\Models\AdminUser;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,9 +23,16 @@ beforeEach(function () {
     $this->admin->assignRole('super-admin');
 });
 
-it('lista perfis existentes', function () {
+it('renderiza a página de perfis com cabeçalho', function () {
     Livewire::actingAs($this->admin, 'admin')
         ->test(IndexPerfis::class)
+        ->assertOk()
+        ->assertSee('Perfis e permissões');
+});
+
+it('lista perfis existentes', function () {
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(PerfisTable::class)
         ->assertOk()
         ->assertSee('super-admin')
         ->assertSee('gestor');
