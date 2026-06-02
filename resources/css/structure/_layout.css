@@ -44,7 +44,7 @@
 }
 
 .page-title-head {
-    @apply h-10 flex items-center flex-wrap gap-2 md:justify-between bg-[#fbfbfd] dark:bg-[#22232c] -mx-5 mb-5 px-5 border-default-300 border-b;
+    @apply bg-[#fbfbfd] dark:bg-[#22232c] -mx-5 px-5 py-4 border-default-300 border-b;
 }
 
 html[data-theme="dark"],

@@ -9,7 +9,6 @@
 
     $resolvedBreadcrumbs = collect(is_array($breadcrumbs) ? $breadcrumbs : [
         ['label' => 'Admin', 'url' => route('admin.dashboard')],
-        filled($subtitle) ? ['label' => $subtitle] : null,
         ['label' => $title, 'current' => true],
     ])
         ->filter()
@@ -23,6 +22,10 @@
     <div class="page-title-head mb-6 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div class="min-w-0">
             <h4 class="page-main-title">{{ $title }}</h4>
+
+            @if (filled($subtitle))
+                <p class="text-default-500 mt-1 text-sm">{{ $subtitle }}</p>
+            @endif
         </div>
 
         <div class="flex flex-col gap-3 xl:items-end">
