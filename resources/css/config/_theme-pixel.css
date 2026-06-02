@@ -99,7 +99,7 @@ html[data-skin="pixel"] {
 
     /* Image Menu */
     &[data-menu-color="image"] {
-        --sidenav-bg: linear-gradient(to bottom right, rgba(16, 16, 30, 0.85), #8e7fe0), url("/images/sidenav-bg.jpg") center/cover no-repeat;
+        --sidenav-bg: linear-gradient(to bottom right, rgba(16, 16, 30, 0.85), #8e7fe0), url("../images/sidenav-bg.jpg") center/cover no-repeat;
         --sidenav-border-color: null;
         --sidenav-item-color: #9195c1;
         --sidenav-item-hover-color: #bccee4;

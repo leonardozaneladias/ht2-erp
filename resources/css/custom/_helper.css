@@ -1,5 +1,9 @@
 /* _helper.css */
 
+.bg-auth-hero {
+    background-image: url("../images/auth.jpg");
+}
+
 .animate-grow {
     opacity: 0;
     animation: 0.75s linear infinite spinner-grow;

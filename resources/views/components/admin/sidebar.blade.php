@@ -72,7 +72,7 @@
 
     <div class="relative min-h-0 grow">
         <div class="size-full" data-simplebar>
-            <div class="sidenav-user bg-[url('/images/user-bg-pattern.svg')] p-5" id="user-profile-settings">
+            <div class="sidenav-user p-5" id="user-profile-settings">
                 <div class="flex items-center justify-between gap-3">
                     <div class="min-w-0">
                         <a class="link-reset block" href="{{ route('admin.perfil.show') }}">

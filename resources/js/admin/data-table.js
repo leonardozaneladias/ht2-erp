@@ -18,13 +18,17 @@ window.$ = window.jQuery = $;
 window.JSZip = JSZip;
 window.pdfMake = pdfMake;
 
-DataTable.Buttons.jszip(JSZip);
+// O export HTML5 do Buttons resolve JSZip/pdfMake via window.* (fallback interno),
+// entao os setters abaixo sao apenas reforco. Guardamos com optional chaining: se a
+// extensao Buttons nao estiver acoplada a esta instancia do DataTable, no maximo o
+// export degrada — nunca derruba o admin.js inteiro com TypeError.
+DataTable.Buttons?.jszip?.(JSZip);
 
 const pdfVfs = pdfFonts?.default?.pdfMake?.vfs || pdfFonts?.default?.vfs || pdfFonts?.pdfMake?.vfs || pdfFonts?.vfs;
 
 if (pdfVfs) {
   pdfMake.vfs = pdfVfs;
-  DataTable.Buttons.pdfMake(pdfMake);
+  DataTable.Buttons?.pdfMake?.(pdfMake);
 }
 
 const DATATABLE_LANGUAGE = {

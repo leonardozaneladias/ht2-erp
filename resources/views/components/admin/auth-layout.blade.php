@@ -28,9 +28,7 @@
         <div class="flex h-full w-full">
             {{-- Painel esquerdo: hero (oculto no mobile) --}}
             <div class="hidden w-full md:block">
-                <div
-                    class="relative h-full overflow-hidden bg-[url('/images/auth.jpg')] bg-cover bg-center bg-no-repeat"
-                >
+                <div class="bg-auth-hero relative h-full overflow-hidden bg-cover bg-center bg-no-repeat">
                     <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-9">
                         <img

@@ -43,7 +43,7 @@ html[data-menu-color="gradient"] {
 
 /* Image Menu */
 html[data-menu-color="image"] {
-    --sidenav-bg: linear-gradient(to bottom right, rgba(16, 16, 30, 0.85), #183c52), url("/images/sidenav-bg.jpg") center/cover no-repeat;
+    --sidenav-bg: linear-gradient(to bottom right, rgba(16, 16, 30, 0.85), #183c52), url("../images/sidenav-bg.jpg") center/cover no-repeat;
     --sidenav-border-color: null;
     --sidenav-item-color: #799cb7;
     --sidenav-item-hover-color: #bccee4;

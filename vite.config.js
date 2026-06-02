@@ -10,6 +10,14 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  resolve: {
+    // Colapsa todas as referencias a estes pacotes numa unica instancia.
+    // Sem isso, datatables.net-dt (core 2.3.3 aninhado) e as extensoes Buttons
+    // (core 2.3.4 hoisted) acabam em objetos DataTable distintos: a extensao
+    // acopla `.Buttons` numa instancia e o `new DataTable()` usa a outra,
+    // derrubando o export (jszip/pdfMake) e o admin.js inteiro.
+    dedupe: ['jquery', 'datatables.net'],
+  },
   build: {
     chunkSizeWarningLimit: 2500,
     rollupOptions: {

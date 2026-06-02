@@ -13,7 +13,6 @@
 @import "@simonwep/pickr/dist/themes/monolith.min.css";
 @import "@simonwep/pickr/dist/themes/nano.min.css";
 @import "@sjmc11/tourguidejs/dist/css/tour.min.css";
-@import "animate.css/animate.min.css";
 @import "choices.js/public/assets/styles/choices.min.css";
 @import "datatables.net-dt/css/dataTables.dataTables.css";
 @import "datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css";
@@ -30,7 +29,6 @@
 @import "jsvectormap/dist/jsvectormap.min.css";
 @import "ladda/dist/ladda.min.css";
 @import "nouislider/dist/nouislider.min.css";
-@import "plyr/dist/plyr.css";
 @import "quill/dist/quill.bubble.css";
 @import "quill/dist/quill.core.css";
 @import "quill/dist/quill.snow.css";
@@ -40,6 +38,14 @@
 
 /* ========= Tailwind CSS ========= */
 @import "tailwindcss";
+
+/* Restringir o scan do Tailwind ao Blade-fonte. Excluir:
+   - docs/: exemplos .md com classes arbitrarias (ex.: bg-[url('/images/...')])
+     que gerariam utilitarios e referencias a assets inexistentes;
+   - storage/framework/views/: views Blade compiladas (cache derivado do fonte),
+     que podem reintroduzir classes obsoletas. */
+@source not "../../docs";
+@source not "../../storage";
 
 /* ========= Tailwind Plugin ========= */
 @plugin "@tailwindcss/typography";
