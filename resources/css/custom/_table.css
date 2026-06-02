@@ -107,6 +107,12 @@
                 }
             }
         }
+
+        &.table-sticky {
+            thead th {
+                @apply bg-card sticky top-0 z-10;
+            }
+        }
     }
 
     /* Table select */

@@ -9,6 +9,7 @@ use App\Actions\Admin\BulkUserStatusAction;
 use App\Actions\Admin\ToggleAdminUserStatusAction;
 use App\DTOs\Admin\AtribuicaoPerfilMassaDTO;
 use App\Exceptions\AccessException;
+use App\Livewire\Concerns\WithDataTable;
 use App\Models\AdminUser;
 use App\Services\Admin\AdminUserService;
 use App\Services\Admin\HierarchyResolver;
@@ -20,7 +21,6 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
-use Livewire\WithPagination;
 use RuntimeException;
 use Spatie\Permission\Models\Role;
 
@@ -28,10 +28,7 @@ use Spatie\Permission\Models\Role;
 #[Title('Usuários admin')]
 class IndexUsuarios extends Component
 {
-    use WithPagination;
-
-    #[Url(as: 'q', except: '')]
-    public string $busca = '';
+    use WithDataTable;
 
     #[Url(as: 'status', except: '')]
     public string $status = '';
@@ -39,25 +36,15 @@ class IndexUsuarios extends Component
     #[Url(as: 'role', except: '')]
     public string $role = '';
 
-    public string $sort = 'nome';
-
-    public string $dir = 'asc';
-
-    /** @var array<int, int> IDs selecionados para ações em massa. */
-    public array $selecionados = [];
-
-    public bool $selecionarPagina = false;
-
     public string $perfilEmMassa = '';
 
     public function mount(): void
     {
         $this->authorize('viewAny', AdminUser::class);
-    }
 
-    public function updatingBusca(): void
-    {
-        $this->resetPage();
+        if ($this->sort === '') {
+            $this->sort = 'nome';
+        }
     }
 
     public function updatingStatus(): void
@@ -68,23 +55,6 @@ class IndexUsuarios extends Component
     public function updatingRole(): void
     {
         $this->resetPage();
-    }
-
-    public function updatedSelecionarPagina(bool $valor): void
-    {
-        $this->selecionados = $valor ? $this->idsDaPagina() : [];
-    }
-
-    public function ordenarPor(string $coluna): void
-    {
-        if ($this->sort === $coluna) {
-            $this->dir = $this->dir === 'asc' ? 'desc' : 'asc';
-
-            return;
-        }
-
-        $this->sort = $coluna;
-        $this->dir = 'asc';
     }
 
     public function alternarStatus(int $id, ToggleAdminUserStatusAction $action): void
@@ -209,7 +179,7 @@ class IndexUsuarios extends Component
     /**
      * @return array<int, int>
      */
-    protected function idsDaPagina(): array
+    protected function idsDaPaginaAtual(): array
     {
         $paginator = app(AdminUserService::class)->listarPaginado([
             'busca' => $this->busca,

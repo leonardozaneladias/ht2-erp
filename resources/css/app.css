@@ -14,11 +14,6 @@
 @import "@simonwep/pickr/dist/themes/nano.min.css";
 @import "@sjmc11/tourguidejs/dist/css/tour.min.css";
 @import "choices.js/public/assets/styles/choices.min.css";
-@import "datatables.net-dt/css/dataTables.dataTables.css";
-@import "datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.css";
-@import "datatables.net-fixedheader-dt/css/fixedHeader.dataTables.css";
-@import "datatables.net-responsive-dt/css/responsive.dataTables.css";
-@import "datatables.net-select-dt/css/select.dataTables.css";
 @import "daterangepicker/daterangepicker.css";
 @import "dropzone/dist/dropzone.css";
 @import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
@@ -101,7 +96,6 @@
 @import "./plugins/_apexcharts.css";
 @import "./plugins/_calendar.css";
 @import "./plugins/_colorpicker.css";
-@import "./plugins/_datatables.css";
 @import "./plugins/_daterangepicker.css";
 @import "./plugins/_dropzone.css";
 @import "./plugins/_filepond.css";

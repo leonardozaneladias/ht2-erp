@@ -76,14 +76,6 @@
     "chart.js": "^4.5.1",
     "choices.js": "^11.1.0",
     "clipboard": "^2.0.11",
-    "datatables.net": "2.3.3",
-    "datatables.net-buttons-dt": "^3.2.5",
-    "datatables.net-dt": "2.3.3",
-    "datatables.net-fixedcolumns-dt": "^5.0.4",
-    "datatables.net-fixedheader-dt": "^4.0.3",
-    "datatables.net-keytable-dt": "^2.12.1",
-    "datatables.net-responsive-dt": "^3.0.6",
-    "datatables.net-select-dt": "^3.1.0",
     "daterangepicker": "^3.1.0",
     "dayjs": "^1.11.19",
     "diff": "^8.0.3",
@@ -99,10 +91,8 @@
     "glightbox": "^3.3.1",
     "inputmask": "^5.0.9",
     "isomorphic-dompurify": "^3.10.0",
-    "jquery": "3.7.1",
     "jstree": "^3.3.17",
     "jsvectormap": "^1.7.0",
-    "jszip": "^3.10.1",
     "ladda": "1.0.6",
     "leaflet": "^1.9.4",
     "lucide": "^1.11.0",
@@ -111,7 +101,6 @@
     "muuri": "^0.9.5",
     "nouislider": "^15.8.1",
     "pdfjs-dist": "2.16.105",
-    "pdfmake": "^0.2.20",
     "plyr": "^3.8.4",
     "preline": "4.0.1",
     "prismjs": "^1.30.0",
@@ -126,9 +115,6 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-arm64-gnu": "^4.60.2"
-  },
-  "overrides": {
-    "datatables.net": "2.3.3"
   },
   "config": {
     "commitizen": {

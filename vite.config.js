@@ -10,14 +10,6 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
-  resolve: {
-    // Colapsa todas as referencias a estes pacotes numa unica instancia.
-    // Sem isso, datatables.net-dt (core 2.3.3 aninhado) e as extensoes Buttons
-    // (core 2.3.4 hoisted) acabam em objetos DataTable distintos: a extensao
-    // acopla `.Buttons` numa instancia e o `new DataTable()` usa a outra,
-    // derrubando o export (jszip/pdfMake) e o admin.js inteiro.
-    dedupe: ['jquery', 'datatables.net'],
-  },
   build: {
     chunkSizeWarningLimit: 2500,
     rollupOptions: {
@@ -27,11 +19,8 @@ export default defineConfig({
 
           if (id.includes('apexcharts')) return 'vendor-charts';
           if (id.includes('moment')) return 'vendor-moment';
-          if (id.includes('datatables') || id.includes('jquery')) return 'vendor-datatables';
           if (id.includes('flatpickr') || id.includes('choices') || id.includes('sortablejs')) return 'vendor-forms';
           if (id.includes('preline')) return 'vendor-preline';
-          if (id.includes('pdfmake')) return 'vendor-pdfmake';
-          if (id.includes('jszip')) return 'vendor-jszip';
           if (id.includes('sweetalert2')) return 'vendor-sweetalert';
           if (id.includes('dropzone') || id.includes('inputmask')) return 'vendor-forms';
 

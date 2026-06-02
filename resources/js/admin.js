@@ -13,7 +13,6 @@ import './admin/sidebar';
 import './admin/toast';
 import './admin/confirm';
 import './admin/forms';
-import './admin/data-table';
 import './admin/sortable';
 import './admin/charts';
 import './admin/copy';
