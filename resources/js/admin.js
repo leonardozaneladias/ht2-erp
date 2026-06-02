@@ -1,6 +1,10 @@
 import 'preline';
 import 'simplebar';
 
+// Livewire PowerGrid — bundle pre-compilado (self-contained, registra os
+// helpers Alpine pgRenderActions/pgRowAttributes/etc. no alpine:init).
+import '../../vendor/power-components/livewire-powergrid/dist/powergrid.js';
+
 // Folhas vendor com `@charset "UTF-8";` no topo. Importadas via JS (pipeline do
 // Vite) em vez de @import no CSS do Tailwind, para o @charset ser tratado pelo
 // Vite e nao gerar warning no lightningcss interno do Tailwind.

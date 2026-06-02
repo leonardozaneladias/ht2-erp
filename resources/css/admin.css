@@ -1,1 +1,44 @@
 @import "./app.css";
+
+/* =========================================================================
+   Livewire PowerGrid (Tailwind CSS 4)
+   -------------------------------------------------------------------------
+   Importamos apenas os estilos base do PowerGrid (NAO o vendor/tailwind4.css
+   inteiro), porque aquele arquivo re-importa o "tailwindcss" e fixa
+   @custom-variant dark (.dark) — o que duplicaria o engine e conflitaria com
+   o dark mode deste projeto, que e via html[data-theme="dark"].
+   ========================================================================= */
+@import "../../vendor/power-components/livewire-powergrid/resources/css/base.css";
+@import "../../vendor/power-components/livewire-powergrid/resources/css/editable.css";
+
+/* dark mode deste projeto = atributo data-theme (nao a classe .dark) */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Tailwind precisa escanear as classes do PowerGrid, do tema e dos grids */
+@source "../../vendor/power-components/livewire-powergrid/src/Themes/Tailwind.php";
+@source "../../vendor/power-components/livewire-powergrid/resources/views/**/*.php";
+@source "../../app/Livewire/Admin/**/*Table.php";
+@source "../../app/PowerGridThemes/*.php";
+
+/* Tokens do PowerGrid casados com a paleta Inspinia.
+   pg-primary e uma rampa NEUTRA fixa (50=claro -> 950=escuro): o PowerGrid
+   escolhe o passo claro no light e o escuro via dark: (ex.: thead usa
+   bg-pg-primary-100 dark:bg-pg-primary-900). Valores espelham os cinzas
+   claros e as superficies escuras do Inspinia (resources/css/config/_root.css). */
+@theme {
+    --color-pg-primary-50: #f9fafb;
+    --color-pg-primary-100: #eef2f7;
+    --color-pg-primary-200: #e7e9eb;
+    --color-pg-primary-300: #cdd2d9;
+    --color-pg-primary-400: #9ba6b7;
+    --color-pg-primary-500: #6c757d;
+    --color-pg-primary-600: #495057;
+    --color-pg-primary-700: #313a46;
+    --color-pg-primary-800: #272832;
+    --color-pg-primary-900: #22232c;
+    --color-pg-primary-950: #1b1c23;
+
+    /* acento da marca (focus ring / checkbox do PowerGrid) = primary Inspinia */
+    --color-primary-500: #1ab394;
+    --color-primary-600: #15997f;
+}

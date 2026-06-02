@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Usuarios\IndexUsuarios;
+use App\Livewire\Admin\Usuarios\UsuariosTable;
 use App\Models\AdminUser;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,12 +29,22 @@ function criarAdmin(string $role = 'super-admin', array $overrides = []): AdminU
     return $admin;
 }
 
+it('renderiza a página de listagem com cabeçalho e ação de criar', function () {
+    $admin = criarAdmin('super-admin');
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(IndexUsuarios::class)
+        ->assertOk()
+        ->assertSee('Usuários admin')
+        ->assertSee('Novo usuário');
+});
+
 it('lista usuários para super-admin', function () {
     $admin = criarAdmin('super-admin');
     criarAdmin('gestor', ['nome' => 'Maria Gestora']);
 
     Livewire::actingAs($admin, 'admin')
-        ->test(IndexUsuarios::class)
+        ->test(UsuariosTable::class)
         ->assertOk()
         ->assertSee($admin->email)
         ->assertSee('Maria Gestora');
@@ -45,8 +56,8 @@ it('filtra por busca no nome', function () {
     criarAdmin('gestor', ['nome' => 'Pedro Oliveira']);
 
     Livewire::actingAs($admin, 'admin')
-        ->test(IndexUsuarios::class)
-        ->set('busca', 'João')
+        ->test(UsuariosTable::class)
+        ->set('search', 'João')
         ->assertSee('João Silva')
         ->assertDontSee('Pedro Oliveira');
 });
@@ -57,8 +68,8 @@ it('filtra por status inativo', function () {
     criarAdmin('gestor', ['nome' => 'Inativo Dois', 'ativo' => false]);
 
     Livewire::actingAs($admin, 'admin')
-        ->test(IndexUsuarios::class)
-        ->set('status', 'inativo')
+        ->test(UsuariosTable::class)
+        ->set('filters', ['boolean' => ['ativo' => 'false']])
         ->assertSee('Inativo Dois')
         ->assertDontSee('Ativo Um');
 });

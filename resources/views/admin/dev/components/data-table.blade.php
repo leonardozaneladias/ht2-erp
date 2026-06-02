@@ -1,6 +1,6 @@
 @extends ('admin.dev.components.shell', [
     'title' => 'Preview • x-admin.table',
-    'description' => 'Tabela nativa Livewire: subcomponentes (toolbar, th-sort, bulk-bar, table) + o trait WithDataTable. Substitui o antigo DataTables (jQuery).',
+    'description' => 'Tabela nativa Livewire: subcomponentes (toolbar, th-sort, bulk-bar, table). Usada em telas mais simples; para grids ricos (filtros, export, bulk) o projeto usa o PowerGrid.',
 ])
 
 @php
@@ -14,10 +14,15 @@
 @section ('preview')
     <div class="grid gap-6">
         <x-shared.alert variant="info" icon="tabler--info-circle">
-            Esta é uma demonstração estática do <strong>chrome</strong> da tabela. A versão interativa (ordenação,
-            busca, seleção e paginação reativas) vive nas telas Livewire reais — veja
-            <a class="text-primary font-medium underline" href="{{ route('admin.usuarios.index') }}">Usuários admin</a>.
-            Os componentes consomem o trait <code>App\Livewire\Concerns\WithDataTable</code>.
+            Esta é uma demonstração estática do <strong>chrome</strong> da tabela nativa. A versão interativa vive em
+            telas Livewire como
+            <a class="text-primary font-medium underline" href="{{ route('admin.perfis.index') }}">Perfis</a>
+            e
+            <a class="text-primary font-medium underline" href="{{ route('admin.auditoria.index') }}"
+                >Logs de auditoria</a
+            >. Para grids ricos (filtros avançados, export, ações em massa), veja
+            <a class="text-primary font-medium underline" href="{{ route('admin.usuarios.index') }}">Usuários admin</a>
+            (PowerGrid).
         </x-shared.alert>
 
         <x-shared.card title="Tabela completa" subtitle="toolbar + th-sort + bulk-bar + table">

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Actions\Admin\ToggleAdminUserStatusAction;
-use App\Livewire\Admin\Usuarios\IndexUsuarios;
+use App\Livewire\Admin\Usuarios\UsuariosTable;
 use App\Models\AdminUser;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,7 +34,7 @@ it('alterna status do usuário e grava activity log', function () {
     $alvo->assignRole('gestor');
 
     Livewire::actingAs($this->admin, 'admin')
-        ->test(IndexUsuarios::class)
+        ->test(UsuariosTable::class)
         ->call('alternarStatus', $alvo->id)
         ->assertHasNoErrors();
 

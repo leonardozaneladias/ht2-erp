@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Usuarios\IndexUsuarios;
+use App\Livewire\Admin\Usuarios\UsuariosTable;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -23,8 +23,8 @@ it('atribui perfil em massa aos usuários selecionados', function () {
     $b = criarAdminUser('b@teste.com');
 
     Livewire::actingAs($this->admin, 'admin')
-        ->test(IndexUsuarios::class)
-        ->set('selecionados', [$a->id, $b->id])
+        ->test(UsuariosTable::class)
+        ->set('checkboxValues', [$a->id, $b->id])
         ->set('perfilEmMassa', 'gestor')
         ->call('atribuirPerfilEmMassa')
         ->assertHasNoErrors();
@@ -38,8 +38,8 @@ it('desativa usuários em massa', function () {
     $b = criarAdminUser('b@teste.com');
 
     Livewire::actingAs($this->admin, 'admin')
-        ->test(IndexUsuarios::class)
-        ->set('selecionados', [$a->id, $b->id])
+        ->test(UsuariosTable::class)
+        ->set('checkboxValues', [$a->id, $b->id])
         ->call('alternarStatusEmMassa', false)
         ->assertHasNoErrors();
 
@@ -51,22 +51,10 @@ it('limpa a seleção ao concluir a ação', function () {
     $a = criarAdminUser('a@teste.com');
 
     Livewire::actingAs($this->admin, 'admin')
-        ->test(IndexUsuarios::class)
-        ->set('selecionados', [$a->id])
+        ->test(UsuariosTable::class)
+        ->set('checkboxValues', [$a->id])
         ->call('alternarStatusEmMassa', false)
-        ->assertSet('selecionados', []);
-});
-
-it('selecionar página preenche os IDs da página atual', function () {
-    criarAdminUser('a@teste.com');
-    criarAdminUser('b@teste.com');
-
-    $component = Livewire::actingAs($this->admin, 'admin')
-        ->test(IndexUsuarios::class)
-        ->set('selecionarPagina', true);
-
-    // admin + 2 = 3 usuários na página
-    expect($component->get('selecionados'))->toHaveCount(3);
+        ->assertSet('checkboxValues', []);
 });
 
 it('perfisAtribuiveis exclui a role super-admin para um gestor', function () {
@@ -77,12 +65,11 @@ it('perfisAtribuiveis exclui a role super-admin para um gestor', function () {
     $gestor = criarAdminUser('g@teste.com');
     $gestor->assignRole('gestor');
 
-    $component = Livewire::actingAs($gestor, 'admin')->test(IndexUsuarios::class);
+    $component = Livewire::actingAs($gestor, 'admin')->test(UsuariosTable::class);
     $perfis = $component->get('perfisAtribuiveis');
     $valores = array_column(is_array($perfis) ? $perfis : [], 'value');
 
     expect($valores)->toContain('analista');
     expect($valores)->not->toContain('super-admin');
-    expect($valores)->not->toContain('gestor');
     expect($valores)->not->toContain('gestor');
 });
