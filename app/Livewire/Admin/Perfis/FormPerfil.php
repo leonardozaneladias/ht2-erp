@@ -90,7 +90,7 @@ class FormPerfil extends Component
         return view('livewire.admin.perfis.form-perfil', [
             'permissoesAgrupadas' => $permissoesAgrupadas,
             'modo' => $this->perfilId === null ? 'criar' : 'editar',
-        ]);
+        ])->title($this->perfilId === null ? 'Novo perfil' : 'Editar perfil');
     }
 
     /**

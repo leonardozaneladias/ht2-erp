@@ -214,7 +214,7 @@ class FormUsuario extends Component
         return view('livewire.admin.usuarios.form-usuario', [
             'rolesDisponiveis' => $rolesDisponiveis,
             'modo' => $this->usuarioId === null ? 'criar' : 'editar',
-        ]);
+        ])->title($this->usuarioId === null ? 'Novo usuário admin' : 'Editar usuário admin');
     }
 
     protected function resolverUsuario(): ?AdminUser
