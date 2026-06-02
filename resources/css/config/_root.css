@@ -1,6 +1,6 @@
 @theme {
-    --font-body: "Open Sans", sans-serif;
-    --font-secondary: "Open Sans", sans-serif;
+    --font-body: "Inter", "Open Sans", sans-serif;
+    --font-secondary: "Inter", "Open Sans", sans-serif;
 
     --text-body: 0.8125rem;
 
@@ -64,14 +64,15 @@
 
     --tw-shadow: var(--shadow);
 
-    --shadow: 0px 1px 4px 0px rgba(130, 143, 163, 0.15);
-    --shadow-lg: 0 0.25rem 1rem rgba(76, 76, 92, 0.2);
-    --shadow-sm: 0 0.0625rem 0.125rem rgba(76, 76, 92, 0.15);
-    --inset-shadow: inset 0 1px 2px rgba(76, 76, 92, 0.075);
+    /* Sombras refinadas: mais difusas e suaves (cara premium, sem "caixa"). */
+    --shadow-sm: 0 1px 2px 0 rgba(76, 76, 92, 0.06);
+    --shadow: 0 2px 8px -1px rgba(76, 76, 92, 0.08), 0 1px 3px -1px rgba(130, 143, 163, 0.06);
+    --shadow-lg: 0 12px 32px -8px rgba(76, 76, 92, 0.16), 0 4px 12px -4px rgba(76, 76, 92, 0.08);
+    --inset-shadow: inset 0 1px 2px rgba(76, 76, 92, 0.06);
 
     --spacing-base: 20px;
 
-    --radius: 4px;
+    --radius: 10px;
 
     --topbar-height: 65px;
 
@@ -130,7 +131,9 @@
     --color-chart-border-color: #242c31;
     --color-chart-gray: #40424f;
 
-    --shadow: 0px 0px 30px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+    --shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.36), 0 2px 6px -2px rgba(0, 0, 0, 0.28);
+    --shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.5), 0 6px 16px -6px rgba(0, 0, 0, 0.4);
 
     --color-default-50: #22232c;
     --color-default-100: #272832;
