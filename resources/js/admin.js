@@ -10,6 +10,7 @@ import 'plyr/dist/plyr.css';
 import { createIcons, icons } from 'lucide';
 import moment from 'moment';
 import './admin/sidebar';
+import './admin/theme';
 import './admin/toast';
 import './admin/confirm';
 import './admin/forms';
