@@ -17,10 +17,16 @@
 /public/storage
 /storage/*.key
 /storage/pail
-/storage/framework/views
-/storage/framework/cache
-/storage/framework/sessions
-/storage/framework/testing
+# Conteúdo das pastas de framework é ignorado pelos .gitignore internos de cada
+# diretório (padrão Laravel: `*` + `!.gitignore`), preservando a pasta vazia.
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
 /vendor
 Homestead.json
 Homestead.yaml
