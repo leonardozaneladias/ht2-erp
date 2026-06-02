@@ -51,3 +51,6 @@ laradock/logs/.superpowers/
 
 # Visual companion
 /.superpowers/
+
+# Playwright MCP (screenshots/snapshots de validação local)
+/.playwright-mcp
