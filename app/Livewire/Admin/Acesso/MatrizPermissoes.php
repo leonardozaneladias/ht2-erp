@@ -19,7 +19,7 @@ use Livewire\Component;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-#[Layout('components.admin.layout', ['withLivewire' => true])]
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Matriz de permissões')]
 class MatrizPermissoes extends Component
 {

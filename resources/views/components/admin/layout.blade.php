@@ -3,6 +3,7 @@
     'subtitle' => null,
     'breadcrumbs' => null,
     'withLivewire' => true,
+    'renderHeader' => true,
 ])
 
 @php
@@ -51,7 +52,7 @@
         <div class="page-content">
             <main>
                 <div class="container-fluid">
-                    @if (filled($title))
+                    @if (filled($title) && $renderHeader)
                         <x-admin.page-header :title="$title" :subtitle="$subtitle" :breadcrumbs="$breadcrumbs">
                             @isset ($actions)
                                 <x-slot:actions>

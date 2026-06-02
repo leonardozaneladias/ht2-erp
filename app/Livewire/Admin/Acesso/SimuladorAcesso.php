@@ -15,7 +15,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-#[Layout('components.admin.layout', ['withLivewire' => true])]
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Simulador de acesso')]
 class SimuladorAcesso extends Component
 {

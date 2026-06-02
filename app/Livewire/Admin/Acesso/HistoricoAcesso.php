@@ -14,7 +14,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
 
-#[Layout('components.admin.layout', ['withLivewire' => true])]
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Histórico de acesso')]
 class HistoricoAcesso extends Component
 {

@@ -1,4 +1,4 @@
-<x-admin.layout :title="$title ?? 'Preview de Componentes'" :with-livewire="false">
+<x-admin.layout :title="$title ?? 'Preview de Componentes'" :with-livewire="false" :render-header="false">
     <x-slot:scripts>
         @yield ('previewScripts')
     </x-slot:scripts>

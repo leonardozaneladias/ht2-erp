@@ -16,7 +16,7 @@ use Livewire\Component;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-#[Layout('components.admin.layout', ['withLivewire' => true])]
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 class FormPerfil extends Component
 {
     #[Locked]

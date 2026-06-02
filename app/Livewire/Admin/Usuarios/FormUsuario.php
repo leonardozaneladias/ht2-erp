@@ -26,7 +26,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Spatie\Permission\Models\Permission;
 
-#[Layout('components.admin.layout', ['withLivewire' => true])]
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 class FormUsuario extends Component
 {
     #[Locked]

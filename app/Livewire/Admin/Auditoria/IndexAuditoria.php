@@ -13,7 +13,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
 
-#[Layout('components.admin.layout', ['withLivewire' => true])]
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Logs de auditoria')]
 class IndexAuditoria extends Component
 {

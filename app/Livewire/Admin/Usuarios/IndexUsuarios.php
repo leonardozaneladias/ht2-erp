@@ -24,7 +24,7 @@ use Livewire\Component;
 use RuntimeException;
 use Spatie\Permission\Models\Role;
 
-#[Layout('components.admin.layout', ['withLivewire' => true])]
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Usuários admin')]
 class IndexUsuarios extends Component
 {
