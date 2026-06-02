@@ -13,6 +13,15 @@ publico: DevOps, SRE, Engenharia
 
 ## Documentos
 
+### ⭐ [`ddev-setup.md`](ddev-setup.md) — Guia DDEV + OrbStack (começe por aqui)
+
+Guia rápido e copiável para **instalar, configurar e rodar** o ambiente com DDEV +
+OrbStack — neste projeto e em projetos novos criados a partir do boilerplate. Inclui
+pré-requisitos, primeiro boot, HTTPS (mkcert), o que fica versionado em `.ddev/` e
+troubleshooting dos problemas reais (troca de provider, portas, Mutagen, banco por provider).
+
+**Quando consultar:** primeiro contato com o projeto; criar um projeto novo; bater um problema de ambiente.
+
 ### 1. [`dev-setup.md`](dev-setup.md) — Setup de ambiente de desenvolvimento
 
 Passo a passo obrigatório para colocar o ambiente local em execução. Cobre pré-requisitos (OrbStack + DDEV no macOS, Docker Desktop/WSL2 em Windows/Linux), setup inicial, comandos do dia a dia, portas locais, troubleshooting e setup do editor (VS Code + PhpStorm).

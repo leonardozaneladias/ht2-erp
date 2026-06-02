@@ -55,7 +55,15 @@ brew install orbstack
 
 Abra o app **uma vez** e selecione "Docker". O OrbStack assume o contexto Docker automaticamente (não precisa de `docker context use`). Tem migração embutida do Docker Desktop, se você já o usava.
 
-`performance_mode` fica no default do macOS (Mutagen) — OrbStack + Mutagen é a combinação mais rápida nos benchmarks oficiais do DDEV.
+> Se o `brew install` falhar com "/opt/homebrew is not writable", rode
+> `sudo chown -R "$(whoami)" /opt/homebrew` e tente de novo.
+
+Este repo usa `performance_mode: none` (bind mounts diretos) em `.ddev/config.yaml`
+porque o projeto vive em `/Users/Shared` e o Mutagen não consegue criar seu diretório
+de staging no diretório pai (não gravável). Em uma pasta do seu usuário, o Mutagen
+(default no macOS) funcionaria e seria ainda mais rápido.
+
+**Guia rápido e copiável (instalar/configurar/rodar):** [`ddev-setup.md`](ddev-setup.md).
 
 ---
 
@@ -119,6 +127,7 @@ O `.env.example` já vem alinhado ao DDEV. As credenciais de **banco** são geri
 ```bash
 ddev start       # sobe containers; hooks rodam composer install, migrate --force, npm install
 make setup       # 1x: key:generate, migrate --seed, assets Horizon/Pulse, npm build
+mkcert -install  # 1x por máquina: CA confiável p/ HTTPS (pede admin) — depois: ddev restart
 ```
 
 O que acontece no `ddev start`:

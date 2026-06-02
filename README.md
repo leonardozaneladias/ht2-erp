@@ -40,8 +40,11 @@ git clone <repo> && cd erp
 cp .env.example .env
 ddev start       # sobe tudo + hooks (composer/npm install + migrate)
 make setup       # 1x: key:generate, seed, assets Horizon/Pulse, build
+mkcert -install  # 1x por máquina: HTTPS confiável (pede admin) → ddev restart
 ddev launch      # abre https://gdf-erp.ddev.site
 ```
+
+> Guia completo (instalar, configurar, rodar, troubleshooting e projeto novo): **[docs/devops/ddev-setup.md](docs/devops/ddev-setup.md)**.
 
 Comandos do dia-a-dia via **Makefile** (wrappers do `ddev`):
 
@@ -126,14 +129,15 @@ Mensagens de commit seguem **Conventional Commits** (`tipo(escopo): descrição 
 
 ## Documentação
 
-| Doc                                                                                              | Finalidade                                       |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| [CLAUDE.md](CLAUDE.md)                                                                           | Contexto, regras e convenções do projeto         |
-| [docs/README.md](docs/README.md)                                                                 | Hub da documentação técnica                      |
-| [docs/template/INSPINIA/CATALOGO-COMPONENTES.md](docs/template/INSPINIA/CATALOGO-COMPONENTES.md) | Catálogo de componentes Blade (fonte de verdade) |
-| [docs/devops/conventions.md](docs/devops/conventions.md)                                         | Convenções de código e Git                       |
-| [docs/devops/infra.md](docs/devops/infra.md)                                                     | Ambiente Docker, Makefile, URLs                  |
-| [bin/init-project.sh](bin/init-project.sh)                                                       | Script de inicialização para novo projeto        |
+| Doc                                                                                              | Finalidade                                           |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
+| [CLAUDE.md](CLAUDE.md)                                                                           | Contexto, regras e convenções do projeto             |
+| [docs/README.md](docs/README.md)                                                                 | Hub da documentação técnica                          |
+| [docs/template/INSPINIA/CATALOGO-COMPONENTES.md](docs/template/INSPINIA/CATALOGO-COMPONENTES.md) | Catálogo de componentes Blade (fonte de verdade)     |
+| [docs/devops/ddev-setup.md](docs/devops/ddev-setup.md)                                           | **Guia DDEV + OrbStack** (instalar/configurar/rodar) |
+| [docs/devops/conventions.md](docs/devops/conventions.md)                                         | Convenções de código e Git                           |
+| [docs/devops/infra.md](docs/devops/infra.md)                                                     | Ambiente DDEV, Makefile, URLs                        |
+| [bin/init-project.sh](bin/init-project.sh)                                                       | Script de inicialização para novo projeto            |
 
 ---
 
