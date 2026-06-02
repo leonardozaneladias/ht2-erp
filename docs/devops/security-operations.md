@@ -43,7 +43,7 @@ Cada item abaixo (entrada, SQL, autenticação, rate limiting, uploads, logs, he
 | `FormRequest` em 100% das rotas        | Trimestral | Tech lead   | `grep -r 'function.*Request' routes/` diff vs controllers |
 | `$request->validated()` em updates     | CI         | PR reviewer | Regra custom (roadmap)                                    |
 | `Rule::enum` em campos enumerados      | Trimestral | Arquitetura | Grep `Rule::in\(` → substituir                            |
-| `max`, `decimal:2`, `integer` em money | PR         | PR reviewer | Review checklist                                         |
+| `max`, `decimal:2`, `integer` em money | PR         | PR reviewer | Review checklist                                          |
 
 ### 1.2 SQL
 
@@ -62,10 +62,10 @@ Cada item abaixo (entrada, SQL, autenticação, rate limiting, uploads, logs, he
 
 ### 1.4 Rate limiting
 
-| Limiter      | Limite             | Verificação |
-| ------------ | ------------------ | ----------- |
-| `login`      | 5/min por email+IP | Logs ≥ 429  |
-| global       | 120/min por ator   | Logs        |
+| Limiter | Limite             | Verificação |
+| ------- | ------------------ | ----------- |
+| `login` | 5/min por email+IP | Logs ≥ 429  |
+| global  | 120/min por ator   | Logs        |
 
 Config em `App\Providers\RateLimiterServiceProvider`. Revisão trimestral.
 
@@ -312,11 +312,11 @@ php artisan tinker --execute '
 
 Documentar em `docs/devops/role-matrix.md` (snapshot inicial):
 
-| Role        | Permissões principais             |
-| ----------- | --------------------------------- |
-| super-admin | `admin.*` (wildcard)              |
+| Role        | Permissões principais                   |
+| ----------- | --------------------------------------- |
+| super-admin | `admin.*` (wildcard)                    |
 | gestor      | `admin.relatorios.*`, gestão de módulos |
-| suporte     | `admin.relatorios.view` (read-only) |
+| suporte     | `admin.relatorios.view` (read-only)     |
 
 ---
 
@@ -383,7 +383,7 @@ SELECT subject_type, description, causer_id, created_at
 - [ ] Slack: `#dev`, `#deploy-notifications`, `#alerts`.
 - [ ] Sentry: convite como `Member`.
 - [ ] Gestor de tarefas: convite com role `Member` no projeto.
-- [ ] Acesso ao Laradock (leitura do repo).
+- [ ] Acesso ao repositório (ambiente DDEV local).
 - [ ] Ler CLAUDE.md + docs/devops/.
 - [ ] Setup local (dev-setup.md) funcionando em ≤ 1 dia.
 
@@ -450,19 +450,19 @@ Documentar em `docs/devops/offboarding/YYYY-MM-DD-<iniciais>.md` com checklist.
 
 ```bash
 # 1. Composer
-docker compose exec workspace composer outdated --direct
+ddev composer outdated --direct
 
 # 2. composer audit
-docker compose exec workspace composer audit --format=plain
+ddev composer audit --format=plain
 
 # 3. Criar branch chore
 git checkout -b chore/bump-deps-YYYY-MM
 
 # 4. Atualizar
-docker compose exec workspace composer update --with-all-dependencies <pacotes>
+ddev composer update --with-all-dependencies <pacotes>
 
 # 5. Rodar suite completa
-docker compose exec workspace composer quality
+make quality
 
 # 6. Abrir PR — detalhar breaking changes se houver
 ```
@@ -660,10 +660,10 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 
 Definir política de retenção por tipo de dado e implementar a anonimização em job dedicado. Referência mínima:
 
-| Dado                    | Retenção padrão | Ação                  |
-| ----------------------- | --------------- | --------------------- |
-| `activity_log`          | 2 anos          | Arquivar S3 + truncar |
-| Dados pessoais inativos | conforme base legal | Anonimizar        |
+| Dado                    | Retenção padrão     | Ação                  |
+| ----------------------- | ------------------- | --------------------- |
+| `activity_log`          | 2 anos              | Arquivar S3 + truncar |
+| Dados pessoais inativos | conforme base legal | Anonimizar            |
 
 ---
 

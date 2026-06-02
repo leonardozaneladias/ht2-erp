@@ -2,6 +2,7 @@
 .DS_Store
 .env
 .env.backup
+.env.bak
 .env.production
 .phpactor.json
 .phpunit.result.cache
@@ -50,10 +51,6 @@ coverage/
 # Python bytecode (scripts de skills)
 __pycache__/
 *.pyc
-
-# Infra
-laradock/.env
-laradock/logs/.superpowers/
 
 # Visual companion
 /.superpowers/

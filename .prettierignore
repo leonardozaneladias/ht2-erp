@@ -11,7 +11,10 @@ public/build/
 public/vendor/
 *.min.js
 *.min.css
-laradock/
+
+# prettier-plugin-blade não-idempotente em <textarea> (whitespace-sensitive):
+# insere uma linha em branco no conteúdo a cada passada e nunca converge.
+resources/views/components/shared/textarea.blade.php
 
 # Inspinia template assets — reference-only, nao serao formatados.
 # Nossos proprios views/CSS/JS ficam em admin/ e portal/ (a criar nas sprints).

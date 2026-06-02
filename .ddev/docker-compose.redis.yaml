@@ -1,0 +1,26 @@
+# Serviço Redis para o DDEV (cache, sessão, fila e broadcast do Laravel).
+# DDEV carrega automaticamente qualquer .ddev/docker-compose.*.yaml.
+# Acessível dentro dos containers em  redis:6379  (REDIS_HOST=redis no .env).
+#
+# Alternativa oficial equivalente: `ddev add-on get ddev/ddev-redis`.
+# Mantemos este arquivo versionado para que `ddev start` funcione sem add-on.
+services:
+    redis:
+        container_name: 'ddev-${DDEV_SITENAME}-redis'
+        image: redis:7
+        restart: 'no'
+        expose:
+            - '6379'
+        labels:
+            com.ddev.site-name: ${DDEV_SITENAME}
+            com.ddev.approot: ${DDEV_APPROOT}
+        volumes:
+            - redis-data:/data
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 5s
+            timeout: 3s
+            retries: 5
+
+volumes:
+    redis-data:

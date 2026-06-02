@@ -49,23 +49,23 @@ Toda PR passa por CI antes de poder ser mergeada (branch protection força statu
 
 ### 2.1 Matriz de ambientes
 
-| Ambiente  | Domínio                    | Região    | Réplica DB    | Horizon        | Sentry |
-| --------- | -------------------------- | --------- | ------------- | -------------- | ------ |
-| `local`   | `http://localhost`         | —         | —             | Sail/Laradock  | —      |
+| Ambiente  | Domínio                          | Região    | Réplica DB    | Horizon        | Sentry |
+| --------- | -------------------------------- | --------- | ------------- | -------------- | ------ |
+| `local`   | `https://gdf-erp.ddev.site`      | —         | —             | DDEV           | —      |
 | `staging` | `https://staging.exemplo.com.br` | us-east-1 | 1 leitor      | 1 supervisor   | Ativo  |
 | `prod`    | `https://exemplo.com.br`         | us-east-1 | 1 leitor + DR | 4 supervisores | Ativo  |
 
 ### 2.2 Diferenças de config por ambiente
 
-| Config                  | local       | staging         | prod            |
-| ----------------------- | ----------- | --------------- | --------------- |
-| `APP_ENV`               | `local`     | `staging`       | `production`    |
-| `APP_DEBUG`             | `true`      | `false`         | `false`         |
-| `LOG_LEVEL`             | `debug`     | `info`          | `warning`       |
-| `preventLazyLoading`    | `true`      | `true`          | `false`         |
-| `SESSION_SECURE_COOKIE` | `false`     | `true`          | `true`          |
-| Horizon `maxProcesses`  | 3           | 6               | 20              |
-| Sentry sample rate      | 0           | 100% / 20% perf | 100% / 10% perf |
+| Config                  | local   | staging         | prod            |
+| ----------------------- | ------- | --------------- | --------------- |
+| `APP_ENV`               | `local` | `staging`       | `production`    |
+| `APP_DEBUG`             | `true`  | `false`         | `false`         |
+| `LOG_LEVEL`             | `debug` | `info`          | `warning`       |
+| `preventLazyLoading`    | `true`  | `true`          | `false`         |
+| `SESSION_SECURE_COOKIE` | `false` | `true`          | `true`          |
+| Horizon `maxProcesses`  | 3       | 6               | 20              |
+| Sentry sample rate      | 0       | 100% / 20% perf | 100% / 10% perf |
 
 ### 2.3 Disaster Recovery
 

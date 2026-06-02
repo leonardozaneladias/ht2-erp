@@ -4,11 +4,11 @@
 
 ## Projeto
 
-Boilerplate Laravel admin server-side. Guard `admin` único; Blade + Livewire 4 + Inspinia + Tailwind 4; PostgreSQL 16, Redis, Horizon, Pulse; ambiente via Docker (Laradock).
+Boilerplate Laravel admin server-side. Guard `admin` único; Blade + Livewire 4 + Inspinia + Tailwind 4; PostgreSQL 16, Redis, Horizon, Pulse; ambiente via DDEV + OrbStack.
 
 ## Setup
 
-`./docker-setup.sh` e depois `make up`. Login default: `admin@example.com` / `password`.
+`cp .env.example .env && ddev start && make setup`. Login default: `admin@example.com` / `password`.
 
 ## Comandos
 

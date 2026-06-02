@@ -1,55 +1,72 @@
-LARADOCK_DIR=laradock
-SERVICES=workspace php-fpm nginx postgres redis laravel-horizon pgadmin mailpit
+# Atalhos do dia-a-dia — wrappers do DDEV.
+# Pré-requisitos: OrbStack + DDEV (ver README.md / docs/devops/infra.md).
+# Argumentos extras são repassados via o truque `%: @:` no fim do arquivo.
+#   ex: make artisan migrate    make composer require vendor/pkg    make npm run dev
 
-.PHONY: up down restart bash artisan migrate fresh seed horizon test logs status setup
+ARGS = $(filter-out $@,$(MAKECMDGOALS))
+
+.PHONY: up down restart bash artisan migrate fresh seed horizon test \
+        composer npm dev lint quality logs status setup
 
 up:
-	cd $(LARADOCK_DIR) && docker compose up -d $(SERVICES)
+	ddev start
 
 down:
-	cd $(LARADOCK_DIR) && docker compose down
+	ddev stop
 
 restart:
-	cd $(LARADOCK_DIR) && docker compose restart $(SERVICES)
-
-build:
-	cd $(LARADOCK_DIR) && docker compose build $(SERVICES)
+	ddev restart
 
 bash:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash
+	ddev ssh
 
 artisan:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash -c "cd /var/www && php artisan $(filter-out $@,$(MAKECMDGOALS))"
+	ddev artisan $(ARGS)
 
 migrate:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash -c "cd /var/www && php artisan migrate"
+	ddev artisan migrate
 
 fresh:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash -c "cd /var/www && php artisan migrate:fresh --seed && php artisan db:seed --class=DevelopmentSeeder"
+	ddev artisan migrate:fresh --seed && ddev artisan db:seed --class=DevelopmentSeeder
 
 seed:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash -c "cd /var/www && php artisan db:seed"
+	ddev artisan db:seed
 
 horizon:
-	cd $(LARADOCK_DIR) && docker compose restart laravel-horizon
+	ddev exec supervisorctl restart webextradaemons:horizon
 
 test:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash -c "cd /var/www && php artisan test"
+	ddev artisan test
 
 composer:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash -c "cd /var/www && composer $(filter-out $@,$(MAKECMDGOALS))"
+	ddev composer $(ARGS)
 
 npm:
-	cd $(LARADOCK_DIR) && docker compose exec workspace bash -c "cd /var/www && npm $(filter-out $@,$(MAKECMDGOALS))"
+	ddev npm $(ARGS)
+
+dev:
+	ddev npm run dev
+
+lint:
+	ddev exec ./vendor/bin/pint && ddev npm run format
+
+quality:
+	ddev npm run quality
 
 logs:
-	cd $(LARADOCK_DIR) && docker compose logs -f --tail=100
+	ddev logs -f
 
 status:
-	cd $(LARADOCK_DIR) && docker compose ps
+	ddev describe
 
+# Setup inicial (uma vez após `ddev start`): chave, schema+seed, assets de
+# Horizon/Pulse e build de produção.
 setup:
-	./docker-setup.sh
+	ddev artisan key:generate
+	ddev artisan migrate --seed
+	ddev artisan horizon:install
+	ddev artisan vendor:publish --tag=pulse-dashboard
+	ddev npm run build
 
 %:
 	@:

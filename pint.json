@@ -54,5 +54,5 @@
     },
     "yoda_style": false
   },
-  "exclude": ["node_modules", "vendor", "storage", "bootstrap/cache", "laradock"]
+  "exclude": ["node_modules", "vendor", "storage", "bootstrap/cache"]
 }

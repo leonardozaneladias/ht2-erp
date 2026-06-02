@@ -33,15 +33,15 @@ Refs: #issue-number
 
 ### 1.3 Escopos
 
-| Escopo       | Área                                    |
-| ------------ | --------------------------------------- |
-| `admin`      | Backoffice administrativo               |
-| `auth`       | Autenticação (guard admin)              |
-| `infra`      | Docker, Laradock, CI, deploy            |
-| `models`     | Models, migrations, seeders             |
-| `docs`       | Documentação                            |
-| `ui`         | Interface, componentes visuais          |
-| `skills`     | Skills e automações `.claude`/`.agents` |
+| Escopo   | Área                                    |
+| -------- | --------------------------------------- |
+| `admin`  | Backoffice administrativo               |
+| `auth`   | Autenticação (guard admin)              |
+| `infra`  | DDEV, Docker, CI, deploy                |
+| `models` | Models, migrations, seeders             |
+| `docs`   | Documentação                            |
+| `ui`     | Interface, componentes visuais          |
+| `skills` | Skills e automações `.claude`/`.agents` |
 
 ### 1.4 Regras
 
@@ -59,7 +59,7 @@ fix(admin): corrigir filtro de status na tabela de usuários
 refactor(admin): extrair lógica de exportação para service dedicado
 docs(docs): documentar convenções de código
 test(admin): adicionar cenários de teste para cadastro de cliente
-chore(infra): atualizar PHP para 8.4 no Laradock
+chore(infra): atualizar PHP para 8.4 no DDEV
 perf(admin): otimizar query de listagem de clientes com eager loading
 ```
 
@@ -165,30 +165,30 @@ parameters:
 
 ### 3.3 Naming Conventions
 
-| Contexto    | Padrão                  | Exemplo                                         |
-| ----------- | ----------------------- | ----------------------------------------------- |
-| Model       | PascalCase, singular    | `Cliente`, `UsuarioPerfil`                      |
-| Controller  | PascalCase + Controller | `ClienteController`                             |
-| Service     | PascalCase + Service    | `ClienteImportService`                          |
-| Action      | PascalCase + Action     | `CreateClienteAction`                           |
-| Job         | PascalCase + Job        | `SendWelcomeEmailJob`                           |
-| Event       | PascalCase (passado)    | `ClienteCriado`, `UsuarioAtivado`               |
-| Listener    | PascalCase (ação)       | `SendClienteWelcomeEmail`                       |
-| Observer    | PascalCase + Observer   | `ClienteObserver`                               |
-| Middleware  | PascalCase              | `AdminActive`, `CheckPermission`                |
-| FormRequest | PascalCase + Request    | `StoreClienteRequest`                           |
-| Enum        | PascalCase              | `StatusCliente`, `TipoUsuario`                  |
-| DTO         | PascalCase + DTO        | `ClienteDTO`                                    |
-| Trait       | PascalCase (has/is)     | `HasAuditLog`, `Filterable`                     |
-| Migration   | snake_case              | `create_clientes_table`                         |
-| Tabela BD   | snake_case, plural      | `clientes`, `cliente_enderecos`                 |
-| Coluna BD   | snake_case              | `nome_completo`, `data_cadastro`                |
-| Rota (name) | dot notation            | `admin.clientes.store`                          |
-| Rota (URI)  | kebab-case              | `/admin/clientes`                               |
-| Blade view  | kebab-case              | `create.blade.php`, `data-table.blade.php`      |
-| Config key  | snake_case              | `app.itens_por_pagina`                          |
-| JS/CSS file | kebab-case              | `apex-charts-init.js`                           |
-| Component   | kebab-case (blade)      | `<x-admin.kpi-card>`                            |
+| Contexto    | Padrão                  | Exemplo                                    |
+| ----------- | ----------------------- | ------------------------------------------ |
+| Model       | PascalCase, singular    | `Cliente`, `UsuarioPerfil`                 |
+| Controller  | PascalCase + Controller | `ClienteController`                        |
+| Service     | PascalCase + Service    | `ClienteImportService`                     |
+| Action      | PascalCase + Action     | `CreateClienteAction`                      |
+| Job         | PascalCase + Job        | `SendWelcomeEmailJob`                      |
+| Event       | PascalCase (passado)    | `ClienteCriado`, `UsuarioAtivado`          |
+| Listener    | PascalCase (ação)       | `SendClienteWelcomeEmail`                  |
+| Observer    | PascalCase + Observer   | `ClienteObserver`                          |
+| Middleware  | PascalCase              | `AdminActive`, `CheckPermission`           |
+| FormRequest | PascalCase + Request    | `StoreClienteRequest`                      |
+| Enum        | PascalCase              | `StatusCliente`, `TipoUsuario`             |
+| DTO         | PascalCase + DTO        | `ClienteDTO`                               |
+| Trait       | PascalCase (has/is)     | `HasAuditLog`, `Filterable`                |
+| Migration   | snake_case              | `create_clientes_table`                    |
+| Tabela BD   | snake_case, plural      | `clientes`, `cliente_enderecos`            |
+| Coluna BD   | snake_case              | `nome_completo`, `data_cadastro`           |
+| Rota (name) | dot notation            | `admin.clientes.store`                     |
+| Rota (URI)  | kebab-case              | `/admin/clientes`                          |
+| Blade view  | kebab-case              | `create.blade.php`, `data-table.blade.php` |
+| Config key  | snake_case              | `app.itens_por_pagina`                     |
+| JS/CSS file | kebab-case              | `apex-charts-init.js`                      |
+| Component   | kebab-case (blade)      | `<x-admin.kpi-card>`                       |
 
 ### 3.4 Models — Padrão Interno
 
@@ -431,12 +431,12 @@ $this->authorize('update', $cliente);
 
 ### 9.1 Quando Cachear
 
-| Dado                       | TTL   | Invalidação                         |
-| -------------------------- | ----- | ----------------------------------- |
-| Configurações globais      | 24h   | Ao salvar em ConfiguracaoController |
-| Permissões ACL por usuário | 1h    | Ao editar perfil/permissões         |
-| Listas de apoio (lookups)  | 1h    | Ao criar/editar o registro          |
-| Dashboard KPIs             | 5min  | Auto-expira                         |
+| Dado                       | TTL  | Invalidação                         |
+| -------------------------- | ---- | ----------------------------------- |
+| Configurações globais      | 24h  | Ao salvar em ConfiguracaoController |
+| Permissões ACL por usuário | 1h   | Ao editar perfil/permissões         |
+| Listas de apoio (lookups)  | 1h   | Ao criar/editar o registro          |
+| Dashboard KPIs             | 5min | Auto-expira                         |
 
 ### 9.2 Quando NÃO Cachear
 
@@ -463,12 +463,12 @@ Cache::forget('config:global');
 
 ### 10.1 Filas
 
-| Fila       | Prioridade | Uso                  |
-| ---------- | :--------: | -------------------- |
-| `default`  |   Normal   | Jobs gerais          |
-| `emails`   |   Normal   | Envio de e-mails     |
-| `exports`  |   Baixa    | Relatórios CSV/Excel |
-| `pdf`      |   Baixa    | Geração de PDFs      |
+| Fila      | Prioridade | Uso                  |
+| --------- | :--------: | -------------------- |
+| `default` |   Normal   | Jobs gerais          |
+| `emails`  |   Normal   | Envio de e-mails     |
+| `exports` |   Baixa    | Relatórios CSV/Excel |
+| `pdf`     |   Baixa    | Geração de PDFs      |
 
 ### 10.2 Retry Policy
 

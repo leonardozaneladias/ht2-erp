@@ -30,7 +30,6 @@ export default [
       'public/vendor/',
       'storage/',
       'bootstrap/cache/',
-      'laradock/',
       '**/*.min.js',
       // Inspinia template files — will be audited/pruned in Task 16.
       // Our own code goes in resources/js/admin.js and resources/js/portal.js.

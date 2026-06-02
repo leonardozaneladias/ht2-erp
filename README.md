@@ -8,29 +8,48 @@ O onboarding detalhado para agentes e humanos está em [CLAUDE.md](CLAUDE.md).
 
 ## Stack
 
-| Camada                  | Tecnologia                                              |
-| ----------------------- | ------------------------------------------------------- |
-| Backend                 | Laravel 13, PHP 8.4                                     |
-| Dados                   | PostgreSQL 16, Redis                                    |
-| Admin (UI)              | Livewire 4, Inspinia, Tailwind CSS 4                    |
-| Auth                    | Guard `admin` (AdminUser)                               |
-| ACL / Auditoria         | spatie/laravel-permission, spatie/laravel-activitylog   |
-| Assíncrono / observação | Laravel Horizon, Laravel Pulse                          |
-| Build                   | Vite                                                    |
-| Testes                  | Pest                                                    |
-| Ambiente recomendado    | Docker (Laradock); ver [docs/devops/infra.md](docs/devops/infra.md) |
+| Camada                  | Tecnologia                                                        |
+| ----------------------- | ----------------------------------------------------------------- |
+| Backend                 | Laravel 13, PHP 8.4                                               |
+| Dados                   | PostgreSQL 16, Redis                                              |
+| Admin (UI)              | Livewire 4, Inspinia, Tailwind CSS 4                              |
+| Auth                    | Guard `admin` (AdminUser)                                         |
+| ACL / Auditoria         | spatie/laravel-permission, spatie/laravel-activitylog             |
+| Assíncrono / observação | Laravel Horizon, Laravel Pulse                                    |
+| Build                   | Vite                                                              |
+| Testes                  | Pest                                                              |
+| Ambiente recomendado    | DDEV + OrbStack; ver [docs/devops/infra.md](docs/devops/infra.md) |
 
 ---
 
 ## Início rápido
 
-1. Na raiz do clone, execute **`./docker-setup.sh`** — sobe stacks, Composer, migrations/publicações (Horizon, Pulse), NPM e build (ver «Primeiro Boot» em [docs/devops/infra.md](docs/devops/infra.md)).
-2. Comandos do dia-a-dia no container via **Makefile**:
+**Pré-requisitos (uma vez por máquina):**
 
 ```bash
-make up          # containers
-make bash        # shell no workspace (/var/www)
+brew install orbstack          # abra o OrbStack 1x e selecione "Docker"
+brew install ddev/ddev/ddev
+```
+
+> macOS usa **OrbStack** como provider Docker (rápido e leve). Em Windows/Linux o mesmo `.ddev/` funciona com Docker Desktop/WSL2.
+
+**Subir o projeto:**
+
+```bash
+git clone <repo> && cd erp
+cp .env.example .env
+ddev start       # sobe tudo + hooks (composer/npm install + migrate)
+make setup       # 1x: key:generate, seed, assets Horizon/Pulse, build
+ddev launch      # abre https://gdf-erp.ddev.site
+```
+
+Comandos do dia-a-dia via **Makefile** (wrappers do `ddev`):
+
+```bash
+make up          # ddev start
+make bash        # shell no container web (ddev ssh)
 make fresh       # migrate:fresh --seed
+make dev         # Vite dev server (HMR)
 make test        # php artisan test
 make lint        # Pint + Prettier
 make quality     # Lint + PHPStan + Test
@@ -55,7 +74,7 @@ O script pergunta nome do projeto, slug e domínio de e-mail e aplica em `compos
 
 ## Depois do setup — primeiros passos
 
-1. Acesse **`http://localhost/admin/login`** com `admin@example.com` / `password`.
+1. Acesse **`https://gdf-erp.ddev.site/admin/login`** com `admin@example.com` / `password`.
 2. Confira o **módulo de referência do stack** em `/admin/usuarios`, `/admin/perfis` e `/admin/auditoria` — implementação completa de FormRequest/Service/Action/DTO/Policy/Livewire/Activity Log que serve de molde para novos módulos.
 3. Para criar seu próprio módulo, siga o passo-a-passo em [CLAUDE.md §16](CLAUDE.md#16-iniciando-um-novo-projeto-com-este-boilerplate).
 
@@ -70,24 +89,24 @@ Arquivos-chave do módulo de referência:
 
 ---
 
-## URLs locais (Docker)
+## URLs locais (DDEV)
 
-| O quê     | URL                      |
-| --------- | ------------------------ |
-| Aplicação | http://localhost         |
-| Horizon   | http://localhost/horizon |
-| Pulse     | http://localhost/pulse   |
-| pgAdmin   | http://localhost:5050    |
-| Mailpit   | http://localhost:8125    |
+| O quê      | URL / Comando                     |
+| ---------- | --------------------------------- |
+| Aplicação  | https://gdf-erp.ddev.site         |
+| Horizon    | https://gdf-erp.ddev.site/horizon |
+| Pulse      | https://gdf-erp.ddev.site/pulse   |
+| Mailpit    | `ddev mailpit`                    |
+| PostgreSQL | `ddev psql` (ou `ddev describe`)  |
 
 ---
 
 ## Frontend (assets)
 
 ```bash
-npm install
-npm run dev      # desenvolvimento Vite
-npm run build    # build de produção
+ddev npm install
+ddev npm run dev      # desenvolvimento Vite (HMR em *.ddev.site:5173)
+ddev npm run build    # build de produção
 ```
 
 Pontos de entrada Vite: `resources/css/admin.css`, `resources/js/admin.js`.
@@ -107,14 +126,14 @@ Mensagens de commit seguem **Conventional Commits** (`tipo(escopo): descrição 
 
 ## Documentação
 
-| Doc                                                                          | Finalidade                                  |
-| ---------------------------------------------------------------------------- | ------------------------------------------- |
-| [CLAUDE.md](CLAUDE.md)                                                       | Contexto, regras e convenções do projeto    |
-| [docs/README.md](docs/README.md)                                            | Hub da documentação técnica                 |
+| Doc                                                                                              | Finalidade                                       |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| [CLAUDE.md](CLAUDE.md)                                                                           | Contexto, regras e convenções do projeto         |
+| [docs/README.md](docs/README.md)                                                                 | Hub da documentação técnica                      |
 | [docs/template/INSPINIA/CATALOGO-COMPONENTES.md](docs/template/INSPINIA/CATALOGO-COMPONENTES.md) | Catálogo de componentes Blade (fonte de verdade) |
-| [docs/devops/conventions.md](docs/devops/conventions.md)                    | Convenções de código e Git                  |
-| [docs/devops/infra.md](docs/devops/infra.md)                                | Ambiente Docker, Makefile, URLs             |
-| [bin/init-project.sh](bin/init-project.sh)                                  | Script de inicialização para novo projeto   |
+| [docs/devops/conventions.md](docs/devops/conventions.md)                                         | Convenções de código e Git                       |
+| [docs/devops/infra.md](docs/devops/infra.md)                                                     | Ambiente Docker, Makefile, URLs                  |
+| [bin/init-project.sh](bin/init-project.sh)                                                       | Script de inicialização para novo projeto        |
 
 ---
 

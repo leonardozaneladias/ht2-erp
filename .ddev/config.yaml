@@ -1,0 +1,47 @@
+# Ambiente de desenvolvimento oficial do projeto — DDEV.
+# Docs: https://docs.ddev.com/ | Provider recomendado no macOS: OrbStack.
+#
+# Pré-requisitos (uma vez por máquina):
+#   brew install orbstack            # abra 1x, selecione "Docker"
+#   brew install ddev/ddev/ddev
+#
+# Subir:  ddev start   |   App: https://gdf-erp.ddev.site
+name: gdf-erp
+type: laravel
+docroot: public
+php_version: '8.4'
+webserver_type: nginx-fpm
+database:
+    type: postgres
+    version: '16'
+nodejs_version: '22'
+
+# Bind mounts diretos (sem Mutagen). O projeto vive em /Users/Shared, e o
+# Mutagen precisa criar um diretório de staging no diretório PAI do projeto
+# (/Users/Shared/projects/GDF), que não é gravável → "permission denied".
+# Com OrbStack/Docker Desktop os bind mounts já são rápidos o bastante.
+performance_mode: none
+
+# Horizon como daemon persistente (supervisord interno do container web).
+# Requer laravel/horizon instalado (já está no composer.json); por isso o
+# hook post-start roda `composer install` antes.
+web_extra_daemons:
+    - name: 'horizon'
+      command: 'php artisan horizon'
+      directory: /var/www/html
+
+# Vite dev server + HMR expostos para `ddev npm run dev`.
+# Assets servidos em https://gdf-erp.ddev.site:5173
+web_extra_exposed_ports:
+    - name: vite
+      container_port: 5173
+      http_port: 5172
+      https_port: 5173
+
+# Automatiza dependências e schema a cada `ddev start` (idempotente).
+# Seed NÃO entra aqui (não é idempotente) — fica em `make setup` / `make fresh`.
+hooks:
+    post-start:
+        - composer: install
+        - exec: 'php artisan migrate --force'
+        - exec: 'npm install'

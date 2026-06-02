@@ -6,12 +6,14 @@
 #   ./bin/init-project.sh --dry-run # mostra o que mudaria sem editar
 #
 # Substitui em:
-#   composer.json    → name = "<slug>/admin"
-#   package.json     → name = "<slug>-admin"
-#   .env.example     → APP_NAME, DB_DATABASE, DB_USERNAME, HORIZON_PREFIX,
-#                      PULSE_SERVER_NAME, MAIL_FROM_ADDRESS
+#   composer.json     → name = "<slug>/admin"
+#   package.json      → name = "<slug>-admin"
+#   .env.example      → APP_NAME, APP_URL, HORIZON_PREFIX, MAIL_FROM_ADDRESS
+#   .ddev/config.yaml → name = "<slug>" (define a URL https://<slug>.ddev.site)
 #   .env (cria a partir do .env.example se não existir)
 #   README.md, CLAUDE.md, AGENTS.md → primeira linha de título
+#
+# Obs: credenciais de banco NÃO são tocadas — o DDEV as gere (db/db/db).
 #
 # Opcional (com confirmação): limpa CHANGELOG, memória do Claude, planos
 # do superpowers e reinicializa git history.
@@ -91,17 +93,22 @@ if [[ -f package.json ]]; then
         sed_inplace "s|\"name\": \"laravel-admin-inspinia\"|\"name\": \"${SLUG}-admin\"|" package.json
 fi
 
-# .env.example
+# .env.example (DB_* NÃO é tocado — gerido pelo DDEV)
 if [[ -f .env.example ]]; then
-    apply ".env.example → APP_NAME, DB_*, HORIZON_PREFIX, PULSE, MAIL" \
+    apply ".env.example → APP_NAME, APP_URL, HORIZON_PREFIX, MAIL" \
         bash -c "
         sed_inplace_fn() { if sed --version >/dev/null 2>&1; then sed -i \"\$@\"; else sed -i '' \"\$@\"; fi; }
         sed_inplace_fn 's|APP_NAME=.*|APP_NAME=\"${APP_NAME}\"|' .env.example
-        sed_inplace_fn 's|DB_DATABASE=.*|DB_DATABASE=${SLUG}|' .env.example
-        sed_inplace_fn 's|DB_USERNAME=.*|DB_USERNAME=${SLUG}|' .env.example
+        sed_inplace_fn 's|APP_URL=.*|APP_URL=https://${SLUG}.ddev.site|' .env.example
         sed_inplace_fn 's|HORIZON_PREFIX=.*|HORIZON_PREFIX=${SLUG}_horizon:|' .env.example
         sed_inplace_fn 's|MAIL_FROM_ADDRESS=.*|MAIL_FROM_ADDRESS=\"noreply@${MAIL_DOMAIN}\"|' .env.example
         "
+fi
+
+# .ddev/config.yaml → nome do projeto (define https://<slug>.ddev.site)
+if [[ -f .ddev/config.yaml ]]; then
+    apply ".ddev/config.yaml → name '${SLUG}'" \
+        sed_inplace "s|^name: .*|name: ${SLUG}|" .ddev/config.yaml
 fi
 
 # .env (cria se não existe)
@@ -169,7 +176,7 @@ fi
 echo -e "${GREEN}============================================${NC}"
 echo ""
 echo -e " Próximos passos:"
-echo -e "  1. Revise .env e ajuste senhas/segredos"
-echo -e "  2. Rode  ${YELLOW}./docker-setup.sh${NC}  para subir o ambiente"
-echo -e "  3. Acesse  ${YELLOW}http://localhost/admin/login${NC}  (admin@example.com / password)"
+echo -e "  1. ${YELLOW}cp .env.example .env${NC}  e revise segredos"
+echo -e "  2. Rode  ${YELLOW}ddev start${NC}  e depois  ${YELLOW}make setup${NC}"
+echo -e "  3. Acesse  ${YELLOW}https://${SLUG}.ddev.site/admin/login${NC}  (admin@example.com / password)"
 echo ""

@@ -8,25 +8,25 @@
 
 ### 1.1 Core da Aplicação
 
-| Pacote                       | Versão | Finalidade                | Onde Usar                       |
-| ---------------------------- | ------ | ------------------------- | ------------------------------- |
-| `laravel/framework`          | ^13.0  | Framework base            | Todo o sistema                  |
-| `laravel/horizon`            | ^5.0   | Dashboard de filas        | Processamento assíncrono        |
-| `laravel/pulse`              | ^1.0   | Monitoramento/métricas    | Observabilidade                 |
-| `livewire/livewire`          | ^4.0   | Componentes reativos      | Tabelas, formulários, modais    |
-| `spatie/laravel-permission`  | ^7.0   | ACL (Roles & Permissions) | Admin ACL                       |
-| `spatie/laravel-activitylog` | ^5.0   | Log de auditoria          | Audit logs (append-only)        |
-| `barryvdh/laravel-dompdf`    | ^3.0   | Geração de PDF            | Documentos, relatórios em PDF   |
-| `maatwebsite/excel`          | ^3.1   | Export CSV/Excel          | Relatórios, exportações admin   |
+| Pacote                       | Versão | Finalidade                | Onde Usar                     |
+| ---------------------------- | ------ | ------------------------- | ----------------------------- |
+| `laravel/framework`          | ^13.0  | Framework base            | Todo o sistema                |
+| `laravel/horizon`            | ^5.0   | Dashboard de filas        | Processamento assíncrono      |
+| `laravel/pulse`              | ^1.0   | Monitoramento/métricas    | Observabilidade               |
+| `livewire/livewire`          | ^4.0   | Componentes reativos      | Tabelas, formulários, modais  |
+| `spatie/laravel-permission`  | ^7.0   | ACL (Roles & Permissions) | Admin ACL                     |
+| `spatie/laravel-activitylog` | ^5.0   | Log de auditoria          | Audit logs (append-only)      |
+| `barryvdh/laravel-dompdf`    | ^3.0   | Geração de PDF            | Documentos, relatórios em PDF |
+| `maatwebsite/excel`          | ^3.1   | Export CSV/Excel          | Relatórios, exportações admin |
 
 ### 1.2 Dev e Qualidade
 
-| Pacote                      | Versão | Finalidade                 | Onde Usar           |
-| --------------------------- | ------ | -------------------------- | ------------------- |
-| `laravel/pint`              | ^1.0   | Code formatter (PSR-12)    | CI/CD, pré-commit   |
-| `larastan/larastan`         | ^3.0   | PHPStan para Laravel       | Análise estática    |
-| `pestphp/pest`              | ^4.0   | Testing framework          | Testes unit/feature |
-| `fakerphp/faker`            | ^1.23  | Geração de dados fake      | Seeders, factories  |
+| Pacote              | Versão | Finalidade              | Onde Usar           |
+| ------------------- | ------ | ----------------------- | ------------------- |
+| `laravel/pint`      | ^1.0   | Code formatter (PSR-12) | CI/CD, pré-commit   |
+| `larastan/larastan` | ^3.0   | PHPStan para Laravel    | Análise estática    |
+| `pestphp/pest`      | ^4.0   | Testing framework       | Testes unit/feature |
+| `fakerphp/faker`    | ^1.23  | Geração de dados fake   | Seeders, factories  |
 
 ---
 
@@ -34,27 +34,27 @@
 
 ### 2.1 Build e Framework
 
-| Pacote                    | Finalidade                | Onde Usar          |
-| ------------------------- | ------------------------- | ------------------ |
-| `vite`                    | Bundler/dev server        | Build dos assets   |
-| `laravel-vite-plugin`     | Integração Laravel + Vite | Build              |
-| `tailwindcss` (v4)        | Framework CSS utilitário  | Todo o frontend    |
-| `@tailwindcss/forms`      | Reset de formulários      | Forms admin        |
-| `@tailwindcss/typography` | Prose/text rico           | Conteúdo           |
-| `autoprefixer`            | Compatibilidade CSS       | Build              |
+| Pacote                    | Finalidade                | Onde Usar        |
+| ------------------------- | ------------------------- | ---------------- |
+| `vite`                    | Bundler/dev server        | Build dos assets |
+| `laravel-vite-plugin`     | Integração Laravel + Vite | Build            |
+| `tailwindcss` (v4)        | Framework CSS utilitário  | Todo o frontend  |
+| `@tailwindcss/forms`      | Reset de formulários      | Forms admin      |
+| `@tailwindcss/typography` | Prose/text rico           | Conteúdo         |
+| `autoprefixer`            | Compatibilidade CSS       | Build            |
 
 ### 2.2 Plugins de UI (do Inspinia ou compatíveis)
 
-| Plugin        | Finalidade                        | Uso                                 |
-| ------------- | --------------------------------- | ----------------------------------- |
-| `apexcharts`  | Gráficos interativos              | Dashboard admin, relatórios         |
-| `flatpickr`   | Datepicker                        | Formulários com data                |
-| `choices.js`  | Select searchable                 | Selects avançados                   |
-| `inputmask`   | Máscara de input                  | CPF, CNPJ, telefone, CEP, monetário |
-| `sortablejs`  | Drag-and-drop                     | Reordenação de listas               |
-| `dropzone`    | Upload de arquivos                | Uploads com drag-and-drop           |
-| `sweetalert2` | Alerts/confirmações               | Confirmações de ação                |
-| `tinymce`     | Editor WYSIWYG                    | Conteúdo rich text                  |
+| Plugin        | Finalidade           | Uso                                 |
+| ------------- | -------------------- | ----------------------------------- |
+| `apexcharts`  | Gráficos interativos | Dashboard admin, relatórios         |
+| `flatpickr`   | Datepicker           | Formulários com data                |
+| `choices.js`  | Select searchable    | Selects avançados                   |
+| `inputmask`   | Máscara de input     | CPF, CNPJ, telefone, CEP, monetário |
+| `sortablejs`  | Drag-and-drop        | Reordenação de listas               |
+| `dropzone`    | Upload de arquivos   | Uploads com drag-and-drop           |
+| `sweetalert2` | Alerts/confirmações  | Confirmações de ação                |
+| `tinymce`     | Editor WYSIWYG       | Conteúdo rich text                  |
 
 ---
 
@@ -163,12 +163,12 @@ php artisan pulse:install
 
 ### 5.1 IDE / Editor
 
-| Ferramenta      | Uso                                          |
-| --------------- | -------------------------------------------- |
-| **VS Code**     | IDE (com Intelephense + Blade formatter)     |
-| **Claude Code** | CLI para tarefas de código assistidas por IA |
-| **pgAdmin 4**   | Gerenciamento visual do PostgreSQL           |
-| **Mailpit**     | Interceptor de e-mails em dev                |
+| Ferramenta      | Uso                                             |
+| --------------- | ----------------------------------------------- |
+| **VS Code**     | IDE (com Intelephense + Blade formatter)        |
+| **Claude Code** | CLI para tarefas de código assistidas por IA    |
+| **`ddev psql`** | Acesso ao PostgreSQL (ou GUI via porta exposta) |
+| **Mailpit**     | Interceptor de e-mails em dev (`ddev mailpit`)  |
 
 ### 5.2 Extensões Recomendadas (VS Code)
 
@@ -246,13 +246,12 @@ jobs:
 ├─────────────────────────────────────────────────────────┤
 │                    INFRA                                 │
 │                                                         │
-│  Docker (Laradock)                                      │
+│  DDEV + OrbStack                                        │
 │  ├── Nginx                                              │
 │  ├── PHP-FPM 8.4                                        │
 │  ├── PostgreSQL 16                                      │
 │  ├── Redis                                              │
-│  ├── Horizon (worker)                                   │
-│  ├── Mailpit                                            │
-│  └── pgAdmin 4                                          │
+│  ├── Horizon (worker / daemon)                          │
+│  └── Mailpit (embutido)                                 │
 └─────────────────────────────────────────────────────────┘
 ```

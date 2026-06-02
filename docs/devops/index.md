@@ -15,7 +15,7 @@ publico: DevOps, SRE, Engenharia
 
 ### 1. [`dev-setup.md`](dev-setup.md) — Setup de ambiente de desenvolvimento
 
-Passo a passo obrigatório para colocar o ambiente local em execução. Cobre pré-requisitos (macOS, Linux, WSL2), setup inicial do Laradock, comandos do dia a dia, portas locais, troubleshooting e setup do editor (VS Code + PhpStorm).
+Passo a passo obrigatório para colocar o ambiente local em execução. Cobre pré-requisitos (OrbStack + DDEV no macOS, Docker Desktop/WSL2 em Windows/Linux), setup inicial, comandos do dia a dia, portas locais, troubleshooting e setup do editor (VS Code + PhpStorm).
 
 **Quando consultar:**
 
@@ -44,7 +44,7 @@ Pacotes Composer (Livewire, Spatie Permission/Activitylog, Horizon, Pulse, DomPD
 
 ### 4. [`infra.md`](infra.md) — Infraestrutura local
 
-URLs e serviços do ambiente Docker/Laradock, comandos do Makefile, primeiro boot, acessos (PostgreSQL, Redis, Mailpit), patches locais aplicados no Laradock e troubleshooting de containers.
+URLs e serviços do ambiente DDEV, comandos do Makefile, primeiro boot, acessos (PostgreSQL, Redis, Mailpit), configuração do Vite/Horizon e troubleshooting de containers.
 
 **Quando consultar:**
 
@@ -97,13 +97,13 @@ npx prettier --write resources/
 
 ### Links operacionais (dev)
 
-| Recurso | URL                      |
-| ------- | ------------------------ |
-| Admin   | http://localhost/admin   |
-| Horizon | http://localhost/horizon |
-| Pulse   | http://localhost/pulse   |
-| pgAdmin | http://localhost:5050    |
-| Mailpit | http://localhost:8125    |
+| Recurso | URL / Comando                     |
+| ------- | --------------------------------- |
+| Admin   | https://gdf-erp.ddev.site/admin   |
+| Horizon | https://gdf-erp.ddev.site/horizon |
+| Pulse   | https://gdf-erp.ddev.site/pulse   |
+| Mailpit | `ddev mailpit`                    |
+| Banco   | `ddev psql`                       |
 
 ---
 

@@ -19,21 +19,21 @@ Toda a UI é server-side: Blade + Livewire + Alpine.js.
 
 ## 2. Stack Tecnológica
 
-| Camada               | Tecnologia                      | Versão |
-| -------------------- | ------------------------------- | ------ |
-| Framework            | Laravel                         | 13.x   |
-| PHP                  | PHP                             | 8.4    |
-| Banco de Dados       | PostgreSQL                      | 16     |
-| Cache / Sessão / Fila | Redis                          | latest |
-| Frontend Admin       | Livewire 4 + Inspinia + Tailwind CSS 4 | — |
-| Auth                 | Guard `admin` (AdminUser)       | —      |
-| ACL                  | spatie/laravel-permission        | ^7.0   |
-| Auditoria            | spatie/laravel-activitylog       | ^5.0   |
-| Filas                | Laravel Horizon                  | ^5.0   |
-| Monitoramento        | Laravel Pulse                    | ^1.0   |
-| Build                | Vite                             | latest |
-| Testes               | Pest                             | ^4.0   |
-| Ambiente             | Docker via Laradock (macOS)      | —      |
+| Camada                | Tecnologia                             | Versão |
+| --------------------- | -------------------------------------- | ------ |
+| Framework             | Laravel                                | 13.x   |
+| PHP                   | PHP                                    | 8.4    |
+| Banco de Dados        | PostgreSQL                             | 16     |
+| Cache / Sessão / Fila | Redis                                  | latest |
+| Frontend Admin        | Livewire 4 + Inspinia + Tailwind CSS 4 | —      |
+| Auth                  | Guard `admin` (AdminUser)              | —      |
+| ACL                   | spatie/laravel-permission              | ^7.0   |
+| Auditoria             | spatie/laravel-activitylog             | ^5.0   |
+| Filas                 | Laravel Horizon                        | ^5.0   |
+| Monitoramento         | Laravel Pulse                          | ^1.0   |
+| Build                 | Vite                                   | latest |
+| Testes                | Pest                                   | ^4.0   |
+| Ambiente              | DDEV + OrbStack (macOS)                | —      |
 
 ---
 
@@ -100,28 +100,28 @@ input: ['resources/css/admin.css', 'resources/js/admin.js'];
 
 ## 7. Naming Conventions
 
-| Tipo                          | Padrão                          | Exemplo                                         |
-| ----------------------------- | ------------------------------- | ----------------------------------------------- |
-| Model                         | PascalCase singular             | `Cliente`                                       |
-| Controller/Service/Action/Job | PascalCase + sufixo             | `ClienteController`, `CreateClienteAction`      |
-| FormRequest                   | Store\|Update + Request         | `StoreClienteRequest`                           |
-| Enum / DTO                    | PascalCase + sufixo             | `StatusCliente`, `ClienteDTO`                   |
-| Tabela BD / Coluna            | snake_case                      | `clientes`, `nome_completo`                     |
-| Rota name                     | dot.notation                    | `admin.clientes.store`                          |
-| Rota URI / Blade / Component  | kebab-case                      | `/admin/clientes`, `<x-admin.kpi-card>`         |
-| Commit                        | `tipo(escopo): descrição pt-BR` | `feat(admin): adicionar listagem de clientes`   |
+| Tipo                          | Padrão                          | Exemplo                                       |
+| ----------------------------- | ------------------------------- | --------------------------------------------- |
+| Model                         | PascalCase singular             | `Cliente`                                     |
+| Controller/Service/Action/Job | PascalCase + sufixo             | `ClienteController`, `CreateClienteAction`    |
+| FormRequest                   | Store\|Update + Request         | `StoreClienteRequest`                         |
+| Enum / DTO                    | PascalCase + sufixo             | `StatusCliente`, `ClienteDTO`                 |
+| Tabela BD / Coluna            | snake_case                      | `clientes`, `nome_completo`                   |
+| Rota name                     | dot.notation                    | `admin.clientes.store`                        |
+| Rota URI / Blade / Component  | kebab-case                      | `/admin/clientes`, `<x-admin.kpi-card>`       |
+| Commit                        | `tipo(escopo): descrição pt-BR` | `feat(admin): adicionar listagem de clientes` |
 
 ---
 
 ## 8. Formatadores e Qualidade
 
-| Ferramenta     | O Que Faz                          | Comando                        |
-| -------------- | ---------------------------------- | ------------------------------ |
-| Laravel Pint   | Formata PHP (PSR-12 + Laravel)     | `./vendor/bin/pint`            |
-| Prettier       | Formata Blade, JS, CSS, JSON, MD   | `npx prettier --write resources/` |
-| PHPStan/Larastan | Análise estática PHP (level 6)   | `./vendor/bin/phpstan analyse` |
-| Pest           | Testes                             | `php artisan test`             |
-| Husky + lint-staged | Roda tudo no git commit       | Automático                     |
+| Ferramenta          | O Que Faz                        | Comando                           |
+| ------------------- | -------------------------------- | --------------------------------- |
+| Laravel Pint        | Formata PHP (PSR-12 + Laravel)   | `./vendor/bin/pint`               |
+| Prettier            | Formata Blade, JS, CSS, JSON, MD | `npx prettier --write resources/` |
+| PHPStan/Larastan    | Análise estática PHP (level 6)   | `./vendor/bin/phpstan analyse`    |
+| Pest                | Testes                           | `php artisan test`                |
+| Husky + lint-staged | Roda tudo no git commit          | Automático                        |
 
 **Verificação completa:** `npm run quality`
 
@@ -205,6 +205,7 @@ resources/views/livewire/admin/  ← Views dos componentes
 ## 12. Pacotes Disponíveis (não remover sem motivo)
 
 **Composer:**
+
 - `livewire/livewire` — UI reativa server-side
 - `spatie/laravel-permission` — ACL (roles + permissions)
 - `spatie/laravel-activitylog` — auditoria automática
@@ -226,6 +227,7 @@ php artisan migrate:fresh --seed
 ```
 
 Cria:
+
 - `admin@example.com` / `password` — role `super-admin`
 - `gestor@example.com` / `password` — role `gestor`
 
@@ -246,28 +248,32 @@ Dashboard: `/horizon`
 
 ## 15. Ambiente de Desenvolvimento
 
+Ambiente oficial: **DDEV** (config em `.ddev/`), provider **OrbStack** no macOS.
+Pré-requisitos: `brew install orbstack && brew install ddev/ddev/ddev`.
+
 ```bash
-make up          # Subir containers
-make bash        # Entrar no workspace
+ddev start       # Subir o ambiente (containers + hooks)
+make setup       # 1x: key, migrate --seed, assets Horizon/Pulse, build
+make bash        # Shell no container web (ddev ssh)
 make fresh       # migrate:fresh --seed
+make dev         # Vite dev server (HMR)
 make test        # Rodar testes
 make lint        # Pint + Prettier
 make quality     # Lint + PHPStan + Test
 ```
 
-URLs locais: App `http://localhost`, Horizon `/horizon`, Pulse `/pulse`
+URLs locais: App `https://gdf-erp.ddev.site`, Horizon `/horizon`, Pulse `/pulse`, Mailpit `ddev mailpit`.
 
 ---
 
 ## 16. Iniciando um Novo Projeto com Este Boilerplate
 
 1. Copiar este repositório
-2. Renomear `APP_NAME`, `DB_DATABASE`, `DB_USERNAME` no `.env`
-3. Rodar `composer install && npm install`
-4. Rodar `php artisan key:generate`
-5. Rodar `php artisan migrate:fresh --seed`
-6. Rodar `npm run build`
-7. Acessar `http://localhost/admin` → login com `admin@example.com` / `password`
+2. Rodar `./bin/init-project.sh` (renomeia marca/slug; ajuste o `name` do `.ddev/config.yaml`)
+3. `cp .env.example .env`
+4. `ddev start` (instala deps e roda migrate via hooks)
+5. `make setup` (key, seed, assets Horizon/Pulse, build)
+6. Acessar `https://<slug>.ddev.site/admin` → login com `admin@example.com` / `password`
 
 ### Adicionando um módulo de negócio
 
