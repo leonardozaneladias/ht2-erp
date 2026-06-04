@@ -11,6 +11,7 @@ use App\Policies\AdminUserPolicy;
 use App\Policies\PermissionGrantPolicy;
 use App\Policies\RolePolicy;
 use App\Services\Admin\AccessResolver;
+use App\Services\Admin\Settings\SettingsRuntimeApplier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
@@ -28,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(! app()->isProduction());
+
+        // Aplica as configurações persistidas (idioma, e-mail, sessão) ao config()
+        // em runtime. Tolerante a falhas durante a 1ª instalação/migração.
+        app(SettingsRuntimeApplier::class)->apply();
 
         Paginator::defaultView('vendor.pagination.inspinia');
         Paginator::defaultSimpleView('vendor.pagination.simple-inspinia');
