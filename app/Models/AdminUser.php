@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Models\Role;
@@ -109,6 +110,29 @@ class AdminUser extends Authenticatable
     public function filialAtiva(): BelongsTo
     {
         return $this->belongsTo(Filial::class, 'filial_ativa_id');
+    }
+
+    /**
+     * Papéis atribuídos ao usuário no escopo de empresas (dimensão por empresa).
+     * Complementa os papéis globais de `roles()` (spatie), que valem em todas.
+     *
+     * @return BelongsToMany<Role, $this>
+     */
+    public function papeisPorEmpresa(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'admin_user_empresa_role')
+            ->withPivot('empresa_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Papéis do usuário em uma empresa específica (apenas a dimensão por empresa).
+     *
+     * @return Collection<int, Role>
+     */
+    public function rolesNaEmpresa(int $empresaId): Collection
+    {
+        return $this->papeisPorEmpresa()->wherePivot('empresa_id', $empresaId)->get();
     }
 
     public function temAcessoAEmpresa(int $empresaId): bool
