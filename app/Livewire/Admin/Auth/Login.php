@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Auth;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -43,14 +46,27 @@ final class Login extends Component
     {
         $this->validate();
 
+        // O login é um componente Livewire e não passa pelo middleware
+        // `throttle`; o rate-limit é aplicado aqui (5 tentativas/min por e-mail+IP).
+        $chave = $this->chaveThrottle();
+
+        if (RateLimiter::tooManyAttempts($chave, 5)) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.throttle', ['seconds' => RateLimiter::availableIn($chave)]),
+            ]);
+        }
+
         if (! Auth::guard('admin')->attempt(
             ['email' => $this->email, 'password' => $this->password],
             $this->remember,
         )) {
+            RateLimiter::hit($chave, 60);
             $this->addError('email', __('auth.failed'));
 
             return;
         }
+
+        RateLimiter::clear($chave);
 
         session()->regenerate();
 
@@ -63,5 +79,10 @@ final class Login extends Component
     public function render(): View
     {
         return view('livewire.admin.auth.login');
+    }
+
+    private function chaveThrottle(): string
+    {
+        return 'login:' . Str::lower($this->email) . '|' . (request()->ip() ?? 'desconhecido');
     }
 }

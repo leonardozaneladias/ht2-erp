@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
+use App\Support\Settings\PasswordPolicy;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -11,7 +12,6 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 #[Layout('components.admin.auth-layout')]
@@ -20,13 +20,10 @@ final class ResetPassword extends Component
 {
     public string $token = '';
 
-    #[Validate('required|email')]
     public string $email = '';
 
-    #[Validate('required|confirmed|min:8')]
     public string $password = '';
 
-    #[Validate('required')]
     public string $password_confirmation = '';
 
     public function mount(string $token): void
@@ -67,5 +64,17 @@ final class ResetPassword extends Component
     public function render(): View
     {
         return view('livewire.admin.auth.reset-password');
+    }
+
+    /**
+     * @return array<string, array<int, mixed>>
+     */
+    protected function rules(): array
+    {
+        return [
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', PasswordPolicy::rule()],
+            'password_confirmation' => ['required'],
+        ];
     }
 }

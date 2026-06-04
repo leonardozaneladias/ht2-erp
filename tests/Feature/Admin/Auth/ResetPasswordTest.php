@@ -40,7 +40,7 @@ it('exibe erro se a senha é muito curta', function () {
         ->set('password', '1234567')
         ->set('password_confirmation', '1234567')
         ->call('resetPassword')
-        ->assertHasErrors(['password' => 'min']);
+        ->assertHasErrors(['password']);
 });
 
 it('redireciona para login após reset bem-sucedido', function () {
@@ -57,11 +57,11 @@ it('redireciona para login após reset bem-sucedido', function () {
 
     Livewire::test(ResetPassword::class, ['token' => $token])
         ->set('email', 'admin@teste.com')
-        ->set('password', 'nova-senha-segura')
-        ->set('password_confirmation', 'nova-senha-segura')
+        ->set('password', 'NovaSenhaSegura1')
+        ->set('password_confirmation', 'NovaSenhaSegura1')
         ->call('resetPassword')
         ->assertRedirect(route('admin.login'));
 
-    expect(Hash::check('nova-senha-segura', $admin->fresh()->password))->toBeTrue();
+    expect(Hash::check('NovaSenhaSegura1', $admin->fresh()->password))->toBeTrue();
     Event::assertDispatched(PasswordReset::class);
 });
