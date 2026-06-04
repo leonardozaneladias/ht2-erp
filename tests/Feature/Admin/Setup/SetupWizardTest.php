@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Livewire\Admin\Setup\SetupWizard;
 use App\Models\AdminUser;
+use App\Models\Empresa;
 use App\Settings\BrandingSettings;
 use App\Settings\GeneralSettings;
 use Database\Seeders\RolePermissionSeeder;
@@ -62,6 +63,14 @@ it('conclui a instalação criando o super-admin e marcando instalado', function
 
     expect($admin)->not->toBeNull()
         ->and($admin->hasRole('super-admin'))->toBeTrue();
+
+    // A instalação cria a 1ª empresa (com Matriz) e vincula o super-admin a ela.
+    $empresa = Empresa::query()->where('nome', 'Cliente Acme')->first();
+
+    expect($empresa)->not->toBeNull()
+        ->and($empresa->filiais()->where('e_matriz', true)->exists())->toBeTrue()
+        ->and($admin->temAcessoAEmpresa($empresa->id))->toBeTrue()
+        ->and($admin->fresh()->empresa_ativa_id)->toBe($empresa->id);
 });
 
 it('redireciona para o login se a instalação já foi concluída', function () {
