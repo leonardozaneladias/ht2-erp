@@ -55,18 +55,35 @@
     <div class="p-5">
         @if ($aba === 'perfis')
             {{-- ── Aba Perfis (escopo da empresa ativa) ───────────────── --}}
-            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+            @php ($superRole = config('access.super_admin_role', 'super-admin'))
+            <div class="mb-4 space-y-2">
                 <div class="text-sm">
                     @if ($empresaAtivaNome)
                         <span class="text-default-500">Perfis em</span>
                         <span class="font-semibold">{{ $empresaAtivaNome }}</span>
                     @endif
                 </div>
-                @if ($ehSuperAdminGlobal)
-                    <span class="badge badge-soft-warning">
-                        <span class="iconify tabler--crown me-1 size-4"></span>
-                        Super-admin (global)
-                    </span>
+
+                @if (! empty($rolesGlobais))
+                    <div
+                        class="bg-default-50 border-default-200 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2"
+                    >
+                        <span class="text-default-500 text-xs font-medium">Papéis globais (todas as empresas):</span>
+                        @foreach ($rolesGlobais as $papelGlobal)
+                            <span
+                                @class ([
+                                'badge',
+                                'badge-soft-warning' => $papelGlobal === $superRole,
+                                'badge-soft-secondary' => $papelGlobal !== $superRole,
+                            ])
+                            >
+                                @if ($papelGlobal === $superRole)
+                                    <span class="iconify tabler--crown me-1 size-4"></span>
+                                @endif
+                                {{ $papelGlobal }}
+                            </span>
+                        @endforeach
+                    </div>
                 @endif
             </div>
             @if ($empresaAtivaId === null)

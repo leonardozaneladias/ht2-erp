@@ -51,6 +51,10 @@ class PainelPessoa extends Component
 
     public bool $ehSuperAdminGlobal = false;
 
+    /** Papéis globais (valem em todas as empresas) — exibidos em leitura. */
+    /** @var list<string> */
+    public array $rolesGlobais = [];
+
     public string $aba = 'perfis';
 
     /** @var array<int, string> */
@@ -98,6 +102,7 @@ class PainelPessoa extends Component
         $this->rolesOriginais = $this->rolesOrdenadas();
 
         $this->ehSuperAdminGlobal = $usuario->hasRole((string) config('access.super_admin_role', 'super-admin'), 'admin');
+        $this->rolesGlobais = $usuario->getRoleNames()->all();
 
         $policy = app(AdminUserPolicy::class);
         $this->podeEditarPerfis = $this->empresaAtivaId !== null

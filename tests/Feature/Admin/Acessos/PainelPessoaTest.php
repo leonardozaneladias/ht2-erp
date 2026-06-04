@@ -74,6 +74,16 @@ it('descarta a alteração de perfis', function () {
         ->assertSet('roles', []);
 });
 
+it('exibe papéis globais em leitura na aba Perfis', function () {
+    $pessoa = criarAdminUser('pessoa@teste.com');
+    $pessoa->assignRole('gestor'); // papel global (todas as empresas)
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(PainelPessoa::class, ['usuarioId' => $pessoa->id])
+        ->assertSet('rolesGlobais', ['gestor'])
+        ->assertSee('Papéis globais');
+});
+
 it('concede e revoga um acesso direto', function () {
     $pessoa = criarAdminUser('pessoa@teste.com');
 
