@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Usuarios;
 use App\Actions\Admin\ConcederAcessoDiretoAction;
 use App\Actions\Admin\CreateAdminUserAction;
 use App\Actions\Admin\RevogarAcessoDiretoAction;
+use App\Actions\Admin\SyncAcessoEmpresaAction;
 use App\Actions\Admin\UpdateAdminUserAction;
 use App\DTOs\Admin\AdminUserDTO;
 use App\DTOs\Admin\ConcessaoAcessoDTO;
@@ -14,6 +15,7 @@ use App\Enums\ModuloAcesso;
 use App\Enums\TipoConcessao;
 use App\Exceptions\AccessException;
 use App\Models\AdminUser;
+use App\Models\Empresa;
 use App\Models\PermissionGrant;
 use App\Services\Admin\HierarchyResolver;
 use Illuminate\Contracts\View\View;
@@ -43,6 +45,10 @@ class FormUsuario extends Component
     /** @var array<int, string> */
     public array $roles = [];
 
+    // Empresas a que o usuário tem acesso (todas as filiais).
+    /** @var array<int, int> */
+    public array $empresasAcesso = [];
+
     // Painel de concessão de acesso extra (grant/deny direto).
     public bool $mostrarFormAcesso = false;
 
@@ -64,6 +70,7 @@ class FormUsuario extends Component
             $this->email = $alvo->email;
             $this->ativo = (bool) $alvo->ativo;
             $this->roles = $alvo->getRoleNames()->all();
+            $this->empresasAcesso = $alvo->empresasAcessiveis()->pluck('empresas.id')->all();
 
             return;
         }
@@ -86,6 +93,39 @@ class FormUsuario extends Component
         }
 
         $this->redirect(route('admin.usuarios.index'), navigate: true);
+    }
+
+    public function salvarEmpresas(SyncAcessoEmpresaAction $action): void
+    {
+        $this->authorize('empresas.acessos');
+
+        if ($this->usuarioId === null) {
+            return;
+        }
+
+        $action->execute(
+            AdminUser::findOrFail($this->usuarioId),
+            array_map('intval', $this->empresasAcesso),
+        );
+
+        session()->flash('toast.success', 'Acesso a empresas atualizado.');
+    }
+
+    /**
+     * Empresas ativas que podem ser concedidas ao usuário.
+     *
+     * @return Collection<int, Empresa>
+     */
+    #[Computed]
+    public function empresasDisponiveis(): Collection
+    {
+        return Empresa::query()->ativas()->orderBy('nome')->get();
+    }
+
+    #[Computed]
+    public function podeGerirEmpresas(): bool
+    {
+        return Auth::guard('admin')->user()?->can('empresas.acessos') ?? false;
     }
 
     public function abrirFormAcesso(): void

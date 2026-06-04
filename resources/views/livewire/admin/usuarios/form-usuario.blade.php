@@ -12,6 +12,7 @@
         <x-shared.tab-trigger id="aba-dados" active icon="tabler--user">Dados</x-shared.tab-trigger>
         <x-shared.tab-trigger id="aba-perfis" icon="tabler--shield-lock">Perfis</x-shared.tab-trigger>
         @if ($modo === 'editar')
+            <x-shared.tab-trigger id="aba-empresas" icon="tabler--building-community">Empresas</x-shared.tab-trigger>
             <x-shared.tab-trigger id="aba-acessos" icon="tabler--key">Acessos extras</x-shared.tab-trigger>
         @endif
     </x-shared.tab-nav>
@@ -64,6 +65,50 @@
                 @enderror
             </x-shared.card>
         </x-shared.tab-panel>
+
+        {{-- ABA EMPRESAS --}}
+        @if ($modo === 'editar')
+            <x-shared.tab-panel id="aba-empresas">
+                <x-shared.card
+                    title="Empresas acessíveis"
+                    subtitle="Empresas em que o usuário pode operar (todas as filiais)."
+                >
+                    @if (! $this->podeGerirEmpresas)
+                        <x-shared.alert variant="info" icon="tabler--lock">
+                            Você não tem permissão para gerenciar o acesso a empresas.
+                        </x-shared.alert>
+                    @elseif ($this->empresasDisponiveis->isEmpty())
+                        <x-shared.empty-state
+                            icon="tabler--building-off"
+                            title="Nenhuma empresa cadastrada"
+                            description="Cadastre empresas para conceder acesso."
+                        />
+                    @else
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                            @foreach ($this->empresasDisponiveis as $empresa)
+                                <x-shared.checkbox
+                                    :name="'empresa_' . $empresa->id"
+                                    :value="$empresa->id"
+                                    :label="$empresa->nome"
+                                    wire:model="empresasAcesso"
+                                />
+                            @endforeach
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <x-shared.button
+                                variant="primary"
+                                size="sm"
+                                wire:click="salvarEmpresas"
+                                wire:loading.attr="disabled"
+                            >
+                                <span wire:loading.remove wire:target="salvarEmpresas">Salvar acesso</span>
+                                <span wire:loading wire:target="salvarEmpresas">Salvando...</span>
+                            </x-shared.button>
+                        </div>
+                    @endif
+                </x-shared.card>
+            </x-shared.tab-panel>
+        @endif
 
         {{-- ABA ACESSOS EXTRAS --}}
         @if ($modo === 'editar')
