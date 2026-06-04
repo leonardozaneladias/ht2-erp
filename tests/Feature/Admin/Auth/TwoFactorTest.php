@@ -17,6 +17,8 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
     $this->google2fa = app(Google2FA::class);
+    // Ações sensíveis de 2FA exigem senha confirmada; aqui o foco é o 2FA.
+    session()->put('auth.password_confirmed_at', time());
 });
 
 /**

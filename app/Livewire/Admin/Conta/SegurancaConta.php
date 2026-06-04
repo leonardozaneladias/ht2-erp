@@ -8,6 +8,7 @@ use App\Actions\Admin\Security\ConfirmTwoFactorAction;
 use App\Actions\Admin\Security\DisableTwoFactorAction;
 use App\Actions\Admin\Security\EnableTwoFactorAction;
 use App\Actions\Admin\Security\RegenerateRecoveryCodesAction;
+use App\Livewire\Concerns\ConfirmsPassword;
 use App\Models\AdminUser;
 use App\Services\Admin\Security\TwoFactorService;
 use Illuminate\Contracts\View\View;
@@ -17,15 +18,16 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * Segurança da conta: gestão do 2FA do próprio usuário (ativar, confirmar,
- * regenerar códigos de recuperação e desativar).
- *
- * Nota: a confirmação de senha para estas ações é adicionada no Batch 2.3.
+ * Segurança da conta: gestão do 2FA do próprio usuário. Ações sensíveis
+ * (ativar, desativar, regenerar) exigem reconfirmação de senha (ConfirmsPassword)
+ * — por isso resolvem as Actions via app(), já que são chamadas pelo trait.
  */
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Segurança da conta')]
 class SegurancaConta extends Component
 {
+    use ConfirmsPassword;
+
     public bool $configurando = false;
 
     public string $svgQr = '';
@@ -35,12 +37,14 @@ class SegurancaConta extends Component
     /** @var list<string> */
     public array $recoveryCodes = [];
 
-    public function ativar(EnableTwoFactorAction $enable, TwoFactorService $service): void
+    public function ativar(): void
     {
-        $usuario = $this->usuario();
-        $secret = $enable->execute($usuario);
+        $this->ensurePasswordIsConfirmed();
 
-        $this->svgQr = $service->qrCodeSvg($usuario, $secret);
+        $usuario = $this->usuario();
+        $secret = app(EnableTwoFactorAction::class)->execute($usuario);
+
+        $this->svgQr = app(TwoFactorService::class)->qrCodeSvg($usuario, $secret);
         $this->configurando = true;
         $this->recoveryCodes = [];
         $this->reset('codigoConfirmacao');
@@ -65,16 +69,20 @@ class SegurancaConta extends Component
         $this->dispatch('toast', variant: 'success', message: 'Verificação em duas etapas ativada.');
     }
 
-    public function regenerar(RegenerateRecoveryCodesAction $action): void
+    public function regenerar(): void
     {
-        $this->recoveryCodes = $action->execute($this->usuario());
+        $this->ensurePasswordIsConfirmed();
+
+        $this->recoveryCodes = app(RegenerateRecoveryCodesAction::class)->execute($this->usuario());
 
         $this->dispatch('toast', variant: 'success', message: 'Novos códigos de recuperação gerados.');
     }
 
-    public function desativar(DisableTwoFactorAction $action): void
+    public function desativar(): void
     {
-        $action->execute($this->usuario());
+        $this->ensurePasswordIsConfirmed();
+
+        app(DisableTwoFactorAction::class)->execute($this->usuario());
 
         $this->reset('recoveryCodes', 'svgQr', 'configurando', 'codigoConfirmacao');
 

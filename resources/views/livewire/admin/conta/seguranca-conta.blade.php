@@ -31,24 +31,22 @@
                     <span class="text-default-500 text-sm">Sua conta está protegida por 2FA.</span>
                 </div>
                 <div class="mt-5 flex flex-wrap gap-3">
-                    <x-shared.loading-button
+                    <x-shared.button
                         type="button"
                         variant="light"
-                        wire:click="regenerar"
-                        target="regenerar"
+                        wire:click="iniciarConfirmacaoDeSenha('regenerar')"
                         icon="tabler--refresh"
                     >
                         Gerar novos códigos de recuperação
-                    </x-shared.loading-button>
-                    <x-shared.loading-button
+                    </x-shared.button>
+                    <x-shared.button
                         type="button"
                         variant="danger"
-                        wire:click="desativar"
-                        target="desativar"
+                        wire:click="iniciarConfirmacaoDeSenha('desativar')"
                         icon="tabler--shield-off"
                     >
                         Desativar 2FA
-                    </x-shared.loading-button>
+                    </x-shared.button>
                 </div>
             @elseif ($configurando)
                 <p class="text-default-500 mb-4 text-sm">Escaneie o QR Code no seu aplicativo autenticador (Google Authenticator, Authy…) e informe o código de 6 dígitos para concluir.</p>
@@ -71,10 +69,16 @@
                 </div>
             @else
                 <p class="text-default-500 mb-4 text-sm">A verificação em duas etapas está desativada. Recomendamos ativá-la para reforçar a segurança do seu acesso.</p>
-                <x-shared.loading-button type="button" wire:click="ativar" target="ativar" icon="tabler--shield-lock">
+                <x-shared.button
+                    type="button"
+                    wire:click="iniciarConfirmacaoDeSenha('ativar')"
+                    icon="tabler--shield-lock"
+                >
                     Ativar 2FA
-                </x-shared.loading-button>
+                </x-shared.button>
             @endif
         </x-shared.card>
     </div>
+
+    @include ('admin.partials.confirms-password')
 </div>
