@@ -18,6 +18,13 @@ return [
         'title' => 'Administração',
         'items' => [
             [
+                'label' => 'Empresas',
+                'icon' => 'tabler--building-community',
+                'route' => 'admin.empresas.index',
+                'permission' => 'empresas.listar',
+                'active' => ['admin.empresas.*'],
+            ],
+            [
                 'label' => 'Controle de acesso',
                 'icon' => 'tabler--shield-lock',
                 'route' => 'admin.acesso.index',

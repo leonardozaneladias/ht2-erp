@@ -10,6 +10,7 @@ enum ModuloAcesso: string
     {
         return match ($this) {
             self::Dashboard => 'Dashboard',
+            self::Empresas => 'Empresas',
             self::Usuarios => 'Usuários',
             self::Perfis => 'Perfis',
             self::Acessos => 'Controle de Acesso',
@@ -22,6 +23,7 @@ enum ModuloAcesso: string
     {
         return match ($this) {
             self::Dashboard => 'Painel inicial e indicadores.',
+            self::Empresas => 'Cadastro de empresas e filiais (multi-tenant).',
             self::Usuarios => 'Gestão de usuários administrativos.',
             self::Perfis => 'Gestão de perfis (papéis) e suas permissões.',
             self::Acessos => 'Concessões diretas, matriz e governança de acesso.',
@@ -34,6 +36,7 @@ enum ModuloAcesso: string
     {
         return match ($this) {
             self::Dashboard => 'info',
+            self::Empresas => 'primary',
             self::Usuarios => 'primary',
             self::Perfis => 'secondary',
             self::Acessos => 'warning',
@@ -45,6 +48,7 @@ enum ModuloAcesso: string
     {
         return match ($this) {
             self::Dashboard => 'tabler--dashboard',
+            self::Empresas => 'tabler--building-community',
             self::Usuarios => 'tabler--users',
             self::Perfis => 'tabler--shield-lock',
             self::Acessos => 'tabler--lock-access',
@@ -65,6 +69,7 @@ enum ModuloAcesso: string
     }
 
     case Dashboard = 'dashboard';
+    case Empresas = 'empresas';
     case Usuarios = 'usuarios';
     case Perfis = 'perfis';
     case Acessos = 'acessos';

@@ -84,6 +84,29 @@ return [
             ],
         ],
 
+        ModuloAcesso::Empresas->value => [
+            'empresas.listar' => [
+                'label' => 'Listar empresas',
+                'descricao' => 'Ver a listagem de empresas e filiais.',
+            ],
+            'empresas.criar' => [
+                'label' => 'Criar empresas',
+                'descricao' => 'Cadastrar novas empresas e filiais.',
+            ],
+            'empresas.editar' => [
+                'label' => 'Editar empresas',
+                'descricao' => 'Alterar dados, branding, filiais e status de empresas.',
+            ],
+            'empresas.deletar' => [
+                'label' => 'Excluir empresas',
+                'descricao' => 'Remover empresas e suas filiais.',
+            ],
+            'empresas.acessos' => [
+                'label' => 'Gerenciar acesso a empresas',
+                'descricao' => 'Definir quais empresas e filiais cada usuário acessa.',
+            ],
+        ],
+
         ModuloAcesso::Usuarios->value => [
             'usuarios.listar' => [
                 'label' => 'Listar usuários',

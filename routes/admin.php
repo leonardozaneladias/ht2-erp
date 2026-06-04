@@ -107,6 +107,12 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         Route::get('/seguranca', App\Livewire\Admin\Conta\SegurancaConta::class)->name('seguranca');
     });
 
+    Route::prefix('empresas')->name('empresas.')->group(function (): void {
+        Route::get('/', App\Livewire\Admin\Empresas\IndexEmpresas::class)->name('index');
+        Route::get('/nova', App\Livewire\Admin\Empresas\FormEmpresa::class)->name('create');
+        Route::get('/{empresa}/editar', App\Livewire\Admin\Empresas\FormEmpresa::class)->name('edit');
+    });
+
     Route::prefix('usuarios')->name('usuarios.')->group(function (): void {
         Route::get('/', App\Livewire\Admin\Usuarios\IndexUsuarios::class)->name('index');
         Route::get('/novo', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('create');
