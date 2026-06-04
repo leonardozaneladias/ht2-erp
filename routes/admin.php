@@ -91,7 +91,7 @@ Route::prefix('admin')->name('admin.')->middleware(App\Http\Middleware\EnsureSys
 });
 
 // ── Admin autenticado (setup tem precedência sobre o login) ─────────────────
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class])->group(function () use ($placeholder): void {
+Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class])->group(function () use ($placeholder): void {
     Route::redirect('/', '/admin/dashboard');
 
     Route::post('/logout', LogoutController::class)->name('logout');
