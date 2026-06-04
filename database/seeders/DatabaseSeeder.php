@@ -17,5 +17,15 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             AdminUserSeeder::class,
         ]);
+
+        // O ambiente semeado representa um sistema já configurado: pula o Setup Wizard.
+        $general = app(\App\Settings\GeneralSettings::class);
+        $general->instalado = true;
+
+        if ($general->nome_cliente === '') {
+            $general->nome_cliente = 'Empresa Demonstração';
+        }
+
+        $general->save();
     }
 }

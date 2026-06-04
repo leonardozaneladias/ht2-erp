@@ -79,15 +79,18 @@ if (app()->isLocal()) {
     Route::view('/admin/dev/livewire', 'admin.dev.livewire')->name('admin.dev.livewire');
 }
 
-// ── Auth (sem middleware) ──────────────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->group(function (): void {
+// ── Setup Wizard (público enquanto a instalação não foi concluída) ──────────
+Route::get('/admin/setup', App\Livewire\Admin\Setup\SetupWizard::class)->name('admin.setup');
+
+// ── Auth (redireciona para o setup enquanto não instalado) ──────────────────
+Route::prefix('admin')->name('admin.')->middleware(App\Http\Middleware\EnsureSystemConfigured::class)->group(function (): void {
     Route::get('/login', App\Livewire\Admin\Auth\Login::class)->name('login');
     Route::get('/esqueceu-senha', App\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
     Route::get('/resetar-senha/{token}', App\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
 });
 
-// ── Admin autenticado ─────────────────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function () use ($placeholder): void {
+// ── Admin autenticado (setup tem precedência sobre o login) ─────────────────
+Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth'])->group(function () use ($placeholder): void {
     Route::redirect('/', '/admin/dashboard');
 
     Route::post('/logout', LogoutController::class)->name('logout');
@@ -125,6 +128,10 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
 
     Route::prefix('auditoria')->name('auditoria.')->group(function (): void {
         Route::get('/', App\Livewire\Admin\Auditoria\IndexAuditoria::class)->name('index');
+    });
+
+    Route::prefix('configuracoes')->name('configuracoes.')->group(function (): void {
+        Route::get('/', App\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)->name('index');
     });
 
     // Adicione aqui as rotas do seu módulo de negócio

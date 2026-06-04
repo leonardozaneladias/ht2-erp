@@ -1,6 +1,8 @@
+@inject ('loginSettings', 'App\Settings\LoginSettings')
+
 <x-admin.auth-form-card>
-    <h4 class="text-default-900 mb-2 text-center text-lg font-bold">Bem-vindo de volta!</h4>
-    <p class="text-default-400 mx-auto mb-9 w-full text-center text-sm lg:w-72">Acesse o painel administrativo.</p>
+    <h4 class="text-default-900 mb-2 text-center text-lg font-bold">{{ $loginSettings->titulo }}</h4>
+    <p class="text-default-400 mx-auto mb-9 w-full text-center text-sm lg:w-72">{{ $loginSettings->subtitulo }}</p>
 
     @if (session('status'))
         <x-shared.alert variant="success" class="mb-6">{{ session('status') }}</x-shared.alert>

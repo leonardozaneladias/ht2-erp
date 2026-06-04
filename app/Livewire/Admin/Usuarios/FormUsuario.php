@@ -228,8 +228,8 @@ class FormUsuario extends Component
     protected function rules(): array
     {
         $senhaRegra = $this->usuarioId === null
-            ? ['required', 'string', 'min:8', 'max:191']
-            : ['nullable', 'string', 'min:8', 'max:191'];
+            ? ['required', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191']
+            : ['nullable', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'];
 
         $ator = Auth::guard('admin')->user();
         $gerenciaveis = $ator instanceof AdminUser

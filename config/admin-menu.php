@@ -38,6 +38,13 @@ return [
                 'permission' => 'auditoria.visualizar',
                 'active' => ['admin.auditoria.*'],
             ],
+            [
+                'label' => 'Configurações',
+                'icon' => 'tabler--settings',
+                'route' => 'admin.configuracoes.index',
+                'permission' => 'configuracoes.editar',
+                'active' => ['admin.configuracoes.*'],
+            ],
         ],
     ],
 ];

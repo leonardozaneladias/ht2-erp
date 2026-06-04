@@ -30,7 +30,6 @@
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ config('app.name') }}" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <link rel="icon" href="{{ asset('images/favicon.ico') }}" />
 
     @isset ($styles)
         {{ $styles }}
@@ -39,6 +38,10 @@
     <x-admin.partials.theme-bootstrap />
 
     @vite (['resources/css/admin.css', 'resources/js/admin.js'])
+
+    {{-- Identidade visual configurável: favicon + cores do tema (sobrescreve o @theme em runtime). --}}
+    <x-admin.branding-css />
+
     @if ($withLivewire)
         @livewireStyles
     @endif

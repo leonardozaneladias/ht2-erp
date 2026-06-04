@@ -44,22 +44,26 @@
 @endphp
 
 <aside class="app-menu" id="app-menu">
+    @php
+        $brandingSidebar = app(\App\Services\Admin\Settings\BrandingService::class);
+    @endphp
+
     <a class="logo-box" href="{{ route('admin.dashboard') }}">
         <span class="logo logo-light">
             <span class="logo-lg">
-                <img alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_path')) }}" />
+                <img alt="{{ $brandingSidebar->nomeSistema() }}" src="{{ $brandingSidebar->logoUrl('light') }}" />
             </span>
             <span class="logo-sm">
-                <img alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_sm_path')) }}" />
+                <img alt="{{ $brandingSidebar->nomeSistema() }}" src="{{ $brandingSidebar->logoUrl('sm') }}" />
             </span>
         </span>
 
         <span class="logo logo-dark">
             <span class="logo-lg">
-                <img alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_dark_path')) }}" />
+                <img alt="{{ $brandingSidebar->nomeSistema() }}" src="{{ $brandingSidebar->logoUrl('dark') }}" />
             </span>
             <span class="logo-sm">
-                <img alt="{{ config('app.name') }}" src="{{ asset(config('branding.logo_sm_path')) }}" />
+                <img alt="{{ $brandingSidebar->nomeSistema() }}" src="{{ $brandingSidebar->logoUrl('sm') }}" />
             </span>
         </span>
     </a>

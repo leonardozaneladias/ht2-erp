@@ -23,31 +23,35 @@
 <header class="app-header">
     <div class="container-fluid flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
+            @php
+                $brandingTopbar = app(\App\Services\Admin\Settings\BrandingService::class);
+            @endphp
+
             <div class="logo-topbar">
                 <a class="logo-box" href="{{ route('admin.dashboard') }}">
                     <div class="logo-light">
                         <img
                             class="logo-lg h-6"
-                            alt="{{ config('app.name') }}"
-                            src="{{ asset(config('branding.logo_path')) }}"
+                            alt="{{ $brandingTopbar->nomeSistema() }}"
+                            src="{{ $brandingTopbar->logoUrl('light') }}"
                         />
                         <img
                             class="logo-sm h-6"
-                            alt="{{ config('app.name') }}"
-                            src="{{ asset(config('branding.logo_sm_path')) }}"
+                            alt="{{ $brandingTopbar->nomeSistema() }}"
+                            src="{{ $brandingTopbar->logoUrl('sm') }}"
                         />
                     </div>
 
                     <div class="logo-dark">
                         <img
                             class="logo-lg h-6"
-                            alt="{{ config('app.name') }}"
-                            src="{{ asset(config('branding.logo_dark_path')) }}"
+                            alt="{{ $brandingTopbar->nomeSistema() }}"
+                            src="{{ $brandingTopbar->logoUrl('dark') }}"
                         />
                         <img
                             class="logo-sm h-6"
-                            alt="{{ config('app.name') }}"
-                            src="{{ asset(config('branding.logo_sm_path')) }}"
+                            alt="{{ $brandingTopbar->nomeSistema() }}"
+                            src="{{ $brandingTopbar->logoUrl('sm') }}"
                         />
                     </div>
                 </a>
