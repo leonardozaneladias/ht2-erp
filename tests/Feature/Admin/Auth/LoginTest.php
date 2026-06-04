@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 
 it('renderiza o formulário de login', function () {
     Livewire::test(Login::class)
-        ->assertSee('Bem-vindo de volta!')
+        ->assertSee('Acesse sua conta')
         ->assertSee('E-mail')
         ->assertSee('Senha');
 });

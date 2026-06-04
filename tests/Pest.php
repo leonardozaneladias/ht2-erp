@@ -15,6 +15,18 @@ pest()->extend(TestCase::class)
 pest()->extend(TestCase::class)
     ->in('Unit');
 
+// Por padrão, considera o sistema já instalado para não acionar o middleware do
+// Setup Wizard nos testes HTTP. Os testes do próprio wizard sobrescrevem isto.
+pest()->beforeEach(function () {
+    try {
+        if (Illuminate\Support\Facades\Schema::hasTable('settings')) {
+            marcarInstalado(true);
+        }
+    } catch (Throwable) {
+        // Settings indisponíveis neste teste — nada a fazer.
+    }
+})->in('Feature');
+
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
@@ -53,4 +65,14 @@ function concederAcessoDireto(
         'reason' => 'teste',
         'expires_at' => $expiraEm,
     ]);
+}
+
+/**
+ * Marca (ou desmarca) o sistema como instalado para os testes.
+ */
+function marcarInstalado(bool $instalado = true): void
+{
+    $settings = app(App\Settings\GeneralSettings::class);
+    $settings->instalado = $instalado;
+    $settings->save();
 }

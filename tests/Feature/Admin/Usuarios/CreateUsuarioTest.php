@@ -36,7 +36,7 @@ it('cria usuário com role e grava activity log', function () {
         ->test(FormUsuario::class)
         ->set('nome', 'Novo Usuário')
         ->set('email', 'novo@teste.com')
-        ->set('password', 'senhaforte')
+        ->set('password', 'SenhaForte1')
         ->set('ativo', true)
         ->set('roles', ['gestor'])
         ->call('salvar')
@@ -46,7 +46,7 @@ it('cria usuário com role e grava activity log', function () {
     $novo = AdminUser::where('email', 'novo@teste.com')->firstOrFail();
     expect($novo->nome)->toBe('Novo Usuário')
         ->and($novo->hasRole('gestor'))->toBeTrue()
-        ->and(Hash::check('senhaforte', $novo->password))->toBeTrue();
+        ->and(Hash::check('SenhaForte1', $novo->password))->toBeTrue();
 
     expect(Activity::where('log_name', 'admin_users')
         ->where('event', 'created')
@@ -67,7 +67,7 @@ it('valida e-mail único', function () {
         ->test(FormUsuario::class)
         ->set('nome', 'Conflito')
         ->set('email', 'existe@teste.com')
-        ->set('password', 'senhaforte')
+        ->set('password', 'SenhaForte1')
         ->call('salvar')
         ->assertHasErrors(['email']);
 });
