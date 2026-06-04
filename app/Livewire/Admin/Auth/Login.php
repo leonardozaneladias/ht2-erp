@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
+use App\Models\AdminUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -56,10 +57,9 @@ final class Login extends Component
             ]);
         }
 
-        if (! Auth::guard('admin')->attempt(
-            ['email' => $this->email, 'password' => $this->password],
-            $this->remember,
-        )) {
+        // Valida as credenciais SEM autenticar: com 2FA ativo, só autenticamos
+        // após o desafio (estado intermediário "pendente"). Nunca antes.
+        if (! Auth::guard('admin')->validate(['email' => $this->email, 'password' => $this->password])) {
             RateLimiter::hit($chave, 60);
             $this->addError('email', __('auth.failed'));
 
@@ -67,6 +67,21 @@ final class Login extends Component
         }
 
         RateLimiter::clear($chave);
+
+        $usuario = AdminUser::where('email', $this->email)->first();
+
+        if ($usuario !== null && $usuario->hasTwoFactorEnabled()) {
+            session()->put('2fa.pending', [
+                'id' => $usuario->id,
+                'remember' => $this->remember,
+            ]);
+
+            $this->redirect(route('admin.two-factor-challenge'), navigate: true);
+
+            return;
+        }
+
+        Auth::guard('admin')->login($usuario, $this->remember);
 
         session()->regenerate();
 

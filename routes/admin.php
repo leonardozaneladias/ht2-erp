@@ -87,10 +87,11 @@ Route::prefix('admin')->name('admin.')->middleware(App\Http\Middleware\EnsureSys
     Route::get('/login', App\Livewire\Admin\Auth\Login::class)->name('login');
     Route::get('/esqueceu-senha', App\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
     Route::get('/resetar-senha/{token}', App\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
+    Route::get('/two-factor-challenge', App\Livewire\Admin\Auth\TwoFactorChallenge::class)->name('two-factor-challenge');
 });
 
 // ── Admin autenticado (setup tem precedência sobre o login) ─────────────────
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\CheckInactivity::class])->group(function () use ($placeholder): void {
+Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class])->group(function () use ($placeholder): void {
     Route::redirect('/', '/admin/dashboard');
 
     Route::post('/logout', LogoutController::class)->name('logout');
@@ -103,6 +104,7 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
     Route::prefix('conta')->name('conta.')->group(function () use ($placeholder): void {
         Route::get('/editar', static fn (): Response => $placeholder('Configurações da Conta'))->name('edit');
         Route::get('/notificacoes', static fn (): Response => $placeholder('Preferências de Notificação'))->name('notificacoes');
+        Route::get('/seguranca', App\Livewire\Admin\Conta\SegurancaConta::class)->name('seguranca');
     });
 
     Route::prefix('usuarios')->name('usuarios.')->group(function (): void {
