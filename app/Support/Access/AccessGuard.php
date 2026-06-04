@@ -74,6 +74,45 @@ final class AccessGuard
         }
     }
 
+    /**
+     * Auto-gestão no escopo por empresa: o ator não pode remover de si as
+     * permissões de auto-gestão considerando seus papéis globais somados aos
+     * novos papéis na empresa. Super-admin global nunca se tranca.
+     *
+     * @param  list<string>  $rolesNovas  nomes dos papéis na empresa após a mudança
+     */
+    public function garantirAutoGestaoEmpresa(AdminUser $ator, AdminUser $alvo, array $rolesNovas): void
+    {
+        if (! $ator->is($alvo)) {
+            return;
+        }
+
+        $ator->loadMissing('roles');
+
+        if ($ator->roles->contains('name', $this->superAdminRole())) {
+            return;
+        }
+
+        $nomes = array_values(array_unique([
+            ...$ator->roles->pluck('name')->all(),
+            ...$rolesNovas,
+        ]));
+
+        $permsNovas = Role::query()
+            ->where('guard_name', 'admin')
+            ->whereIn('name', $nomes)
+            ->with('permissions')
+            ->get()
+            ->flatMap(static fn (Role $role) => $role->permissions->pluck('name'))
+            ->unique();
+
+        foreach ($this->selfManagementPermissions() as $permissao) {
+            if (! $permsNovas->contains($permissao)) {
+                throw AccessException::autoRemocaoGestao();
+            }
+        }
+    }
+
     public function garantirRoleNaoProtegida(string $role): void
     {
         if (in_array($role, $this->protectedRoles(), true)) {
