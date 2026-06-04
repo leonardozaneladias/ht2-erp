@@ -1,0 +1,109 @@
+# Multi-empresa & Multi-filial (multi-tenant lógico)
+
+> Várias **empresas** e **filiais** convivem na mesma instância, com **isolamento
+> de dados** por empresa, **papéis por empresa** e **branding** que muda conforme
+> a empresa ativa. É um multi-tenant **lógico** (single-database), não multi-database.
+
+---
+
+## 1. Conceitos
+
+| Conceito          | Onde vive                                                                                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Empresa (tenant)  | tabela `empresas` (`App\Models\Empresa`)                                                                                                            |
+| Filial            | tabela `filiais` (`App\Models\Filial`), `belongsTo` empresa; toda empresa nasce com a **Matriz**                                                    |
+| Acesso do usuário | pivots `admin_user_empresa` (com `todas_filiais`) e `admin_user_filial`                                                                             |
+| Contexto ativo    | `App\Support\Tenancy\TenantContext` (sessão: `tenant.empresa_id` / `tenant.filial_id`) + colunas `admin_users.empresa_ativa_id` / `filial_ativa_id` |
+
+O contexto ativo é hidratado a cada requisição admin autenticada pelo middleware
+`App\Http\Middleware\DefinirContextoTenant`, que revalida o acesso e cai para a
+empresa padrão quando necessário. `App\Support\Tenancy\TenantResolver` decide as
+empresas/filiais acessíveis (super-admin enxerga todas as ativas).
+
+A troca de empresa/filial acontece pelo seletor da topbar
+(`App\Livewire\Admin\Tenancy\SeletorEmpresaFilial`), que delega às actions
+`DefinirEmpresaAtivaAction` / `DefinirFilialAtivaAction` (persistem coluna + sessão
+e invalidam o cache de acesso).
+
+---
+
+## 2. Isolamento de dados — criando um módulo de negócio
+
+Todo registro de negócio deve ter `empresa_id`. Use o trait `BelongsToEmpresa`:
+
+```php
+// migration
+$table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
+$table->index('empresa_id');
+
+// model
+use App\Models\Concerns\BelongsToEmpresa;
+
+class Cliente extends Model
+{
+    use BelongsToEmpresa; // global scope por empresa ativa + auto-preenche no create
+}
+```
+
+Com isso:
+
+- **Leitura** é filtrada automaticamente pela empresa ativa (global scope `empresa`).
+- **Criação** preenche `empresa_id` com a empresa ativa quando não informado.
+- **`unique` deve ser por empresa**: `Rule::unique('clientes', 'cpf')->where('empresa_id', $empresaId)`.
+- **Escape consciente** (relatórios cross-empresa autorizados): `Cliente::withoutGlobalScope('empresa')`.
+- **Sem empresa ativa** (CLI/jobs) o scope não filtra — defina o contexto:
+  `app(TenantContext::class)->definirEmpresa($id)` antes de operar, e re-hidrate o
+  contexto no `handle()` de jobs (passe `empresa_id`/`filial_id` no payload).
+
+`filial_id` é **opcional**: use em registros de filial (não em dados corporativos da empresa).
+
+---
+
+## 3. RBAC por empresa (dois níveis)
+
+O controle de acesso é customizado (`AccessResolver` lê um snapshot próprio, não o
+`$user->can()` do spatie). Os papéis efetivos de um usuário numa empresa são a **união**:
+
+1. **Papéis globais** — atribuídos via spatie (`$user->assignRole(...)`, tabela
+   `model_has_roles`). Valem em **todas** as empresas (ex.: `super-admin`, papéis "do grupo").
+   Geridos no **formulário de Usuários** e exibidos em leitura no hub.
+2. **Papéis por empresa** — tabela `admin_user_empresa_role` (`$user->papeisPorEmpresa()` /
+   `$user->rolesNaEmpresa($empresaId)`). Valem só na empresa. Geridos no **hub de Controle de
+   Acesso** (`PainelPessoa`), no escopo da **empresa ativa**, via `SyncRolesEmpresaAction`.
+
+O `AccessCache` chaveia o snapshot por `(usuário, empresa ativa)` e une os dois níveis;
+`HierarchyResolver` calcula o nível efetivo no contexto da empresa. **super-admin é sempre
+global** e imune (bypass no Gate). Papéis protegidos (`config('access.protected_roles')`)
+não são atribuíveis no escopo por empresa.
+
+Conceder a um usuário **acesso** a uma empresa (independente de papéis) é feito na aba
+**Empresas** do formulário de usuário (`SyncAcessoEmpresaAction`, permissão `empresas.acessos`).
+
+---
+
+## 4. Branding por empresa ativa
+
+`App\Services\Admin\Settings\BrandingService` resolve, nesta ordem:
+
+1. Empresa ativa (logo, favicon, cores em `empresas`);
+2. Settings da instância (`BrandingSettings`);
+3. Fallback estático (`config/branding.php`).
+
+Login e Setup Wizard (sem empresa ativa) usam o branding da instância. As cores são
+emitidas como CSS custom properties no `<head>` (sem rebuild).
+
+---
+
+## 5. Bootstrap
+
+`migrate:fresh --seed` e o **Setup Wizard** criam a 1ª empresa + filial Matriz e vinculam
+o super-admin (definindo-a como ativa). Em uma instalação nova, o Setup coleta os dados do
+cliente, cria a empresa e o primeiro super-admin já com acesso.
+
+---
+
+## 6. Gestão de Empresas/Filiais
+
+Módulo em `/admin/empresas` (`App\Livewire\Admin\Empresas\*`), permissões `empresas.*`
+(catálogo em `config/access.php`). O CRUD de empresa inclui dados cadastrais e a paleta de
+cores de branding; toda empresa criada nasce com a filial Matriz.

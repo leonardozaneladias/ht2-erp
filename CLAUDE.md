@@ -63,6 +63,21 @@ Rotas admin: `routes/admin.php` → auth + dashboard + módulos + dev/components
 input: ['resources/css/admin.css', 'resources/js/admin.js'];
 ```
 
+### 3.3 Multi-tenancy lógico (empresa/filial)
+
+Uma instalação por cliente, porém **multi-tenant lógico**: várias **empresas** e
+**filiais** na mesma instância, com isolamento de dados, papéis por empresa e branding
+por empresa ativa. Regras essenciais:
+
+- Todo registro de negócio tem `empresa_id`; use o trait `App\Models\Concerns\BelongsToEmpresa`
+  (global scope por empresa ativa + auto-preenche no `creating`). `filial_id` é opcional.
+- Tenant ativo: `App\Support\Tenancy\TenantContext` (sessão), hidratado pelo middleware
+  `DefinirContextoTenant`. `unique` sempre por empresa. Escape consciente: `withoutGlobalScope('empresa')`.
+- RBAC de **dois níveis**: papéis globais (spatie, todas as empresas) + papéis por empresa
+  (`admin_user_empresa_role`, geridos no hub no escopo da empresa ativa). super-admin é sempre global.
+
+**Detalhes e como criar módulos tenant-scoped:** [`docs/multi-empresa.md`](docs/multi-empresa.md).
+
 ---
 
 ## 4. Idioma e Comunicação
