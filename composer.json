@@ -24,7 +24,8 @@
     "openspout/openspout": "^5.7",
     "power-components/livewire-powergrid": "^6.10",
     "spatie/laravel-activitylog": "^5.0",
-    "spatie/laravel-permission": "^7.3"
+    "spatie/laravel-permission": "^7.3",
+    "spatie/laravel-settings": "^3.9"
   },
   "require-dev": {
     "barryvdh/laravel-debugbar": "^4.2",
