@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\Models\AdminUser;
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
 
@@ -24,9 +25,7 @@ final class HierarchyResolver
             return PHP_INT_MAX;
         }
 
-        $user->loadMissing('roles');
-
-        $niveis = $user->roles->pluck('nivel');
+        $niveis = $this->rolesEfetivas($user)->pluck('nivel');
 
         return $niveis->isEmpty() ? 0 : (int) $niveis->max();
     }
@@ -63,6 +62,28 @@ final class HierarchyResolver
         }
 
         return $query->get();
+    }
+
+    /**
+     * Roles efetivas no contexto atual: globais (spatie) unidas às atribuídas
+     * na empresa ativa. Base do nível efetivo por empresa.
+     *
+     * @return Collection<int, Role>
+     */
+    private function rolesEfetivas(AdminUser $user): Collection
+    {
+        $user->loadMissing('roles');
+
+        /** @var Collection<int, Role> $roles */
+        $roles = collect($user->roles->all());
+
+        $empresaId = app(TenantContext::class)->empresaAtivaId();
+
+        if ($empresaId !== null) {
+            $roles = $roles->merge($user->rolesNaEmpresa($empresaId));
+        }
+
+        return $roles;
     }
 
     private function ehSuperAdmin(AdminUser $user): bool

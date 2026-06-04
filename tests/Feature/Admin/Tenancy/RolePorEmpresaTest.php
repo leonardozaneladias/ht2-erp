@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\Empresa;
+use App\Services\Admin\AccessResolver;
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
@@ -46,4 +49,55 @@ it('não confunde papel global (spatie) com papel por empresa', function () {
     // Papel global vive em roles() (spatie); por empresa vive na dimensão própria.
     expect($user->roles->pluck('name')->all())->toBe(['super-admin'])
         ->and($user->rolesNaEmpresa($empresa->id)->pluck('name')->all())->toBe(['gestor']);
+});
+
+it('resolve permissão de papel apenas na empresa onde foi atribuído', function () {
+    $a = Empresa::create(['nome' => 'A', 'ativo' => true]);
+    $b = Empresa::create(['nome' => 'B', 'ativo' => true]);
+    $perm = Permission::create(['name' => 'relatorios.ver', 'guard_name' => 'admin']);
+    $gestor = novaRoleAdmin('gestor');
+    $gestor->givePermissionTo($perm);
+
+    $user = criarAdminUser('u@teste.com');
+    $user->papeisPorEmpresa()->attach($gestor->id, ['empresa_id' => $a->id]);
+
+    $ctx = app(TenantContext::class);
+    $resolver = app(AccessResolver::class);
+
+    $ctx->definirEmpresa($a->id);
+    expect($resolver->decide($user, 'relatorios.ver'))->toBeTrue();
+
+    // Na empresa B o usuário não tem o papel: sem opinião (cai nas policies).
+    $ctx->definirEmpresa($b->id);
+    expect($resolver->decide($user, 'relatorios.ver'))->toBeNull();
+});
+
+it('papel global concede em qualquer empresa e sem empresa', function () {
+    $a = Empresa::create(['nome' => 'A', 'ativo' => true]);
+    $perm = Permission::create(['name' => 'relatorios.ver', 'guard_name' => 'admin']);
+    $role = novaRoleAdmin('plataforma');
+    $role->givePermissionTo($perm);
+
+    $user = criarAdminUser('u@teste.com');
+    $user->assignRole('plataforma');
+
+    $ctx = app(TenantContext::class);
+    $resolver = app(AccessResolver::class);
+
+    $ctx->definirEmpresa($a->id);
+    expect($resolver->decide($user, 'relatorios.ver'))->toBeTrue();
+
+    $ctx->limpar();
+    expect($resolver->decide($user, 'relatorios.ver'))->toBeTrue();
+});
+
+it('super-admin global ignora a empresa ativa', function () {
+    $a = Empresa::create(['nome' => 'A', 'ativo' => true]);
+    novaRoleAdmin('super-admin');
+    $user = criarAdminUser('u@teste.com');
+    $user->assignRole('super-admin');
+
+    app(TenantContext::class)->definirEmpresa($a->id);
+
+    expect(app(AccessResolver::class)->decide($user, 'qualquer.coisa'))->toBeTrue();
 });
