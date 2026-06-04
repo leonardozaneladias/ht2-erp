@@ -83,7 +83,7 @@ final class UsuariosTable extends PowerGridComponent
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
-            ->add('nome')
+            ->add('nome', fn (AdminUser $u): string => $this->renderNome($u))
             ->add('email')
             ->add('perfis', fn (AdminUser $u): string => $this->renderPerfis($u))
             ->add('status', fn (AdminUser $u): string => $this->renderStatus($u))
@@ -270,11 +270,28 @@ final class UsuariosTable extends PowerGridComponent
             ->all();
     }
 
+    protected function renderNome(AdminUser $u): string
+    {
+        $nome = (string) $u->getAttribute('nome');
+
+        return Blade::render(
+            '<div class="flex items-center gap-2.5">'
+            . '<span class="bg-primary/12 text-primary inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold">{{ $iniciais }}</span>'
+            . '<span class="font-medium">{{ $nome }}</span>'
+            . '</div>',
+            ['iniciais' => $this->iniciais($nome), 'nome' => $nome],
+        );
+    }
+
     protected function renderStatus(AdminUser $u): string
     {
         return Blade::render(
-            '<x-shared.badge :variant="$v">{{ $t }}</x-shared.badge>',
-            ['v' => $u->ativo ? 'success' : 'neutral', 't' => $u->ativo ? 'Ativo' : 'Inativo'],
+            '<x-shared.badge :variant="$v" :icon="$i" size="sm">{{ $t }}</x-shared.badge>',
+            [
+                'v' => $u->ativo ? 'success' : 'default',
+                'i' => $u->ativo ? 'tabler--circle-check' : 'tabler--circle-x',
+                't' => $u->ativo ? 'Ativo' : 'Inativo',
+            ],
         );
     }
 
@@ -286,9 +303,32 @@ final class UsuariosTable extends PowerGridComponent
             return '<span class="text-default-400">—</span>';
         }
 
+        $visiveis = array_slice($nomes, 0, 2);
+        $resto = count($nomes) - count($visiveis);
+
         return Blade::render(
-            '<div class="flex flex-wrap gap-1">@foreach ($nomes as $nome)<x-shared.badge>{{ $nome }}</x-shared.badge>@endforeach</div>',
-            ['nomes' => $nomes],
+            '<div class="flex flex-wrap items-center gap-1">'
+            . '@foreach ($visiveis as $nome)<x-shared.badge variant="primary" size="sm">{{ $nome }}</x-shared.badge>@endforeach'
+            . '@if ($resto > 0)<x-shared.badge variant="default" size="sm">+{{ $resto }}</x-shared.badge>@endif'
+            . '</div>',
+            ['visiveis' => $visiveis, 'resto' => $resto],
         );
+    }
+
+    /**
+     * Iniciais (1-2 letras) derivadas do nome, para o avatar da listagem.
+     */
+    protected function iniciais(string $nome): string
+    {
+        $partes = array_values(array_filter(preg_split('/\s+/', trim($nome)) ?: []));
+
+        if ($partes === []) {
+            return '?';
+        }
+
+        $primeira = mb_substr($partes[0], 0, 1);
+        $ultima = count($partes) > 1 ? mb_substr($partes[count($partes) - 1], 0, 1) : '';
+
+        return mb_strtoupper($primeira . $ultima);
     }
 }

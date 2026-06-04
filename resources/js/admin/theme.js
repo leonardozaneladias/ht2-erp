@@ -35,6 +35,40 @@ function applyTheme(theme) {
   persist(theme);
 }
 
+// Reaplica o tema salvo no <html>. Necessario apos wire:navigate: o Livewire
+// substitui o <html> pela renderizacao do servidor (data-theme="light"
+// hardcoded) e NAO re-executa o script inline theme-bootstrap — entao o tema
+// escolhido se perdia ao trocar de tela. O sessionStorage persiste na navegacao
+// SPA, entao reaplicamos a partir dele.
+function syncThemeFromStorage() {
+  const raw = sessionStorage.getItem(STORAGE_KEY);
+
+  if (!raw) {
+    return;
+  }
+
+  try {
+    const config = JSON.parse(raw);
+
+    if (config && typeof config === 'object' && config.theme) {
+      window.config = config;
+
+      const theme =
+        config.theme === 'system'
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light'
+          : config.theme;
+
+      if (html.getAttribute('data-theme') !== theme) {
+        html.setAttribute('data-theme', theme);
+      }
+    }
+  } catch (error) {
+    // Config malformada no storage: ignora e mantem o tema atual do <html>.
+  }
+}
+
 function toggleTheme() {
   applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
 }
@@ -56,5 +90,9 @@ if (document.readyState === 'loading') {
   bindToggle();
 }
 
-// Livewire troca o DOM da topbar ao navegar; religa o handler.
-document.addEventListener('livewire:navigated', bindToggle);
+// Apos navegar (wire:navigate): reaplica o tema salvo (o servidor reseta para
+// light) e religa o handler do botao (a topbar e re-renderizada).
+document.addEventListener('livewire:navigated', () => {
+  syncThemeFromStorage();
+  bindToggle();
+});

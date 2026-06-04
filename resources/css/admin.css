@@ -42,3 +42,49 @@
     --color-primary-500: #1ab394;
     --color-primary-600: #15997f;
 }
+
+/* =========================================================================
+   PowerGrid — harmonizacao fina com o Inspinia
+   -------------------------------------------------------------------------
+   O grosso do visual vem da classe de tema App\PowerGridThemes\InspiniaTheme
+   (mapeia os slots para .table / .form-* / .badge). Aqui ficam apenas os
+   ajustes que dependem de runtime do pacote: o spinner de loading e o
+   TomSelect (injetado via JS pelo bundle do PowerGrid nos filtros select).
+   ========================================================================= */
+@layer components {
+    /* Spinner de loading do PowerGrid usa o primary da marca */
+    .loader {
+        border-top-color: var(--color-primary) !important;
+    }
+
+    /* TomSelect (filtros select / boolean) com a mesma cara do .form-select-sm */
+    .ts-wrapper {
+        @apply w-full min-w-[7rem];
+    }
+
+    .ts-wrapper .ts-control {
+        @apply bg-card border-default-300 text-body-color min-h-[1.875rem] rounded border px-2 py-0 text-[0.8125rem] shadow-none;
+    }
+
+    .ts-wrapper.focus .ts-control {
+        @apply border-default-500 outline-0 ring-0;
+    }
+
+    .ts-wrapper .ts-control input,
+    .ts-wrapper .ts-control .item {
+        @apply text-body-color;
+    }
+
+    .ts-dropdown {
+        @apply bg-card border-default-300 text-body-color z-50 rounded border text-[0.8125rem] shadow-lg;
+    }
+
+    .ts-dropdown .option.active,
+    .ts-dropdown .option:hover {
+        @apply bg-light text-body-color;
+    }
+
+    .ts-wrapper.single .ts-control:after {
+        border-color: var(--color-default-400) transparent transparent transparent;
+    }
+}

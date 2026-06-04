@@ -8,7 +8,6 @@ use PowerComponents\LivewirePowerGrid\FilterAttributes\Boolean;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\InputText;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\Number;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\Select;
-use PowerComponents\LivewirePowerGrid\Themes\Tailwind;
 
 return [
 
@@ -21,7 +20,8 @@ return [
     | Configure here the theme of your choice.
     */
 
-    'theme' => Tailwind::class,
+    'theme' => App\PowerGridThemes\InspiniaTheme::class,
+    // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\Tailwind::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\DaisyUI::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class,
 

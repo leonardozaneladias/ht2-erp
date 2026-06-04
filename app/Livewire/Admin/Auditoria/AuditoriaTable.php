@@ -57,9 +57,9 @@ final class AuditoriaTable extends PowerGridComponent
     {
         return PowerGrid::fields()
             ->add('created_at_formatted', fn (Activity $a): string => $a->created_at instanceof Carbon ? $a->created_at->format('d/m/Y H:i:s') : '—')
-            ->add('quem', fn (Activity $a): string => e($this->quem($a)))
-            ->add('log_name', fn (Activity $a): string => Blade::render('<x-shared.badge>{{ $l }}</x-shared.badge>', ['l' => $a->log_name ?? '—']))
-            ->add('event', fn (Activity $a): string => e($a->event ?? '—'))
+            ->add('quem', fn (Activity $a): string => Blade::render('<span class="text-body-color inline-flex items-center gap-1.5"><i class="iconify tabler--user text-default-400 shrink-0 text-sm"></i>{{ $q }}</span>', ['q' => $this->quem($a)]))
+            ->add('log_name', fn (Activity $a): string => Blade::render('<x-shared.badge variant="default" size="sm">{{ $l }}</x-shared.badge>', ['l' => $a->log_name ?? '—']))
+            ->add('event', fn (Activity $a): string => $this->renderEvento($a))
             ->add('sujeito', fn (Activity $a): string => $this->sujeito($a))
             ->add('description', fn (Activity $a): string => e((string) $a->description));
     }
@@ -124,8 +124,31 @@ final class AuditoriaTable extends PowerGridComponent
         }
 
         return Blade::render(
-            '<span class="text-default-600 text-sm">{{ $tipo }} #{{ $id }}</span>',
+            '<span class="inline-flex items-center gap-1.5"><x-shared.badge variant="default" size="sm">{{ $tipo }}</x-shared.badge><span class="text-default-500 text-xs">#{{ $id }}</span></span>',
             ['tipo' => class_basename($a->subject_type), 'id' => (string) $a->subject_id],
+        );
+    }
+
+    /**
+     * Badge do evento com cor e icone semanticos (mantem o valor cru como rotulo
+     * para casar com as opcoes do filtro).
+     */
+    protected function renderEvento(Activity $a): string
+    {
+        $evento = (string) ($a->event ?? '');
+
+        $mapa = [
+            'created' => ['success', 'tabler--circle-plus'],
+            'updated' => ['warning', 'tabler--edit'],
+            'deleted' => ['danger', 'tabler--trash'],
+            'restored' => ['info', 'tabler--restore'],
+        ];
+
+        [$variant, $icon] = $mapa[$evento] ?? ['default', 'tabler--point'];
+
+        return Blade::render(
+            '<x-shared.badge :variant="$v" :icon="$i" size="sm">{{ $t }}</x-shared.badge>',
+            ['v' => $variant, 'i' => $icon, 't' => $evento !== '' ? $evento : '—'],
         );
     }
 
