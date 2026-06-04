@@ -81,6 +81,8 @@
         </div>
 
         <div class="flex items-center gap-2.5">
+            <livewire:admin.tenancy.seletor-empresa-filial />
+
             <div class="hidden sm:inline-flex">
                 <div class="topbar-item">
                     <button

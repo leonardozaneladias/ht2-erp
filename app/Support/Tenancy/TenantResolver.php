@@ -6,6 +6,7 @@ namespace App\Support\Tenancy;
 
 use App\Models\AdminUser;
 use App\Models\Empresa;
+use App\Models\Filial;
 use Illuminate\Support\Collection;
 
 /**
@@ -52,6 +53,39 @@ final class TenantResolver
         }
 
         return $this->empresasDisponiveis($user)->first()?->getKey();
+    }
+
+    /**
+     * Filiais ativas da empresa que o usuário pode selecionar. Quem tem
+     * "todas as filiais" (ou super-admin) vê todas; os demais, só as concedidas.
+     *
+     * @return Collection<int, Filial>
+     */
+    public function filiaisDisponiveis(AdminUser $user, int $empresaId): Collection
+    {
+        $base = Filial::query()
+            ->where('empresa_id', $empresaId)
+            ->where('ativo', true)
+            ->orderBy('nome');
+
+        if ($this->ehSuperAdmin($user) || $this->temTodasFiliais($user, $empresaId)) {
+            return $base->get();
+        }
+
+        $ids = $user->filiaisAcessiveis()
+            ->where('filiais.empresa_id', $empresaId)
+            ->pluck('filiais.id')
+            ->all();
+
+        return $ids === [] ? collect() : $base->whereIn('id', $ids)->get();
+    }
+
+    private function temTodasFiliais(AdminUser $user, int $empresaId): bool
+    {
+        return $user->empresasAcessiveis()
+            ->where('empresas.id', $empresaId)
+            ->wherePivot('todas_filiais', true)
+            ->exists();
     }
 
     private function ehSuperAdmin(AdminUser $user): bool
