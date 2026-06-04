@@ -15,42 +15,21 @@ return [
         ],
     ],
     [
-        'title' => 'Controle de Acesso',
+        'title' => 'Administração',
         'items' => [
+            [
+                'label' => 'Controle de acesso',
+                'icon' => 'tabler--shield-lock',
+                'route' => 'admin.acesso.index',
+                'permission' => 'perfis.listar',
+                'active' => ['admin.acesso.*', 'admin.perfis.*'],
+            ],
             [
                 'label' => 'Usuários admin',
                 'icon' => 'tabler--users',
                 'route' => 'admin.usuarios.index',
                 'permission' => 'usuarios.listar',
                 'active' => ['admin.usuarios.*'],
-            ],
-            [
-                'label' => 'Perfis & permissões',
-                'icon' => 'tabler--shield-lock',
-                'route' => 'admin.perfis.index',
-                'permission' => 'perfis.listar',
-                'active' => ['admin.perfis.*'],
-            ],
-            [
-                'label' => 'Matriz de permissões',
-                'icon' => 'tabler--table',
-                'route' => 'admin.acesso.matriz',
-                'permission' => 'acessos.matriz',
-                'active' => ['admin.acesso.matriz'],
-            ],
-            [
-                'label' => 'Simulador de acesso',
-                'icon' => 'tabler--user-search',
-                'route' => 'admin.acesso.simulador',
-                'permission' => 'acessos.simular',
-                'active' => ['admin.acesso.simulador'],
-            ],
-            [
-                'label' => 'Histórico de acesso',
-                'icon' => 'tabler--clock-shield',
-                'route' => 'admin.acesso.historico',
-                'permission' => 'acessos.historico',
-                'active' => ['admin.acesso.historico'],
             ],
             [
                 'label' => 'Logs de auditoria',

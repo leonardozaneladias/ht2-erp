@@ -16,7 +16,9 @@
         <x-shared.alert variant="info" icon="tabler--info-circle">
             Esta é uma demonstração estática do <strong>chrome</strong> da tabela nativa. A versão interativa vive em
             telas Livewire como
-            <a class="text-primary font-medium underline" href="{{ route('admin.perfis.index') }}">Perfis</a>
+            <a class="text-primary font-medium underline" href="{{ route('admin.acesso.index') }}"
+                >Controle de acesso</a
+            >
             e
             <a class="text-primary font-medium underline" href="{{ route('admin.auditoria.index') }}"
                 >Logs de auditoria</a

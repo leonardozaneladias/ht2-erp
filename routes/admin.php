@@ -108,16 +108,19 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
         Route::get('/{usuario}/editar', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('edit');
     });
 
+    // Rotas legadas de perfis — consolidadas no hub de Controle de Acesso.
     Route::prefix('perfis')->name('perfis.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Perfis\IndexPerfis::class)->name('index');
-        Route::get('/novo', App\Livewire\Admin\Perfis\FormPerfil::class)->name('create');
-        Route::get('/{perfil}/editar', App\Livewire\Admin\Perfis\FormPerfil::class)->name('edit');
+        Route::redirect('/', '/admin/acesso')->name('index');
+        Route::redirect('/novo', '/admin/acesso')->name('create');
+        Route::redirect('/{perfil}/editar', '/admin/acesso')->name('edit');
     });
 
     Route::prefix('acesso')->name('acesso.')->group(function (): void {
-        Route::get('/matriz', App\Livewire\Admin\Acesso\MatrizPermissoes::class)->name('matriz');
-        Route::get('/simulador', App\Livewire\Admin\Acesso\SimuladorAcesso::class)->name('simulador');
-        Route::get('/historico', App\Livewire\Admin\Acesso\HistoricoAcesso::class)->name('historico');
+        Route::get('/', App\Livewire\Admin\Acesso\ControleAcesso::class)->name('index');
+        // Telas antigas (matriz, simulador, histórico) absorvidas pelo hub.
+        Route::redirect('/matriz', '/admin/acesso')->name('matriz');
+        Route::redirect('/simulador', '/admin/acesso')->name('simulador');
+        Route::redirect('/historico', '/admin/acesso')->name('historico');
     });
 
     Route::prefix('auditoria')->name('auditoria.')->group(function (): void {

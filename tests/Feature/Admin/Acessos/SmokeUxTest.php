@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->admin->assignRole('super-admin');
 });
 
-it('renderiza todas as telas do módulo de acesso sem erro (HTTP 200)', function (string $rota) {
+it('renderiza as telas do módulo de acesso sem erro (HTTP 200)', function (string $rota) {
     $this->actingAs($this->admin, 'admin')
         ->get(route($rota))
         ->assertOk();
@@ -27,19 +27,26 @@ it('renderiza todas as telas do módulo de acesso sem erro (HTTP 200)', function
     'admin.dashboard',
     'admin.usuarios.index',
     'admin.usuarios.create',
+    'admin.acesso.index',
+    'admin.auditoria.index',
+]);
+
+it('redireciona as rotas legadas de acesso para o hub', function (string $rota) {
+    $this->actingAs($this->admin, 'admin')
+        ->get(route($rota))
+        ->assertRedirect(route('admin.acesso.index'));
+})->with([
     'admin.perfis.index',
     'admin.perfis.create',
     'admin.acesso.matriz',
     'admin.acesso.simulador',
     'admin.acesso.historico',
-    'admin.auditoria.index',
 ]);
 
-it('renderiza a edição de perfil e de usuário sem erro', function () {
-    $perfil = Spatie\Permission\Models\Role::where('name', 'gestor')->where('guard_name', 'admin')->firstOrFail();
-
-    $this->actingAs($this->admin, 'admin')->get(route('admin.perfis.edit', $perfil))->assertOk();
-    $this->actingAs($this->admin, 'admin')->get(route('admin.usuarios.edit', $this->admin))->assertOk();
+it('renderiza a edição de usuário sem erro', function () {
+    $this->actingAs($this->admin, 'admin')
+        ->get(route('admin.usuarios.edit', $this->admin))
+        ->assertOk();
 });
 
 it('persiste o guard admin nas requisições de update do Livewire', function () {

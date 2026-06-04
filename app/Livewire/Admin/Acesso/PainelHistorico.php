@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Acesso;
 
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
 
-#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
-#[Title('Histórico de acesso')]
-class HistoricoAcesso extends Component
+/**
+ * Painel de histórico de acesso dentro do hub: trilha paginada e filtrável
+ * dos eventos de governança de acesso (concessões, negações, sincronizações).
+ */
+class PainelHistorico extends Component
 {
     use WithPagination;
 
@@ -32,23 +29,11 @@ class HistoricoAcesso extends Component
         'permissoes_sincronizadas',
     ];
 
-    #[Url(as: 'event', except: '')]
     public string $event = '';
 
-    #[Url(as: 'de', except: '')]
     public string $de = '';
 
-    #[Url(as: 'ate', except: '')]
     public string $ate = '';
-
-    public function mount(): void
-    {
-        $user = Auth::guard('admin')->user();
-
-        if ($user === null || ! $user->can('acessos.historico')) {
-            throw new AuthorizationException('Acesso negado.');
-        }
-    }
 
     public function updating(): void
     {
@@ -78,8 +63,8 @@ class HistoricoAcesso extends Component
             $query->whereDate('created_at', '<=', $this->ate);
         }
 
-        return view('livewire.admin.acesso.historico-acesso', [
-            'eventos' => $query->paginate(20)->withQueryString(),
+        return view('livewire.admin.acesso.painel-historico', [
+            'eventos' => $query->paginate(10),
             'eventosDisponiveis' => self::EVENTOS_ACESSO,
         ]);
     }
