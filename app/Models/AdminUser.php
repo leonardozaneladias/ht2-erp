@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -34,6 +35,8 @@ class AdminUser extends Authenticatable
         'last_login_at',
         'last_login_ip',
         'perfil_ativo_role_id',
+        'empresa_ativa_id',
+        'filial_ativa_id',
     ];
 
     protected $hidden = [
@@ -68,6 +71,69 @@ class AdminUser extends Authenticatable
     public function perfilAtivo(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'perfil_ativo_role_id');
+    }
+
+    /**
+     * Empresas a que o usuário tem acesso (pivot indica se inclui todas as filiais).
+     *
+     * @return BelongsToMany<Empresa, $this>
+     */
+    public function empresasAcessiveis(): BelongsToMany
+    {
+        return $this->belongsToMany(Empresa::class, 'admin_user_empresa')
+            ->withPivot('todas_filiais')
+            ->withTimestamps();
+    }
+
+    /**
+     * Filiais específicas concedidas ao usuário (quando o acesso não é "todas").
+     *
+     * @return BelongsToMany<Filial, $this>
+     */
+    public function filiaisAcessiveis(): BelongsToMany
+    {
+        return $this->belongsToMany(Filial::class, 'admin_user_filial')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsTo<Empresa, $this>
+     */
+    public function empresaAtiva(): BelongsTo
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_ativa_id');
+    }
+
+    /**
+     * @return BelongsTo<Filial, $this>
+     */
+    public function filialAtiva(): BelongsTo
+    {
+        return $this->belongsTo(Filial::class, 'filial_ativa_id');
+    }
+
+    public function temAcessoAEmpresa(int $empresaId): bool
+    {
+        return $this->empresasAcessiveis()->whereKey($empresaId)->exists();
+    }
+
+    public function temAcessoAFilial(int $filialId): bool
+    {
+        $filial = Filial::query()->find($filialId);
+
+        if ($filial === null) {
+            return false;
+        }
+
+        $temTodasDaEmpresa = $this->empresasAcessiveis()
+            ->where('empresas.id', $filial->empresa_id)
+            ->wherePivot('todas_filiais', true)
+            ->exists();
+
+        if ($temTodasDaEmpresa) {
+            return true;
+        }
+
+        return $this->filiaisAcessiveis()->whereKey($filialId)->exists();
     }
 
     /**

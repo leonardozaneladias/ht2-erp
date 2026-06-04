@@ -6,3 +6,8 @@ parameters:
     paths:
         - app/
     treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # Trait fundacional de tenancy: ainda não há módulos de negócio que o
+        # consumam (serão criados depois). É usado por models de teste e futuros.
+        - identifier: trait.unused
+          path: app/Models/Concerns/BelongsToEmpresa.php
