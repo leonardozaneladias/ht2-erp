@@ -1,0 +1,90 @@
+# Configurações do Sistema
+
+Tela administrativa de configuração do sistema (`/admin/configuracoes`) e
+assistente de primeira instalação (`/admin/setup`). Permite que cada cliente
+ajuste seus dados, identidade visual e preferências sem tocar em código.
+
+> Modelo **single-tenant**: cada cliente tem sua própria instalação; as settings
+> guardam os dados desse único cliente.
+
+---
+
+## Arquitetura
+
+Baseada em [`spatie/laravel-settings`](https://github.com/spatie/laravel-settings):
+configurações são **classes PHP tipadas**, persistidas na tabela `settings` e
+cacheadas.
+
+| Camada   | Local                                                                             | Responsabilidade                                     |
+| -------- | --------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Settings | `app/Settings/*Settings.php`                                                      | Grupos tipados (fonte da verdade dos campos)         |
+| Enum     | `app/Enums/Admin/SettingsGroup.php`                                               | Grupos + rótulos/ícones das abas                     |
+| Defaults | `database/settings/*.php`                                                         | Valores de fábrica (settings migrations)             |
+| Runtime  | `app/Services/Admin/Settings/SettingsRuntimeApplier.php`                          | Aplica idioma/fuso/SMTP/sessão ao `config()` no boot |
+| UI       | `app/Livewire/Admin/Configuracao/`                                                | Shell (`ConfiguracaoSistema`) + uma `Aba*` por grupo |
+| Gravação | `app/Actions/Admin/Settings/Save*Action.php` + `app/DTOs/Admin/Settings/*DTO.php` | Persistência transacional + activity log             |
+
+Grupos disponíveis: **Empresa** (`general`), **Marca e tema** (`branding`),
+**Tela de login** (`login`), **E-mail** (`email`), **Localização**
+(`localizacao`), **Segurança** (`seguranca`).
+
+Acesso protegido pela permissão `configuracoes.editar`.
+
+---
+
+## Branding dinâmico
+
+- **Logo/favicon**: enviados pela aba e guardados no disco `public`
+  (`storage/app/public/branding`). Quando ausentes, usa o fallback de
+  `config/branding.php`. Resolvidos por `BrandingService::logoUrl()`/`faviconUrl()`.
+- **Cores**: `BrandingService::cssVariables()` gera CSS custom properties (com
+  `color-mix` nos estados hover) injetadas em `<x-admin.branding-css>` **após o
+  `@vite`** — sobrescrevendo o `@theme` do Tailwind em runtime, **sem rebuild**.
+  Só valores hex `#RRGGBB` válidos são emitidos (proteção contra injeção de CSS).
+
+Após salvar a aba de marca, a página recarrega (mantendo a aba via `?aba=branding`)
+para reaplicar logo/cores no chrome.
+
+---
+
+## Setup Wizard
+
+Enquanto `GeneralSettings::instalado === false`, o middleware
+`EnsureSystemConfigured` redireciona o painel para `/admin/setup`. O assistente
+coleta empresa, marca e cria o primeiro super-admin (`ConcluirSetupAction`),
+então marca `instalado = true`.
+
+- **Dev**: `migrate:fresh --seed` marca `instalado = true` (pula o wizard).
+- **Cliente novo**: `migrate` sem `--seed` deixa `instalado = false` → o wizard roda.
+
+---
+
+## Como adicionar um novo grupo/aba
+
+1. **Settings class** em `app/Settings/FooSettings.php` (estende `Settings`,
+   define `group()` e, se houver segredos, `encrypted()`).
+2. **Enum**: adicione um case em `App\Enums\Admin\SettingsGroup` (rótulo + ícone).
+3. **Defaults**: crie uma settings migration em `database/settings/` semeando
+   **todas** as propriedades (`php artisan make:settings-migration` ou manual) —
+   senão o pacote lança `MissingSettings`.
+4. **DTO + Action** em `app/DTOs/Admin/Settings/` e `app/Actions/Admin/Settings/`.
+5. **Componente** `app/Livewire/Admin/Configuracao/AbaFoo.php` + view, no padrão
+   das abas existentes (`rules()`, `validate()`, `dispatch('toast', ...)`).
+6. **Plugue no shell**: adicione um `@case('foo')` em
+   `resources/views/livewire/admin/configuracao/configuracao-sistema.blade.php`.
+7. (Opcional) Aplique em runtime no `SettingsRuntimeApplier`.
+8. **Teste** em `tests/Feature/Admin/Configuracao/`.
+
+---
+
+## Usando settings no código
+
+```php
+use App\Settings\GeneralSettings;
+
+$nome = app(GeneralSettings::class)->nome_cliente;
+// ou via injeção de dependência no construtor/método.
+```
+
+> Nos testes, o sistema é considerado **instalado** por padrão (ver
+> `tests/Pest.php`). Os testes do próprio wizard chamam `marcarInstalado(false)`.

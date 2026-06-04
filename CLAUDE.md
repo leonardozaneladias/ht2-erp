@@ -199,6 +199,7 @@ resources/views/livewire/admin/  ← Views dos componentes
 - `create_permission_tables` — Spatie Permission
 - `create_activity_log_table` — Spatie Activitylog
 - `create_admin_users_table` — auth admin
+- `create_settings_table` — Spatie Settings (configurações do sistema)
 
 ---
 
@@ -209,6 +210,7 @@ resources/views/livewire/admin/  ← Views dos componentes
 - `livewire/livewire` — UI reativa server-side
 - `spatie/laravel-permission` — ACL (roles + permissions)
 - `spatie/laravel-activitylog` — auditoria automática
+- `spatie/laravel-settings` — configurações tipadas do sistema (tela de Configurações)
 - `laravel/horizon` — dashboard de filas
 - `laravel/pulse` — monitoramento de performance
 - `barryvdh/laravel-dompdf` — PDFs
@@ -230,6 +232,10 @@ Cria:
 
 - `admin@example.com` / `password` — role `super-admin`
 - `gestor@example.com` / `password` — role `gestor`
+
+O seed também marca o sistema como **instalado** (`GeneralSettings::instalado = true`), pulando o Setup Wizard. Em uma instalação limpa (`migrate` sem `--seed`), `instalado` é `false` e o primeiro acesso ao painel é redirecionado para `/admin/setup`.
+
+Veja [`docs/configuracoes-sistema.md`](docs/configuracoes-sistema.md) para a arquitetura de configurações, branding dinâmico e como adicionar um novo grupo/aba.
 
 ---
 
