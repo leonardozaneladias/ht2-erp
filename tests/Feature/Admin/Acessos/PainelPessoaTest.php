@@ -5,7 +5,9 @@ declare(strict_types=1);
 use App\Enums\TipoConcessao;
 use App\Livewire\Admin\Acesso\ControleAcesso;
 use App\Livewire\Admin\Acesso\PainelPessoa;
+use App\Models\Empresa;
 use App\Models\PermissionGrant;
+use App\Support\Tenancy\TenantContext;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +18,12 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
+    $this->empresa = Empresa::create(['nome' => 'Empresa Teste', 'ativo' => true]);
     $this->admin = criarAdminUser('admin@teste.com');
     $this->admin->assignRole('super-admin');
+
+    // Perfis são geridos no escopo da empresa ativa.
+    app(TenantContext::class)->definirEmpresa($this->empresa->id);
 });
 
 function criarPerfilGerenciavel(string $nome = 'vendas', int $nivel = 20): Role
@@ -54,7 +60,7 @@ it('sincroniza os perfis da pessoa com dirty-state', function () {
         ->assertHasNoErrors()
         ->assertDontSee('não salva');
 
-    expect($pessoa->fresh()->getRoleNames()->all())->toContain('vendas');
+    expect($pessoa->fresh()->rolesNaEmpresa($this->empresa->id)->pluck('name')->all())->toContain('vendas');
 });
 
 it('descarta a alteração de perfis', function () {

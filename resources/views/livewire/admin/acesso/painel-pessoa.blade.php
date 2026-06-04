@@ -54,8 +54,26 @@
 
     <div class="p-5">
         @if ($aba === 'perfis')
-            {{-- ── Aba Perfis ─────────────────────────────────────────── --}}
-            @if ($podeEditarPerfis)
+            {{-- ── Aba Perfis (escopo da empresa ativa) ───────────────── --}}
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <div class="text-sm">
+                    @if ($empresaAtivaNome)
+                        <span class="text-default-500">Perfis em</span>
+                        <span class="font-semibold">{{ $empresaAtivaNome }}</span>
+                    @endif
+                </div>
+                @if ($ehSuperAdminGlobal)
+                    <span class="badge badge-soft-warning">
+                        <span class="iconify tabler--crown me-1 size-4"></span>
+                        Super-admin (global)
+                    </span>
+                @endif
+            </div>
+            @if ($empresaAtivaId === null)
+                <x-shared.alert variant="warning" icon="tabler--building">
+                    Selecione uma empresa no topo para gerir os perfis desta pessoa.
+                </x-shared.alert>
+            @elseif ($podeEditarPerfis)
                 @if ($this->rolesGerenciaveis->isEmpty())
                     <x-shared.empty-state
                         icon="tabler--shield-off"
@@ -63,7 +81,7 @@
                         description="Você só pode atribuir perfis de nível abaixo do seu."
                     />
                 @else
-                    <p class="text-default-500 mb-3 text-sm">O acesso da pessoa é a soma de todos os perfis marcados.</p>
+                    <p class="text-default-500 mb-3 text-sm">O acesso da pessoa nesta empresa é a soma de todos os perfis marcados.</p>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         @foreach ($this->rolesGerenciaveis as $role)
                             <x-shared.checkbox
@@ -88,7 +106,7 @@
                         @forelse ($roles as $nomePerfil)
                             <span class="badge badge-soft-primary">{{ $nomePerfil }}</span>
                         @empty
-                            <span class="text-default-500 text-sm">Sem perfis atribuídos.</span>
+                            <span class="text-default-500 text-sm">Sem perfis atribuídos nesta empresa.</span>
                         @endforelse
                     </div>
                 </div>

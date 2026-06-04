@@ -6,18 +6,20 @@ namespace App\Livewire\Admin\Acesso;
 
 use App\Actions\Admin\ConcederAcessoDiretoAction;
 use App\Actions\Admin\RevogarAcessoDiretoAction;
-use App\Actions\Admin\SyncRolesUsuarioAction;
+use App\Actions\Admin\SyncRolesEmpresaAction;
 use App\DTOs\Admin\AcessoEfetivoDTO;
 use App\DTOs\Admin\ConcessaoAcessoDTO;
-use App\DTOs\Admin\SyncRolesDTO;
+use App\DTOs\Admin\SyncRolesEmpresaDTO;
 use App\Enums\ModuloAcesso;
 use App\Enums\TipoConcessao;
 use App\Exceptions\AccessException;
 use App\Models\AdminUser;
+use App\Models\Empresa;
 use App\Models\PermissionGrant;
 use App\Policies\AdminUserPolicy;
 use App\Services\Admin\AcessoService;
 use App\Services\Admin\HierarchyResolver;
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -42,6 +44,12 @@ class PainelPessoa extends Component
     public string $email = '';
 
     public bool $ativo = true;
+
+    public ?int $empresaAtivaId = null;
+
+    public ?string $empresaAtivaNome = null;
+
+    public bool $ehSuperAdminGlobal = false;
 
     public string $aba = 'perfis';
 
@@ -77,19 +85,32 @@ class PainelPessoa extends Component
         $this->nome = $usuario->nome;
         $this->email = $usuario->email;
         $this->ativo = (bool) $usuario->ativo;
-        $this->roles = $usuario->getRoleNames()->all();
+
+        // Os perfis são geridos no escopo da empresa ativa do ator.
+        $this->empresaAtivaId = app(TenantContext::class)->empresaAtivaId();
+        $this->empresaAtivaNome = $this->empresaAtivaId !== null
+            ? Empresa::query()->whereKey($this->empresaAtivaId)->value('nome')
+            : null;
+
+        $this->roles = $this->empresaAtivaId !== null
+            ? $usuario->rolesNaEmpresa($this->empresaAtivaId)->pluck('name')->all()
+            : [];
         $this->rolesOriginais = $this->rolesOrdenadas();
 
+        $this->ehSuperAdminGlobal = $usuario->hasRole((string) config('access.super_admin_role', 'super-admin'), 'admin');
+
         $policy = app(AdminUserPolicy::class);
-        $this->podeEditarPerfis = $ator instanceof AdminUser && $policy->update($ator, $usuario);
+        $this->podeEditarPerfis = $this->empresaAtivaId !== null
+            && $ator instanceof AdminUser
+            && $policy->update($ator, $usuario);
         $this->podeGerirAcessos = $ator instanceof AdminUser && $policy->gerenciarAcessos($ator, $usuario);
     }
 
     // ── Aba Perfis ─────────────────────────────────────────────────────────
 
-    public function salvarPerfis(SyncRolesUsuarioAction $action): void
+    public function salvarPerfis(SyncRolesEmpresaAction $action): void
     {
-        if (! $this->podeEditarPerfis || $this->usuarioId === null) {
+        if (! $this->podeEditarPerfis || $this->usuarioId === null || $this->empresaAtivaId === null) {
             return;
         }
 
@@ -101,8 +122,9 @@ class PainelPessoa extends Component
         ]);
 
         try {
-            $action->execute(SyncRolesDTO::fromArray([
+            $action->execute(SyncRolesEmpresaDTO::fromArray([
                 'adminUserId' => $this->usuarioId,
+                'empresaId' => $this->empresaAtivaId,
                 'roles' => array_values($this->roles),
             ]), Auth::guard('admin')->user());
         } catch (AccessException $e) {
@@ -150,7 +172,12 @@ class PainelPessoa extends Component
             return collect();
         }
 
-        return app(HierarchyResolver::class)->rolesGerenciaveis($ator);
+        // Papéis protegidos (super-admin) são globais de plataforma, não por empresa.
+        $protegidas = (array) config('access.protected_roles', []);
+
+        return app(HierarchyResolver::class)->rolesGerenciaveis($ator)
+            ->reject(static fn (Role $role): bool => in_array($role->name, $protegidas, true))
+            ->values();
     }
 
     // ── Aba Acessos diretos ────────────────────────────────────────────────
