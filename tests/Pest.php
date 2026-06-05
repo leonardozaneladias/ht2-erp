@@ -68,6 +68,17 @@ function concederAcessoDireto(
 }
 
 /**
+ * Cria (ou recupera) uma role do guard admin com um nível hierárquico.
+ */
+function criarRoleAdmin(string $name, int $nivel): Spatie\Permission\Models\Role
+{
+    $role = Spatie\Permission\Models\Role::findOrCreate($name, 'admin');
+    $role->forceFill(['nivel' => $nivel])->save();
+
+    return $role;
+}
+
+/**
  * Marca (ou desmarca) o sistema como instalado para os testes.
  */
 function marcarInstalado(bool $instalado = true): void
