@@ -23,3 +23,35 @@ it('usa o model custom e resolve a relação empresa do activity_log', function 
     expect($fresh->empresa)->not->toBeNull()
         ->and($fresh->empresa->nome)->toBe('Acme');
 });
+
+it('carimba empresa_id/filial_id do contexto ativo em toda atividade', function (): void {
+    $empresa = Empresa::create(['nome' => 'Acme', 'ativo' => true]);
+    app(App\Support\Tenancy\TenantContext::class)->definirEmpresa($empresa->id);
+
+    activity('test')->log('com contexto');
+
+    $log = Activity::latest('id')->firstOrFail();
+    expect($log->empresa_id)->toBe($empresa->id);
+});
+
+it('deixa empresa_id nulo quando não há contexto ativo', function (): void {
+    app(App\Support\Tenancy\TenantContext::class)->limpar();
+
+    activity('test')->log('sem contexto');
+
+    $log = Activity::latest('id')->firstOrFail();
+    expect($log->empresa_id)->toBeNull();
+});
+
+it('preserva empresa_id já setado explicitamente (não sobrescreve)', function (): void {
+    $a = Empresa::create(['nome' => 'A', 'ativo' => true]);
+    $b = Empresa::create(['nome' => 'B', 'ativo' => true]);
+    app(App\Support\Tenancy\TenantContext::class)->definirEmpresa($a->id);
+
+    activity('test')->tap(function (Activity $activity) use ($b): void {
+        $activity->empresa_id = $b->id;
+    })->log('explícito');
+
+    $log = Activity::latest('id')->firstOrFail();
+    expect($log->empresa_id)->toBe($b->id);
+});

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Http\Middleware\AdminAuthenticate;
+use App\Models\Activity;
 use App\Models\AdminUser;
 use App\Models\PermissionGrant;
 use App\Policies\AdminUserPolicy;
@@ -18,7 +19,6 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
@@ -61,25 +61,8 @@ class AppServiceProvider extends ServiceProvider
             return app(AccessResolver::class)->decide($user, $ability);
         });
 
-        // Marca toda atividade gravada durante uma personificação com quem está
-        // por trás (impersonado_por). O causer permanece o alvo (act-as).
-        Activity::creating(function (Activity $activity): void {
-            $context = app(ImpersonationContext::class);
-
-            if (! $context->ativo()) {
-                return;
-            }
-
-            $originalId = $context->originalId();
-
-            if ($originalId === null) {
-                return;
-            }
-
-            $original = AdminUser::find($originalId);
-
-            $activity->properties = collect($activity->properties ?? [])
-                ->put('impersonado_por', ['id' => $originalId, 'nome' => $original?->nome]);
-        });
+        // Carimba empresa/filial do tenant ativo e, durante personificação, quem
+        // está por trás (impersonado_por). Ponto único de "contexto → activity_log".
+        Activity::creating(app(\App\Support\Audit\CarimbarContextoNaAtividade::class));
     }
 }
