@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Auth;
 
 use App\Services\Admin\AuditoriaSeguranca;
+use App\Services\Admin\Security\LimiteTentativas;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,6 +24,17 @@ final class ForgotPassword extends Component
     public function sendLink(): void
     {
         $this->validate();
+
+        $limite = app(LimiteTentativas::class);
+        $chave = 'reset:' . Str::lower($this->email) . '|' . (request()->ip() ?? 'desconhecido');
+
+        if ($limite->excedido($chave)) {
+            $this->addError('email', 'Muitas solicitações. Tente novamente mais tarde.');
+
+            return;
+        }
+
+        $limite->registrar($chave);
 
         $status = Password::broker('admins')->sendResetLink(['email' => $this->email]);
 
