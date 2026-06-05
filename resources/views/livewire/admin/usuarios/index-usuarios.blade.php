@@ -12,4 +12,5 @@
     <livewire:admin.usuarios.usuarios-table />
 
     <livewire:admin.impersonation.iniciar-impersonation />
+    <livewire:admin.lgpd.anonimizar-usuario />
 </div>

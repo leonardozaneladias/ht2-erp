@@ -148,6 +148,10 @@ final class UsuariosTable extends PowerGridComponent
         $ator = Auth::guard('admin')->user();
         $botoes = [];
 
+        if ($row->estaAnonimizado()) {
+            return [];
+        }
+
         if ($ator?->can('update', $row)) {
             $botoes[] = Button::add('edit')
                 ->slot('Editar')
@@ -180,6 +184,21 @@ final class UsuariosTable extends PowerGridComponent
                 ->slot('Desbloquear')
                 ->class('btn btn-sm inline-flex items-center gap-x-2 bg-info/12 text-info hover:bg-info/20')
                 ->dispatch('usuarios::desbloquear', ['id' => $row->id]);
+        }
+
+        if ($ator?->can('exportarDados', $row)) {
+            $botoes[] = Button::add('exportar-json')
+                ->slot('Exportar JSON')
+                ->class('btn btn-sm inline-flex items-center gap-x-2 border-default-300 text-default-700 hover:bg-light')
+                ->route('admin.usuarios.lgpd.json', ['usuario' => $row->id])
+                ->attributes(['target' => '_blank']);
+        }
+
+        if ($ator?->can('anonimizar', $row)) {
+            $botoes[] = Button::add('anonimizar')
+                ->slot('Anonimizar')
+                ->class('btn btn-sm inline-flex items-center gap-x-2 bg-danger/12 text-danger hover:bg-danger/20')
+                ->dispatch('lgpd::anonimizar', ['id' => $row->id]);
         }
 
         return $botoes;
@@ -310,6 +329,10 @@ final class UsuariosTable extends PowerGridComponent
 
     protected function renderStatus(AdminUser $u): string
     {
+        if ($u->estaAnonimizado()) {
+            return Blade::render('<x-shared.badge variant="default" icon="tabler--user-off" size="sm">Anonimizado</x-shared.badge>');
+        }
+
         if ($u->estaBloqueada()) {
             return Blade::render('<x-shared.badge variant="warning" icon="tabler--lock" size="sm">Bloqueada</x-shared.badge>');
         }
