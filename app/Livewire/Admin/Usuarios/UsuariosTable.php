@@ -167,6 +167,13 @@ final class UsuariosTable extends PowerGridComponent
                 ->confirm($row->ativo ? 'Desativar usuário?' : 'Reativar usuário?');
         }
 
+        if ($ator?->can('impersonate', $row)) {
+            $botoes[] = Button::add('impersonate')
+                ->slot('Entrar como')
+                ->class('btn btn-sm inline-flex items-center gap-x-2 bg-primary/12 text-primary hover:bg-primary/20')
+                ->dispatch('impersonation::abrir', ['id' => $row->id]);
+        }
+
         return $botoes;
     }
 
