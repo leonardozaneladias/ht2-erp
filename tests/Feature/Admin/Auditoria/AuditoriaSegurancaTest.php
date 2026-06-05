@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Livewire\Admin\Auth\ForgotPassword;
 use App\Livewire\Admin\Auth\Login;
 use App\Livewire\Admin\Auth\TwoFactorChallenge;
 use App\Services\Admin\AuditoriaSeguranca;
@@ -81,5 +82,46 @@ it('registra falha no desafio 2FA', function (): void {
         ->call('verificar');
 
     expect(Activity::query()->where('event', '2fa-desafio-falhou')->where('causer_id', $user->id)->exists())
+        ->toBeTrue();
+});
+
+it('registra logout genuíno (não durante personificação)', function (): void {
+    $user = criarAdminUser('u@teste.com');
+    $this->actingAs($user, 'admin');
+
+    $this->post(route('admin.logout'))->assertRedirect(route('admin.login'));
+
+    expect(Activity::query()->where('event', 'logout')->where('causer_id', $user->id)->exists())
+        ->toBeTrue();
+});
+
+it('não duplica logout durante personificação (só encerrada)', function (): void {
+    $original = criarAdminUser('original@teste.com');
+    $alvo = criarAdminUser('alvo@teste.com');
+
+    $this->withSession([
+        'impersonate.original_id' => $original->id,
+        'impersonate.started_at' => time(),
+        'impersonate.motivo' => 'suporte',
+    ])->actingAs($alvo, 'admin');
+
+    $this->post(route('admin.logout'));
+
+    expect(Activity::query()->where('log_name', 'auth')->where('event', 'logout')->exists())->toBeFalse()
+        ->and(Activity::query()->where('log_name', 'impersonation')->where('event', 'encerrada')->exists())->toBeTrue();
+});
+
+it('registra solicitação de reset de senha', function (): void {
+    // Fake da notificação: isola o teste no log da solicitação, sem disparar o
+    // envio real do e-mail de reset (cuja URL é assunto separado da auditoria).
+    Illuminate\Support\Facades\Notification::fake();
+    criarAdminUser('u@teste.com');
+
+    Livewire::test(ForgotPassword::class)
+        ->set('email', 'u@teste.com')
+        ->call('sendLink')
+        ->assertHasNoErrors();
+
+    expect(Activity::query()->where('event', 'senha-reset-solicitado')->where('properties->email', 'u@teste.com')->exists())
         ->toBeTrue();
 });

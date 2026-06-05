@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
+use App\Models\AdminUser;
+use App\Services\Admin\AuditoriaSeguranca;
 use App\Support\Settings\PasswordPolicy;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
@@ -54,6 +56,12 @@ final class ResetPassword extends Component
         );
 
         if ($status === Password::PASSWORD_RESET) {
+            $usuario = AdminUser::where('email', $this->email)->first();
+
+            if ($usuario !== null) {
+                app(AuditoriaSeguranca::class)->senhaResetAplicada($usuario);
+            }
+
             session()->flash('success', __($status));
             $this->redirect(route('admin.login'), navigate: true);
         } else {

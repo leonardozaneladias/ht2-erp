@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
+use App\Services\Admin\AuditoriaSeguranca;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
@@ -25,6 +26,7 @@ final class ForgotPassword extends Component
         $status = Password::broker('admins')->sendResetLink(['email' => $this->email]);
 
         if ($status === Password::RESET_LINK_SENT) {
+            app(AuditoriaSeguranca::class)->senhaResetSolicitada($this->email);
             session()->flash('status', __($status));
             $this->email = '';
         } else {

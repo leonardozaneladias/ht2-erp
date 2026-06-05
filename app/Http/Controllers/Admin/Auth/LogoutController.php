@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminUser;
+use App\Services\Admin\AuditoriaSeguranca;
 use App\Support\Impersonation\ImpersonationContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ final class LogoutController extends Controller
 {
     public function __invoke(Request $request, ImpersonationContext $context): RedirectResponse
     {
+        $usuario = Auth::guard('admin')->user();
+
         if ($context->ativo()) {
             $originalId = $context->originalId();
             $original = $originalId !== null ? AdminUser::find($originalId) : null;
@@ -22,9 +25,11 @@ final class LogoutController extends Controller
 
             activity('impersonation')
                 ->causedBy($original)
-                ->performedOn(Auth::guard('admin')->user())
+                ->performedOn($usuario)
                 ->event('encerrada')
                 ->log('Personificação encerrada (logout)');
+        } elseif ($usuario instanceof AdminUser) {
+            app(AuditoriaSeguranca::class)->logout($usuario);
         }
 
         Auth::guard('admin')->logout();
