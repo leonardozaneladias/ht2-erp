@@ -105,3 +105,31 @@ it('isolado sem empresa ativa não vê nada', function (): void {
         ->assertDontSee('evento-empresa-B')
         ->assertDontSee('evento-sem-empresa');
 });
+
+it('escopa as opções de filtro por empresa (não vaza categorias de outras)', function (): void {
+    $a = Empresa::create(['nome' => 'Empresa A', 'ativo' => true]);
+    $b = Empresa::create(['nome' => 'Empresa B', 'ativo' => true]);
+    $ctx = app(TenantContext::class);
+    $ctx->definirEmpresa($a->id);
+    activity('auditoria-a')->log('x');
+    $ctx->definirEmpresa($b->id);
+    activity('auditoria-b')->log('y');
+
+    $gestor = criarAdminUser('gestor@teste.com');
+    criarRoleAdmin('gestor', 50)->givePermissionTo(
+        Permission::findOrCreate('auditoria.visualizar', 'admin'),
+    );
+    $gestor->assignRole('gestor');
+    $this->actingAs($gestor, 'admin');
+    session(['tenant.empresa_id' => $a->id]);
+
+    // opcoes() é protegido; chamamos via reflexão para validar o escopo das opções
+    // de filtro (não basta isolar as linhas — os dropdowns também não podem vazar).
+    $componente = Livewire::test(AuditoriaTable::class)->instance();
+    $metodo = new ReflectionMethod($componente, 'opcoes');
+    $metodo->setAccessible(true);
+    $logNames = collect($metodo->invoke($componente, 'log_name'))->pluck('valor')->all();
+
+    expect($logNames)->toContain('auditoria-a')
+        ->not->toContain('auditoria-b');
+});

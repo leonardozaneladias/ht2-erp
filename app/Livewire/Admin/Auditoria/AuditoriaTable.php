@@ -53,17 +53,9 @@ final class AuditoriaTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        $query = Activity::query()->with(['causer', 'subject', 'empresa']);
-
-        if (! $this->podeVerTodasEmpresas()) {
-            $empresaId = app(TenantContext::class)->empresaAtivaId();
-
-            $empresaId === null
-                ? $query->whereRaw('1 = 0')
-                : $query->where('empresa_id', $empresaId);
-        }
-
-        return $query;
+        return $this->aplicarEscopoTenant(
+            Activity::query()->with(['causer', 'subject', 'empresa']),
+        );
     }
 
     public function fields(): PowerGridFields
@@ -184,7 +176,7 @@ final class AuditoriaTable extends PowerGridComponent
      */
     protected function opcoes(string $coluna): array
     {
-        return Activity::query()
+        return $this->aplicarEscopoTenant(Activity::query())
             ->select($coluna)
             ->whereNotNull($coluna)
             ->distinct()
@@ -192,6 +184,26 @@ final class AuditoriaTable extends PowerGridComponent
             ->pluck($coluna)
             ->map(static fn (string $valor): array => ['valor' => $valor])
             ->all();
+    }
+
+    /**
+     * Restringe a query à empresa ativa quando o usuário não é privilegiado, para
+     * que TANTO as linhas QUANTO as opções de filtro respeitem o isolamento.
+     *
+     * @param  Builder<Activity>  $query
+     * @return Builder<Activity>
+     */
+    private function aplicarEscopoTenant(Builder $query): Builder
+    {
+        if ($this->podeVerTodasEmpresas()) {
+            return $query;
+        }
+
+        $empresaId = app(TenantContext::class)->empresaAtivaId();
+
+        return $empresaId === null
+            ? $query->whereRaw('1 = 0')
+            : $query->where('empresa_id', $empresaId);
     }
 
     private function podeVerTodasEmpresas(): bool
