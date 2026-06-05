@@ -6,8 +6,10 @@ namespace App\Livewire\Admin\Auth;
 
 use App\Models\AdminUser;
 use App\Services\Admin\AuditoriaSeguranca;
+use App\Services\Admin\Security\AlertaSeguranca;
+use App\Services\Admin\Security\ControleLockout;
+use App\Services\Admin\Security\LimiteTentativas;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -48,31 +50,48 @@ final class Login extends Component
     {
         $this->validate();
 
-        // O login é um componente Livewire e não passa pelo middleware
-        // `throttle`; o rate-limit é aplicado aqui (5 tentativas/min por e-mail+IP).
         $chave = $this->chaveThrottle();
+        $limite = app(LimiteTentativas::class);
 
-        if (RateLimiter::tooManyAttempts($chave, 5)) {
+        if ($limite->excedido($chave)) {
             app(AuditoriaSeguranca::class)->loginBloqueado($this->email);
 
             throw ValidationException::withMessages([
-                'email' => __('auth.throttle', ['seconds' => RateLimiter::availableIn($chave)]),
+                'email' => __('auth.throttle', ['seconds' => $limite->disponivelEm($chave)]),
             ]);
         }
 
         // Valida as credenciais SEM autenticar: com 2FA ativo, só autenticamos
         // após o desafio (estado intermediário "pendente"). Nunca antes.
         if (! Auth::guard('admin')->validate(['email' => $this->email, 'password' => $this->password])) {
-            RateLimiter::hit($chave, 60);
+            $limite->registrar($chave);
+            app(ControleLockout::class)->registrarFalha($this->email);
             app(AuditoriaSeguranca::class)->loginFalhou($this->email);
             $this->addError('email', __('auth.failed'));
 
             return;
         }
 
-        RateLimiter::clear($chave);
-
         $usuario = AdminUser::where('email', $this->email)->first();
+
+        if ($usuario !== null && app(ControleLockout::class)->estaBloqueada($usuario)) {
+            $this->addError('email', 'Conta temporariamente bloqueada por excesso de tentativas. Tente novamente mais tarde.');
+
+            return;
+        }
+
+        if ($usuario !== null && ! $usuario->ativo) {
+            app(AuditoriaSeguranca::class)->loginFalhou($this->email);
+            $this->addError('email', 'Esta conta está desativada.');
+
+            return;
+        }
+
+        $limite->limpar($chave);
+
+        if ($usuario !== null) {
+            app(ControleLockout::class)->liberar($usuario);
+        }
 
         if ($usuario !== null && $usuario->hasTwoFactorEnabled()) {
             session()->put('2fa.pending', [
@@ -88,6 +107,10 @@ final class Login extends Component
         Auth::guard('admin')->login($usuario, $this->remember);
 
         app(AuditoriaSeguranca::class)->loginBemSucedido($usuario, false);
+
+        if ($usuario->hasRole((string) config('access.super_admin_role', 'super-admin'))) {
+            app(AlertaSeguranca::class)->superAdminLogou($usuario);
+        }
 
         session()->regenerate();
 
