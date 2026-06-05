@@ -8,6 +8,7 @@ use App\Exceptions\AccessException;
 use App\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
 use App\Services\Admin\HierarchyResolver;
+use App\Services\Admin\Security\AlertaSeguranca;
 use App\Support\Impersonation\ImpersonationContext;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,6 +23,7 @@ final class IniciarImpersonationAction
         private readonly HierarchyResolver $hierarchy,
         private readonly ImpersonationContext $context,
         private readonly AccessResolver $accessResolver,
+        private readonly AlertaSeguranca $alerta,
     ) {}
 
     public function execute(AdminUser $ator, AdminUser $alvo, string $motivo): void
@@ -40,6 +42,7 @@ final class IniciarImpersonationAction
         $this->context->iniciar((int) $ator->getKey(), $motivo);
         Auth::guard('admin')->login($alvo);
         $this->accessResolver->invalidar($alvo);
+        $this->alerta->personificacaoIniciada($ator, $alvo);
     }
 
     private function garantirElegivel(AdminUser $ator, AdminUser $alvo): void
