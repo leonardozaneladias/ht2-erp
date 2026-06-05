@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Models\AdminUser;
 use App\Settings\SegurancaSettings;
+use App\Support\Impersonation\ImpersonationContext;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ final class EnsureTwoFactorEnabled
         $usuario = Auth::guard('admin')->user();
 
         if ($usuario instanceof AdminUser
+            && ! app(ImpersonationContext::class)->ativo()
             && ! $usuario->hasTwoFactorEnabled()
             && app(SegurancaSettings::class)->exigir_2fa_admin
             && ! $request->routeIs('admin.conta.seguranca')
