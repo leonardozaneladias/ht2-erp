@@ -86,5 +86,9 @@ final class SettingsRuntimeApplier
         if ($seg->sessao_timeout_minutos > 0) {
             $this->config->set('session.lifetime', $seg->sessao_timeout_minutos);
         }
+
+        if ($seg->dias_retencao_logs > 0) {
+            $this->config->set('activitylog.clean_after_days', $seg->dias_retencao_logs);
+        }
     }
 }
