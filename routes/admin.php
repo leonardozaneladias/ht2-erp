@@ -95,6 +95,8 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
     Route::redirect('/', '/admin/dashboard');
 
     Route::post('/logout', LogoutController::class)->name('logout');
+    Route::post('/impersonation/sair', [App\Http\Controllers\Admin\ImpersonationController::class, 'sair'])
+        ->name('impersonation.sair');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('perfil')->name('perfil.')->group(function () use ($placeholder): void {
