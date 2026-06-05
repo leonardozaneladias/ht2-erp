@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auditoria;
 
+use App\Models\Activity;
+use App\Models\Empresa;
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Wireable;
 use PowerComponents\LivewirePowerGrid\Column;
@@ -16,7 +20,6 @@ use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\Traits\WithExport;
-use Spatie\Activitylog\Models\Activity;
 
 final class AuditoriaTable extends PowerGridComponent
 {
@@ -50,7 +53,17 @@ final class AuditoriaTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return Activity::query()->with(['causer', 'subject']);
+        $query = Activity::query()->with(['causer', 'subject', 'empresa']);
+
+        if (! $this->podeVerTodasEmpresas()) {
+            $empresaId = app(TenantContext::class)->empresaAtivaId();
+
+            $empresaId === null
+                ? $query->whereRaw('1 = 0')
+                : $query->where('empresa_id', $empresaId);
+        }
+
+        return $query;
     }
 
     public function fields(): PowerGridFields
@@ -58,6 +71,7 @@ final class AuditoriaTable extends PowerGridComponent
         return PowerGrid::fields()
             ->add('created_at_formatted', fn (Activity $a): string => $a->created_at instanceof Carbon ? $a->created_at->format('d/m/Y H:i:s') : '—')
             ->add('quem', fn (Activity $a): string => Blade::render('<span class="text-body-color inline-flex items-center gap-1.5"><i class="iconify tabler--user text-default-400 shrink-0 text-sm"></i>{{ $q }}</span>', ['q' => $this->quem($a)]))
+            ->add('empresa', fn (Activity $a): string => $a->empresa?->getAttribute('nome') ?? '—')
             ->add('log_name', fn (Activity $a): string => Blade::render('<x-shared.badge variant="default" size="sm">{{ $l }}</x-shared.badge>', ['l' => $a->log_name ?? '—']))
             ->add('event', fn (Activity $a): string => $this->renderEvento($a))
             ->add('sujeito', fn (Activity $a): string => $this->sujeito($a))
@@ -74,6 +88,8 @@ final class AuditoriaTable extends PowerGridComponent
                 ->sortable(),
 
             Column::make('Quem', 'quem'),
+
+            Column::make('Empresa', 'empresa'),
 
             Column::make('Log', 'log_name')
                 ->sortable(),
@@ -93,7 +109,7 @@ final class AuditoriaTable extends PowerGridComponent
      */
     public function filters(): array
     {
-        return [
+        $filtros = [
             Filter::select('log_name')
                 ->dataSource($this->opcoes('log_name'))
                 ->optionValue('valor')
@@ -106,6 +122,15 @@ final class AuditoriaTable extends PowerGridComponent
 
             Filter::datepicker('created_at_formatted', 'created_at'),
         ];
+
+        if ($this->podeVerTodasEmpresas()) {
+            $filtros[] = Filter::select('empresa', 'empresa_id')
+                ->dataSource(Empresa::query()->orderBy('nome')->get(['id', 'nome'])->all())
+                ->optionValue('id')
+                ->optionLabel('nome');
+        }
+
+        return $filtros;
     }
 
     protected function quem(Activity $a): string
@@ -167,5 +192,10 @@ final class AuditoriaTable extends PowerGridComponent
             ->pluck($coluna)
             ->map(static fn (string $valor): array => ['valor' => $valor])
             ->all();
+    }
+
+    private function podeVerTodasEmpresas(): bool
+    {
+        return Auth::guard('admin')->user()?->can('auditoria.todas-empresas') ?? false;
     }
 }
