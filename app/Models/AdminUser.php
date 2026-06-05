@@ -16,6 +16,9 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property \Illuminate\Support\Carbon|null $bloqueado_ate
+ */
 class AdminUser extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
