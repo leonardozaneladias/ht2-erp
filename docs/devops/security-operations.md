@@ -631,8 +631,8 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 | Confirmação de tratamento | 15 dias    | Email com detalhes                             |
 | Acesso a dados            | 15 dias    | Export pseudonimizado                          |
 | Correção                  | 15 dias    | Orientar uso da aplicação                      |
-| Anonimização/exclusão     | 15 dias    | Action `ExcluirContaAction`                    |
-| Portabilidade             | 15 dias    | Export estruturado JSON                        |
+| Anonimização/exclusão     | 15 dias    | Action `AnonimizarUsuarioAction` (ver §9.5)    |
+| Portabilidade             | 15 dias    | Export estruturado JSON/PDF (ver §9.5)         |
 | Informação sobre uso      | 15 dias    | Política de privacidade + resposta customizada |
 
 ### 9.3 Registro de requisições
@@ -646,7 +646,7 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 - **Tipo**: exclusão
 - **Recebido em**: 2026-04-18 09:22
 - **Atendido em**: 2026-04-18 14:30
-- **Ação**: `ExcluirContaAction` executada; dados anonimizados
+- **Ação**: `AnonimizarUsuarioAction` executada; dados anonimizados
 - **Evidência**: `activity_log` entry id=XXX
 ```
 
@@ -658,12 +658,37 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 
 ### 9.5 Retenção e anonimização
 
-Definir política de retenção por tipo de dado e implementar a anonimização em job dedicado. Referência mínima:
+Implementado no painel (módulo de Usuários + Auditoria). Referência:
 
-| Dado                    | Retenção padrão     | Ação                  |
-| ----------------------- | ------------------- | --------------------- |
-| `activity_log`          | 2 anos              | Arquivar S3 + truncar |
-| Dados pessoais inativos | conforme base legal | Anonimizar            |
+| Dado                   | Retenção padrão                  | Ação                                             |
+| ---------------------- | -------------------------------- | ------------------------------------------------ |
+| `activity_log`         | `dias_retencao_logs` (Segurança) | `activitylog:clean` — agendado (diário) + manual |
+| Dados pessoais (admin) | conforme base legal              | Anonimizar (irreversível, mantém a linha + log)  |
+
+**Retenção do `activity_log`.** O setting **Segurança → `dias_retencao_logs`** é
+aplicado em runtime a `config('activitylog.clean_after_days')` pelo
+`SettingsRuntimeApplier`. O expurgo roda de duas formas:
+
+- **Agendado:** `Schedule::command('activitylog:clean')->daily()` (`routes/console.php`).
+  **Requer o cron do scheduler no servidor** — sem ele, o agendamento não dispara:
+
+    ```cron
+    * * * * * cd /caminho/do/app && php artisan schedule:run >> /dev/null 2>&1
+    ```
+
+    Em desenvolvimento, `php artisan schedule:work` (ou o botão manual) cobre o caso.
+
+- **Manual:** botão **"Expurgar logs antigos"** na tela de Auditoria (visível só a
+  super-admin) → `ExpurgarLogsAction`. Cobre ambientes sem cron e expurgo sob demanda.
+
+**Anonimização (direito ao esquecimento).** Ação **"Anonimizar"** na tabela de Usuários
+(permissão `usuarios.anonimizar` + hierarquia; exige confirmação digitada + reconfirmação
+de senha) → `AnonimizarUsuarioAction`. Substitui a PII por valores neutros, embaralha a
+senha, desativa a conta e desfaz vínculos (papéis/empresas/filiais/concessões), gravando
+`anonimizado_em`. O `activity_log` é **append-only**: a linha é preservada e o causer
+aparece como "Usuário anonimizado". **Export** (JSON/PDF, permissão `usuarios.exportar-dados`)
+para acesso/portabilidade — nunca inclui o secret do 2FA. As três operações são auditadas
+no canal `lgpd`.
 
 ---
 
