@@ -47,4 +47,14 @@ class AdminUserPolicy
     {
         return $auth->can('usuarios.impersonar') && $this->hierarchy->podeGerir($auth, $usuario);
     }
+
+    public function exportarDados(AdminUser $auth, AdminUser $usuario): bool
+    {
+        return $auth->can('usuarios.exportar-dados');
+    }
+
+    public function anonimizar(AdminUser $auth, AdminUser $usuario): bool
+    {
+        return $auth->can('usuarios.anonimizar') && $this->hierarchy->podeGerir($auth, $usuario);
+    }
 }
