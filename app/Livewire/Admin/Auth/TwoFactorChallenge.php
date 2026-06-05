@@ -6,9 +6,10 @@ namespace App\Livewire\Admin\Auth;
 
 use App\Models\AdminUser;
 use App\Services\Admin\AuditoriaSeguranca;
+use App\Services\Admin\Security\AlertaSeguranca;
+use App\Services\Admin\Security\LimiteTentativas;
 use App\Services\Admin\Security\TwoFactorService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
@@ -49,11 +50,13 @@ final class TwoFactorChallenge extends Component
 
         $chave = 'two-factor:' . $pendente['id'] . '|' . (request()->ip() ?? 'desconhecido');
 
-        if (RateLimiter::tooManyAttempts($chave, 5)) {
+        $limite = app(LimiteTentativas::class);
+
+        if ($limite->excedido($chave)) {
             app(AuditoriaSeguranca::class)->loginBloqueado((string) ($pendente['id'] ?? 'desconhecido'));
 
             throw ValidationException::withMessages([
-                'codigo' => __('auth.throttle', ['seconds' => RateLimiter::availableIn($chave)]),
+                'codigo' => __('auth.throttle', ['seconds' => $limite->disponivelEm($chave)]),
             ]);
         }
 
@@ -67,16 +70,21 @@ final class TwoFactorChallenge extends Component
         }
 
         if (! $this->codigoConfere($service, $usuario)) {
-            RateLimiter::hit($chave, 60);
+            $limite->registrar($chave);
             app(AuditoriaSeguranca::class)->desafio2faFalhou($usuario);
 
             return;
         }
 
-        RateLimiter::clear($chave);
+        $limite->limpar($chave);
 
         Auth::guard('admin')->login($usuario, (bool) ($pendente['remember'] ?? false));
         app(AuditoriaSeguranca::class)->loginBemSucedido($usuario, true);
+
+        if ($usuario->hasRole((string) config('access.super_admin_role', 'super-admin'))) {
+            app(AlertaSeguranca::class)->superAdminLogou($usuario);
+        }
+
         session()->forget('2fa.pending');
         session()->regenerate();
 
