@@ -128,6 +128,14 @@ return [
                 'label' => 'Personificar usuários',
                 'descricao' => 'Entrar como outro usuário (act-as) para suporte e diagnóstico.',
             ],
+            'usuarios.exportar-dados' => [
+                'label' => 'Exportar dados (LGPD)',
+                'descricao' => 'Exportar os dados pessoais de um usuário (direito de acesso/portabilidade).',
+            ],
+            'usuarios.anonimizar' => [
+                'label' => 'Anonimizar usuário (LGPD)',
+                'descricao' => 'Anonimizar irreversivelmente a PII de um usuário (direito ao esquecimento).',
+            ],
         ],
 
         ModuloAcesso::Perfis->value => [
