@@ -28,3 +28,18 @@ it('super-admin desbloqueia uma conta', function (): void {
 
     expect($alvo->fresh()->estaBloqueada())->toBeFalse();
 });
+
+it('operador sem permissão/hierarquia não desbloqueia', function (): void {
+    $operador = criarAdminUser('op@teste.com');
+    $operador->assignRole('operador'); // sem usuarios.editar
+    $alvo = criarAdminUser('alvo@teste.com');
+    $alvo->assignRole('operador');
+    $alvo->forceFill(['bloqueado_ate' => now()->addMinutes(10)])->save();
+
+    $this->actingAs($operador, 'admin');
+
+    // authorize('update') lança AuthorizationException → o harness Livewire converte em 403.
+    Livewire::test(UsuariosTable::class)->call('desbloquear', $alvo->id)->assertForbidden();
+
+    expect($alvo->fresh()->estaBloqueada())->toBeTrue();
+});

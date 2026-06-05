@@ -310,6 +310,10 @@ final class UsuariosTable extends PowerGridComponent
 
     protected function renderStatus(AdminUser $u): string
     {
+        if ($u->estaBloqueada()) {
+            return Blade::render('<x-shared.badge variant="warning" icon="tabler--lock" size="sm">Bloqueada</x-shared.badge>');
+        }
+
         return Blade::render(
             '<x-shared.badge :variant="$v" :icon="$i" size="sm">{{ $t }}</x-shared.badge>',
             [

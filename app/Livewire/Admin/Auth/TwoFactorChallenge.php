@@ -69,6 +69,15 @@ final class TwoFactorChallenge extends Component
             return;
         }
 
+        // Fecha a janela TOCTOU: se a conta foi desativada/bloqueada entre a 1ª
+        // etapa (Login) e o desafio 2FA, recusa antes de autenticar.
+        if ($usuario->estaBloqueada() || ! $usuario->ativo) {
+            session()->forget('2fa.pending');
+            $this->redirect(route('admin.login'), navigate: true);
+
+            return;
+        }
+
         if (! $this->codigoConfere($service, $usuario)) {
             $limite->registrar($chave);
             app(AuditoriaSeguranca::class)->desafio2faFalhou($usuario);
