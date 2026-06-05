@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Auth;
 
 use App\Models\AdminUser;
+use App\Services\Admin\AuditoriaSeguranca;
 use App\Services\Admin\Security\TwoFactorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -49,6 +50,8 @@ final class TwoFactorChallenge extends Component
         $chave = 'two-factor:' . $pendente['id'] . '|' . (request()->ip() ?? 'desconhecido');
 
         if (RateLimiter::tooManyAttempts($chave, 5)) {
+            app(AuditoriaSeguranca::class)->loginBloqueado((string) ($pendente['id'] ?? 'desconhecido'));
+
             throw ValidationException::withMessages([
                 'codigo' => __('auth.throttle', ['seconds' => RateLimiter::availableIn($chave)]),
             ]);
@@ -65,6 +68,7 @@ final class TwoFactorChallenge extends Component
 
         if (! $this->codigoConfere($service, $usuario)) {
             RateLimiter::hit($chave, 60);
+            app(AuditoriaSeguranca::class)->desafio2faFalhou($usuario);
 
             return;
         }
@@ -72,6 +76,7 @@ final class TwoFactorChallenge extends Component
         RateLimiter::clear($chave);
 
         Auth::guard('admin')->login($usuario, (bool) ($pendente['remember'] ?? false));
+        app(AuditoriaSeguranca::class)->loginBemSucedido($usuario, true);
         session()->forget('2fa.pending');
         session()->regenerate();
 

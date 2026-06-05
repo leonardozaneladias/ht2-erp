@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\Login;
+use App\Livewire\Admin\Auth\TwoFactorChallenge;
 use App\Services\Admin\AuditoriaSeguranca;
+use App\Services\Admin\Security\TwoFactorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Activitylog\Models\Activity;
@@ -64,5 +66,20 @@ it('registra login bem-sucedido (sem 2FA) pela tela', function (): void {
         ->call('authenticate');
 
     expect(Activity::query()->where('event', 'login')->where('causer_id', $user->id)->exists())
+        ->toBeTrue();
+});
+
+it('registra falha no desafio 2FA', function (): void {
+    $user = criarAdminUser('u@teste.com');
+    $secret = app(TwoFactorService::class)->gerarSecret();
+    $user->forceFill(['two_factor_secret' => $secret, 'two_factor_confirmed_at' => now()])->save();
+
+    session(['2fa.pending' => ['id' => $user->id, 'remember' => false]]);
+
+    Livewire::test(TwoFactorChallenge::class)
+        ->set('codigo', '000000')
+        ->call('verificar');
+
+    expect(Activity::query()->where('event', '2fa-desafio-falhou')->where('causer_id', $user->id)->exists())
         ->toBeTrue();
 });
