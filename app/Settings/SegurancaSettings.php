@@ -32,6 +32,18 @@ final class SegurancaSettings extends Settings
 
     public int $impersonation_timeout_minutos;
 
+    public int $login_max_tentativas;
+
+    public int $login_janela_minutos;
+
+    public int $lockout_max_falhas;
+
+    public int $lockout_duracao_minutos;
+
+    public bool $alertas_seguranca_habilitados;
+
+    public bool $alerta_login_super_admin;
+
     public static function group(): string
     {
         return SettingsGroup::SEGURANCA->value;
