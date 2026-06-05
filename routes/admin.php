@@ -119,6 +119,8 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         Route::get('/', App\Livewire\Admin\Usuarios\IndexUsuarios::class)->name('index');
         Route::get('/novo', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('create');
         Route::get('/{usuario}/editar', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('edit');
+        Route::get('/{usuario}/lgpd/json', [App\Http\Controllers\Admin\LgpdController::class, 'exportarJson'])->name('lgpd.json');
+        Route::get('/{usuario}/lgpd/pdf', [App\Http\Controllers\Admin\LgpdController::class, 'exportarPdf'])->name('lgpd.pdf');
     });
 
     // Rotas legadas de perfis — consolidadas no hub de Controle de Acesso.
