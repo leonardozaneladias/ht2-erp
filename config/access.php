@@ -177,6 +177,10 @@ return [
                 'label' => 'Visualizar auditoria',
                 'descricao' => 'Consultar os logs de auditoria do sistema.',
             ],
+            'auditoria.todas-empresas' => [
+                'label' => 'Ver auditoria de todas as empresas',
+                'descricao' => 'Consultar a auditoria sem isolamento por empresa (visão cross-empresa).',
+            ],
         ],
 
         ModuloAcesso::Configuracoes->value => [
