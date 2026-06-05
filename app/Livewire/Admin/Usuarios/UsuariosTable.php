@@ -192,6 +192,12 @@ final class UsuariosTable extends PowerGridComponent
                 ->class('btn btn-sm inline-flex items-center gap-x-2 border-default-300 text-default-700 hover:bg-light')
                 ->route('admin.usuarios.lgpd.json', ['usuario' => $row->id])
                 ->attributes(['target' => '_blank']);
+
+            $botoes[] = Button::add('exportar-pdf')
+                ->slot('Exportar PDF')
+                ->class('btn btn-sm inline-flex items-center gap-x-2 border-default-300 text-default-700 hover:bg-light')
+                ->route('admin.usuarios.lgpd.pdf', ['usuario' => $row->id])
+                ->attributes(['target' => '_blank']);
         }
 
         if ($ator?->can('anonimizar', $row)) {
