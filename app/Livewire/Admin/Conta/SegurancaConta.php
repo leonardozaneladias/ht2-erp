@@ -11,6 +11,7 @@ use App\Actions\Admin\Security\RegenerateRecoveryCodesAction;
 use App\Livewire\Concerns\ConfirmsPassword;
 use App\Models\AdminUser;
 use App\Services\Admin\Security\TwoFactorService;
+use App\Support\Impersonation\ImpersonationContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -39,6 +40,7 @@ class SegurancaConta extends Component
 
     public function ativar(): void
     {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
         $this->ensurePasswordIsConfirmed();
 
         $usuario = $this->usuario();
@@ -52,6 +54,7 @@ class SegurancaConta extends Component
 
     public function confirmar(ConfirmTwoFactorAction $confirm): void
     {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
         $this->validate(['codigoConfirmacao' => ['required', 'string']]);
 
         $codigos = $confirm->execute($this->usuario(), trim($this->codigoConfirmacao));
@@ -71,6 +74,7 @@ class SegurancaConta extends Component
 
     public function regenerar(): void
     {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
         $this->ensurePasswordIsConfirmed();
 
         $this->recoveryCodes = app(RegenerateRecoveryCodesAction::class)->execute($this->usuario());
@@ -80,6 +84,7 @@ class SegurancaConta extends Component
 
     public function desativar(): void
     {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
         $this->ensurePasswordIsConfirmed();
 
         app(DisableTwoFactorAction::class)->execute($this->usuario());
