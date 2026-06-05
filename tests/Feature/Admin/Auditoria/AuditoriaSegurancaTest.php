@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Livewire\Admin\Auth\Login;
 use App\Services\Admin\AuditoriaSeguranca;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Spatie\Activitylog\Models\Activity;
 
 uses(RefreshDatabase::class);
@@ -39,4 +41,28 @@ it('loga os demais eventos de autenticação', function (): void {
     foreach (['login-bloqueado', 'logout', '2fa-desafio-falhou', 'senha-reset-solicitado', 'senha-reset-aplicado'] as $evento) {
         expect(Activity::query()->where('log_name', 'auth')->where('event', $evento)->exists())->toBeTrue();
     }
+});
+
+it('registra falha de login pela tela', function (): void {
+    criarAdminUser('real@teste.com'); // senha "password"
+
+    Livewire::test(Login::class)
+        ->set('email', 'real@teste.com')
+        ->set('password', 'errada')
+        ->call('authenticate');
+
+    expect(Activity::query()->where('event', 'login-falhou')->where('properties->email', 'real@teste.com')->exists())
+        ->toBeTrue();
+});
+
+it('registra login bem-sucedido (sem 2FA) pela tela', function (): void {
+    $user = criarAdminUser('real@teste.com');
+
+    Livewire::test(Login::class)
+        ->set('email', 'real@teste.com')
+        ->set('password', 'password')
+        ->call('authenticate');
+
+    expect(Activity::query()->where('event', 'login')->where('causer_id', $user->id)->exists())
+        ->toBeTrue();
 });

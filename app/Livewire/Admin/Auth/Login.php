@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Auth;
 
 use App\Models\AdminUser;
+use App\Services\Admin\AuditoriaSeguranca;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -52,6 +53,8 @@ final class Login extends Component
         $chave = $this->chaveThrottle();
 
         if (RateLimiter::tooManyAttempts($chave, 5)) {
+            app(AuditoriaSeguranca::class)->loginBloqueado($this->email);
+
             throw ValidationException::withMessages([
                 'email' => __('auth.throttle', ['seconds' => RateLimiter::availableIn($chave)]),
             ]);
@@ -61,6 +64,7 @@ final class Login extends Component
         // após o desafio (estado intermediário "pendente"). Nunca antes.
         if (! Auth::guard('admin')->validate(['email' => $this->email, 'password' => $this->password])) {
             RateLimiter::hit($chave, 60);
+            app(AuditoriaSeguranca::class)->loginFalhou($this->email);
             $this->addError('email', __('auth.failed'));
 
             return;
@@ -82,6 +86,8 @@ final class Login extends Component
         }
 
         Auth::guard('admin')->login($usuario, $this->remember);
+
+        app(AuditoriaSeguranca::class)->loginBemSucedido($usuario, false);
 
         session()->regenerate();
 
