@@ -49,6 +49,7 @@
 
 <body>
     <div class="wrapper">
+        <x-admin.impersonation-banner />
         <x-admin.topbar />
         <x-admin.sidebar />
 
