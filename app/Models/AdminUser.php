@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Models\Role;
@@ -37,6 +38,8 @@ class AdminUser extends Authenticatable
         'email',
         'password',
         'avatar_url',
+        'locale',
+        'timezone',
         'ativo',
         'bloqueado_ate',
         'anonimizado_em',
@@ -189,6 +192,28 @@ class AdminUser extends Authenticatable
     public function estaAnonimizado(): bool
     {
         return $this->anonimizado_em !== null;
+    }
+
+    /**
+     * @return HasMany<LoginHistory, $this>
+     */
+    public function loginHistory(): HasMany
+    {
+        return $this->hasMany(LoginHistory::class, 'admin_user_id');
+    }
+
+    /**
+     * URL pública do avatar (ou null para cair no fallback de iniciais).
+     */
+    public function urlAvatar(): ?string
+    {
+        $caminho = $this->avatar_url;
+
+        if ($caminho === null || $caminho === '') {
+            return null;
+        }
+
+        return Storage::disk('public')->url($caminho);
     }
 
     protected function casts(): array
