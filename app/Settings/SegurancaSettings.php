@@ -30,6 +30,8 @@ final class SegurancaSettings extends Settings
 
     public int $dias_retencao_logs;
 
+    public int $impersonation_timeout_minutos;
+
     public static function group(): string
     {
         return SettingsGroup::SEGURANCA->value;
