@@ -33,6 +33,18 @@ class AbaSeguranca extends Component
 
     public int $dias_retencao_logs = 365;
 
+    public int $login_max_tentativas = 5;
+
+    public int $login_janela_minutos = 1;
+
+    public int $lockout_max_falhas = 10;
+
+    public int $lockout_duracao_minutos = 15;
+
+    public bool $alertas_seguranca_habilitados = true;
+
+    public bool $alerta_login_super_admin = false;
+
     public function mount(SegurancaSettings $settings): void
     {
         $this->senha_min_caracteres = $settings->senha_min_caracteres;
@@ -42,6 +54,12 @@ class AbaSeguranca extends Component
         $this->sessao_timeout_minutos = $settings->sessao_timeout_minutos;
         $this->exigir_2fa_admin = $settings->exigir_2fa_admin;
         $this->dias_retencao_logs = $settings->dias_retencao_logs;
+        $this->login_max_tentativas = $settings->login_max_tentativas;
+        $this->login_janela_minutos = $settings->login_janela_minutos;
+        $this->lockout_max_falhas = $settings->lockout_max_falhas;
+        $this->lockout_duracao_minutos = $settings->lockout_duracao_minutos;
+        $this->alertas_seguranca_habilitados = $settings->alertas_seguranca_habilitados;
+        $this->alerta_login_super_admin = $settings->alerta_login_super_admin;
     }
 
     public function salvar(SaveSegurancaSettingsAction $action): void
@@ -56,6 +74,12 @@ class AbaSeguranca extends Component
             sessao_timeout_minutos: $this->sessao_timeout_minutos,
             exigir_2fa_admin: $this->exigir_2fa_admin,
             dias_retencao_logs: $this->dias_retencao_logs,
+            login_max_tentativas: $this->login_max_tentativas,
+            login_janela_minutos: $this->login_janela_minutos,
+            lockout_max_falhas: $this->lockout_max_falhas,
+            lockout_duracao_minutos: $this->lockout_duracao_minutos,
+            alertas_seguranca_habilitados: $this->alertas_seguranca_habilitados,
+            alerta_login_super_admin: $this->alerta_login_super_admin,
         ));
 
         $this->dispatch('toast', variant: 'success', message: 'Configurações de segurança salvas.');
@@ -96,6 +120,12 @@ class AbaSeguranca extends Component
             'sessao_timeout_minutos' => ['required', 'integer', 'min:5', 'max:1440'],
             'exigir_2fa_admin' => ['boolean'],
             'dias_retencao_logs' => ['required', 'integer', 'min:1', 'max:3650'],
+            'login_max_tentativas' => ['required', 'integer', 'min:1', 'max:100'],
+            'login_janela_minutos' => ['required', 'integer', 'min:1', 'max:60'],
+            'lockout_max_falhas' => ['required', 'integer', 'min:1', 'max:100'],
+            'lockout_duracao_minutos' => ['required', 'integer', 'min:1', 'max:1440'],
+            'alertas_seguranca_habilitados' => ['boolean'],
+            'alerta_login_super_admin' => ['boolean'],
         ];
     }
 

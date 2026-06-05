@@ -64,6 +64,66 @@
             </div>
         </x-shared.card>
 
+        <x-shared.card
+            title="Proteção de acesso"
+            subtitle="Rate-limit de login, bloqueio de conta e alertas de segurança."
+        >
+            <div class="grid gap-4 md:max-w-xs">
+                <x-shared.input
+                    type="number"
+                    name="login_max_tentativas"
+                    label="Máx. de tentativas de login"
+                    wire:model="login_max_tentativas"
+                    :value="$login_max_tentativas"
+                    min="1"
+                    max="100"
+                    hint="Tentativas por janela antes de bloquear o rate-limit."
+                />
+                <x-shared.input
+                    type="number"
+                    name="login_janela_minutos"
+                    label="Janela do rate-limit (min)"
+                    wire:model="login_janela_minutos"
+                    :value="$login_janela_minutos"
+                    min="1"
+                    max="60"
+                    hint="Duração da janela de contagem de tentativas (minutos)."
+                />
+                <x-shared.input
+                    type="number"
+                    name="lockout_max_falhas"
+                    label="Falhas até bloquear a conta"
+                    wire:model="lockout_max_falhas"
+                    :value="$lockout_max_falhas"
+                    min="1"
+                    max="100"
+                    hint="Quantidade de falhas consecutivas para bloquear o usuário."
+                />
+                <x-shared.input
+                    type="number"
+                    name="lockout_duracao_minutos"
+                    label="Duração do bloqueio (min)"
+                    wire:model="lockout_duracao_minutos"
+                    :value="$lockout_duracao_minutos"
+                    min="1"
+                    max="1440"
+                    hint="Tempo em minutos que a conta fica bloqueada após exceder as falhas."
+                />
+            </div>
+            <div class="mt-4 space-y-1">
+                <x-shared.toggle
+                    name="alertas_seguranca_habilitados"
+                    label="Alertas de segurança por e-mail"
+                    wire:model="alertas_seguranca_habilitados"
+                />
+                <x-shared.toggle
+                    name="alerta_login_super_admin"
+                    label="Alertar login de super-admin"
+                    wire:model="alerta_login_super_admin"
+                />
+            </div>
+        </x-shared.card>
+
         <div class="flex justify-end">
             <x-shared.loading-button target="salvar" icon="tabler--device-floppy">
                 Salvar segurança

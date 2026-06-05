@@ -23,6 +23,12 @@ final class SaveSegurancaSettingsAction
             $settings->sessao_timeout_minutos = $dto->sessao_timeout_minutos;
             $settings->exigir_2fa_admin = $dto->exigir_2fa_admin;
             $settings->dias_retencao_logs = $dto->dias_retencao_logs;
+            $settings->login_max_tentativas = $dto->login_max_tentativas;
+            $settings->login_janela_minutos = $dto->login_janela_minutos;
+            $settings->lockout_max_falhas = $dto->lockout_max_falhas;
+            $settings->lockout_duracao_minutos = $dto->lockout_duracao_minutos;
+            $settings->alertas_seguranca_habilitados = $dto->alertas_seguranca_habilitados;
+            $settings->alerta_login_super_admin = $dto->alerta_login_super_admin;
             $settings->save();
 
             activity('configuracoes')
