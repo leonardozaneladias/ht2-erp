@@ -33,6 +33,7 @@ class AdminUser extends Authenticatable
         'password',
         'avatar_url',
         'ativo',
+        'bloqueado_ate',
         'last_login_at',
         'last_login_ip',
         'perfil_ativo_role_id',
@@ -168,10 +169,19 @@ class AdminUser extends Authenticatable
         return $this->two_factor_secret !== null && $this->two_factor_confirmed_at !== null;
     }
 
+    /**
+     * A conta está temporariamente bloqueada por excesso de falhas de login.
+     */
+    public function estaBloqueada(): bool
+    {
+        return $this->bloqueado_ate !== null && $this->bloqueado_ate->isFuture();
+    }
+
     protected function casts(): array
     {
         return [
             'ativo' => 'boolean',
+            'bloqueado_ate' => 'datetime',
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
