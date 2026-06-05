@@ -11,6 +11,7 @@ use App\DTOs\Admin\AtribuicaoPerfilMassaDTO;
 use App\Exceptions\AccessException;
 use App\Models\AdminUser;
 use App\Services\Admin\HierarchyResolver;
+use App\Services\Admin\Security\ControleLockout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -174,6 +175,13 @@ final class UsuariosTable extends PowerGridComponent
                 ->dispatch('impersonation::abrir', ['id' => $row->id]);
         }
 
+        if ($row->estaBloqueada() && $ator?->can('update', $row)) {
+            $botoes[] = Button::add('desbloquear')
+                ->slot('Desbloquear')
+                ->class('btn btn-sm inline-flex items-center gap-x-2 bg-info/12 text-info hover:bg-info/20')
+                ->dispatch('usuarios::desbloquear', ['id' => $row->id]);
+        }
+
         return $botoes;
     }
 
@@ -189,6 +197,16 @@ final class UsuariosTable extends PowerGridComponent
         } catch (RuntimeException $e) {
             session()->flash('toast.error', $e->getMessage());
         }
+    }
+
+    #[On('usuarios::desbloquear')]
+    public function desbloquear(int $id, ControleLockout $lockout): void
+    {
+        $usuario = AdminUser::findOrFail($id);
+        $this->authorize('update', $usuario);
+
+        $lockout->liberar($usuario);
+        session()->flash('toast.success', 'Conta desbloqueada.');
     }
 
     public function atribuirPerfilEmMassa(AtribuirPerfilEmMassaAction $action): void
