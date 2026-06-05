@@ -14,6 +14,7 @@ use App\Policies\RolePolicy;
 use App\Services\Admin\AccessResolver;
 use App\Services\Admin\Settings\SettingsRuntimeApplier;
 use App\Support\Impersonation\ImpersonationContext;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
@@ -64,5 +65,13 @@ class AppServiceProvider extends ServiceProvider
         // Carimba empresa/filial do tenant ativo e, durante personificação, quem
         // está por trás (impersonado_por). Ponto único de "contexto → activity_log".
         Activity::creating(app(\App\Support\Audit\CarimbarContextoNaAtividade::class));
+
+        // A notificação padrão de reset de senha monta a URL com route('password.reset'),
+        // que não existe aqui (a rota é admin.password.reset). Redireciona a construção
+        // da URL para a rota admin (token na URI, e-mail na query).
+        ResetPassword::createUrlUsing(static fn (\Illuminate\Contracts\Auth\CanResetPassword $notifiable, string $token): string => route(
+            'admin.password.reset',
+            ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()],
+        ));
     }
 }
