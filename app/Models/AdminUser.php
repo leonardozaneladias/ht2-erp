@@ -18,6 +18,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property \Illuminate\Support\Carbon|null $bloqueado_ate
+ * @property \Illuminate\Support\Carbon|null $anonimizado_em
  */
 class AdminUser extends Authenticatable
 {
@@ -37,6 +38,7 @@ class AdminUser extends Authenticatable
         'avatar_url',
         'ativo',
         'bloqueado_ate',
+        'anonimizado_em',
         'last_login_at',
         'last_login_ip',
         'perfil_ativo_role_id',
@@ -180,10 +182,19 @@ class AdminUser extends Authenticatable
         return $this->bloqueado_ate !== null && $this->bloqueado_ate->isFuture();
     }
 
+    /**
+     * A conta foi anonimizada (LGPD) — PII removida, acesso revogado.
+     */
+    public function estaAnonimizado(): bool
+    {
+        return $this->anonimizado_em !== null;
+    }
+
     protected function casts(): array
     {
         return [
             'ativo' => 'boolean',
+            'anonimizado_em' => 'datetime',
             'bloqueado_ate' => 'datetime',
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
