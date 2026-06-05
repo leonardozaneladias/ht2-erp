@@ -124,6 +124,10 @@ return [
                 'label' => 'Excluir usuários',
                 'descricao' => 'Remover usuários administrativos.',
             ],
+            'usuarios.impersonar' => [
+                'label' => 'Personificar usuários',
+                'descricao' => 'Entrar como outro usuário (act-as) para suporte e diagnóstico.',
+            ],
         ],
 
         ModuloAcesso::Perfis->value => [
