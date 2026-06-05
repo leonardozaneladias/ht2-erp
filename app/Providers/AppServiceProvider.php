@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(AccessResolver::class);
         $this->app->singleton(\App\Support\Tenancy\TenantContext::class);
+        $this->app->singleton(\App\Support\Impersonation\ImpersonationContext::class);
     }
 
     public function boot(): void
