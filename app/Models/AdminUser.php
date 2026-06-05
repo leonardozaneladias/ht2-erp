@@ -19,6 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * @property \Illuminate\Support\Carbon|null $bloqueado_ate
  * @property \Illuminate\Support\Carbon|null $anonimizado_em
+ * @property \Illuminate\Support\Carbon|null $last_login_at
  */
 class AdminUser extends Authenticatable
 {
