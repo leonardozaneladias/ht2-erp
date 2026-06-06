@@ -186,10 +186,11 @@
                         class="hs-dropdown-toggle topbar-link ms-2.5 flex cursor-pointer items-center px-3!"
                         aria-label="Abrir menu do usuário"
                     >
-                        <img
-                            alt="{{ $displayUser['nome'] }}"
-                            class="size-8 rounded-full lg:me-3"
-                            src="{{ $displayUser['avatar'] }}"
+                        <x-shared.avatar
+                            :name="$displayUser['nome']"
+                            :src="$user?->urlAvatar()"
+                            size="size-8"
+                            class="lg:me-3"
                         />
 
                         <div class="hidden items-center gap-1.5 lg:flex">
@@ -208,10 +209,13 @@
                     <p class="text-body-color mt-1 font-semibold">{{ $displayUser['nome'] }}</p>
                 </div>
 
-                <x-shared.dropdown-item icon="tabler--user-circle" :href="route('admin.perfil.show')">
+                <x-shared.dropdown-item icon="tabler--user-circle" :href="route('admin.conta')">
                     Meu perfil
                 </x-shared.dropdown-item>
-                <x-shared.dropdown-item icon="tabler--settings-2" :href="route('admin.conta.edit')">
+                <x-shared.dropdown-item
+                    icon="tabler--settings-2"
+                    :href="route('admin.conta', ['aba' => 'preferencias'])"
+                >
                     Configurações da conta
                 </x-shared.dropdown-item>
                 <x-shared.dropdown-item icon="tabler--bell-ringing" :href="route('admin.conta.notificacoes')">

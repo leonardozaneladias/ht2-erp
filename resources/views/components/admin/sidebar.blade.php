@@ -79,11 +79,12 @@
             <div class="sidenav-user p-5" id="user-profile-settings">
                 <div class="flex items-center justify-between gap-3">
                     <div class="min-w-0">
-                        <a class="link-reset block" href="{{ route('admin.perfil.show') }}">
-                            <img
-                                alt="{{ $displayUser['nome'] }}"
-                                class="mb-3 size-9 rounded-full"
-                                src="{{ $displayUser['avatar'] }}"
+                        <a class="link-reset block" href="{{ route('admin.conta') }}">
+                            <x-shared.avatar
+                                :name="$displayUser['nome']"
+                                :src="$user?->urlAvatar()"
+                                size="size-9"
+                                class="mb-3"
                             />
                             <span class="sidenav-user-name block truncate font-bold">{{ $displayUser['nome'] }}</span>
                             <span class="text-xs font-semibold">{{ $displayUser['perfil'] }}</span>
@@ -101,10 +102,13 @@
                             </button>
                         </x-slot:button>
 
-                        <x-shared.dropdown-item icon="tabler--user-circle" :href="route('admin.perfil.show')">
+                        <x-shared.dropdown-item icon="tabler--user-circle" :href="route('admin.conta')">
                             Meu perfil
                         </x-shared.dropdown-item>
-                        <x-shared.dropdown-item icon="tabler--settings-2" :href="route('admin.conta.edit')">
+                        <x-shared.dropdown-item
+                            icon="tabler--settings-2"
+                            :href="route('admin.conta', ['aba' => 'preferencias'])"
+                        >
                             Configurações
                         </x-shared.dropdown-item>
                         <x-shared.dropdown-divider />
