@@ -4,7 +4,6 @@
     $displayUser = [
         'nome' => $user?->nome ?? config('branding.user_default_name'),
         'perfil' => $user?->getRoleNames()->first() ?? config('branding.user_default_role'),
-        'avatar' => $user?->avatar_url ?: asset(config('branding.avatar_default')),
     ];
 
     $notifications = [];

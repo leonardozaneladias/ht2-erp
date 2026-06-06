@@ -31,4 +31,5 @@ it('redireciona os placeholders antigos para a conta', function (): void {
 
     $this->get(route('admin.perfil.show'))->assertRedirect(route('admin.conta'));
     $this->get(route('admin.conta.edit'))->assertRedirect(route('admin.conta'));
+    $this->get(route('admin.conta.seguranca'))->assertRedirect(route('admin.conta', ['aba' => 'seguranca']));
 });
