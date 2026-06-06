@@ -29,34 +29,43 @@
     --color-light-hover: #d6dbe0;
     --color-dark-hover: #2c3440;
 
+    /* Rampa de cinzas monotônica (clara → escura). Antes o 500 era mais claro
+       que o 400, achatando a hierarquia e enfraquecendo o contraste do texto
+       secundário; o 500/600/700 agora escurecem progressivamente (500 atinge
+       contraste AA sobre o card branco). */
     --color-default-50: var(--color-slate-50);
     --color-default-100: #f6f7fb;
     --color-default-200: #eef2f7;
     --color-default-300: #e7e9eb;
     --color-default-400: #9ba6b7;
-    --color-default-500: #a1a9b1;
-    --color-default-600: #8a969c;
-    --color-default-700: #6c757d;
+    --color-default-500: #6c757d;
+    --color-default-600: #565e64;
+    --color-default-700: #495057;
     --color-default-800: #343a40;
     --color-default-900: #313a46;
     --color-default-950: var(--color-slate-950);
 
+    /* Escala tipográfica com hierarquia real (antes text-xs == text-sm == 13px).
+       2xs 11 · xs 12 · sm 13 (corpo) · md 15 — degraus claros para metadados,
+       hints e labels secundários. */
     --text-2xs: 11px;
+    --text-xs: 0.75rem;
     --text-sm: 13px;
     --text-md: 15px;
-    --text-xs: 0.8125rem;
 
     --text-2xs--line-height: 1.5;
     --text-xs--line-height: 1.5;
     --text-md--line-height: 1.5;
     --text-sm--line-height: 1.5;
     --text-base--line-height: 1.5;
-    --text-lg--line-height: 1.5;
-    --text-xl--line-height: 1.5;
-    --text-2xl--line-height: 1.5;
-    --text-3xl--line-height: 1.5;
-    --text-4xl--line-height: 1.5;
-    --text-5xl--line-height: 1.5;
+    --text-lg--line-height: 1.4;
+    /* Títulos: line-height mais apertado para uma hierarquia mais sofisticada
+       (1.5 deixava títulos grandes excessivamente espaçados). */
+    --text-xl--line-height: 1.35;
+    --text-2xl--line-height: 1.3;
+    --text-3xl--line-height: 1.25;
+    --text-4xl--line-height: 1.2;
+    --text-5xl--line-height: 1.15;
 
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
