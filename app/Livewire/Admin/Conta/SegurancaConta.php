@@ -14,8 +14,6 @@ use App\Services\Admin\Security\TwoFactorService;
 use App\Support\Impersonation\ImpersonationContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
@@ -23,8 +21,6 @@ use Livewire\Component;
  * (ativar, desativar, regenerar) exigem reconfirmação de senha (ConfirmsPassword)
  * — por isso resolvem as Actions via app(), já que são chamadas pelo trait.
  */
-#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
-#[Title('Segurança da conta')]
 class SegurancaConta extends Component
 {
     use ConfirmsPassword;

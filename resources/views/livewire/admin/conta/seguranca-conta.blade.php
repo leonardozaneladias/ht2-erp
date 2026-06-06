@@ -1,9 +1,4 @@
 <div>
-    <x-admin.page-header
-        title="Segurança da conta"
-        subtitle="Proteja seu acesso com verificação em duas etapas (2FA)."
-    />
-
     <div class="grid gap-6">
         {{-- Códigos de recuperação (exibidos uma única vez) --}}
         @if ($recoveryCodes !== [])
