@@ -11,8 +11,8 @@
     };
 
     $displayUser = [
-        'nome' => $user?->nome ?? config('branding.user_default_name'),
-        'perfil' => $user?->getRoleNames()->first() ?? config('branding.user_default_role'),
+        'nome' => $user?->nomeExibicao() ?? config('branding.user_default_name'),
+        'perfil' => $user?->perfilExibicao() ?? config('branding.user_default_role'),
     ];
 
     $sections = collect(config('admin-menu', []))
@@ -76,52 +76,16 @@
     <div class="relative min-h-0 grow">
         <div class="size-full" data-simplebar>
             <div class="sidenav-user p-5" id="user-profile-settings">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                        <a class="link-reset block" href="{{ route('admin.conta') }}">
-                            <x-shared.avatar
-                                :name="$displayUser['nome']"
-                                :src="$user?->urlAvatar()"
-                                size="size-9"
-                                class="mb-3"
-                            />
-                            <span class="sidenav-user-name block truncate font-bold">{{ $displayUser['nome'] }}</span>
-                            <span class="text-xs font-semibold">{{ $displayUser['perfil'] }}</span>
-                        </a>
-                    </div>
-
-                    <x-shared.dropdown placement="bottom-end">
-                        <x-slot:button>
-                            <button
-                                type="button"
-                                class="hs-dropdown-toggle cursor-pointer"
-                                aria-label="Abrir menu rápido do usuário"
-                            >
-                                <i class="iconify tabler--settings ms-1 size-6 align-middle"></i>
-                            </button>
-                        </x-slot:button>
-
-                        <x-shared.dropdown-item icon="tabler--user-circle" :href="route('admin.conta')">
-                            Meu perfil
-                        </x-shared.dropdown-item>
-                        <x-shared.dropdown-item
-                            icon="tabler--settings-2"
-                            :href="route('admin.conta', ['aba' => 'preferencias'])"
-                        >
-                            Configurações
-                        </x-shared.dropdown-item>
-                        <x-shared.dropdown-divider />
-
-                        <form method="POST" action="{{ route('admin.logout') }}">
-                            @csrf
-
-                            <button type="submit" class="dropdown-item text-danger w-full text-start">
-                                <i class="iconify tabler--logout align-middle text-base"></i>
-                                <span class="align-middle">Sair</span>
-                            </button>
-                        </form>
-                    </x-shared.dropdown>
-                </div>
+                <a class="link-reset block min-w-0" href="{{ route('admin.conta') }}">
+                    <x-shared.avatar
+                        :name="$displayUser['nome']"
+                        :src="$user?->urlAvatar()"
+                        size="size-9"
+                        class="mb-3"
+                    />
+                    <span class="sidenav-user-name block truncate font-bold">{{ $displayUser['nome'] }}</span>
+                    <span class="text-xs font-semibold">{{ $displayUser['perfil'] }}</span>
+                </a>
             </div>
 
             <div id="sidenav-menu">

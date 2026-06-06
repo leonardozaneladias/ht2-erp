@@ -2,8 +2,8 @@
     $user = auth('admin')->user();
 
     $displayUser = [
-        'nome' => $user?->nome ?? config('branding.user_default_name'),
-        'perfil' => $user?->getRoleNames()->first() ?? config('branding.user_default_role'),
+        'nome' => $user?->nomeExibicao() ?? config('branding.user_default_name'),
+        'perfil' => $user?->perfilExibicao() ?? config('branding.user_default_role'),
     ];
 
     $notifications = [];
@@ -182,24 +182,12 @@
                 <x-slot:button>
                     <button
                         type="button"
-                        class="hs-dropdown-toggle topbar-link ms-2.5 flex cursor-pointer items-center px-3!"
+                        class="hs-dropdown-toggle topbar-link ms-2.5 flex cursor-pointer items-center gap-1.5 px-3!"
                         aria-label="Abrir menu do usuário"
                     >
-                        <x-shared.avatar
-                            :name="$displayUser['nome']"
-                            :src="$user?->urlAvatar()"
-                            size="size-8"
-                            class="lg:me-3"
-                        />
+                        <x-shared.avatar :name="$displayUser['nome']" :src="$user?->urlAvatar()" size="size-8" />
 
-                        <div class="hidden items-center gap-1.5 lg:flex">
-                            <div class="text-start">
-                                <p class="text-body-color font-semibold">{{ $displayUser['nome'] }}</p>
-                                <p class="text-default-400 text-xs">{{ $displayUser['perfil'] }}</p>
-                            </div>
-
-                            <i class="iconify tabler--chevron-down align-middle text-sm"></i>
-                        </div>
+                        <i class="iconify tabler--chevron-down hidden align-middle text-sm lg:inline-block"></i>
                     </button>
                 </x-slot:button>
 

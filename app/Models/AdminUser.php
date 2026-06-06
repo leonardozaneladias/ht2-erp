@@ -216,6 +216,22 @@ class AdminUser extends Authenticatable
         return Storage::disk('public')->url($caminho);
     }
 
+    /**
+     * Nome exibido no chrome (topbar/sidebar).
+     */
+    public function nomeExibicao(): string
+    {
+        return $this->nome;
+    }
+
+    /**
+     * Papel global exibido no chrome (primeiro papel atribuído, se houver).
+     */
+    public function perfilExibicao(): ?string
+    {
+        return $this->getRoleNames()->first();
+    }
+
     protected function casts(): array
     {
         return [
