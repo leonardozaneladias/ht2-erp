@@ -38,13 +38,16 @@
     }
 }
 
-/* Page Main Title */
+/* Page Main Title — título de página presente e legível (antes era um
+   "kicker" de 14px em uppercase, datado e de baixa hierarquia). */
 .page-main-title {
-    @apply text-body-color text-[14px] font-bold uppercase;
+    @apply text-body-color text-xl font-semibold tracking-tight;
 }
 
+/* Faixa do cabeçalho de página: tokens em vez de hex fixos (mantém o degradê
+   sutil com o fundo e acompanha o dark mode). */
 .page-title-head {
-    @apply bg-[#fbfbfd] dark:bg-[#22232c] -mx-5 px-5 py-4 border-default-300 border-b;
+    @apply bg-default-50 dark:bg-default-100 -mx-5 px-5 py-4 border-default-300 border-b;
 }
 
 html[data-theme="dark"],
