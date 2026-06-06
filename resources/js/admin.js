@@ -13,6 +13,7 @@ import 'plyr/dist/plyr.css';
 
 import { createIcons, icons } from 'lucide';
 import moment from 'moment';
+import './admin/preline';
 import './admin/sidebar';
 import './admin/theme';
 import './admin/toast';
