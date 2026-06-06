@@ -99,14 +99,16 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         ->name('impersonation.sair');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::prefix('perfil')->name('perfil.')->group(function () use ($placeholder): void {
-        Route::get('/', static fn (): Response => $placeholder('Meu Perfil'))->name('show');
+    Route::get('/conta', App\Livewire\Admin\Conta\MinhaConta::class)->name('conta');
+
+    Route::prefix('perfil')->name('perfil.')->group(function (): void {
+        Route::redirect('/', '/admin/conta')->name('show');
     });
 
     Route::prefix('conta')->name('conta.')->group(function () use ($placeholder): void {
-        Route::get('/editar', static fn (): Response => $placeholder('Configurações da Conta'))->name('edit');
+        Route::redirect('/editar', '/admin/conta')->name('edit');
+        Route::redirect('/seguranca', '/admin/conta?aba=seguranca')->name('seguranca');
         Route::get('/notificacoes', static fn (): Response => $placeholder('Preferências de Notificação'))->name('notificacoes');
-        Route::get('/seguranca', App\Livewire\Admin\Conta\SegurancaConta::class)->name('seguranca');
     });
 
     Route::prefix('empresas')->name('empresas.')->group(function (): void {

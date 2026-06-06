@@ -27,9 +27,9 @@ final class EnsureTwoFactorEnabled
             && ! app(ImpersonationContext::class)->ativo()
             && ! $usuario->hasTwoFactorEnabled()
             && app(SegurancaSettings::class)->exigir_2fa_admin
-            && ! $request->routeIs('admin.conta.seguranca')
+            && ! $request->routeIs('admin.conta')
             && ! $request->routeIs('admin.logout')) {
-            return redirect()->route('admin.conta.seguranca')
+            return redirect()->route('admin.conta', ['aba' => 'seguranca'])
                 ->with('warning', 'A verificação em duas etapas é obrigatória. Configure-a para continuar.');
         }
 

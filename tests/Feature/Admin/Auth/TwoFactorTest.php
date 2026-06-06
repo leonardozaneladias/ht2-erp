@@ -139,7 +139,7 @@ it('força a configuração de 2FA quando a política exige', function () {
 
     $this->actingAs($admin, 'admin')
         ->get(route('admin.dashboard'))
-        ->assertRedirect(route('admin.conta.seguranca'));
+        ->assertRedirect(route('admin.conta', ['aba' => 'seguranca']));
 });
 
 it('desativa o 2FA', function () {
