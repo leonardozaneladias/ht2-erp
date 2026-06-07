@@ -5,18 +5,6 @@
         'nome' => $user?->nomeExibicao() ?? config('branding.user_default_name'),
         'perfil' => $user?->perfilExibicao() ?? config('branding.user_default_role'),
     ];
-
-    $notifications = [];
-
-    $notificationCount = count($notifications);
-
-    $notificationToneClasses = [
-        'primary' => 'bg-primary/15 text-primary',
-        'success' => 'bg-success/15 text-success',
-        'warning' => 'bg-warning/15 text-warning',
-        'danger' => 'bg-danger/15 text-danger',
-        'info' => 'bg-info/15 text-info',
-    ];
 @endphp
 
 <header class="app-header">
@@ -100,64 +88,7 @@
                 </div>
             </div>
 
-            <x-shared.dropdown class="topbar-item" placement="bottom-end" auto-close="inside">
-                <x-slot:button>
-                    <button
-                        type="button"
-                        class="topbar-link hs-dropdown-toggle relative flex items-center"
-                        aria-label="Abrir notificações"
-                    >
-                        <i class="iconify tabler--bell topbar-link-icon"></i>
-
-                        @if ($notificationCount > 0)
-                            <x-shared.badge
-                                variant="warning"
-                                solid
-                                class="absolute -end-px -top-[13px] min-w-4 px-1 py-0 text-[10px] leading-none text-white"
-                            >
-                                {{ $notificationCount }}
-                            </x-shared.badge>
-                        @endif
-                    </button>
-                </x-slot:button>
-
-                <div class="border-default-300 border-b px-3 py-2">
-                    <div class="flex items-center justify-between gap-3">
-                        <h6 class="text-body-color text-base font-semibold">Notificações</h6>
-                        <x-shared.badge variant="warning" solid>{{ $notificationCount }} alertas</x-shared.badge>
-                    </div>
-                </div>
-
-                <div class="max-h-80 overflow-y-auto" data-simplebar>
-                    @foreach ($notifications as $notification)
-                        <a
-                            href="{{ $notification['href'] }}"
-                            class="dropdown-item items-start gap-3 px-4.5 py-3 text-wrap"
-                        >
-                            <span class="shrink-0">
-                                <span
-                                    class="flex size-9 items-center justify-center rounded {{ $notificationToneClasses[$notification['variant']] ?? $notificationToneClasses['info'] }}"
-                                >
-                                    <i class="iconify {{ $notification['icon'] }} text-lg"></i>
-                                </span>
-                            </span>
-
-                            <span class="text-default-400 grow">
-                                <span class="text-body-color font-medium">{{ $notification['title'] }}</span>
-                                <br />
-                                <span class="text-xs">{{ $notification['time'] }}</span>
-                            </span>
-                        </a>
-                    @endforeach
-                </div>
-
-                <a
-                    href="{{ route('admin.conta.notificacoes') }}"
-                    class="dropdown-item text-reset border-light justify-center border-t py-3 font-bold underline underline-offset-2"
-                >
-                    Ver central de notificações
-                </a>
-            </x-shared.dropdown>
+            <livewire:admin.notificacoes.sino-notificacoes />
 
             <div class="hidden md:inline-flex">
                 <div class="topbar-item">

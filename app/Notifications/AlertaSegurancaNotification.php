@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications;
 
 use App\Enums\TipoAlertaSeguranca;
+use App\Enums\TipoNotificacao;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -33,7 +34,7 @@ final class AlertaSegurancaNotification extends Notification implements ShouldQu
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -47,5 +48,33 @@ final class AlertaSegurancaNotification extends Notification implements ShouldQu
         }
 
         return $mail->line('Verifique a trilha de auditoria em /admin/auditoria.');
+    }
+
+    /**
+     * Payload persistido pelo canal database e consumido pelo sino/central in-app.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'tipo' => $this->tipoNotificacao()->value,
+            'titulo' => $this->tipo->label(),
+            'mensagem' => $this->tipo->descricao(),
+            'icon' => $this->tipoNotificacao()->icon(),
+            'url' => route('admin.auditoria.index'),
+            'contexto' => $this->contexto,
+        ];
+    }
+
+    /**
+     * Mapeia o alerta de segurança para a categoria visual da notificação in-app.
+     */
+    private function tipoNotificacao(): TipoNotificacao
+    {
+        return match ($this->tipo) {
+            TipoAlertaSeguranca::LoginSuperAdmin => TipoNotificacao::Info,
+            default => TipoNotificacao::Aviso,
+        };
     }
 }
