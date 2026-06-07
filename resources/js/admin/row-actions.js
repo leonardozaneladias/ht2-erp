@@ -9,7 +9,7 @@
 //
 // Solucao: Alpine (reinicializa sozinho apos morph, como o sino de notificacoes)
 // + posicao `fixed` calculada a partir do botao, escapando do clipping do
-// overflow e de stacking contexts.
+// overflow e de stacking contexts. Inclui navegacao por teclado (WAI-ARIA menu).
 
 document.addEventListener('alpine:init', () => {
   window.Alpine.data('afRowActions', () => ({
@@ -18,7 +18,7 @@ document.addEventListener('alpine:init', () => {
 
     toggle() {
       if (this.open) {
-        this.fechar();
+        this.fechar(true);
       } else {
         this.abrir();
       }
@@ -26,12 +26,25 @@ document.addEventListener('alpine:init', () => {
 
     abrir() {
       this.open = true;
-      // Posiciona apos o menu existir no DOM (para medir altura/largura reais).
-      this.$nextTick(() => this.posicionar());
+      // Posiciona e foca o primeiro item apos o menu existir no DOM.
+      this.$nextTick(() => {
+        this.posicionar();
+        this.focarPrimeiro();
+      });
     },
 
-    fechar() {
+    fechar(retornarFoco = false) {
+      if (!this.open) {
+        return;
+      }
+
       this.open = false;
+
+      // Devolve o foco ao gatilho (ex.: fechou via ESC) para nao "perder" o
+      // ponto de navegacao por teclado.
+      if (retornarFoco) {
+        this.$refs.trigger?.focus();
+      }
     },
 
     posicionar() {
@@ -62,6 +75,75 @@ document.addEventListener('alpine:init', () => {
 
     get menuStyle() {
       return `top:${this.coords.top}px;left:${this.coords.left}px`;
+    },
+
+    // ---- Navegacao por teclado (WAI-ARIA menu) -----------------------------
+
+    itensMenu() {
+      if (!this.$refs.menu) {
+        return [];
+      }
+
+      return Array.from(this.$refs.menu.querySelectorAll('[role="menuitem"]')).filter(
+        (el) => !el.hasAttribute('disabled') && el.getAttribute('aria-disabled') !== 'true',
+      );
+    },
+
+    focarPrimeiro() {
+      this.itensMenu()[0]?.focus();
+    },
+
+    mover(delta) {
+      const itens = this.itensMenu();
+
+      if (itens.length === 0) {
+        return;
+      }
+
+      const atual = itens.indexOf(document.activeElement);
+      const proximo = (atual + delta + itens.length) % itens.length;
+      itens[proximo].focus();
+    },
+
+    extremo(qual) {
+      const itens = this.itensMenu();
+
+      if (itens.length === 0) {
+        return;
+      }
+
+      (qual === 'fim' ? itens[itens.length - 1] : itens[0]).focus();
+    },
+
+    aoTeclar(evento) {
+      switch (evento.key) {
+        case 'ArrowDown':
+          evento.preventDefault();
+          this.mover(1);
+          break;
+        case 'ArrowUp':
+          evento.preventDefault();
+          this.mover(-1);
+          break;
+        case 'Home':
+          evento.preventDefault();
+          this.extremo('inicio');
+          break;
+        case 'End':
+          evento.preventDefault();
+          this.extremo('fim');
+          break;
+        case 'Escape':
+          evento.preventDefault();
+          this.fechar(true); // fecha e devolve o foco ao gatilho
+          break;
+        case 'Tab':
+          // Deixa o Tab seguir naturalmente, apenas fechando o menu.
+          this.fechar();
+          break;
+        default:
+          break;
+      }
     },
   }));
 });

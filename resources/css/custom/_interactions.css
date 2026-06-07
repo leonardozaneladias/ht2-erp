@@ -1,0 +1,41 @@
+/* _interactions.css
+   -------------------------------------------------------------------------
+   Microinteracoes e foco acessivel — refinamentos SUTIS sobre o Inspinia.
+   Tudo sob prefers-reduced-motion e com baixa especificidade para nao
+   conflitar com os estilos do template. */
+
+@layer base {
+    /* Baseline de foco acessivel (apenas navegacao por teclado). O :where()
+       tem especificidade ZERO, entao qualquer estilo de foco ja existente
+       prevalece — isto e so uma rede de seguranca com a cor da marca. */
+    :where(a, button, summary, [tabindex]):focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
+@layer components {
+    /* Itens de menu (kebab/dropdown): hover suave + foco visivel claro. */
+    .dropdown-item {
+        transition:
+            background-color 0.15s ease,
+            color 0.15s ease;
+    }
+
+    .dropdown-item:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
+    }
+
+    /* Hover de linha de tabela mais fluido (suaviza o .table-hover). */
+    .table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dropdown-item,
+    .table tbody tr {
+        transition: none;
+    }
+}
