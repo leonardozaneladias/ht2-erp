@@ -16,6 +16,7 @@ enum ModuloAcesso: string
             self::Acessos => 'Controle de Acesso',
             self::Auditoria => 'Auditoria',
             self::Configuracoes => 'Configurações',
+            self::Notificacoes => 'Notificações',
         };
     }
 
@@ -29,6 +30,7 @@ enum ModuloAcesso: string
             self::Acessos => 'Concessões diretas, matriz e governança de acesso.',
             self::Auditoria => 'Trilhas de auditoria e histórico de mudanças.',
             self::Configuracoes => 'Configurações gerais do sistema.',
+            self::Notificacoes => 'Envio de comunicados in-app aos usuários.',
         };
     }
 
@@ -41,6 +43,7 @@ enum ModuloAcesso: string
             self::Perfis => 'secondary',
             self::Acessos => 'warning',
             self::Auditoria, self::Configuracoes => 'neutral',
+            self::Notificacoes => 'info',
         };
     }
 
@@ -54,6 +57,7 @@ enum ModuloAcesso: string
             self::Acessos => 'tabler--lock-access',
             self::Auditoria => 'tabler--history',
             self::Configuracoes => 'tabler--settings',
+            self::Notificacoes => 'tabler--bell',
         };
     }
 
@@ -75,4 +79,5 @@ enum ModuloAcesso: string
     case Acessos = 'acessos';
     case Auditoria = 'auditoria';
     case Configuracoes = 'configuracoes';
+    case Notificacoes = 'notificacoes';
 }

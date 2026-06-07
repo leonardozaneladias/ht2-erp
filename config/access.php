@@ -198,5 +198,12 @@ return [
             ],
         ],
 
+        ModuloAcesso::Notificacoes->value => [
+            'notificacoes.enviar' => [
+                'label' => 'Enviar comunicados',
+                'descricao' => 'Compor e enviar comunicados in-app aos usuários.',
+            ],
+        ],
+
     ],
 ];

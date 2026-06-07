@@ -46,6 +46,13 @@ return [
                 'active' => ['admin.auditoria.*'],
             ],
             [
+                'label' => 'Comunicados',
+                'icon' => 'tabler--bell',
+                'route' => 'admin.comunicados',
+                'permission' => 'notificacoes.enviar',
+                'active' => ['admin.comunicados'],
+            ],
+            [
                 'label' => 'Configurações',
                 'icon' => 'tabler--settings',
                 'route' => 'admin.configuracoes.index',

@@ -1,0 +1,97 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire\Admin\Notificacoes;
+
+use App\Actions\Admin\Notificacoes\EnviarComunicadoAction;
+use App\DTOs\Admin\ComunicadoDTO;
+use App\Enums\PublicoComunicado;
+use App\Enums\TipoNotificacao;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Spatie\Permission\Models\Role;
+
+/**
+ * Composição e envio de comunicados in-app aos usuários. Restrito à permissão
+ * notificacoes.enviar.
+ *
+ * @property-read Collection<int, string> $papeis
+ */
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
+#[Title('Enviar comunicado')]
+final class EnviarComunicado extends Component
+{
+    public string $tipo = TipoNotificacao::Info->value;
+
+    public string $titulo = '';
+
+    public string $mensagem = '';
+
+    public string $publico = PublicoComunicado::Todos->value;
+
+    public string $papel = '';
+
+    public function mount(): void
+    {
+        $user = auth('admin')->user();
+
+        if ($user === null || ! $user->can('notificacoes.enviar')) {
+            throw new AuthorizationException('Acesso negado.');
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        return [
+            'tipo' => ['required', Rule::enum(TipoNotificacao::class)],
+            'titulo' => ['required', 'string', 'max:120'],
+            'mensagem' => ['required', 'string', 'max:1000'],
+            'publico' => ['required', Rule::enum(PublicoComunicado::class)],
+            'papel' => ['nullable', 'required_if:publico,papel', Rule::in($this->papeis->all())],
+        ];
+    }
+
+    public function enviar(EnviarComunicadoAction $action): void
+    {
+        $dados = $this->validate();
+
+        $total = $action->execute(ComunicadoDTO::fromArray($dados));
+
+        $this->reset(['titulo', 'mensagem']);
+
+        $this->dispatch(
+            'toast',
+            variant: 'success',
+            message: "Comunicado enviado para {$total} usuário(s).",
+        );
+    }
+
+    /**
+     * Papéis globais disponíveis para segmentação.
+     *
+     * @return Collection<int, string>
+     */
+    #[Computed]
+    public function papeis(): Collection
+    {
+        return Role::query()->where('guard_name', 'admin')->orderBy('name')->pluck('name');
+    }
+
+    public function render(): View
+    {
+        return view('livewire.admin.notificacoes.enviar-comunicado', [
+            'tipos' => TipoNotificacao::options(),
+            'publicos' => PublicoComunicado::options(),
+        ]);
+    }
+}
