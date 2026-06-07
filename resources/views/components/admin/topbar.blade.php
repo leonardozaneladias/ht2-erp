@@ -97,6 +97,7 @@
                         class="topbar-link btn group size-8 rounded-full"
                         data-toggle="fullscreen"
                         aria-label="Alternar tela cheia"
+                        aria-pressed="false"
                     >
                         <i class="iconify tabler--maximize topbar-link-icon group-[.fullscreen-active]:hidden"></i>
                         <i
