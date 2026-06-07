@@ -15,6 +15,7 @@
                     'footer' => ['Rodapé simples com versão e ambiente', 'tabler--baseline-density-medium'],
                     'pagination' => ['Tema oficial de paginação do Laravel para controllers e Livewire', 'tabler--chevrons-left-right'],
                     'spinner' => ['Loading inline para wire:loading, placeholders e estados leves', 'tabler--loader-2'],
+                    'skeleton' => ['Placeholder de carregamento (block, text, circle) para estados sofisticados', 'tabler--layout-board-split'],
                     'alert' => ['Alertas persistentes e dismissible', 'tabler--alert-triangle'],
                     'badge' => ['Badges de status, contagem e chip', 'tabler--tag'],
                     'button' => ['Ações primárias, outline, ghost e icon-only', 'tabler--pointer'],

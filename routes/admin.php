@@ -57,6 +57,7 @@ if (app()->isLocal()) {
         Route::view('/footer', 'admin.dev.components.footer')->name('footer');
         Route::view('/pagination', 'admin.dev.components.pagination')->name('pagination');
         Route::view('/spinner', 'admin.dev.components.spinner')->name('spinner');
+        Route::view('/skeleton', 'admin.dev.components.skeleton')->name('skeleton');
         Route::view('/data-table', 'admin.dev.components.data-table')->name('data-table');
         Route::view('/list-group', 'admin.dev.components.list-group')->name('list-group');
         Route::view('/static-table', 'admin.dev.components.static-table')->name('static-table');

@@ -157,12 +157,13 @@ Batch 2 concluído em 2026-04-11: `layout`, `theme-bootstrap`, `sidebar`, `topba
 
 ## 6. Feedback (P1)
 
-|  #  | Blade destino             | Categoria | Doc                                                                          | Vai usar | Prioridade | Status |                         Decisão                         |
-| :-: | ------------------------- | --------- | ---------------------------------------------------------------------------- | :------: | :--------: | :----: | :-----------------------------------------------------: |
-| 23  | `x-shared.toast`          | Feedback  | [toast.md](template/INSPINIA/Components/Feedback/toast.md)                   |    🟢    |     P1     |   🟢   |    🧩 (+ `toast-container` + helper JS de dispatch)     |
-| 24  | `x-shared.loading-button` | Feedback  | [loading-button.md](template/INSPINIA/Components/Feedback/loading-button.md) |    🟢    |     P1     |   🟢   |       ➕ (variação de `button` + `wire:loading`)        |
-| 25  | `x-shared.confirm-dialog` | Feedback  | [confirm-dialog.md](template/INSPINIA/Components/Feedback/confirm-dialog.md) |    🟢    |     P1     |   🟢   | ⚙️ (helper JS SweetAlert2 + bridge Livewire; sem Blade) |
-| 26  | `x-shared.empty-state`    | Feedback  | [empty-state.md](template/INSPINIA/Components/Feedback/empty-state.md)       |    🟢    |     P1     |   🟢   |                           ✅                            |
+|  #  | Blade destino             | Categoria | Doc                                                                          | Vai usar | Prioridade | Status |                                              Decisão                                               |
+| :-: | ------------------------- | --------- | ---------------------------------------------------------------------------- | :------: | :--------: | :----: | :------------------------------------------------------------------------------------------------: |
+| 23  | `x-shared.toast`          | Feedback  | [toast.md](template/INSPINIA/Components/Feedback/toast.md)                   |    🟢    |     P1     |   🟢   |                          🧩 (+ `toast-container` + helper JS de dispatch)                          |
+| 24  | `x-shared.loading-button` | Feedback  | [loading-button.md](template/INSPINIA/Components/Feedback/loading-button.md) |    🟢    |     P1     |   🟢   |                             ➕ (variação de `button` + `wire:loading`)                             |
+| 25  | `x-shared.confirm-dialog` | Feedback  | [confirm-dialog.md](template/INSPINIA/Components/Feedback/confirm-dialog.md) |    🟢    |     P1     |   🟢   |                      ⚙️ (helper JS SweetAlert2 + bridge Livewire; sem Blade)                       |
+| 26  | `x-shared.empty-state`    | Feedback  | [empty-state.md](template/INSPINIA/Components/Feedback/empty-state.md)       |    🟢    |     P1     |   🟢   |                                                 ✅                                                 |
+| 27  | `x-shared.skeleton`       | Feedback  | —                                                                            |    🟢    |     P1     |   🟢   | ✅ Placeholder de loading (block/text/circle) p/ `wire:loading`; respeita `prefers-reduced-motion` |
 
 **Notas:**
 

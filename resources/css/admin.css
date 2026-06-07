@@ -88,3 +88,27 @@
         border-color: var(--color-default-400) transparent transparent transparent;
     }
 }
+
+/* =========================================================================
+   Barra de progresso de navegacao (wire:navigate)
+   -------------------------------------------------------------------------
+   O Livewire injeta o NProgress (#nprogress) com o azul padrao (#29d).
+   Sobrescrevemos para a cor primaria do Inspinia + leve brilho, dando a
+   sensacao de fluidez/marca em toda navegacao SPA. Fica sem @layer e com
+   !important porque o Livewire injeta o <style> do NProgress em runtime.
+   ========================================================================= */
+#nprogress .bar {
+    background: var(--color-primary) !important;
+    height: 3px !important;
+}
+
+#nprogress .peg {
+    box-shadow:
+        0 0 10px var(--color-primary),
+        0 0 5px var(--color-primary) !important;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: var(--color-primary) !important;
+    border-left-color: var(--color-primary) !important;
+}
