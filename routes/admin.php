@@ -91,7 +91,7 @@ Route::prefix('admin')->name('admin.')->middleware(App\Http\Middleware\EnsureSys
 });
 
 // ── Admin autenticado (setup tem precedência sobre o login) ─────────────────
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\GarantirContaAtiva::class, App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class, App\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function () use ($placeholder): void {
+Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\GarantirContaAtiva::class, App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class, App\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function (): void {
     Route::redirect('/', '/admin/dashboard');
 
     Route::post('/logout', LogoutController::class)->name('logout');
@@ -105,10 +105,10 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         Route::redirect('/', '/admin/conta')->name('show');
     });
 
-    Route::prefix('conta')->name('conta.')->group(function () use ($placeholder): void {
+    Route::prefix('conta')->name('conta.')->group(function (): void {
         Route::redirect('/editar', '/admin/conta')->name('edit');
         Route::redirect('/seguranca', '/admin/conta?aba=seguranca')->name('seguranca');
-        Route::get('/notificacoes', static fn (): Response => $placeholder('Preferências de Notificação'))->name('notificacoes');
+        Route::get('/notificacoes', App\Livewire\Admin\Notificacoes\MinhasNotificacoes::class)->name('notificacoes');
     });
 
     Route::prefix('empresas')->name('empresas.')->group(function (): void {
