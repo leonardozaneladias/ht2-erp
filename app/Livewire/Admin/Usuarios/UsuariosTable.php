@@ -155,6 +155,29 @@ final class UsuariosTable extends PowerGridComponent
         return view('livewire.admin.usuarios._acoes', ['row' => $row]);
     }
 
+    /**
+     * Abre a confirmação temática (bridge SweetAlert2) antes de alternar o
+     * status. Feito no servidor para evitar montar JSON/strings dentro de
+     * atributos Blade (onde diretivas não compilam). Ao confirmar, o bridge
+     * dispara `usuarios::toggle-status`.
+     */
+    public function solicitarToggleStatus(int $id): void
+    {
+        $usuario = AdminUser::findOrFail($id);
+        $this->authorize('toggleStatus', $usuario);
+
+        $this->dispatch(
+            'confirm',
+            title: $usuario->ativo ? 'Desativar usuário?' : 'Reativar usuário?',
+            text: $usuario->ativo
+                ? 'O usuário perderá o acesso ao painel enquanto estiver inativo.'
+                : 'O usuário poderá acessar o painel novamente.',
+            destructive: $usuario->ativo,
+            onConfirm: 'usuarios::toggle-status',
+            params: ['id' => $id],
+        );
+    }
+
     #[On('usuarios::toggle-status')]
     public function alternarStatus(int $id, ToggleAdminUserStatusAction $action): void
     {

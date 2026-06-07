@@ -14,12 +14,11 @@
     Se o slot vier vazio (ex.: usuario sem permissao para nenhuma acao), nada e
     renderizado — evita um kebab "fantasma" sem itens.
 
-    Uso:
-        <x-admin.row-actions>
-            <x-shared.dropdown-item icon="tabler--edit" :href="...">Editar</x-shared.dropdown-item>
-            <x-shared.dropdown-divider />
-            <x-shared.dropdown-item icon="tabler--trash" variant="danger" wire:click="...">Excluir</x-shared.dropdown-item>
-        </x-admin.row-actions>
+    NAO escrever exemplos com a tag literal "x-admin.row-actions" (com angle
+    bracket) aqui dentro: o Blade compila componentes ANTES de remover
+    comentarios, e a auto-referencia causaria recursao infinita. Exemplo de uso
+    real em resources/views/livewire/admin/usuarios/_acoes.blade.php e no
+    showcase /admin/dev/components/row-actions.
 --}}
 
 @if (trim($slot) !== '')

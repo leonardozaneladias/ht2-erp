@@ -58,3 +58,22 @@ it('actionsFromView omite as ações de usuários anonimizados', function () {
     expect($tabela->actionsFromView($anonimizado))->toBeNull();
     expect($tabela->actionsFromView($this->superAdmin))->not->toBeNull();
 });
+
+it('solicitarToggleStatus dispara a confirmação temática (sem alterar status ainda)', function () {
+    $alvo = AdminUser::create([
+        'nome' => 'Alvo Toggle',
+        'email' => 'alvotoggle@teste.com',
+        'password' => Hash::make('password'),
+        'ativo' => true,
+    ]);
+    $alvo->assignRole('gestor');
+
+    Livewire::actingAs($this->superAdmin, 'admin')
+        ->test(UsuariosTable::class)
+        ->call('solicitarToggleStatus', $alvo->id)
+        ->assertDispatched('confirm')
+        ->assertHasNoErrors();
+
+    // Apenas pediu confirmação — o status só muda no onConfirm (usuarios::toggle-status).
+    expect($alvo->fresh()->ativo)->toBeTrue();
+});

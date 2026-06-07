@@ -44,6 +44,9 @@ async function runConfirm(payload = {}) {
   const baseOptions = getBaseOptions();
 
   return Swal.fire({
+    // baseOptions PRIMEIRO: o customClass (com o botão destrutivo) precisa vir
+    // DEPOIS, senão o spread sobrescreveria o vermelho da ação destrutiva.
+    ...baseOptions,
     title: data.title ?? 'Confirmar ação',
     text: data.html ? undefined : data.text,
     html: data.html,
@@ -60,7 +63,6 @@ async function runConfirm(payload = {}) {
         ? 'btn bg-danger text-white hover:bg-danger-hover'
         : baseOptions.customClass.confirmButton,
     },
-    ...baseOptions,
   });
 }
 
