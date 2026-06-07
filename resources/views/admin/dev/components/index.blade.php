@@ -50,6 +50,7 @@
                     'list-group' => ['Composição vertical para dados estruturados e navegação lateral', 'tabler--list'],
                     'static-table' => ['Tabela HTML leve para listas curtas, cards e subtelas internas', 'tabler--table-options'],
                     'timeline-table' => ['Grid visual para programações com vigência, valor e ações rápidas', 'tabler--timeline-event'],
+                    'row-actions' => ['Menu kebab — padrão único de ações por linha (PowerGrid e tabelas custom)', 'tabler--dots-vertical'],
                     'kpi-card' => ['Métrica compacta para dashboard, relatórios e totais rápidos', 'tabler--chart-infographic'],
                     'chart-card' => ['Wrapper visual para charts com header, filtros e área reservada', 'tabler--chart-histogram'],
                     'chart-bar' => ['Wrapper ApexCharts horizontal para comparação entre registros e categorias', 'tabler--chart-bar'],

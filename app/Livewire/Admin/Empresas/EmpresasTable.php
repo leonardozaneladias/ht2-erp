@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Empresas;
 
 use App\Models\Empresa;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -97,22 +96,16 @@ final class EmpresasTable extends PowerGridComponent
     }
 
     /**
-     * @return array<int, Button>
+     * Renderiza a coluna de acoes como um unico menu (kebab). A logica de
+     * permissao vive na view `livewire.admin.empresas._acoes`.
      */
-    public function actions(Empresa $row): array
+    public function actionsFromView(mixed $row): ?View
     {
-        $ator = Auth::guard('admin')->user();
-        $botoes = [];
-
-        if ($ator?->can('update', $row)) {
-            $botoes[] = Button::add('edit')
-                ->slot('Editar')
-                ->class('btn btn-sm inline-flex items-center gap-x-2 border-default-300 text-default-700 hover:bg-light hover:border-default-400')
-                ->route('admin.empresas.edit', ['empresa' => $row->id])
-                ->attributes(['wire:navigate' => '']);
+        if (! $row instanceof Empresa) {
+            return null;
         }
 
-        return $botoes;
+        return view('livewire.admin.empresas._acoes', ['row' => $row]);
     }
 
     protected function renderStatus(Empresa $e): string

@@ -12,6 +12,7 @@ use App\Exceptions\AccessException;
 use App\Models\AdminUser;
 use App\Services\Admin\HierarchyResolver;
 use App\Services\Admin\Security\ControleLockout;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,6 @@ use Illuminate\Support\Facades\Blade;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Wireable;
-use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -141,73 +141,18 @@ final class UsuariosTable extends PowerGridComponent
     }
 
     /**
-     * @return array<int, Button>
+     * Renderiza a coluna de acoes como um unico menu (kebab), substituindo a
+     * lista de botoes soltos. A logica de permissao vive na view
+     * `livewire.admin.usuarios._acoes`. Retorna null para usuarios anonimizados
+     * (sem acoes disponiveis).
      */
-    public function actions(AdminUser $row): array
+    public function actionsFromView(mixed $row): ?View
     {
-        $ator = Auth::guard('admin')->user();
-        $botoes = [];
-
-        if ($row->estaAnonimizado()) {
-            return [];
+        if (! $row instanceof AdminUser || $row->estaAnonimizado()) {
+            return null;
         }
 
-        if ($ator?->can('update', $row)) {
-            $botoes[] = Button::add('edit')
-                ->slot('Editar')
-                ->class('btn btn-sm inline-flex items-center gap-x-2 border-default-300 text-default-700 hover:bg-light hover:border-default-400')
-                ->route('admin.usuarios.edit', ['usuario' => $row->id])
-                ->attributes(['wire:navigate' => '']);
-        }
-
-        if ($ator?->can('toggleStatus', $row)) {
-            $classeToggle = $row->ativo
-                ? 'btn btn-sm inline-flex items-center gap-x-2 bg-warning/15 text-warning hover:bg-warning/25'
-                : 'btn btn-sm inline-flex items-center gap-x-2 bg-success/12 text-success hover:bg-success/20';
-
-            $botoes[] = Button::add('toggle')
-                ->slot($row->ativo ? 'Desativar' : 'Reativar')
-                ->class($classeToggle)
-                ->dispatch('usuarios::toggle-status', ['id' => $row->id])
-                ->confirm($row->ativo ? 'Desativar usuário?' : 'Reativar usuário?');
-        }
-
-        if ($ator?->can('impersonate', $row)) {
-            $botoes[] = Button::add('impersonate')
-                ->slot('Entrar como')
-                ->class('btn btn-sm inline-flex items-center gap-x-2 bg-primary/12 text-primary hover:bg-primary/20')
-                ->dispatch('impersonation::abrir', ['id' => $row->id]);
-        }
-
-        if ($row->estaBloqueada() && $ator?->can('update', $row)) {
-            $botoes[] = Button::add('desbloquear')
-                ->slot('Desbloquear')
-                ->class('btn btn-sm inline-flex items-center gap-x-2 bg-info/12 text-info hover:bg-info/20')
-                ->dispatch('usuarios::desbloquear', ['id' => $row->id]);
-        }
-
-        if ($ator?->can('exportarDados', $row)) {
-            $botoes[] = Button::add('exportar-json')
-                ->slot('Exportar JSON')
-                ->class('btn btn-sm inline-flex items-center gap-x-2 border-default-300 text-default-700 hover:bg-light')
-                ->route('admin.usuarios.lgpd.json', ['usuario' => $row->id])
-                ->attributes(['target' => '_blank']);
-
-            $botoes[] = Button::add('exportar-pdf')
-                ->slot('Exportar PDF')
-                ->class('btn btn-sm inline-flex items-center gap-x-2 border-default-300 text-default-700 hover:bg-light')
-                ->route('admin.usuarios.lgpd.pdf', ['usuario' => $row->id])
-                ->attributes(['target' => '_blank']);
-        }
-
-        if ($ator?->can('anonimizar', $row)) {
-            $botoes[] = Button::add('anonimizar')
-                ->slot('Anonimizar')
-                ->class('btn btn-sm inline-flex items-center gap-x-2 bg-danger/12 text-danger hover:bg-danger/20')
-                ->dispatch('lgpd::anonimizar', ['id' => $row->id]);
-        }
-
-        return $botoes;
+        return view('livewire.admin.usuarios._acoes', ['row' => $row]);
     }
 
     #[On('usuarios::toggle-status')]

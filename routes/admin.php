@@ -61,6 +61,7 @@ if (app()->isLocal()) {
         Route::view('/list-group', 'admin.dev.components.list-group')->name('list-group');
         Route::view('/static-table', 'admin.dev.components.static-table')->name('static-table');
         Route::view('/timeline-table', 'admin.dev.components.timeline-table')->name('timeline-table');
+        Route::view('/row-actions', 'admin.dev.components.row-actions')->name('row-actions');
         Route::view('/kpi-card', 'admin.dev.components.kpi-card')->name('kpi-card');
         Route::view('/chart-card', 'admin.dev.components.chart-card')->name('chart-card');
         Route::view('/chart-bar', 'admin.dev.components.chart-bar')->name('chart-bar');
