@@ -7,13 +7,21 @@ namespace App\Livewire\Admin\Conta;
 use App\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Lazy;
 use Livewire\Component;
 
 /**
  * Aba "Segurança" — últimos acessos do próprio usuário (leitura).
+ * Lazy: carrega após o conteúdo principal da aba, com skeleton.
  */
+#[Lazy]
 class HistoricoLogins extends Component
 {
+    public function placeholder(): View
+    {
+        return view('livewire.admin.placeholders.skeleton-table');
+    }
+
     public function render(): View
     {
         $usuario = $this->usuario();

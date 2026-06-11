@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Acesso;
 
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Lazy;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
@@ -12,7 +13,9 @@ use Spatie\Activitylog\Models\Activity;
 /**
  * Painel de histórico de acesso dentro do hub: trilha paginada e filtrável
  * dos eventos de governança de acesso (concessões, negações, sincronizações).
+ * Lazy: query pesada, carrega com skeleton sem travar o hub.
  */
+#[Lazy]
 class PainelHistorico extends Component
 {
     use WithPagination;
@@ -34,6 +37,11 @@ class PainelHistorico extends Component
     public string $de = '';
 
     public string $ate = '';
+
+    public function placeholder(): View
+    {
+        return view('livewire.admin.placeholders.skeleton-table');
+    }
 
     public function updating(): void
     {

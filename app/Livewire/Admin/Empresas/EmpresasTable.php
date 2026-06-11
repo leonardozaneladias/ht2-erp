@@ -23,6 +23,19 @@ final class EmpresasTable extends PowerGridComponent
 
     public string $tableName = 'empresas-table';
 
+    public function noDataLabel(): View
+    {
+        $podeCriar = auth('admin')->user()?->can('empresas.criar') ?? false;
+
+        return view('admin.partials.powergrid-empty', [
+            'icon' => 'tabler--building-off',
+            'titulo' => 'Nenhuma empresa encontrada',
+            'descricao' => 'Cadastre a primeira empresa para começar a operar.',
+            'ctaUrl' => $podeCriar ? route('admin.empresas.create') : null,
+            'ctaLabel' => $podeCriar ? 'Nova empresa' : null,
+        ]);
+    }
+
     /**
      * @return array<int, mixed>
      */

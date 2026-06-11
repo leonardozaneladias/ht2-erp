@@ -40,7 +40,7 @@ function registrarEventoHistorico(string $motivo = 'evento de teste do historico
 it('lista eventos de acesso no painel de histórico', function () {
     registrarEventoHistorico();
 
-    Livewire::actingAs($this->admin, 'admin')
+    Livewire::withoutLazyLoading()->actingAs($this->admin, 'admin')
         ->test(PainelHistorico::class)
         ->assertOk()
         ->assertSee('evento de teste do historico');
@@ -49,7 +49,7 @@ it('lista eventos de acesso no painel de histórico', function () {
 it('filtra o histórico por tipo de evento', function () {
     registrarEventoHistorico();
 
-    Livewire::actingAs($this->admin, 'admin')
+    Livewire::withoutLazyLoading()->actingAs($this->admin, 'admin')
         ->test(PainelHistorico::class)
         ->set('event', 'acesso_revogado')
         ->assertDontSee('evento de teste do historico')
@@ -58,7 +58,7 @@ it('filtra o histórico por tipo de evento', function () {
 });
 
 it('o hub abre o histórico para quem tem permissão', function () {
-    Livewire::actingAs($this->admin, 'admin')
+    Livewire::withoutLazyLoading()->actingAs($this->admin, 'admin')
         ->test(ControleAcesso::class)
         ->call('verHistorico')
         ->assertSet('mostrarHistorico', true)
@@ -73,7 +73,7 @@ it('o hub bloqueia o histórico para quem não tem acessos.historico', function 
     $auditor = criarAdminUser('auditor@teste.com');
     $auditor->assignRole('auditor');
 
-    Livewire::actingAs($auditor, 'admin')
+    Livewire::withoutLazyLoading()->actingAs($auditor, 'admin')
         ->test(ControleAcesso::class)
         ->call('verHistorico')
         ->assertSet('mostrarHistorico', false);

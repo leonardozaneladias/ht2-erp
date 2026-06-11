@@ -87,6 +87,17 @@ final class BrandingService
     }
 
     /**
+     * Título do documento: "{página} — {empresa ativa}" com fallback para o
+     * nome do sistema quando não há empresa no contexto (login, setup).
+     */
+    public function tituloPagina(?string $titulo = null): string
+    {
+        $contexto = $this->empresa()?->nome ?: $this->nomeSistema();
+
+        return filled($titulo) ? "{$titulo} — {$contexto}" : $contexto;
+    }
+
+    /**
      * CSS custom properties da paleta, para injeção em <style> no <head>.
      * Cada cor vem da empresa ativa (se hex válido) ou da instância.
      * Só emite hex válido (#RRGGBB) — evita injeção de CSS.

@@ -40,6 +40,19 @@ final class UsuariosTable extends PowerGridComponent
     // Perfil selecionado na barra de ações em massa.
     public string $perfilEmMassa = '';
 
+    public function noDataLabel(): View
+    {
+        $podeCriar = auth('admin')->user()?->can('usuarios.criar') ?? false;
+
+        return view('admin.partials.powergrid-empty', [
+            'icon' => 'tabler--users',
+            'titulo' => 'Nenhum usuário encontrado',
+            'descricao' => 'Convide o primeiro usuário para acessar o painel.',
+            'ctaUrl' => $podeCriar ? route('admin.usuarios.create') : null,
+            'ctaLabel' => $podeCriar ? 'Novo usuário' : null,
+        ]);
+    }
+
     /**
      * @return array<int, Wireable>
      */

@@ -34,6 +34,8 @@ class SegurancaConta extends Component
     /** @var list<string> */
     public array $recoveryCodes = [];
 
+    public string $senhaDesconectar = '';
+
     public function ativar(): void
     {
         app(ImpersonationContext::class)->garantirNaoPersonificando();
@@ -88,6 +90,29 @@ class SegurancaConta extends Component
         $this->reset('recoveryCodes', 'svgQr', 'configurando', 'codigoConfirmacao');
 
         $this->dispatch('toast', variant: 'success', message: 'Verificação em duas etapas desativada.');
+    }
+
+    /**
+     * Encerra as sessões do usuário em outros dispositivos (AuthenticateSession
+     * invalida as demais sessões; a atual permanece).
+     */
+    public function desconectarOutrosDispositivos(): void
+    {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
+
+        $this->validate(
+            ['senhaDesconectar' => ['required', 'current_password:admin']],
+            ['senhaDesconectar.current_password' => 'A senha informada está incorreta.'],
+        );
+
+        $guard = Auth::guard('admin');
+        assert($guard instanceof \Illuminate\Auth\SessionGuard);
+        $guard->logoutOtherDevices($this->senhaDesconectar);
+
+        app(\App\Services\Admin\AuditoriaSeguranca::class)->outrosDispositivosDesconectados($this->usuario());
+
+        $this->reset('senhaDesconectar');
+        $this->dispatch('toast', variant: 'success', message: 'Sessões em outros dispositivos foram encerradas.');
     }
 
     public function render(): View

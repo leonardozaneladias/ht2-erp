@@ -94,7 +94,7 @@ Route::prefix('admin')->name('admin.')->middleware(App\Http\Middleware\EnsureSys
 });
 
 // ── Admin autenticado (setup tem precedência sobre o login) ─────────────────
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\GarantirContaAtiva::class, App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class, App\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function (): void {
+Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', Illuminate\Session\Middleware\AuthenticateSession::class, App\Http\Middleware\GarantirContaAtiva::class, App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class, App\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function (): void {
     Route::redirect('/', '/admin/dashboard');
 
     Route::post('/logout', LogoutController::class)->name('logout');

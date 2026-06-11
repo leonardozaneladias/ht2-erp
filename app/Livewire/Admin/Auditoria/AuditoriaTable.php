@@ -31,6 +31,15 @@ final class AuditoriaTable extends PowerGridComponent
 
     public string $sortDirection = 'desc';
 
+    public function noDataLabel(): \Illuminate\Contracts\View\View
+    {
+        return view('admin.partials.powergrid-empty', [
+            'icon' => 'tabler--history-off',
+            'titulo' => 'Nenhum registro de auditoria',
+            'descricao' => 'As ações relevantes do painel aparecerão aqui automaticamente.',
+        ]);
+    }
+
     /**
      * @return array<int, Wireable>
      */

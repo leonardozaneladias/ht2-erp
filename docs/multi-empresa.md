@@ -92,6 +92,23 @@ Conceder a um usuário **acesso** a uma empresa (independente de papéis) é fei
 Login e Setup Wizard (sem empresa ativa) usam o branding da instância. As cores são
 emitidas como CSS custom properties no `<head>` (sem rebuild).
 
+O **título do documento** também é white-label: `BrandingService::tituloPagina($titulo)`
+gera "{Página} — {Empresa ativa}" (fallback: nome do sistema), usado pelo `x-admin.layout`.
+O favicon segue a mesma precedência (empresa → instância → estático).
+
+### Fonte de verdade: `GeneralSettings` × tabela `empresas`
+
+Os dois coexistem com papéis distintos — não migrar um para o outro:
+
+- **`GeneralSettings`/`BrandingSettings`** = identidade da **instância/sistema**
+  (nome do sistema, slogan, branding default, dados do cliente contratante coletados
+  no Setup). Vale quando não há empresa no contexto (login, setup, e-mails).
+- **`empresas`** = dado **fiscal/operacional do tenant** (CNPJ, endereço, filiais,
+  branding específico). Vale dentro do painel com empresa ativa.
+
+A 1ª empresa criada no Setup pode espelhar os dados de `GeneralSettings`, mas a partir
+daí evoluem de forma independente.
+
 ---
 
 ## 5. Bootstrap

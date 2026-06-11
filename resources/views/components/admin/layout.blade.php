@@ -7,9 +7,8 @@
 ])
 
 @php
-    $pageTitle = filled($title)
-        ? sprintf('%s | %s', $title, config('app.name'))
-        : config('app.name');
+    // Título com a empresa ativa (white-label) — fallback: nome do sistema.
+    $pageTitle = app(\App\Services\Admin\Settings\BrandingService::class)->tituloPagina($title);
 @endphp
 
 <!DOCTYPE html>

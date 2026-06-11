@@ -37,6 +37,10 @@ class TrocarSenha extends Component
 
         session()->regenerate();
 
+        // Reancora o hash da sessão atual (AuthenticateSession): sem isto, a
+        // troca de senha derrubaria também ESTA sessão na próxima request.
+        session(['password_hash_admin' => $usuario->fresh()?->getAuthPassword()]);
+
         activity('conta')
             ->causedBy($usuario)
             ->event('senha_alterada')

@@ -79,6 +79,14 @@ final class AuditoriaSeguranca
             ->log('Convite de acesso enviado');
     }
 
+    public function outrosDispositivosDesconectados(AdminUser $usuario): void
+    {
+        activity('auth')
+            ->causedBy($usuario)
+            ->event('sessoes-encerradas')
+            ->log('Sessões em outros dispositivos encerradas pelo usuário');
+    }
+
     public function conviteAceito(AdminUser $usuario): void
     {
         activity('auth')

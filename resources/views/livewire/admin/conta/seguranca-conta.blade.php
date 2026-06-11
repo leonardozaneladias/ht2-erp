@@ -73,6 +73,29 @@
                 </x-shared.button>
             @endif
         </x-shared.card>
+
+        <x-shared.card
+            title="Outros dispositivos"
+            subtitle="Encerre as sessões abertas em outros navegadores e dispositivos. A sessão atual permanece ativa."
+        >
+            <form wire:submit="desconectarOutrosDispositivos" class="grid max-w-md gap-4">
+                <x-shared.password-input
+                    name="senhaDesconectar"
+                    label="Confirme sua senha"
+                    wire:model="senhaDesconectar"
+                    autocomplete="current-password"
+                />
+                <div class="flex justify-end">
+                    <x-shared.loading-button
+                        type="submit"
+                        target="desconectarOutrosDispositivos"
+                        icon="tabler--devices-off"
+                    >
+                        Desconectar outros dispositivos
+                    </x-shared.loading-button>
+                </div>
+            </form>
+        </x-shared.card>
     </div>
 
     @include ('admin.partials.confirms-password')
