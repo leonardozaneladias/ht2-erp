@@ -9,6 +9,7 @@
 #   composer.json     → name = "<slug>/admin"
 #   package.json      → name = "<slug>-admin"
 #   .env.example      → APP_NAME, APP_URL, HORIZON_PREFIX, MAIL_FROM_ADDRESS
+#   .env.production.example → APP_NAME, HORIZON_PREFIX, MAIL_FROM_ADDRESS
 #   .ddev/config.yaml → name = "<slug>" (define a URL https://<slug>.ddev.site)
 #   .env (cria a partir do .env.example se não existir)
 #   README.md, CLAUDE.md, AGENTS.md → primeira linha de título
@@ -102,6 +103,17 @@ if [[ -f .env.example ]]; then
         sed_inplace_fn 's|APP_URL=.*|APP_URL=https://${SLUG}.ddev.site|' .env.example
         sed_inplace_fn 's|HORIZON_PREFIX=.*|HORIZON_PREFIX=${SLUG}_horizon:|' .env.example
         sed_inplace_fn 's|MAIL_FROM_ADDRESS=.*|MAIL_FROM_ADDRESS=\"noreply@${MAIL_DOMAIN}\"|' .env.example
+        "
+fi
+
+# .env.production.example (APP_URL/DB ficam por conta do deploy)
+if [[ -f .env.production.example ]]; then
+    apply ".env.production.example → APP_NAME, HORIZON_PREFIX, MAIL" \
+        bash -c "
+        sed_inplace_fn() { if sed --version >/dev/null 2>&1; then sed -i \"\$@\"; else sed -i '' \"\$@\"; fi; }
+        sed_inplace_fn 's|APP_NAME=.*|APP_NAME=\"${APP_NAME}\"|' .env.production.example
+        sed_inplace_fn 's|HORIZON_PREFIX=.*|HORIZON_PREFIX=${SLUG}_horizon:|' .env.production.example
+        sed_inplace_fn 's|MAIL_FROM_ADDRESS=.*|MAIL_FROM_ADDRESS=\"noreply@${MAIL_DOMAIN}\"|' .env.production.example
         "
 fi
 

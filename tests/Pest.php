@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Enums\TipoConcessao;
 use App\Models\AdminUser;
 use App\Models\PermissionGrant;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
@@ -32,14 +31,13 @@ expect()->extend('toBeOne', function () {
 });
 
 /**
- * Cria um AdminUser de teste.
+ * Cria um AdminUser de teste (delega para a AdminUserFactory).
  */
 function criarAdminUser(string $email = 'user@teste.com', bool $ativo = true): AdminUser
 {
-    return AdminUser::create([
+    return AdminUser::factory()->create([
         'nome' => 'Usuário Teste',
         'email' => $email,
-        'password' => Hash::make('password'),
         'ativo' => $ativo,
     ]);
 }
