@@ -40,6 +40,130 @@
         </div>
     </x-shared.card>
 
+    @if ($modo === 'editar')
+        <x-shared.card
+            title="Filiais"
+            subtitle="Unidades da empresa. A Matriz é criada automaticamente e não pode ser desativada."
+        >
+            <x-slot:headerActions>
+                @unless ($mostrarFormFilial)
+                    <x-shared.button variant="primary" size="sm" icon="tabler--plus" wire:click="abrirFormFilial">
+                        Adicionar filial
+                    </x-shared.button>
+                @endunless
+            </x-slot:headerActions>
+
+            @if ($mostrarFormFilial)
+                <div class="border-default-200 bg-default-50 mb-5 rounded-lg border p-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <x-shared.input name="filial_nome" label="Nome" wire:model="filial_nome" required />
+                        <x-shared.input
+                            name="filial_cnpj"
+                            label="CNPJ"
+                            placeholder="00.000.000/0000-00"
+                            wire:model="filial_cnpj"
+                        />
+                        <x-shared.input
+                            name="filial_inscricao_estadual"
+                            label="Inscrição estadual"
+                            wire:model="filial_inscricao_estadual"
+                        />
+                        <x-shared.input name="filial_telefone" label="Telefone" wire:model="filial_telefone" />
+                        <x-shared.input name="filial_cidade" label="Cidade" wire:model="filial_cidade" />
+                        <x-shared.input
+                            name="filial_estado"
+                            label="UF"
+                            placeholder="SP"
+                            maxlength="2"
+                            wire:model="filial_estado"
+                        />
+                        <x-shared.toggle name="filial_ativo" label="Filial ativa" wire:model="filial_ativo" />
+                    </div>
+                    <div class="mt-4 flex justify-end gap-2">
+                        <x-shared.button
+                            variant="default"
+                            appearance="outline"
+                            size="sm"
+                            wire:click="cancelarFormFilial"
+                        >
+                            Cancelar
+                        </x-shared.button>
+                        <x-shared.button
+                            variant="primary"
+                            size="sm"
+                            wire:click="salvarFilial"
+                            wire:loading.attr="disabled"
+                        >
+                            <span wire:loading.remove wire:target="salvarFilial">
+                                {{ $filialEditandoId === null ? 'Criar filial' : 'Salvar filial' }}
+                            </span>
+                            <span wire:loading wire:target="salvarFilial">Salvando...</span>
+                        </x-shared.button>
+                    </div>
+                </div>
+            @endif
+
+            <div class="overflow-x-auto">
+                <table class="table w-full">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CNPJ</th>
+                            <th>Cidade/UF</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($this->filiais as $filial)
+                            <tr wire:key="filial-{{ $filial->id }}">
+                                <td>
+                                    <span class="font-medium">{{ $filial->nome }}</span>
+                                    @if ($filial->e_matriz)
+                                        <x-shared.badge variant="primary" class="ms-2">Matriz</x-shared.badge>
+                                    @endif
+                                </td>
+                                <td>{{ $filial->cnpj ?: '—' }}</td>
+                                <td>
+                                    {{ $filial->cidade ? $filial->cidade . ($filial->estado ? '/' . $filial->estado : '') : '—' }}
+                                </td>
+                                <td>
+                                    @if ($filial->ativo)
+                                        <x-shared.badge variant="success">Ativa</x-shared.badge>
+                                    @else
+                                        <x-shared.badge variant="neutral">Inativa</x-shared.badge>
+                                    @endif
+                                </td>
+                                <td class="text-end">
+                                    <x-shared.button
+                                        variant="default"
+                                        appearance="outline"
+                                        size="sm"
+                                        icon="tabler--pencil"
+                                        wire:click="abrirFormFilial({{ $filial->id }})"
+                                    >
+                                        Editar
+                                    </x-shared.button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    <x-shared.empty-state
+                                        size="sm"
+                                        icon="tabler--building-off"
+                                        title="Nenhuma filial"
+                                        description="A Matriz é criada junto com a empresa."
+                                    />
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </x-shared.card>
+    @endif
+
     <div class="flex justify-end gap-2">
         <a class="btn btn-outline-secondary" href="{{ route('admin.empresas.index') }}" wire:navigate>Cancelar</a>
         <button type="button" class="btn btn-primary" wire:click="salvar" wire:loading.attr="disabled">
