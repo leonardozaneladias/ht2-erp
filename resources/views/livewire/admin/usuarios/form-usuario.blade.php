@@ -24,13 +24,57 @@
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <x-shared.input name="nome" label="Nome completo" wire:model="nome" required />
                     <x-shared.input type="email" name="email" label="E-mail" wire:model="email" required />
-                    <x-shared.password-input
-                        name="password"
-                        :label="$modo === 'criar' ? 'Senha' : 'Nova senha (deixe vazio para manter)'"
-                        wire:model="password"
-                        :required="$modo === 'criar'"
-                    />
+
+                    @if ($modo === 'criar')
+                        <div class="md:col-span-2">
+                            <x-shared.radio-group name="modoAcesso" label="Como o usuário recebe o acesso?" inline>
+                                <x-shared.radio
+                                    name="modoAcesso"
+                                    value="convite"
+                                    label="Enviar convite por e-mail"
+                                    description="O usuário define a própria senha pelo link (válido por 7 dias)."
+                                    wire:model.live="modoAcesso"
+                                />
+                                <x-shared.radio
+                                    name="modoAcesso"
+                                    value="manual"
+                                    label="Definir senha manualmente"
+                                    description="Você informa a senha e a repassa ao usuário."
+                                    wire:model.live="modoAcesso"
+                                />
+                            </x-shared.radio-group>
+                        </div>
+                    @endif
+
+                    @if ($modo === 'editar' || $modoAcesso === 'manual')
+                        <x-shared.password-input
+                            name="password"
+                            :label="$modo === 'criar' ? 'Senha' : 'Nova senha (deixe vazio para manter)'"
+                            wire:model="password"
+                            :required="$modo === 'criar'"
+                        />
+                    @endif
+
                     <x-shared.toggle name="ativo" label="Usuário ativo" wire:model="ativo" />
+
+                    @if ($modo === 'editar' && $this->emailNaoVerificado)
+                        <div class="md:col-span-2">
+                            <x-shared.alert variant="info" icon="tabler--mail-question">
+                                <div class="flex flex-wrap items-center justify-between gap-3">
+                                    <span>Este usuário ainda não ativou a conta pelo convite.</span>
+                                    <x-shared.button
+                                        variant="primary"
+                                        size="sm"
+                                        icon="tabler--send"
+                                        wire:click="reenviarConvite"
+                                        wire:loading.attr="disabled"
+                                    >
+                                        Reenviar convite
+                                    </x-shared.button>
+                                </div>
+                            </x-shared.alert>
+                        </div>
+                    @endif
                 </div>
             </x-shared.card>
         </x-shared.tab-panel>

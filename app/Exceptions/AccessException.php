@@ -32,4 +32,9 @@ final class AccessException extends RuntimeException
     {
         return new self('Você não tem hierarquia suficiente para gerir este usuário ou perfil.');
     }
+
+    public static function conviteInvalido(): self
+    {
+        return new self('Este convite é inválido, já foi utilizado ou expirou. Solicite um novo ao administrador.');
+    }
 }

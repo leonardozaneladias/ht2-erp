@@ -36,6 +36,7 @@ it('cria usuário com role e grava activity log', function () {
         ->test(FormUsuario::class)
         ->set('nome', 'Novo Usuário')
         ->set('email', 'novo@teste.com')
+        ->set('modoAcesso', 'manual')
         ->set('password', 'SenhaForte1')
         ->set('ativo', true)
         ->set('roles', ['gestor'])
@@ -67,6 +68,7 @@ it('valida e-mail único', function () {
         ->test(FormUsuario::class)
         ->set('nome', 'Conflito')
         ->set('email', 'existe@teste.com')
+        ->set('modoAcesso', 'manual')
         ->set('password', 'SenhaForte1')
         ->call('salvar')
         ->assertHasErrors(['email']);
@@ -79,6 +81,7 @@ it('valida senha mínima de 8 caracteres', function () {
         ->test(FormUsuario::class)
         ->set('nome', 'Teste')
         ->set('email', 'teste@teste.com')
+        ->set('modoAcesso', 'manual')
         ->set('password', '123')
         ->call('salvar')
         ->assertHasErrors(['password']);

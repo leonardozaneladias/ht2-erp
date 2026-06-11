@@ -108,6 +108,7 @@ it('aplica a política de senha ao cadastrar usuário', function () {
         ->test(FormUsuario::class)
         ->set('nome', 'Fulano de Tal')
         ->set('email', 'fulano@teste.com')
+        ->set('modoAcesso', 'manual')
         ->set('password', 'apenasminusculas')
         ->call('salvar')
         ->assertHasErrors(['password']);

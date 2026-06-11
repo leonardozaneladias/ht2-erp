@@ -68,4 +68,23 @@ final class AuditoriaSeguranca
             ->event('senha-reset-aplicado')
             ->log('Senha redefinida');
     }
+
+    public function conviteEnviado(AdminUser $usuario, ?AdminUser $enviadoPor = null): void
+    {
+        activity('auth')
+            ->performedOn($usuario)
+            ->causedBy($enviadoPor)
+            ->event('convite-enviado')
+            ->withProperties(['email' => $usuario->email])
+            ->log('Convite de acesso enviado');
+    }
+
+    public function conviteAceito(AdminUser $usuario): void
+    {
+        activity('auth')
+            ->performedOn($usuario)
+            ->causedBy($usuario)
+            ->event('convite-aceito')
+            ->log('Convite de acesso aceito — senha definida pelo usuário');
+    }
 }

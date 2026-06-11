@@ -89,6 +89,7 @@ Route::prefix('admin')->name('admin.')->middleware(App\Http\Middleware\EnsureSys
     Route::get('/login', App\Livewire\Admin\Auth\Login::class)->name('login');
     Route::get('/esqueceu-senha', App\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
     Route::get('/resetar-senha/{token}', App\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
+    Route::get('/convite/{token}', App\Livewire\Admin\Auth\AceitarConvite::class)->name('convite.aceitar');
     Route::get('/two-factor-challenge', App\Livewire\Admin\Auth\TwoFactorChallenge::class)->name('two-factor-challenge');
 });
 

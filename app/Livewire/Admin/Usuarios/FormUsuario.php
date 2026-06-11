@@ -40,6 +40,9 @@ class FormUsuario extends Component
 
     public string $password = '';
 
+    // Como o novo usuário recebe a senha: convite por e-mail (padrão) ou manual.
+    public string $modoAcesso = 'convite';
+
     public bool $ativo = true;
 
     /** @var array<int, string> */
@@ -78,21 +81,61 @@ class FormUsuario extends Component
         $this->authorize('create', AdminUser::class);
     }
 
-    public function salvar(CreateAdminUserAction $criar, UpdateAdminUserAction $atualizar): void
-    {
+    public function salvar(
+        CreateAdminUserAction $criar,
+        UpdateAdminUserAction $atualizar,
+        \App\Actions\Admin\Convites\ConvidarUsuarioAction $convidar,
+    ): void {
         $dados = $this->validate();
-        $dto = AdminUserDTO::fromArray($dados);
         $alvo = $this->resolverUsuario();
+        $porConvite = $alvo === null && $this->modoAcesso === 'convite';
+
+        if ($porConvite) {
+            // Senha provisória aleatória, inutilizável: o convidado define a sua no aceite.
+            $dados['password'] = \Illuminate\Support\Str::password(40);
+        }
+
+        $dto = AdminUserDTO::fromArray($dados);
 
         if ($alvo === null) {
-            $criar->execute($dto);
-            session()->flash('toast.success', 'Usuário admin criado.');
+            $usuario = $criar->execute($dto);
+
+            if ($porConvite) {
+                $convidar->execute($usuario, Auth::guard('admin')->user());
+                session()->flash('toast.success', 'Usuário criado. Convite enviado por e-mail.');
+            } else {
+                session()->flash('toast.success', 'Usuário admin criado.');
+            }
         } else {
             $atualizar->execute($alvo, $dto);
             session()->flash('toast.success', 'Usuário admin atualizado.');
         }
 
         $this->redirect(route('admin.usuarios.index'), navigate: true);
+    }
+
+    public function reenviarConvite(\App\Actions\Admin\Convites\ConvidarUsuarioAction $convidar): void
+    {
+        $alvo = $this->resolverUsuario();
+
+        if ($alvo === null) {
+            return;
+        }
+
+        $this->authorize('update', $alvo);
+        $convidar->execute($alvo, Auth::guard('admin')->user());
+
+        session()->flash('toast.success', 'Convite reenviado por e-mail.');
+    }
+
+    #[Computed]
+    public function emailNaoVerificado(): bool
+    {
+        if ($this->usuarioId === null) {
+            return false;
+        }
+
+        return AdminUser::findOrFail($this->usuarioId)->email_verified_at === null;
     }
 
     public function salvarEmpresas(SyncAcessoEmpresaAction $action): void
@@ -267,9 +310,12 @@ class FormUsuario extends Component
      */
     protected function rules(): array
     {
-        $senhaRegra = $this->usuarioId === null
-            ? ['required', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191']
-            : ['nullable', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'];
+        $senhaRegra = match (true) {
+            // Criação por convite: a senha é definida pelo convidado no aceite.
+            $this->usuarioId === null && $this->modoAcesso === 'convite' => ['exclude'],
+            $this->usuarioId === null => ['required', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'],
+            default => ['nullable', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'],
+        };
 
         $ator = Auth::guard('admin')->user();
         $gerenciaveis = $ator instanceof AdminUser

@@ -211,6 +211,14 @@ class AdminUser extends Authenticatable
     }
 
     /**
+     * @return HasMany<AdminUserConvite, $this>
+     */
+    public function convites(): HasMany
+    {
+        return $this->hasMany(AdminUserConvite::class, 'admin_user_id');
+    }
+
+    /**
      * URL pública do avatar (ou null para cair no fallback de iniciais).
      */
     public function urlAvatar(): ?string
