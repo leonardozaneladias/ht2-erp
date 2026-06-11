@@ -25,14 +25,16 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     /**
      * Register the Horizon gate.
      *
-     * This gate determines who can access Horizon in non-local environments.
+     * Integrado ao RBAC do admin: a permissão `sistema.horizon` decide o acesso
+     * (super-admin passa pelo bypass do AccessResolver). As rotas do Horizon usam
+     * o grupo `web`, então o usuário chega pelo guard admin via sessão.
      */
     protected function gate(): void
     {
-        Gate::define('viewHorizon', function ($user = null) {
-            return in_array(optional($user)->email, [
+        Gate::define('viewHorizon', function ($user = null): bool {
+            $admin = auth('admin')->user();
 
-            ]);
+            return $admin instanceof \App\Models\AdminUser && $admin->can('sistema.horizon');
         });
     }
 }

@@ -62,6 +62,14 @@ class AppServiceProvider extends ServiceProvider
             return app(AccessResolver::class)->decide($user, $ability);
         });
 
+        // Pulse integrado ao RBAC do admin (mesmo modelo do Horizon): a permissão
+        // `sistema.pulse` decide o acesso; super-admin passa pelo bypass.
+        Gate::define('viewPulse', function ($user = null): bool {
+            $admin = auth('admin')->user();
+
+            return $admin instanceof AdminUser && $admin->can('sistema.pulse');
+        });
+
         // Carimba empresa/filial do tenant ativo e, durante personificação, quem
         // está por trás (impersonado_por). Ponto único de "contexto → activity_log".
         Activity::creating(app(\App\Support\Audit\CarimbarContextoNaAtividade::class));

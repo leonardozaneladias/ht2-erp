@@ -297,16 +297,17 @@ As listagens de produção (`UsuariosTable`, `EmpresasTable`, `AuditoriaTable`) 
 |  #  | View destino                       | Categoria    | Doc                                                                        | Vai usar | Prioridade | Status |            Decisão            |
 | :-: | ---------------------------------- | ------------ | -------------------------------------------------------------------------- | :------: | :--------: | :----: | :---------------------------: |
 | 56  | `admin/auth/login.blade.php`       | Page/Auth    | [sign-in-split.md](template/INSPINIA/Pages/Auth/sign-in-split.md)          |    🟢    |     P4     |   🟢   | 🧩 (`x-admin.auth-form-card`) |
-| 57  | `errors/404.blade.php`             | Page/Error   | [404.md](template/INSPINIA/Pages/Error/404.md)                             |    🟢    |     P4     |   🔴   |           ❌ (view)           |
-| 58  | `errors/500.blade.php`             | Page/Error   | [500.md](template/INSPINIA/Pages/Error/500.md)                             |    🟢    |     P4     |   🔴   |           ❌ (view)           |
-| 59  | `errors/403.blade.php`             | Page/Error   | [403.md](template/INSPINIA/Pages/Error/403.md)                             |    🟢    |     P4     |   🔴   |           ❌ (view)           |
-| 60  | `errors/503.blade.php`             | Page/Error   | [maintenance.md](template/INSPINIA/Pages/Error/maintenance.md)             |    🟢    |     P4     |   🔴   |           ❌ (view)           |
+| 57  | `errors/404.blade.php`             | Page/Error   | [404.md](template/INSPINIA/Pages/Error/404.md)                             |    🟢    |     P4     |   🟢   |           ❌ (view)           |
+| 58  | `errors/500.blade.php`             | Page/Error   | [500.md](template/INSPINIA/Pages/Error/500.md)                             |    🟢    |     P4     |   🟢   |           ❌ (view)           |
+| 59  | `errors/403.blade.php`             | Page/Error   | [403.md](template/INSPINIA/Pages/Error/403.md)                             |    🟢    |     P4     |   🟢   |           ❌ (view)           |
+| 60  | `errors/503.blade.php`             | Page/Error   | [maintenance.md](template/INSPINIA/Pages/Error/maintenance.md)             |    🟢    |     P4     |   🟢   |           ❌ (view)           |
 | 61  | `admin/account/settings.blade.php` | Page/Utility | [account-settings.md](template/INSPINIA/Pages/Utility/account-settings.md) |    🟢    |     P4     |   🔴   |    ❌ (view, 3 sub-rotas)     |
 
 **Notas:**
 
 - `account-settings` tem 3 sub-rotas (`perfil`, `senha`, `notificacoes`) com navegação via `x-shared.list-group` — portanto depende de 5, 6 e 7 prontos.
 - As páginas de erro usam `<x-admin.partials.theme-bootstrap />` para persistir dark/light via sessionStorage mesmo fora do layout autenticado.
+- Implementadas em `resources/views/errors/` com layout standalone próprio (`errors/layout.blade.php`) — sem sessão, banco ou layout autenticado, para funcionarem mesmo com a aplicação degradada (500/503).
 - `admin/auth/login.blade.php` (item 56) usa `<x-admin.auth-form-card />` — componente auth-form-card foi concluído em 2026-05-28. Também utilizado nas páginas forgot-password e reset-password via Livewire.
 
 ---

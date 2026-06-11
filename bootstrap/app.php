@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth' => App\Http\Middleware\AdminAuthenticate::class,
         ]);
         $middleware->append(App\Http\Middleware\AttachRequestId::class);
+        $middleware->appendToGroup('web', App\Http\Middleware\SecurityHeaders::class);
         $middleware->appendToGroup('api', [
             'throttle:api',
         ]);

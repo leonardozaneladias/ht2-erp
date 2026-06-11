@@ -205,5 +205,16 @@ return [
             ],
         ],
 
+        ModuloAcesso::Sistema->value => [
+            'sistema.horizon' => [
+                'label' => 'Acessar Horizon',
+                'descricao' => 'Ver o dashboard de filas (Laravel Horizon).',
+            ],
+            'sistema.pulse' => [
+                'label' => 'Acessar Pulse',
+                'descricao' => 'Ver o monitoramento de performance (Laravel Pulse).',
+            ],
+        ],
+
     ],
 ];
