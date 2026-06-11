@@ -4,6 +4,8 @@
     'disabled' => false,
     'icon' => null,
     'justified' => false,
+    // Indica erro de validação em campo desta aba (visível mesmo com a aba inativa).
+    'hasError' => false,
 ])
 
 <button
@@ -30,4 +32,9 @@ $attributes->class([
     @endif
 
     <span>{{ $slot }}</span>
+
+    @if ($hasError)
+        <span class="bg-danger size-2 shrink-0 rounded-full" aria-hidden="true"></span>
+        <span class="sr-only">(há erros nesta aba)</span>
+    @endif
 </button>

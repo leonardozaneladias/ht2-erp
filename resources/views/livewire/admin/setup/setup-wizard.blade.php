@@ -78,7 +78,13 @@
                     required
                 />
                 <div class="md:col-span-2">
-                    <x-shared.password-input name="admin_senha" label="Senha" wire:model="admin_senha" required />
+                    <x-shared.password-input
+                        name="admin_senha"
+                        label="Senha"
+                        wire:model="admin_senha"
+                        required
+                        with-meter
+                    />
                     <small class="text-default-400 mt-1 block text-xs">
                         {{ \App\Support\Settings\PasswordPolicy::descricao() }}
                     </small>

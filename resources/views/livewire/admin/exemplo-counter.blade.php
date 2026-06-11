@@ -1,19 +1,19 @@
 <x-shared.card title="Componente Livewire — Exemplo">
-    <p class="text-muted mb-4">Este é um componente Livewire simples demonstrando reatividade sem JavaScript. Use como ponto de partida para componentes do admin.</p>
+    <p class="text-default-500 mb-4">Este é um componente Livewire simples demonstrando reatividade sem JavaScript. Use como ponto de partida para componentes do admin.</p>
 
-    <div class="d-flex align-items-center gap-3">
-        <button wire:click="decrement" class="btn btn-outline-secondary btn-sm">
-            <iconify-icon icon="tabler--minus" class="me-1"></iconify-icon>
+    <div class="flex items-center gap-3">
+        <x-shared.button variant="default" appearance="outline" size="sm" icon="tabler--minus" wire:click="decrement">
             Diminuir
-        </button>
+        </x-shared.button>
 
-        <span class="fs-3 fw-bold px-3">{{ $count }}</span>
+        <span class="px-3 text-2xl font-bold">{{ $count }}</span>
 
-        <button wire:click="increment" class="btn btn-primary btn-sm">
-            <iconify-icon icon="tabler--plus" class="me-1"></iconify-icon>
+        <x-shared.button variant="primary" size="sm" icon="tabler--plus" wire:click="increment">
             Aumentar
-        </button>
+        </x-shared.button>
 
-        <button wire:click="resetar" class="btn btn-outline-danger btn-sm ms-2">Resetar</button>
+        <x-shared.button variant="danger" appearance="outline" size="sm" class="ms-2" wire:click="resetar">
+            Resetar
+        </x-shared.button>
     </div>
 </x-shared.card>

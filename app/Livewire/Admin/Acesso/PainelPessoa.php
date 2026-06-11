@@ -241,6 +241,19 @@ class PainelPessoa extends Component
         $this->dispatch('toast', variant: 'success', message: 'Acesso registrado.');
     }
 
+    public function solicitarRevogarAcesso(int $grantId): void
+    {
+        $this->dispatch(
+            'confirm',
+            title: 'Revogar este acesso?',
+            text: 'A concessão direta deixa de valer imediatamente.',
+            destructive: true,
+            onConfirm: 'painel-pessoa::revogar-acesso',
+            params: ['grantId' => $grantId],
+        );
+    }
+
+    #[\Livewire\Attributes\On('painel-pessoa::revogar-acesso')]
     public function revogarAcesso(int $grantId, RevogarAcessoDiretoAction $action): void
     {
         if (! $this->podeGerirAcessos || $this->usuarioId === null) {

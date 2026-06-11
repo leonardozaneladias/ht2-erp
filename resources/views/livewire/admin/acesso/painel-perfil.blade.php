@@ -110,22 +110,22 @@
                                     {{ $moduloLabel }}
                                 </p>
                                 <div class="flex items-center gap-1">
-                                    <button
-                                        type="button"
-                                        class="btn btn-xs btn-light"
+                                    <x-shared.button
+                                        variant="light"
+                                        size="sm"
+                                        icon="tabler--checks"
                                         wire:click="marcarModulo('{{ $grupo }}')"
                                     >
-                                        <span class="iconify tabler--checks me-1 size-3.5"></span>
                                         Marcar tudo
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-xs btn-light"
+                                    </x-shared.button>
+                                    <x-shared.button
+                                        variant="light"
+                                        size="sm"
+                                        icon="tabler--square-off"
                                         wire:click="limparModulo('{{ $grupo }}')"
                                     >
-                                        <span class="iconify tabler--square-off me-1 size-3.5"></span>
                                         Limpar
-                                    </button>
+                                    </x-shared.button>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">

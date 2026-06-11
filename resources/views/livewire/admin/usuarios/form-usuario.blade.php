@@ -2,15 +2,35 @@
     <x-admin.page-header
         :title="$modo === 'criar' ? 'Novo usuário admin' : 'Editar usuário admin'"
         subtitle="Defina identificação, perfis de acesso e concessões específicas."
+        :breadcrumbs="[
+            ['label' => 'Admin', 'url' => route('admin.dashboard')],
+            ['label' => 'Usuários', 'url' => route('admin.usuarios.index')],
+            ['label' => $modo === 'criar' ? 'Novo usuário' : $nome, 'current' => true],
+        ]"
     >
         <x-slot:actions>
-            <a class="btn btn-outline-secondary" href="{{ route('admin.usuarios.index') }}" wire:navigate>Cancelar</a>
+            <x-shared.button :href="route('admin.usuarios.index')" variant="default" appearance="outline" wire:navigate>
+                Cancelar
+            </x-shared.button>
         </x-slot:actions>
     </x-admin.page-header>
 
     <x-shared.tab-nav>
-        <x-shared.tab-trigger id="aba-dados" active icon="tabler--user">Dados</x-shared.tab-trigger>
-        <x-shared.tab-trigger id="aba-perfis" icon="tabler--shield-lock">Perfis</x-shared.tab-trigger>
+        <x-shared.tab-trigger
+            id="aba-dados"
+            active
+            icon="tabler--user"
+            :has-error="$errors->hasAny(['nome', 'email', 'password', 'modoAcesso', 'ativo'])"
+        >
+            Dados
+        </x-shared.tab-trigger>
+        <x-shared.tab-trigger
+            id="aba-perfis"
+            icon="tabler--shield-lock"
+            :has-error="$errors->hasAny(['roles', 'roles.*'])"
+        >
+            Perfis
+        </x-shared.tab-trigger>
         @if ($modo === 'editar')
             <x-shared.tab-trigger id="aba-empresas" icon="tabler--building-community">Empresas</x-shared.tab-trigger>
             <x-shared.tab-trigger id="aba-acessos" icon="tabler--key">Acessos extras</x-shared.tab-trigger>
@@ -52,6 +72,7 @@
                             :label="$modo === 'criar' ? 'Senha' : 'Nova senha (deixe vazio para manter)'"
                             wire:model="password"
                             :required="$modo === 'criar'"
+                            with-meter
                         />
                     @endif
 
@@ -267,14 +288,14 @@
                                         </td>
                                         <td class="text-default-600 max-w-xs truncate">{{ $grant->reason }}</td>
                                         <td class="text-end">
-                                            <button
-                                                type="button"
-                                                class="btn btn-sm btn-outline-danger"
-                                                wire:click="revogarAcessoExtra({{ $grant->id }})"
-                                                wire:confirm="Revogar este acesso?"
+                                            <x-shared.button
+                                                variant="danger"
+                                                appearance="outline"
+                                                size="sm"
+                                                wire:click="solicitarRevogarAcessoExtra({{ $grant->id }})"
                                             >
                                                 Revogar
-                                            </button>
+                                            </x-shared.button>
                                         </td>
                                     </tr>
                                 @empty
@@ -297,16 +318,9 @@
         @endif
 
         {{-- RODAPÉ: salvar dados/perfis --}}
-        <div class="flex justify-end gap-2">
-            <a class="btn btn-outline-secondary" href="{{ route('admin.usuarios.index') }}" wire:navigate>Cancelar</a>
-            <button type="button" class="btn btn-primary" wire:click="salvar" wire:loading.attr="disabled">
-                <span
-                    wire:loading.remove
-                    wire:target="salvar"
-                    >{{ $modo === 'criar' ? 'Criar usuário' : 'Salvar alterações' }}</span
-                >
-                <span wire:loading wire:target="salvar">Salvando...</span>
-            </button>
-        </div>
+        <x-admin.form-footer
+            :cancel-href="route('admin.usuarios.index')"
+            :label="$modo === 'criar' ? 'Criar usuário' : 'Salvar alterações'"
+        />
     </div>
 </div>

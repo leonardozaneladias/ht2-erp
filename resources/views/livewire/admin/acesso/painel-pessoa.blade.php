@@ -19,15 +19,17 @@
             @else
                 <span class="badge badge-soft-danger">Inativo</span>
             @endif
-            <a
-                class="btn btn-outline-secondary btn-sm"
-                href="{{ route('admin.usuarios.edit', $usuarioId) }}"
+            <x-shared.button
+                :href="route('admin.usuarios.edit', $usuarioId)"
+                variant="default"
+                appearance="outline"
+                size="sm"
+                icon="tabler--user-edit"
                 wire:navigate
                 title="Editar dados da conta"
             >
-                <span class="iconify tabler--user-edit me-1 size-4"></span>
                 Editar conta
-            </a>
+            </x-shared.button>
         </div>
     </div>
 
@@ -229,14 +231,14 @@
                                 <td class="text-default-600 max-w-xs truncate">{{ $grant->reason }}</td>
                                 @if ($podeGerirAcessos)
                                     <td class="text-end">
-                                        <button
-                                            type="button"
-                                            class="btn btn-sm btn-outline-danger"
-                                            wire:click="revogarAcesso({{ $grant->id }})"
-                                            wire:confirm="Revogar este acesso?"
+                                        <x-shared.button
+                                            variant="danger"
+                                            appearance="outline"
+                                            size="sm"
+                                            wire:click="solicitarRevogarAcesso({{ $grant->id }})"
                                         >
                                             Revogar
-                                        </button>
+                                        </x-shared.button>
                                     </td>
                                 @endif
                             </tr>

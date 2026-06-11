@@ -23,12 +23,7 @@
                 />
             </div>
 
-            <x-shared.button
-                variant="primary"
-                size="sm"
-                wire:click="atribuirPerfilEmMassa"
-                wire:confirm="Atribuir o perfil aos usuários selecionados?"
-            >
+            <x-shared.button variant="primary" size="sm" wire:click="solicitarAtribuirPerfilEmMassa">
                 Aplicar perfil
             </x-shared.button>
 
@@ -36,8 +31,7 @@
                 variant="success"
                 appearance="soft"
                 size="sm"
-                wire:click="alternarStatusEmMassa(true)"
-                wire:confirm="Reativar os usuários selecionados?"
+                wire:click="solicitarAlternarStatusEmMassa(true)"
             >
                 Reativar
             </x-shared.button>
@@ -46,8 +40,7 @@
                 variant="warning"
                 appearance="soft"
                 size="sm"
-                wire:click="alternarStatusEmMassa(false)"
-                wire:confirm="Desativar os usuários selecionados?"
+                wire:click="solicitarAlternarStatusEmMassa(false)"
             >
                 Desativar
             </x-shared.button>

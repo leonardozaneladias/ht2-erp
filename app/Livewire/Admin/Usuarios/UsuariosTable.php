@@ -202,6 +202,24 @@ final class UsuariosTable extends PowerGridComponent
         session()->flash('toast.success', 'Conta desbloqueada.');
     }
 
+    public function solicitarAtribuirPerfilEmMassa(): void
+    {
+        if ($this->checkboxValues === [] || $this->perfilEmMassa === '') {
+            session()->flash('toast.error', 'Selecione usuários e um perfil.');
+
+            return;
+        }
+
+        $this->dispatch(
+            'confirm',
+            title: 'Atribuir perfil em massa?',
+            text: sprintf('O perfil "%s" será atribuído a %d usuário(s).', $this->perfilEmMassa, count($this->checkboxValues)),
+            destructive: false,
+            onConfirm: 'usuarios::atribuir-perfil-massa',
+        );
+    }
+
+    #[On('usuarios::atribuir-perfil-massa')]
     public function atribuirPerfilEmMassa(AtribuirPerfilEmMassaAction $action): void
     {
         $this->authorize('create', AdminUser::class);
@@ -227,6 +245,27 @@ final class UsuariosTable extends PowerGridComponent
         session()->flash('toast.success', "Perfil atribuído a {$total} usuário(s).");
     }
 
+    public function solicitarAlternarStatusEmMassa(bool $ativo): void
+    {
+        if ($this->checkboxValues === []) {
+            return;
+        }
+
+        $total = count($this->checkboxValues);
+
+        $this->dispatch(
+            'confirm',
+            title: $ativo ? 'Reativar usuários selecionados?' : 'Desativar usuários selecionados?',
+            text: $ativo
+                ? "{$total} usuário(s) poderão acessar o painel novamente."
+                : "{$total} usuário(s) perderão o acesso ao painel.",
+            destructive: ! $ativo,
+            onConfirm: 'usuarios::status-massa',
+            params: ['ativo' => $ativo],
+        );
+    }
+
+    #[On('usuarios::status-massa')]
     public function alternarStatusEmMassa(bool $ativo, BulkUserStatusAction $action): void
     {
         $this->authorize('create', AdminUser::class);

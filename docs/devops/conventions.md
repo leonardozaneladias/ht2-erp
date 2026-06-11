@@ -313,6 +313,41 @@ $valor = 150099; // R$ 1.500,99
 - Nunca misturar Alpine.js complexo com Livewire na mesma interação — deixar o Livewire gerenciar o estado
 - Alpine.js apenas para interações visuais locais (toggle menu, collapse, tooltips)
 
+### 4.4 Padrões de UX (obrigatórios em todo módulo novo)
+
+Decididos no fechamento da fase base. Todo CRUD/tela nova segue estas regras — divergência exige decisão registrada.
+
+**Botões — `x-shared.button` é a única API**
+
+- Proibido `class="btn btn-*"` direto em views. O componente cobre âncoras via prop `href` (com `wire:navigate`).
+- Botão com loading: `x-shared.loading-button` (ou o slot com `wire:loading` dentro de `x-shared.button`).
+
+**Confirmação destrutiva — sempre pelo bridge SweetAlert2**
+
+- Proibido `wire:confirm` (usa `window.confirm` nativo: sem dark mode, sem PT-BR, visual inconsistente).
+- Padrão: o componente expõe `solicitarXxx()` que faz `$this->dispatch('confirm', title: ..., text: ..., destructive: true, onConfirm: 'modulo::evento', params: [...])`; o método real leva `#[On('modulo::evento')]`. Exemplos: `UsuariosTable::solicitarToggleStatus()`, `IndexAuditoria::solicitarExpurgo()`.
+- O texto sempre nomeia a consequência ("perderá o acesso", "não pode ser desfeita").
+
+**Formulários longos — cards vs abas**
+
+- **Cards empilhados** = padrão default (fluxo "preencher tudo e salvar"). Exemplo: Form de Empresa.
+- **Abas** = somente quando pelo menos um grupo tem ação de salvar própria ou só existe após persistência (modo edição). Exemplo: Form de Usuário (Empresas/Acessos salvam separado).
+- Com abas, todo `tab-trigger` recebe `:has-error="$errors->hasAny([...campos da aba...])"` — erro em aba inativa precisa de feedback visível.
+- Rodapé de form sempre via `<x-admin.form-footer :cancel-href="..." :label="..." />`.
+
+**Breadcrumbs**
+
+- Toda página de nível ≥ 2 (forms, detalhes) passa `:breadcrumbs` explícito no `x-admin.page-header` (`Admin > Módulo > {nome do registro}`). O fallback automático só é aceitável em páginas de nível 1 (listas/hubs).
+
+**Senhas**
+
+- Todo campo de **definição** de senha (criar, trocar, resetar, aceitar convite, wizard) usa `x-shared.password-input` com `with-meter`. Campos de senha atual/login não usam meter.
+
+**Empty states e skeletons**
+
+- Toda coleção visível tem `x-shared.empty-state` do catálogo, com CTA quando o usuário tem permissão de criar.
+- Componentes pesados não-imediatos usam `#[Lazy]` + `placeholder()` com `x-shared.skeleton` (ver presets no catálogo).
+
 ---
 
 ## 5. Banco de Dados

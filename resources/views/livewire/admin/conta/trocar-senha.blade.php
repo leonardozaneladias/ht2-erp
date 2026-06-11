@@ -13,6 +13,7 @@
             wire:model="novaSenha"
             autocomplete="new-password"
             :hint="$politica"
+            with-meter
         />
 
         <x-shared.password-input

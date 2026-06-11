@@ -225,6 +225,19 @@ class FormUsuario extends Component
         session()->flash('toast.success', 'Acesso registrado.');
     }
 
+    public function solicitarRevogarAcessoExtra(int $grantId): void
+    {
+        $this->dispatch(
+            'confirm',
+            title: 'Revogar este acesso?',
+            text: 'A concessão direta deixa de valer imediatamente.',
+            destructive: true,
+            onConfirm: 'form-usuario::revogar-acesso',
+            params: ['grantId' => $grantId],
+        );
+    }
+
+    #[\Livewire\Attributes\On('form-usuario::revogar-acesso')]
     public function revogarAcessoExtra(int $grantId, RevogarAcessoDiretoAction $action): void
     {
         if ($this->usuarioId === null) {

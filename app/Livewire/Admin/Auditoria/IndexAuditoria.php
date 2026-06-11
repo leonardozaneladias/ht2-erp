@@ -10,6 +10,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -32,6 +33,21 @@ class IndexAuditoria extends Component
         }
     }
 
+    /**
+     * Confirmação destrutiva temática (bridge SweetAlert2) antes do expurgo.
+     */
+    public function solicitarExpurgo(): void
+    {
+        $this->dispatch(
+            'confirm',
+            title: 'Expurgar logs antigos?',
+            text: 'Remove os logs de auditoria além do teto de retenção. Esta ação não pode ser desfeita.',
+            destructive: true,
+            onConfirm: 'auditoria::expurgar',
+        );
+    }
+
+    #[On('auditoria::expurgar')]
     public function expurgar(ExpurgarLogsAction $action): void
     {
         $user = auth('admin')->user();

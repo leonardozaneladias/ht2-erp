@@ -2,9 +2,16 @@
     <x-admin.page-header
         :title="$modo === 'criar' ? 'Nova empresa' : 'Editar empresa'"
         subtitle="Dados cadastrais e identidade visual aplicada quando a empresa está ativa."
+        :breadcrumbs="[
+            ['label' => 'Admin', 'url' => route('admin.dashboard')],
+            ['label' => 'Empresas', 'url' => route('admin.empresas.index')],
+            ['label' => $modo === 'criar' ? 'Nova empresa' : $nome, 'current' => true],
+        ]"
     >
         <x-slot:actions>
-            <a class="btn btn-outline-secondary" href="{{ route('admin.empresas.index') }}" wire:navigate>Cancelar</a>
+            <x-shared.button :href="route('admin.empresas.index')" variant="default" appearance="outline" wire:navigate>
+                Cancelar
+            </x-shared.button>
         </x-slot:actions>
     </x-admin.page-header>
 
@@ -164,15 +171,8 @@
         </x-shared.card>
     @endif
 
-    <div class="flex justify-end gap-2">
-        <a class="btn btn-outline-secondary" href="{{ route('admin.empresas.index') }}" wire:navigate>Cancelar</a>
-        <button type="button" class="btn btn-primary" wire:click="salvar" wire:loading.attr="disabled">
-            <span
-                wire:loading.remove
-                wire:target="salvar"
-                >{{ $modo === 'criar' ? 'Criar empresa' : 'Salvar alterações' }}</span
-            >
-            <span wire:loading wire:target="salvar">Salvando...</span>
-        </button>
-    </div>
+    <x-admin.form-footer
+        :cancel-href="route('admin.empresas.index')"
+        :label="$modo === 'criar' ? 'Criar empresa' : 'Salvar alterações'"
+    />
 </div>

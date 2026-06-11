@@ -3,13 +3,7 @@
 
     @if ($this->podeExpurgar)
         <div class="mb-4 flex justify-end">
-            <x-shared.button
-                type="button"
-                variant="light"
-                icon="tabler--trash"
-                wire:click="expurgar"
-                wire:confirm="Expurgar os logs de auditoria além do teto de retenção? Esta ação não pode ser desfeita."
-            >
+            <x-shared.button type="button" variant="light" icon="tabler--trash" wire:click="solicitarExpurgo">
                 Expurgar logs antigos
             </x-shared.button>
         </div>
