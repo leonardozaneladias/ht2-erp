@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\ForgotPassword;
 use App\Models\AdminUser;
-use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
+use App\Notifications\ResetSenhaNotification as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;

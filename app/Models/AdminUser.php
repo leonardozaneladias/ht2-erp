@@ -67,6 +67,14 @@ class AdminUser extends Authenticatable
     }
 
     /**
+     * Usa a notification enfileirada do guard admin (fila "emails").
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetSenhaNotification($token));
+    }
+
+    /**
      * @return HasMany<PermissionGrant, $this>
      */
     public function permissionGrants(): HasMany
