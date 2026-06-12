@@ -28,6 +28,8 @@ class IniciarImpersonation extends Component
 
     public string $alvoNome = '';
 
+    public ?string $alvoAvatarUrl = null;
+
     public string $motivo = '';
 
     #[On('impersonation::abrir')]
@@ -38,6 +40,7 @@ class IniciarImpersonation extends Component
 
         $this->alvoId = $alvo->id;
         $this->alvoNome = (string) $alvo->getAttribute('nome');
+        $this->alvoAvatarUrl = $alvo->urlAvatar();
         $this->motivo = '';
         $this->resetErrorBag();
         $this->aberto = true;
@@ -71,7 +74,7 @@ class IniciarImpersonation extends Component
     public function fechar(): void
     {
         $this->aberto = false;
-        $this->reset('alvoId', 'alvoNome', 'motivo');
+        $this->reset('alvoId', 'alvoNome', 'alvoAvatarUrl', 'motivo');
         $this->resetErrorBag();
     }
 

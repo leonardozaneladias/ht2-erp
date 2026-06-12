@@ -2,11 +2,7 @@
     {{-- Cabeçalho --}}
     <div class="border-default-200 flex items-start justify-between gap-3 border-b p-5">
         <div class="flex min-w-0 items-center gap-3">
-            <span
-                class="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-full text-base font-semibold"
-            >
-                {{ \Illuminate\Support\Str::of($nome)->substr(0, 1)->upper() }}
-            </span>
+            <x-shared.avatar :name="$nome" :src="$avatarUrl" size="size-11" class="shrink-0" />
             <div class="min-w-0">
                 <h3 class="truncate text-lg font-semibold">{{ $nome }}</h3>
                 <p class="text-default-500 truncate text-sm">{{ $email }}</p>

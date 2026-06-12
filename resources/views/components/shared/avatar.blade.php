@@ -17,7 +17,12 @@
 @endphp
 
 @if ($src)
-    <img alt="{{ $name }}" src="{{ $src }}" {{ $attributes->class([$size, 'rounded-full object-cover']) }} />
+    <img
+        alt="{{ $name }}"
+        src="{{ $src }}"
+        loading="lazy"
+        {{ $attributes->class([$size, 'rounded-full object-cover']) }}
+    />
 @else
     <span
         aria-label="{{ $name }}"

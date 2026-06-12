@@ -4,8 +4,11 @@
             <div class="absolute inset-0 bg-black/50" wire:click="fechar"></div>
 
             <div class="border-default-300 bg-card relative z-10 w-full max-w-md rounded-xl border p-6 shadow-lg">
-                <h3 class="text-body-color text-lg font-semibold">Entrar como {{ $alvoNome }}</h3>
-                <p class="text-default-500 mt-1 mb-4 text-sm">Você vai operar o painel como este usuário. Informe o motivo — ele fica registrado na auditoria.</p>
+                <div class="flex items-center gap-3">
+                    <x-shared.avatar :name="$alvoNome" :src="$alvoAvatarUrl" size="size-10" class="shrink-0" />
+                    <h3 class="text-body-color text-lg font-semibold">Entrar como {{ $alvoNome }}</h3>
+                </div>
+                <p class="text-default-500 mt-2 mb-4 text-sm">Você vai operar o painel como este usuário. Informe o motivo — ele fica registrado na auditoria.</p>
 
                 <form wire:submit="confirmarEntrada">
                     <x-shared.input

@@ -346,10 +346,10 @@ final class UsuariosTable extends PowerGridComponent
 
         return Blade::render(
             '<div class="flex items-center gap-2.5">'
-            . '<span class="bg-primary/12 text-primary inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold">{{ $iniciais }}</span>'
+            . '<x-shared.avatar :name="$nome" :src="$src" size="size-8" class="shrink-0" />'
             . '<span class="font-medium">{{ $nome }}</span>'
             . '</div>',
-            ['iniciais' => $this->iniciais($nome), 'nome' => $nome],
+            ['nome' => $nome, 'src' => $u->urlAvatar()],
         );
     }
 
@@ -391,22 +391,5 @@ final class UsuariosTable extends PowerGridComponent
             . '</div>',
             ['visiveis' => $visiveis, 'resto' => $resto],
         );
-    }
-
-    /**
-     * Iniciais (1-2 letras) derivadas do nome, para o avatar da listagem.
-     */
-    protected function iniciais(string $nome): string
-    {
-        $partes = array_values(array_filter(preg_split('/\s+/', trim($nome)) ?: []));
-
-        if ($partes === []) {
-            return '?';
-        }
-
-        $primeira = mb_substr($partes[0], 0, 1);
-        $ultima = count($partes) > 1 ? mb_substr($partes[count($partes) - 1], 0, 1) : '';
-
-        return mb_strtoupper($primeira . $ultima);
     }
 }

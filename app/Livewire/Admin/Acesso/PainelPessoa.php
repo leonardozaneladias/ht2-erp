@@ -41,6 +41,8 @@ class PainelPessoa extends Component
 
     public string $nome = '';
 
+    public ?string $avatarUrl = null;
+
     public string $email = '';
 
     public bool $ativo = true;
@@ -88,6 +90,7 @@ class PainelPessoa extends Component
         $this->usuarioId = $usuario->id;
         $this->nome = $usuario->nome;
         $this->email = $usuario->email;
+        $this->avatarUrl = $usuario->urlAvatar();
         $this->ativo = (bool) $usuario->ativo;
 
         // Os perfis são geridos no escopo da empresa ativa do ator.
