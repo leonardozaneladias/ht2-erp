@@ -1,28 +1,12 @@
 <x-shared.card title="Perfil" subtitle="Sua foto, nome e identificação no painel.">
     <form wire:submit="salvar" class="grid gap-5">
-        <div class="flex items-center gap-4">
-            @if ($avatar)
-                <img src="{{ $avatar->temporaryUrl() }}" alt="Prévia" class="size-16 rounded-full object-cover" />
-            @else
-                <x-shared.avatar :name="$usuario->nome" :src="$usuario->urlAvatar()" size="size-16" />
-            @endif
-
-            <div class="flex flex-col gap-2">
-                <input type="file" wire:model="avatar" accept="image/png,image/jpeg,image/webp" class="text-sm" />
-                @if ($usuario->urlAvatar())
-                    <button
-                        type="button"
-                        wire:click="removerAvatar"
-                        class="text-danger text-left text-xs hover:underline"
-                    >
-                        Remover foto
-                    </button>
-                @endif
-                @error ('avatar')
-                    <small class="text-danger text-xs">{{ $message }}</small>
-                @enderror
-            </div>
-        </div>
+        <x-shared.avatar-cropper
+            model="avatar"
+            :name="$usuario->nome"
+            :current="$usuario->urlAvatar()"
+            :pending="$avatar?->temporaryUrl()"
+            remove-action="removerAvatar"
+        />
 
         <x-shared.input name="nome" label="Nome" wire:model="nome" required />
 

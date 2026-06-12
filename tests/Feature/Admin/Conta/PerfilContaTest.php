@@ -29,7 +29,7 @@ it('faz upload do avatar e grava o caminho', function (): void {
 
     Livewire::test(PerfilConta::class)
         ->set('nome', 'Usuário Teste')
-        ->set('avatar', UploadedFile::fake()->image('foto.jpg'))
+        ->set('avatar', UploadedFile::fake()->image('foto.jpg', 256, 256))
         ->call('salvar')
         ->assertHasNoErrors();
 

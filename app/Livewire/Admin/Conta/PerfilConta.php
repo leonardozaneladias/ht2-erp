@@ -46,20 +46,24 @@ class PerfilConta extends Component
             'telefone' => ['nullable', 'string', 'max:20'],
             'cargo' => ['nullable', 'string', 'max:120'],
             'bio' => ['nullable', 'string', 'max:500'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:min_width=128,min_height=128'],
         ]);
 
         $action->execute($this->usuario(), \App\DTOs\Admin\PerfilContaDTO::fromArray($dados), $this->avatar);
         $this->reset('avatar');
 
-        $this->dispatch('toast', variant: 'success', message: 'Perfil atualizado.');
+        // Redirect com navigate re-renderiza o layout — a nova foto aparece
+        // imediatamente na topbar e na sidebar, sem F5.
+        session()->flash('toast.success', 'Perfil atualizado.');
+        $this->redirect(route('admin.conta'), navigate: true);
     }
 
     public function removerAvatar(AtualizarPerfilAction $action): void
     {
         $action->removerAvatar($this->usuario());
 
-        $this->dispatch('toast', variant: 'success', message: 'Foto removida.');
+        session()->flash('toast.success', 'Foto removida.');
+        $this->redirect(route('admin.conta'), navigate: true);
     }
 
     public function render(): View
