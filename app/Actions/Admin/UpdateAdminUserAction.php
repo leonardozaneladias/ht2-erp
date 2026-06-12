@@ -23,25 +23,40 @@ class UpdateAdminUserAction
                 'cargo' => $dto->cargo,
             ];
 
-            if ($dto->password !== null && $dto->password !== '') {
-                $atributos['password'] = Hash::make($dto->password);
+            $senhaAlterada = $dto->password !== null && $dto->password !== '';
+
+            if ($senhaAlterada) {
+                $atributos['password'] = Hash::make((string) $dto->password);
             }
+
+            // O updated com o diff vem do trait Auditavel; aqui só os eventos
+            // de domínio que o diff não expressa (senha excluída por segurança
+            // e pivot de roles).
+            $rolesAntes = $usuario->getRoleNames()->sort()->values()->all();
 
             $usuario->update($atributos);
             $usuario->syncRoles($dto->roles);
 
-            activity('admin_users')
-                ->performedOn($usuario)
-                ->causedBy(Auth::guard('admin')->user())
-                ->withProperties([
-                    'nome' => $usuario->nome,
-                    'email' => $usuario->email,
-                    'ativo' => $usuario->ativo,
-                    'roles' => $usuario->getRoleNames()->all(),
-                    'senha_alterada' => $dto->password !== null && $dto->password !== '',
-                ])
-                ->event('updated')
-                ->log('Usuário admin atualizado');
+            $causer = Auth::guard('admin')->user();
+
+            if ($senhaAlterada) {
+                activity('admin_users')
+                    ->performedOn($usuario)
+                    ->causedBy($causer)
+                    ->event('senha_alterada')
+                    ->log('Senha do usuário alterada');
+            }
+
+            $rolesDepois = $usuario->getRoleNames()->sort()->values()->all();
+
+            if ($rolesAntes !== $rolesDepois) {
+                activity('admin_users')
+                    ->performedOn($usuario)
+                    ->causedBy($causer)
+                    ->withProperties(['roles' => $rolesDepois])
+                    ->event('perfis_sincronizados')
+                    ->log('Perfis do usuário atualizados');
+            }
 
             return $usuario->fresh(['roles']);
         });

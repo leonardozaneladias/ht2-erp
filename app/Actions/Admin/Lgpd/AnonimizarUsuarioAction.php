@@ -25,6 +25,10 @@ final class AnonimizarUsuarioAction
         $this->garantirElegivel($ator, $alvo);
 
         DB::transaction(function () use ($ator, $alvo): void {
+            // Sem isto o trait Auditavel gravaria a PII original em
+            // properties.old — derrotando a anonimização.
+            $alvo->disableLogging();
+
             $alvo->forceFill([
                 'nome' => 'Usuário anonimizado',
                 'email' => 'anonimizado-' . $alvo->id . '@removido.local',

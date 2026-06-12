@@ -19,15 +19,10 @@ class ToggleAdminUserStatusAction
             throw new RuntimeException('Você não pode desativar a si mesmo.');
         }
 
-        return DB::transaction(function () use ($usuario, $causer): AdminUser {
+        return DB::transaction(function () use ($usuario): AdminUser {
+            // A mudança de `ativo` (com antes/depois e causer) é capturada
+            // automaticamente pelo trait Auditavel.
             $usuario->update(['ativo' => ! $usuario->ativo]);
-
-            activity('admin_users')
-                ->performedOn($usuario)
-                ->causedBy($causer)
-                ->withProperties(['ativo' => $usuario->ativo])
-                ->event($usuario->ativo ? 'reativado' : 'desativado')
-                ->log($usuario->ativo ? 'Usuário admin reativado' : 'Usuário admin desativado');
 
             return $usuario->fresh(['roles']);
         });

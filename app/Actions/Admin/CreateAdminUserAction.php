@@ -24,21 +24,18 @@ class CreateAdminUserAction
                 'cargo' => $dto->cargo,
             ]);
 
+            // O created com o diff completo vem do trait Auditavel; aqui só o
+            // evento de domínio que o diff não captura (pivot de roles).
             if ($dto->roles !== []) {
                 $usuario->syncRoles($dto->roles);
-            }
 
-            activity('admin_users')
-                ->performedOn($usuario)
-                ->causedBy(Auth::guard('admin')->user())
-                ->withProperties([
-                    'nome' => $usuario->nome,
-                    'email' => $usuario->email,
-                    'ativo' => $usuario->ativo,
-                    'roles' => $usuario->getRoleNames()->all(),
-                ])
-                ->event('created')
-                ->log('Usuário admin criado');
+                activity('admin_users')
+                    ->performedOn($usuario)
+                    ->causedBy(Auth::guard('admin')->user())
+                    ->withProperties(['roles' => $usuario->getRoleNames()->all()])
+                    ->event('perfis_sincronizados')
+                    ->log('Perfis do usuário atualizados');
+            }
 
             return $usuario->fresh(['roles']);
         });

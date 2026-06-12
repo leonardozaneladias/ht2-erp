@@ -41,10 +41,16 @@ it('alterna status do usuário e grava activity log', function () {
     $alvo->refresh();
     expect($alvo->ativo)->toBeFalse();
 
-    expect(Activity::where('log_name', 'admin_users')
-        ->where('event', 'desativado')
+    // A desativação entra na auditoria como diff de `ativo` (trait Auditavel).
+    $log = Activity::where('log_name', 'admin_users')
+        ->where('event', 'updated')
         ->where('subject_id', $alvo->id)
-        ->exists())->toBeTrue();
+        ->latest('id')
+        ->first();
+
+    expect($log)->not->toBeNull()
+        ->and(data_get($log->attribute_changes, 'old.ativo'))->toBeTrue()
+        ->and(data_get($log->attribute_changes, 'attributes.ativo'))->toBeFalse();
 });
 
 it('impede o admin de desativar a si mesmo', function () {

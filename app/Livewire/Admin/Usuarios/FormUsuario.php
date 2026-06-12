@@ -123,7 +123,7 @@ class FormUsuario extends Component
         }
 
         if ($this->avatar !== null) {
-            app(\App\Actions\Admin\AtualizarAvatarAction::class)->execute($usuario, $this->avatar, $ator);
+            app(\App\Actions\Admin\AtualizarAvatarAction::class)->execute($usuario, $this->avatar);
         }
 
         $this->redirect(route('admin.usuarios.index'), navigate: true);
@@ -138,7 +138,7 @@ class FormUsuario extends Component
         }
 
         $this->authorize('update', $alvo);
-        $action->remover($alvo, Auth::guard('admin')->user());
+        $action->remover($alvo);
 
         $this->reset('avatar');
         unset($this->avatarAtualUrl);

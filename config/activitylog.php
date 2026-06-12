@@ -48,7 +48,14 @@ return [
      * These attributes will be excluded from logging for all models.
      * Model-specific exclusions via logExcept() are merged with these.
      */
-    'default_except_attributes' => [],
+    // Sensíveis globais: nunca aparecem no diff de NENHUM model auditado
+    // (mesclam com o logExcept do trait Auditavel).
+    'default_except_attributes' => [
+        'password',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+    ],
 
     /*
      * When enabled, activities are buffered in memory and inserted in a

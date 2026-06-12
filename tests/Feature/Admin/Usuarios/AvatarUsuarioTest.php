@@ -87,7 +87,7 @@ it('rejeita arquivo que não é imagem e imagem pequena demais', function () {
         ->assertHasErrors(['avatar']);
 });
 
-it('audita quando um admin altera a foto de OUTRO usuário', function () {
+it('audita a troca de foto como diff de avatar_url (trait Auditavel)', function () {
     $alvo = criarAdminUser('auditado@teste.com');
 
     Livewire::actingAs($this->admin, 'admin')
@@ -96,14 +96,17 @@ it('audita quando um admin altera a foto de OUTRO usuário', function () {
         ->call('salvar')
         ->assertHasNoErrors();
 
-    expect(Activity::where('log_name', 'admin_users')
-        ->where('event', 'avatar_updated')
+    $log = Activity::where('log_name', 'admin_users')
+        ->where('event', 'updated')
         ->where('subject_id', $alvo->id)
-        ->where('causer_id', $this->admin->id)
-        ->exists())->toBeTrue();
+        ->latest('id')
+        ->first();
+
+    expect($log)->not->toBeNull()
+        ->and(data_get($log->attribute_changes, 'attributes.avatar_url'))->not->toBeNull();
 });
 
-it('não audita quando o usuário troca a própria foto no Minha Conta', function () {
+it('audita também a troca da própria foto no Minha Conta', function () {
     $user = criarAdminUser('proprio@teste.com');
 
     Livewire::actingAs($user, 'admin')
@@ -112,5 +115,12 @@ it('não audita quando o usuário troca a própria foto no Minha Conta', functio
         ->call('salvar')
         ->assertHasNoErrors();
 
-    expect(Activity::where('event', 'avatar_updated')->exists())->toBeFalse();
+    $log = Activity::where('log_name', 'admin_users')
+        ->where('event', 'updated')
+        ->where('subject_id', $user->id)
+        ->latest('id')
+        ->first();
+
+    expect($log)->not->toBeNull()
+        ->and(data_get($log->attribute_changes, 'attributes.avatar_url'))->not->toBeNull();
 });

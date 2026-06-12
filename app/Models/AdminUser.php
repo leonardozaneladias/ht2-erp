@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditavel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,8 +13,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\Models\Concerns\LogsActivity;
-use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -24,11 +23,12 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class AdminUser extends Authenticatable
 {
+    use Auditavel;
+
     /** @use HasFactory<\Database\Factories\AdminUserFactory> */
     use HasFactory;
 
     use HasRoles;
-    use LogsActivity;
     use Notifiable;
 
     protected $table = 'admin_users';
@@ -59,15 +59,6 @@ class AdminUser extends Authenticatable
         'two_factor_secret',
         'two_factor_recovery_codes',
     ];
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['nome', 'email', 'ativo'])
-            ->logOnlyDirty()
-            ->dontLogEmptyChanges()
-            ->useLogName('admin_users');
-    }
 
     /**
      * Usa a notification enfileirada do guard admin (fila "emails").
@@ -249,6 +240,25 @@ class AdminUser extends Authenticatable
     public function perfilExibicao(): ?string
     {
         return $this->getRoleNames()->first();
+    }
+
+    /**
+     * Fora do diff: campos de sessão/navegação (login vai para LoginHistory +
+     * log 'auth'; empresa/filial/perfil ativos são preferência de navegação) e
+     * confirmação 2FA (os eventos 2FA têm logs de domínio próprios).
+     *
+     * @return list<string>
+     */
+    protected function atributosNaoAuditados(): array
+    {
+        return [
+            'last_login_at',
+            'last_login_ip',
+            'empresa_ativa_id',
+            'filial_ativa_id',
+            'perfil_ativo_role_id',
+            'two_factor_confirmed_at',
+        ];
     }
 
     protected function casts(): array

@@ -12,21 +12,19 @@ use Illuminate\Support\Facades\Storage;
 /**
  * Atualiza/remove o avatar de um usuário admin. Reutilizada pelo Minha Conta
  * (próprio usuário) e pelo cadastro de usuários (admin gerindo terceiros).
- * Quando o ator é outra pessoa, a mudança entra na trilha de auditoria.
+ * A mudança de `avatar_url` entra na auditoria via trait Auditavel.
  */
 class AtualizarAvatarAction
 {
     public function __construct(private readonly SettingsFileUploadService $upload) {}
 
-    public function execute(AdminUser $usuario, UploadedFile $avatar, ?AdminUser $ator = null): void
+    public function execute(AdminUser $usuario, UploadedFile $avatar): void
     {
         $usuario->avatar_url = $this->upload->substituir($avatar, (string) $usuario->avatar_url, 'avatars');
         $usuario->save();
-
-        $this->auditar($usuario, $ator, 'avatar_updated', 'Foto do usuário atualizada');
     }
 
-    public function remover(AdminUser $usuario, ?AdminUser $ator = null): void
+    public function remover(AdminUser $usuario): void
     {
         if ($usuario->avatar_url !== null && $usuario->avatar_url !== '') {
             Storage::disk('public')->delete($usuario->avatar_url);
@@ -34,24 +32,5 @@ class AtualizarAvatarAction
 
         $usuario->avatar_url = null;
         $usuario->save();
-
-        $this->auditar($usuario, $ator, 'avatar_removed', 'Foto do usuário removida');
-    }
-
-    /**
-     * Audita apenas quando um admin altera a foto de OUTRO usuário — a troca
-     * da própria foto é gestão pessoal, sem valor de trilha.
-     */
-    private function auditar(AdminUser $usuario, ?AdminUser $ator, string $evento, string $descricao): void
-    {
-        if ($ator === null || $ator->id === $usuario->id) {
-            return;
-        }
-
-        activity('admin_users')
-            ->performedOn($usuario)
-            ->causedBy($ator)
-            ->event($evento)
-            ->log($descricao);
     }
 }

@@ -11,7 +11,8 @@ use Illuminate\Http\UploadedFile;
 
 /**
  * Atualiza o perfil do próprio usuário (dados pessoais + avatar). O avatar é
- * delegado à AtualizarAvatarAction (sem ator => sem auditoria — gestão pessoal).
+ * delegado à AtualizarAvatarAction; as mudanças entram na auditoria via trait
+ * Auditavel do AdminUser.
  */
 final class AtualizarPerfilAction
 {
