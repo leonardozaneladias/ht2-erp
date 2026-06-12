@@ -37,13 +37,19 @@ $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
 $table->index('empresa_id');
 
 // model
+use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
 
 class Cliente extends Model
 {
+    use Auditavel;        // auditoria automática (created/updated/deleted com diff)
     use BelongsToEmpresa; // global scope por empresa ativa + auto-preenche no create
 }
 ```
+
+> `Auditavel` é **obrigatório** (arch test). Opcional: defina `rotuloAuditoria(): string`
+> no model para um rótulo humano na tela de auditoria (default: `nome`/`name`/`titulo`/`email`).
+> Detalhes em `docs/devops/conventions.md` §7.2.
 
 Com isso:
 

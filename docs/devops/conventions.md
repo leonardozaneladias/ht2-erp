@@ -424,10 +424,29 @@ Usar `Log::channel()` com canais separados:
 
 ### 7.2 Auditoria (activity_log no banco)
 
-- Toda ação crítica grava em `activity_log` com before/after JSON
-- Implementado via `spatie/laravel-activitylog` (Trait `LogsActivity` + Observers)
-- Tabela append-only (nunca deletar registros)
-- Acessível via tela dedicada no admin
+**Regra central:** o trait `App\Models\Concerns\Auditavel` é a **verdade crua de
+atributos** (created/updated/deleted/restored com diff em `attribute_changes`);
+Actions só logam **eventos de domínio** que o diff não expressa (sync de
+pivôs/roles, settings, auth, resumos de operação em massa).
+
+- **Todo model novo usa `Auditavel`** — o arch test em `tests/Arch.php` quebra a
+  suíte até o model usar o trait ou entrar na whitelist com justificativa.
+- O trait usa `logAll()` + `logOnlyDirty()`; sensíveis globais (password, tokens,
+  segredos 2FA) ficam em `activitylog.default_except_attributes`. Overrides por
+  model: `atributosNaoAuditados()` (ruído/segredos do model),
+  `nomeLogAuditoria()` (default = tabela), `descricaoEventoAuditoria()` e
+  `rotuloAuditoria()` (rótulo humano gravado em `properties.subject_label`).
+- O contexto é carimbado centralmente em `CarimbarContextoNaAtividade`
+  (`Activity::creating`): empresa/filial derivadas do subject (fallback tenant
+  ativo), causer pelo guard admin, `properties.contexto` (ip/user_agent — só em
+  request real) e `impersonado_por`.
+- **Gotchas:** mass update/delete via Query Builder (`Model::where()->update()`)
+  **não dispara eventos** — itere os models ou logue manualmente; mudanças em
+  pivôs (sync/attach/detach) exigem log de domínio manual; em operação que
+  reescreve PII (anonimização LGPD), chame `disableLogging()` antes do save.
+- Tabela append-only (nunca deletar registros; exceções sancionadas: retenção
+  `dias_retencao_logs` e mascaramento LGPD na anonimização)
+- Acessível via tela dedicada no admin (`/admin/auditoria`)
 
 ### 7.3 Monitoramento
 
