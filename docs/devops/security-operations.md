@@ -686,7 +686,13 @@ aplicado em runtime a `config('activitylog.clean_after_days')` pelo
 de senha) → `AnonimizarUsuarioAction`. Substitui a PII por valores neutros, embaralha a
 senha, desativa a conta e desfaz vínculos (papéis/empresas/filiais/concessões), gravando
 `anonimizado_em`. O `activity_log` é **append-only**: a linha é preservada e o causer
-aparece como "Usuário anonimizado". **Export** (JSON/PDF, permissão `usuarios.exportar-dados`)
+aparece como "Usuário anonimizado". Além disso, a anonimização **mascara a PII que ficou
+nos logs antigos** do titular (`MascararAtividadesUsuarioAction`): diffs do trait
+`Auditavel` (nome/e-mail/telefone/cargo/bio/avatar), `subject_label`, IP/user-agent das
+ações dele e o e-mail em eventos de auth (ex.: `login-falhou`) — exceção sancionada ao
+append-only, da mesma natureza da anonimização do registro; a contagem de logs mascarados
+fica em `properties.atividades_mascaradas` do evento `lgpd.anonimizado`.
+**Export** (JSON/PDF, permissão `usuarios.exportar-dados`)
 para acesso/portabilidade — nunca inclui o secret do 2FA. As três operações são auditadas
 no canal `lgpd`.
 

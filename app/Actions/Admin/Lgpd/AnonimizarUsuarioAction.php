@@ -14,17 +14,22 @@ use Illuminate\Support\Str;
 /**
  * Anonimiza irreversivelmente a PII de um usuário (direito ao esquecimento LGPD):
  * sobrescreve dados pessoais com valores neutros, embaralha a senha, revoga acessos
- * e marca `anonimizado_em`. Mantém a linha + o activity_log (append-only).
+ * e marca `anonimizado_em`. Mantém a linha + o activity_log, mas mascara a PII
+ * que ficou nos logs antigos (MascararAtividadesUsuarioAction).
  */
 final class AnonimizarUsuarioAction
 {
-    public function __construct(private readonly HierarchyResolver $hierarchy) {}
+    public function __construct(
+        private readonly HierarchyResolver $hierarchy,
+        private readonly MascararAtividadesUsuarioAction $mascararAtividades,
+    ) {}
 
     public function execute(AdminUser $ator, AdminUser $alvo): void
     {
         $this->garantirElegivel($ator, $alvo);
 
         DB::transaction(function () use ($ator, $alvo): void {
+            $emailOriginal = $alvo->email;
             // Sem isto o trait Auditavel gravaria a PII original em
             // properties.old — derrotando a anonimização.
             $alvo->disableLogging();
@@ -52,10 +57,15 @@ final class AnonimizarUsuarioAction
             $alvo->papeisPorEmpresa()->detach();
             $alvo->permissionGrants()->delete();
 
+            // Logs antigos guardam a PII em diffs/properties — mascarar é parte
+            // do direito ao esquecimento (exceção sancionada ao append-only).
+            $mascaradas = $this->mascararAtividades->execute($alvo, $emailOriginal);
+
             activity('lgpd')
                 ->causedBy($ator)
                 ->performedOn($alvo)
                 ->event('anonimizado')
+                ->withProperties(['atividades_mascaradas' => $mascaradas])
                 ->log('Usuário anonimizado (LGPD)');
         });
     }
