@@ -6,7 +6,6 @@ namespace App\Livewire\Admin\Auditoria;
 
 use App\Models\Activity;
 use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -62,9 +61,9 @@ final class AuditoriaTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return $this->aplicarEscopoTenant(
-            Activity::query()->with(['causer', 'subject', 'empresa']),
-        );
+        return Activity::query()
+            ->with(['causer', 'subject', 'empresa'])
+            ->visiveisPara($this->usuario());
     }
 
     public function fields(): PowerGridFields
@@ -76,7 +75,10 @@ final class AuditoriaTable extends PowerGridComponent
             ->add('log_name', fn (Activity $a): string => Blade::render('<x-shared.badge variant="default" size="sm">{{ $l }}</x-shared.badge>', ['l' => $a->log_name ?? '—']))
             ->add('event', fn (Activity $a): string => $this->renderEvento($a))
             ->add('sujeito', fn (Activity $a): string => $this->sujeito($a))
-            ->add('description', fn (Activity $a): string => e((string) $a->description));
+            ->add('description', fn (Activity $a): string => e((string) $a->description))
+            ->add('acoes', fn (Activity $a): string => Blade::render(
+                '<x-shared.button type="button" variant="default" appearance="ghost" size="sm" icon="tabler--eye" icon-only aria-label="Ver detalhes" wire:click="$dispatch(\'auditoria::detalhar\', { id: ' . $a->id . ' })" />',
+            ));
     }
 
     /**
@@ -102,6 +104,9 @@ final class AuditoriaTable extends PowerGridComponent
 
             Column::make('Descrição', 'description')
                 ->searchable(),
+
+            Column::make('', 'acoes')
+                ->bodyAttribute('text-end'),
         ];
     }
 
@@ -185,7 +190,8 @@ final class AuditoriaTable extends PowerGridComponent
      */
     protected function opcoes(string $coluna): array
     {
-        return $this->aplicarEscopoTenant(Activity::query())
+        return Activity::query()
+            ->visiveisPara($this->usuario())
             ->select($coluna)
             ->whereNotNull($coluna)
             ->distinct()
@@ -196,23 +202,16 @@ final class AuditoriaTable extends PowerGridComponent
     }
 
     /**
-     * Restringe a query à empresa ativa quando o usuário não é privilegiado, para
-     * que TANTO as linhas QUANTO as opções de filtro respeitem o isolamento.
-     *
-     * @param  Builder<Activity>  $query
-     * @return Builder<Activity>
+     * O isolamento por empresa vive no scope Activity::visiveisPara — único
+     * ponto reusado pelo grid, pelas opções de filtro e pelo drawer de detalhe.
      */
-    private function aplicarEscopoTenant(Builder $query): Builder
+    private function usuario(): \App\Models\AdminUser
     {
-        if ($this->podeVerTodasEmpresas()) {
-            return $query;
-        }
+        $user = Auth::guard('admin')->user();
 
-        $empresaId = app(TenantContext::class)->empresaAtivaId();
+        abort_if($user === null, 403);
 
-        return $empresaId === null
-            ? $query->whereRaw('1 = 0')
-            : $query->where('empresa_id', $empresaId);
+        return $user;
     }
 
     private function podeVerTodasEmpresas(): bool
