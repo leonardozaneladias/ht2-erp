@@ -71,6 +71,14 @@ return [
                 'permission' => 'configuracoes.editar',
                 'active' => ['admin.configuracoes.*'],
             ],
+            [
+                'key' => 'menus',
+                'label' => 'Menus',
+                'icon' => 'tabler--layout-sidebar',
+                'route' => 'admin.menus.index',
+                'permission' => 'configuracoes.menus',
+                'active' => ['admin.menus.*'],
+            ],
         ],
     ],
 ];

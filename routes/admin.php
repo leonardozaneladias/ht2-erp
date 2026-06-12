@@ -152,6 +152,10 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         Route::get('/', App\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)->name('index');
     });
 
+    Route::prefix('menus')->name('menus.')->group(function (): void {
+        Route::get('/', App\Livewire\Admin\Menus\GestaoMenus::class)->name('index');
+    });
+
     Route::get('/comunicados', App\Livewire\Admin\Notificacoes\EnviarComunicado::class)->name('comunicados');
 
     // Adicione aqui as rotas do seu módulo de negócio

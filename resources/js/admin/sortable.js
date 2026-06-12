@@ -25,8 +25,35 @@ function parseConfig(element) {
   }
 }
 
+function idsDe(container) {
+  return Array.from(container.children)
+    .map((child) => child.dataset.id)
+    .filter(Boolean);
+}
+
+function callLivewire(element, target, args) {
+  if (!target) {
+    return;
+  }
+
+  if (element.__livewire) {
+    element.__livewire.call(target, ...args);
+    return;
+  }
+
+  const root = element.closest('[wire\\:id]');
+  const livewireId = root?.getAttribute('wire:id');
+
+  if (window.Livewire?.find && livewireId) {
+    window.Livewire.find(livewireId)?.call(target, ...args);
+  }
+}
+
 function bindSortable(element) {
-  if (element.dataset.afSortableInitialized === 'true') {
+  // Guard por propriedade JS (não data-attribute): o morph do Livewire
+  // remove atributos que não existem no HTML re-renderizado, mas preserva
+  // propriedades do elemento reaproveitado.
+  if (element._afSortable) {
     return;
   }
 
@@ -37,10 +64,36 @@ function bindSortable(element) {
     animation: Number(config.animation || 150),
     ghostClass: config.ghostClass || 'bg-primary/10',
     handle,
-    onEnd: () => {
-      const ids = Array.from(element.children)
-        .map((child) => child.dataset.id)
-        .filter(Boolean);
+    group: config.group || undefined,
+    onEnd: (evt) => {
+      // Com group (drag entre listas), o onEnd dispara na lista de ORIGEM:
+      // o payload precisa ler evt.from/evt.to — nunca element.children.
+      if (config.group) {
+        const item = evt.item?.dataset?.id;
+        const para = evt.to?.dataset?.afContainer;
+
+        if (!item || !para) {
+          return;
+        }
+
+        const ordens = { [para]: idsDe(evt.to) };
+
+        if (evt.from !== evt.to && evt.from?.dataset?.afContainer) {
+          ordens[evt.from.dataset.afContainer] = idsDe(evt.from);
+        }
+
+        element.dispatchEvent(
+          new CustomEvent('sortable:moved', {
+            bubbles: true,
+            detail: { item, para, ordens },
+          }),
+        );
+
+        callLivewire(element, config.target, [item, para, ordens]);
+        return;
+      }
+
+      const ids = idsDe(element);
 
       element.dispatchEvent(
         new CustomEvent('sortable:changed', {
@@ -49,21 +102,10 @@ function bindSortable(element) {
         }),
       );
 
-      if (config.target && element.__livewire) {
-        element.__livewire.call(config.target, ids);
-        return;
-      }
-
-      const root = element.closest('[wire\\:id]');
-      const livewireId = root?.getAttribute('wire:id');
-
-      if (config.target && window.Livewire?.find && livewireId) {
-        window.Livewire.find(livewireId)?.call(config.target, ids);
-      }
+      callLivewire(element, config.target, [ids]);
     },
   });
 
-  element.dataset.afSortableInitialized = 'true';
   element._afSortable = instance;
 }
 

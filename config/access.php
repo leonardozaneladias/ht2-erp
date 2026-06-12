@@ -196,6 +196,10 @@ return [
                 'label' => 'Editar configurações',
                 'descricao' => 'Alterar as configurações gerais do sistema.',
             ],
+            'configuracoes.menus' => [
+                'label' => 'Gerenciar menus',
+                'descricao' => 'Personalizar ordem, rótulos, ícones e visibilidade do menu lateral.',
+            ],
         ],
 
         ModuloAcesso::Notificacoes->value => [
