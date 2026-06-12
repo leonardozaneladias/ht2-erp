@@ -33,12 +33,14 @@ trait Auditavel
 
     public function getActivitylogOptions(): LogOptions
     {
+        // Timestamps são metadado, não dado: fora do diff (o próprio log já
+        // tem created_at). Com eles excluídos, um touch() não gera log
+        // (diff vazio + dontLogEmptyChanges).
         return LogOptions::defaults()
             ->logAll()
-            ->logExcept($this->atributosNaoAuditados())
+            ->logExcept([...$this->atributosNaoAuditados(), 'created_at', 'updated_at'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges()
-            ->dontLogIfAttributesChangedOnly(['updated_at'])
             ->useLogName($this->nomeLogAuditoria())
             ->setDescriptionForEvent(fn (string $evento): string => $this->descricaoEventoAuditoria($evento));
     }
