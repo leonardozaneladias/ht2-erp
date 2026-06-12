@@ -31,8 +31,12 @@ use Spatie\Permission\Models\Permission;
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 class FormUsuario extends Component
 {
+    use \Livewire\WithFileUploads;
+
     #[Locked]
     public ?int $usuarioId = null;
+
+    public mixed $avatar = null;
 
     public string $nome = '';
 
@@ -102,22 +106,68 @@ class FormUsuario extends Component
         }
 
         $dto = AdminUserDTO::fromArray($dados);
+        $ator = Auth::guard('admin')->user();
 
         if ($alvo === null) {
             $usuario = $criar->execute($dto);
 
             if ($porConvite) {
-                $convidar->execute($usuario, Auth::guard('admin')->user());
+                $convidar->execute($usuario, $ator);
                 session()->flash('toast.success', 'Usuário criado. Convite enviado por e-mail.');
             } else {
                 session()->flash('toast.success', 'Usuário admin criado.');
             }
         } else {
-            $atualizar->execute($alvo, $dto);
+            $usuario = $atualizar->execute($alvo, $dto);
             session()->flash('toast.success', 'Usuário admin atualizado.');
         }
 
+        if ($this->avatar !== null) {
+            app(\App\Actions\Admin\AtualizarAvatarAction::class)->execute($usuario, $this->avatar, $ator);
+        }
+
         $this->redirect(route('admin.usuarios.index'), navigate: true);
+    }
+
+    public function removerFoto(\App\Actions\Admin\AtualizarAvatarAction $action): void
+    {
+        $alvo = $this->resolverUsuario();
+
+        if ($alvo === null) {
+            return;
+        }
+
+        $this->authorize('update', $alvo);
+        $action->remover($alvo, Auth::guard('admin')->user());
+
+        $this->reset('avatar');
+        unset($this->avatarAtualUrl);
+        $this->dispatch('toast', variant: 'success', message: 'Foto removida.');
+    }
+
+    #[Computed]
+    public function avatarAtualUrl(): ?string
+    {
+        if ($this->usuarioId === null) {
+            return null;
+        }
+
+        return AdminUser::findOrFail($this->usuarioId)->urlAvatar();
+    }
+
+    /**
+     * Preview do upload pendente — null quando o arquivo não é previewable
+     * (ex.: reprovado na validação), evitando FileNotPreviewableException.
+     */
+    public function avatarPendenteUrl(): ?string
+    {
+        $avatar = $this->avatar;
+
+        if ($avatar instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile && $avatar->isPreviewable()) {
+            return $avatar->temporaryUrl();
+        }
+
+        return null;
     }
 
     public function reenviarConvite(\App\Actions\Admin\Convites\ConvidarUsuarioAction $convidar): void
@@ -346,6 +396,7 @@ class FormUsuario extends Component
             'email' => ['required', 'string', 'email:rfc', 'max:191', Rule::unique('admin_users', 'email')->ignore($this->usuarioId)],
             'telefone' => ['nullable', 'string', 'max:20'],
             'cargo' => ['nullable', 'string', 'max:120'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:min_width=128,min_height=128'],
             'password' => $senhaRegra,
             'ativo' => ['boolean'],
             'roles' => ['array'],

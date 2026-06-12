@@ -66,6 +66,21 @@ class PerfilConta extends Component
         $this->redirect(route('admin.conta'), navigate: true);
     }
 
+    /**
+     * Preview do upload pendente — null quando o arquivo não é previewable
+     * (ex.: reprovado na validação), evitando FileNotPreviewableException.
+     */
+    public function avatarPendenteUrl(): ?string
+    {
+        $avatar = $this->avatar;
+
+        if ($avatar instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile && $avatar->isPreviewable()) {
+            return $avatar->temporaryUrl();
+        }
+
+        return null;
+    }
+
     public function render(): View
     {
         return view('livewire.admin.conta.perfil-conta', [

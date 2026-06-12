@@ -42,6 +42,16 @@
         <x-shared.tab-panel id="aba-dados" active>
             <x-shared.card title="Identificação">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="md:col-span-2">
+                        <x-shared.avatar-cropper
+                            model="avatar"
+                            :name="$nome !== '' ? $nome : 'Novo usuário'"
+                            :current="$this->avatarAtualUrl"
+                            :pending="$this->avatarPendenteUrl()"
+                            :remove-action="$modo === 'editar' ? 'removerFoto' : null"
+                        />
+                    </div>
+
                     <x-shared.input name="nome" label="Nome completo" wire:model="nome" required />
                     <x-shared.input type="email" name="email" label="E-mail" wire:model="email" required />
                     <x-shared.phone-input name="telefone" label="Telefone" wire:model="telefone" />

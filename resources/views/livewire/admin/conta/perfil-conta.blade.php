@@ -4,7 +4,7 @@
             model="avatar"
             :name="$usuario->nome"
             :current="$usuario->urlAvatar()"
-            :pending="$avatar?->temporaryUrl()"
+            :pending="$this->avatarPendenteUrl()"
             remove-action="removerAvatar"
         />
 
