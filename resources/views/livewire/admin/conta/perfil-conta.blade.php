@@ -26,6 +26,20 @@
 
         <x-shared.input name="nome" label="Nome" wire:model="nome" required />
 
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <x-shared.phone-input name="telefone" label="Telefone" wire:model="telefone" />
+            <x-shared.input name="cargo" label="Cargo" placeholder="Ex.: Gerente financeiro" wire:model="cargo" />
+        </div>
+
+        <x-shared.textarea
+            name="bio"
+            label="Bio"
+            rows="3"
+            maxlength="500"
+            hint="Uma breve descrição sobre você (até 500 caracteres). Visível apenas na sua conta."
+            wire:model="bio"
+        />
+
         <div class="grid gap-1">
             <span class="text-default-500 text-sm font-medium">E-mail</span>
             <span class="text-default-700">{{ $usuario->email }}</span>

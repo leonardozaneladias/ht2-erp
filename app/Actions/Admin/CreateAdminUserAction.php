@@ -20,6 +20,8 @@ class CreateAdminUserAction
                 'email' => $dto->email,
                 'password' => Hash::make((string) $dto->password),
                 'ativo' => $dto->ativo,
+                'telefone' => $dto->telefone,
+                'cargo' => $dto->cargo,
             ]);
 
             if ($dto->roles !== []) {

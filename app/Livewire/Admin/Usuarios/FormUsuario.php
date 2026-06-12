@@ -38,6 +38,10 @@ class FormUsuario extends Component
 
     public string $email = '';
 
+    public string $telefone = '';
+
+    public string $cargo = '';
+
     public string $password = '';
 
     // Como o novo usuário recebe a senha: convite por e-mail (padrão) ou manual.
@@ -71,6 +75,8 @@ class FormUsuario extends Component
             $this->usuarioId = $alvo->id;
             $this->nome = $alvo->nome;
             $this->email = $alvo->email;
+            $this->telefone = (string) $alvo->telefone;
+            $this->cargo = (string) $alvo->cargo;
             $this->ativo = (bool) $alvo->ativo;
             $this->roles = $alvo->getRoleNames()->all();
             $this->empresasAcesso = $alvo->empresasAcessiveis()->pluck('empresas.id')->all();
@@ -338,6 +344,8 @@ class FormUsuario extends Component
         return [
             'nome' => ['required', 'string', 'min:3', 'max:120'],
             'email' => ['required', 'string', 'email:rfc', 'max:191', Rule::unique('admin_users', 'email')->ignore($this->usuarioId)],
+            'telefone' => ['nullable', 'string', 'max:20'],
+            'cargo' => ['nullable', 'string', 'max:120'],
             'password' => $senhaRegra,
             'ativo' => ['boolean'],
             'roles' => ['array'],

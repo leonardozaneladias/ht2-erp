@@ -21,21 +21,35 @@ class PerfilConta extends Component
 
     public string $nome = '';
 
+    public string $telefone = '';
+
+    public string $cargo = '';
+
+    public string $bio = '';
+
     public mixed $avatar = null;
 
     public function mount(): void
     {
-        $this->nome = (string) $this->usuario()->getAttribute('nome');
+        $usuario = $this->usuario();
+
+        $this->nome = (string) $usuario->getAttribute('nome');
+        $this->telefone = (string) $usuario->getAttribute('telefone');
+        $this->cargo = (string) $usuario->getAttribute('cargo');
+        $this->bio = (string) $usuario->getAttribute('bio');
     }
 
     public function salvar(AtualizarPerfilAction $action): void
     {
-        $this->validate([
+        $dados = $this->validate([
             'nome' => ['required', 'string', 'max:255'],
+            'telefone' => ['nullable', 'string', 'max:20'],
+            'cargo' => ['nullable', 'string', 'max:120'],
+            'bio' => ['nullable', 'string', 'max:500'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        $action->execute($this->usuario(), $this->nome, $this->avatar);
+        $action->execute($this->usuario(), \App\DTOs\Admin\PerfilContaDTO::fromArray($dados), $this->avatar);
         $this->reset('avatar');
 
         $this->dispatch('toast', variant: 'success', message: 'Perfil atualizado.');

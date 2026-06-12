@@ -19,6 +19,8 @@ class UpdateAdminUserAction
                 'nome' => $dto->nome,
                 'email' => $dto->email,
                 'ativo' => $dto->ativo,
+                'telefone' => $dto->telefone,
+                'cargo' => $dto->cargo,
             ];
 
             if ($dto->password !== null && $dto->password !== '') {
