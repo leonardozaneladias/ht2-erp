@@ -227,6 +227,12 @@ class FormUsuario extends Component
         return Auth::guard('admin')->user()?->can('empresas.acessos') ?? false;
     }
 
+    #[Computed]
+    public function podeVerHistorico(): bool
+    {
+        return Auth::guard('admin')->user()?->can('auditoria.visualizar') ?? false;
+    }
+
     public function abrirFormAcesso(): void
     {
         $this->reset(['novoTipo', 'novaPermissao', 'novaValidade', 'novoMotivo']);

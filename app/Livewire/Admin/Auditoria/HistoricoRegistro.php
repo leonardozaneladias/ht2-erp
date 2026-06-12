@@ -1,0 +1,79 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire\Admin\Auditoria;
+
+use App\Models\Activity;
+use App\Models\AdminUser;
+use App\Support\Audit\FormatadorDiff;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Lazy;
+use Livewire\Attributes\Locked;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+/**
+ * Timeline de auditoria de UM registro (trilha do subject) — componente
+ * reutilizável: embuta em qualquer formulário de edição com
+ * `<livewire:admin.auditoria.historico-registro :subject-type="Model::class" :subject-id="$id" />`.
+ *
+ * Respeita o isolamento por empresa (Activity::visiveisPara) e a permissão
+ * `auditoria.visualizar`. Lazy: carrega após o conteúdo principal, com skeleton.
+ */
+#[Lazy]
+class HistoricoRegistro extends Component
+{
+    use WithPagination;
+
+    /** @var class-string */
+    #[Locked]
+    public string $subjectType;
+
+    #[Locked]
+    public int $subjectId;
+
+    public function mount(string $subjectType, int $subjectId): void
+    {
+        $user = Auth::guard('admin')->user();
+
+        if ($user === null || ! $user->can('auditoria.visualizar')) {
+            throw new AuthorizationException('Acesso negado.');
+        }
+
+        $this->subjectType = $subjectType;
+        $this->subjectId = $subjectId;
+    }
+
+    public function placeholder(): View
+    {
+        return view('livewire.admin.placeholders.skeleton-table');
+    }
+
+    /**
+     * @return list<array{campo: string, antes: ?string, depois: ?string}>
+     */
+    public function mudancasDe(Activity $activity): array
+    {
+        return FormatadorDiff::linhas($activity);
+    }
+
+    public function render(): View
+    {
+        $user = Auth::guard('admin')->user();
+
+        assert($user instanceof AdminUser);
+
+        return view('livewire.admin.auditoria.historico-registro', [
+            'atividades' => Activity::query()
+                ->visiveisPara($user)
+                ->where('subject_type', $this->subjectType)
+                ->where('subject_id', $this->subjectId)
+                ->with('causer')
+                ->latest('id')
+                ->paginate(10, pageName: 'historicoPage'),
+        ]);
+    }
+}

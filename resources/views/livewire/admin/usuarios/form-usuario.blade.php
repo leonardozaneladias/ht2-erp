@@ -34,6 +34,9 @@
         @if ($modo === 'editar')
             <x-shared.tab-trigger id="aba-empresas" icon="tabler--building-community">Empresas</x-shared.tab-trigger>
             <x-shared.tab-trigger id="aba-acessos" icon="tabler--key">Acessos extras</x-shared.tab-trigger>
+            @if ($this->podeVerHistorico)
+                <x-shared.tab-trigger id="aba-historico" icon="tabler--history">Histórico</x-shared.tab-trigger>
+            @endif
         @endif
     </x-shared.tab-nav>
 
@@ -331,6 +334,17 @@
                         </table>
                     </div>
                 </x-shared.card>
+            </x-shared.tab-panel>
+        @endif
+
+        {{-- ABA HISTÓRICO: trilha de auditoria do registro --}}
+        @if ($modo === 'editar' && $this->podeVerHistorico)
+            <x-shared.tab-panel id="aba-historico">
+                <livewire:admin.auditoria.historico-registro
+                    :subject-type="\App\Models\AdminUser::class"
+                    :subject-id="$usuarioId"
+                    :key="'historico-usuario-' . $usuarioId"
+                />
             </x-shared.tab-panel>
         @endif
 

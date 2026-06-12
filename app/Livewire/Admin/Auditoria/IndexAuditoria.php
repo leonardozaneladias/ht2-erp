@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Auditoria;
 use App\Actions\Admin\Lgpd\ExpurgarLogsAction;
 use App\Models\Activity;
 use App\Models\AdminUser;
+use App\Support\Audit\FormatadorDiff;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
@@ -116,21 +117,7 @@ class IndexAuditoria extends Component
     #[Computed]
     public function mudancas(): array
     {
-        $changes = $this->detalhe()?->attribute_changes;
-
-        if ($changes === null) {
-            return [];
-        }
-
-        $depois = (array) data_get($changes, 'attributes', []);
-        $antes = (array) data_get($changes, 'old', []);
-        $campos = array_values(array_unique([...array_keys($antes), ...array_keys($depois)]));
-
-        return array_map(fn (string $campo): array => [
-            'campo' => $campo,
-            'antes' => array_key_exists($campo, $antes) ? $this->formatarValor($antes[$campo]) : null,
-            'depois' => array_key_exists($campo, $depois) ? $this->formatarValor($depois[$campo]) : null,
-        ], $campos);
+        return FormatadorDiff::linhas($this->detalhe());
     }
 
     #[Computed]
@@ -144,15 +131,5 @@ class IndexAuditoria extends Component
     public function render(): View
     {
         return view('livewire.admin.auditoria.index-auditoria');
-    }
-
-    private function formatarValor(mixed $valor): string
-    {
-        return match (true) {
-            $valor === null, $valor === '' => '—',
-            is_bool($valor) => $valor ? 'Sim' : 'Não',
-            is_array($valor) => (string) json_encode($valor, JSON_UNESCAPED_UNICODE),
-            default => (string) $valor,
-        };
     }
 }
