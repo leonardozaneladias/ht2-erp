@@ -118,6 +118,8 @@
    -------------------------------------------------------------------------
    Mascara redonda sobre o crop box do cropperjs. O arquivo salvo e quadrado;
    o circulo e puramente visual (todos os pontos exibem rounded-full).
+   Inclui a animacao de entrada do modal e o slider de zoom customizado
+   (pseudo-elementos de range nao sao cobertos pelo Tailwind).
    ========================================================================= */
 [data-af-avatar-cropper-modal] .cropper-view-box,
 [data-af-avatar-cropper-modal] .cropper-face {
@@ -125,6 +127,85 @@
 }
 
 [data-af-avatar-cropper-modal] .cropper-view-box {
-    outline: 2px solid var(--color-primary);
-    outline-offset: -1px;
+    box-shadow:
+        0 0 0 2px var(--color-primary),
+        0 0 24px rgb(0 0 0 / 0.45);
+    outline: none;
+}
+
+/* Dimming mais forte fora do circulo — foco total no enquadramento. */
+[data-af-avatar-cropper-modal] .cropper-modal {
+    opacity: 0.7;
+}
+
+/* Entrada: backdrop em fade + painel em scale/slide (classe is-open via JS). */
+[data-af-avatar-cropper-modal] {
+    opacity: 0;
+    transition: opacity 0.18s ease-out;
+}
+
+[data-af-avatar-cropper-modal].is-open {
+    opacity: 1;
+}
+
+[data-af-avatar-cropper-modal] > div {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+    transition:
+        opacity 0.18s ease-out,
+        transform 0.18s ease-out;
+}
+
+[data-af-avatar-cropper-modal].is-open > div {
+    opacity: 1;
+    transform: none;
+}
+
+/* Slider de zoom: trilha preenchida ate o thumb via --af-zoom (0-100, JS). */
+[data-af-avatar-zoom-slider] {
+    appearance: none;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: linear-gradient(
+        to right,
+        var(--color-primary) calc(var(--af-zoom, 0) * 1%),
+        var(--color-default-200) calc(var(--af-zoom, 0) * 1%)
+    );
+    outline: none;
+    cursor: pointer;
+}
+
+[data-af-avatar-zoom-slider]:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+[data-af-avatar-zoom-slider]::-webkit-slider-thumb {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: var(--color-primary);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+    transition: transform 0.12s ease-out;
+}
+
+[data-af-avatar-zoom-slider]::-webkit-slider-thumb:hover,
+[data-af-avatar-zoom-slider]:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+}
+
+[data-af-avatar-zoom-slider]::-moz-range-thumb {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: var(--color-primary);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+    transition: transform 0.12s ease-out;
+}
+
+[data-af-avatar-zoom-slider]::-moz-range-thumb:hover,
+[data-af-avatar-zoom-slider]:active::-moz-range-thumb {
+    transform: scale(1.2);
 }
