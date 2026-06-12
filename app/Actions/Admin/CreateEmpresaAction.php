@@ -6,7 +6,6 @@ namespace App\Actions\Admin;
 
 use App\DTOs\Admin\EmpresaDTO;
 use App\Models\Empresa;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -19,17 +18,13 @@ class CreateEmpresaAction
         return DB::transaction(function () use ($dto): Empresa {
             $empresa = Empresa::create($dto->paraModel());
 
+            // Auditoria automática: o trait Auditavel grava o created da
+            // empresa e o da filial Matriz com o diff completo.
             $empresa->filiais()->create([
                 'nome' => 'Matriz',
                 'e_matriz' => true,
                 'ativo' => true,
             ]);
-
-            activity('empresas')
-                ->performedOn($empresa)
-                ->causedBy(Auth::guard('admin')->user())
-                ->event('criada')
-                ->log('Empresa criada');
 
             return $empresa;
         });

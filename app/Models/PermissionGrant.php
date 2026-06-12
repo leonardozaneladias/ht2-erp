@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\TipoConcessao;
+use App\Models\Concerns\Auditavel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,8 @@ use Spatie\Permission\Models\Permission;
  */
 class PermissionGrant extends Model
 {
+    use Auditavel;
+
     protected $fillable = [
         'admin_user_id',
         'permission_id',

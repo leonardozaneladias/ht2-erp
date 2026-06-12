@@ -38,9 +38,17 @@ it('cria filial pela tela de edição da empresa e grava auditoria', function ()
 
     $filial = Filial::where('nome', 'Unidade Campinas')->firstOrFail();
 
+    // Auditoria automática: created da filial via trait Auditavel, com a
+    // empresa carimbada a partir do subject.
+    $log = Activity::where('log_name', 'filiais')
+        ->where('event', 'created')
+        ->where('subject_id', $filial->id)
+        ->first();
+
     expect($filial->empresa_id)->toBe($this->empresa->id)
         ->and($filial->e_matriz)->toBeFalse()
-        ->and(Activity::where('log_name', 'empresas')->where('event', 'filial-criada')->exists())->toBeTrue();
+        ->and($log)->not->toBeNull()
+        ->and($log->empresa_id)->toBe($this->empresa->id);
 });
 
 it('edita filial existente', function () {

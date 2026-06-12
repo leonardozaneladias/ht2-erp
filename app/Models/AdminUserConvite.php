@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditavel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AdminUserConvite extends Model
 {
+    use Auditavel;
+
     protected $table = 'admin_user_convites';
 
     protected $fillable = [
@@ -71,6 +74,16 @@ class AdminUserConvite extends Model
     public static function localizarPorToken(string $token): ?self
     {
         return self::query()->where('token_hash', hash('sha256', $token))->first();
+    }
+
+    /**
+     * O hash do token é segredo de autenticação — nunca entra no diff.
+     *
+     * @return list<string>
+     */
+    protected function atributosNaoAuditados(): array
+    {
+        return ['token_hash'];
     }
 
     protected function casts(): array
