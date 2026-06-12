@@ -21,6 +21,18 @@
             {{ $gestao['orfas']->count() }} {{ $gestao['orfas']->count() === 1 ? 'personalização aponta' : 'personalizações apontam' }} para
             itens que não existem mais no registro do menu ({{ $gestao['orfas']->pluck('key')->join(', ') }}). Elas são
             ignoradas na renderização.
+
+            <div class="mt-3">
+                <x-shared.button
+                    variant="warning"
+                    appearance="outline"
+                    size="sm"
+                    icon="tabler--trash"
+                    wire:click="solicitarLimparOrfas"
+                >
+                    Limpar órfãs
+                </x-shared.button>
+            </div>
         </x-shared.alert>
     @endif
 

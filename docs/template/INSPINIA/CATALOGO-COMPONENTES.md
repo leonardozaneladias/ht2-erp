@@ -324,7 +324,7 @@ As listagens de produção (`UsuariosTable`, `EmpresasTable`, `AuditoriaTable`) 
 
 **Notas:**
 
-- `sortable-list` usa `wire:ignore` e chama `$wire.call(target, ids)` após `onEnd`.
+- `sortable-list` chama `$wire.call(target, ids)` após `onEnd`. Props extras: `group` (drag ENTRE listas com o mesmo group — o `target` passa a receber `(itemId, containerDestino, ordensPorContainer)` e o evento local vira `sortable:moved`), `containerId` (identificador reportado no payload cross-list; default = id do elemento) e `wireIgnore` (default `true`; use `:wire-ignore="false"` + `wire:key` por linha quando a lista é re-renderizada pelo Livewire). O guard de re-init usa propriedade JS (`element._afSortable`) para sobreviver ao morph. Exemplo real: tela de Gestão de Menus (`/admin/menus`).
 - `copy-button` usa `navigator.clipboard.writeText()` — dispensa `clipboard.js`.
 - `avatar-cropper`: `cropperjs` + CSS importados dinamicamente no 1º uso (zero custo no bundle); o recorte vira JPEG 512×512 enviado via `$wire.$upload` (a propriedade Livewire valida como upload normal). JS em `resources/js/admin/avatar-cropper.js` (delegação no document — sem re-init em `wire:navigate`). Máscara redonda é visual; o arquivo salvo é quadrado. Zoom por slider sincronizado nos dois sentidos com scroll/pinch (0–100 ↔ ratio mín. de enquadramento até 4×), botões −/+ como steps finos, rotação 90° e animação de entrada do modal (classe `is-open`).
 - `password-strength-meter` reutiliza o helper JS dos forms base e também continua acessível via prop `with-meter` do `password-input`.

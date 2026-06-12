@@ -127,6 +127,21 @@ it('restaura o menu padrão removendo todas as personalizações', function () {
     expect(MenuPersonalizacao::query()->count())->toBe(0);
 });
 
+it('limpa apenas as personalizações órfãs', function () {
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'modulo-removido', 'label' => 'Fantasma']);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'usuarios', 'label' => 'Equipe']);
+    app(MenuService::class)->invalidarCache();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(GestaoMenus::class)
+        ->assertSee('Personalizações órfãs')
+        ->dispatch('menus::limpar-orfas')
+        ->assertDispatched('toast', variant: 'success');
+
+    expect(MenuPersonalizacao::query()->where('key', 'modulo-removido')->exists())->toBeFalse()
+        ->and(MenuPersonalizacao::query()->where('key', 'usuarios')->exists())->toBeTrue();
+});
+
 it('registra o resumo de domínio da reordenação na auditoria', function () {
     Livewire::actingAs($this->admin, 'admin')
         ->test(GestaoMenus::class)

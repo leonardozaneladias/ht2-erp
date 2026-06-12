@@ -348,6 +348,20 @@ Decididos no fechamento da fase base. Todo CRUD/tela nova segue estas regras —
 - Toda coleção visível tem `x-shared.empty-state` do catálogo, com CTA quando o usuário tem permissão de criar.
 - Componentes pesados não-imediatos usam `#[Lazy]` + `placeholder()` com `x-shared.skeleton` (ver presets no catálogo).
 
+### 4.5 Menu lateral — registry no código + personalizações no banco
+
+O menu do admin tem duas camadas, mescladas pelo `App\Services\Admin\Menu\MenuService` (cache de 10 min, invalidado nas Actions de menu):
+
+- **Registro** (`config/admin-menu.php`) — fonte de verdade dos módulos. Toda seção e item exigem uma **`key` estável** (o serviço lança `LogicException` sem ela); o item declara `label`, `icon` (tabler), `route`, `permission` e `active`. Módulo novo = item novo aqui — ele aparece automaticamente na sidebar e na tela de gestão.
+- **Personalizações** (`menu_personalizacoes`, tela `/admin/menus`, permissão `configuracoes.menus`) — ordem, label, ícone, seção e `ativo` por cima do registro. Valores iguais ao padrão viram `null` (linha 100% padrão é removida); key que sumiu do config vira personalização **órfã** (ignorada na sidebar, listada na gestão para limpeza).
+
+Regras:
+
+- **Visibilidade por usuário é o ACL**, nunca uma segunda flag: o item é exibido se o usuário `can(permission)`. Os toggles "Visível/Oculto" por perfil na tela de gestão concedem/revogam a permissão no perfil (via `AlternarPermissaoPerfilAction`, mesmos guards do hub) — afetam menu **e** páginas.
+- `ativo = false` é decisão global (some para todos, inclusive no preview dev/components); o acesso às rotas continua regido pelo ACL.
+- Ícones de menu são **build-time** (iconify/tailwind escaneia literais): a tela só aceita a lista curada `App\Support\Menu\IconesMenu` — para oferecer um ícone novo, adicione-o lá (o grid de sugestões o renderiza literalmente, garantindo o CSS no bundle).
+- Nunca renomeie uma `key` do config sem migrar a personalização correspondente.
+
 ---
 
 ## 5. Banco de Dados

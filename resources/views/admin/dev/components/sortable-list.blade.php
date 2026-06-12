@@ -52,6 +52,45 @@
             </div>
         </x-shared.card>
     </div>
+    <x-shared.card
+        title="Drag entre listas (group)"
+        subtitle="Listas com o mesmo group aceitam mover itens entre si — caso real: Gestão de Menus"
+        class="mt-6"
+    >
+        <div class="grid gap-4 md:grid-cols-2">
+            @foreach (['coluna-a' => ['Item Alfa', 'Item Bravo'], 'coluna-b' => ['Item Charlie']] as $coluna => $itens)
+                <div>
+                    <p class="text-2xs text-default-400 mb-2 font-semibold tracking-[0.22em] uppercase">{{ $coluna }}</p>
+
+                    <x-admin.sortable-list
+                        id="preview-group-{{ $coluna }}"
+                        group="preview-grupo"
+                        :container-id="$coluna"
+                        class="border-default-300 bg-light/40 min-h-24 rounded-xl border"
+                    >
+                        @foreach ($itens as $item)
+                            <div
+                                data-id="{{ \Illuminate\Support\Str::slug($item) }}"
+                                class="border-default-300 bg-card flex items-center gap-3 border-b px-4 py-3 last:border-b-0"
+                            >
+                                <i
+                                    class="iconify tabler--grip-vertical drag-handle text-default-400 cursor-grab text-xl"
+                                ></i>
+                                <p class="text-body-color text-sm font-semibold">{{ $item }}</p>
+                            </div>
+                        @endforeach
+                    </x-admin.sortable-list>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="border-default-300 bg-light/40 mt-4 rounded-xl border p-4">
+            <p class="text-2xs text-default-400 font-semibold tracking-[0.22em] uppercase">Último sortable:moved</p>
+            <pre id="sortable-moved-output" class="text-body-color mt-3 text-sm whitespace-pre-wrap">
+Mova um item entre as colunas…</pre
+            >
+        </div>
+    </x-shared.card>
 @endsection
 
 @section ('previewScripts')
@@ -66,6 +105,16 @@
 
             sortable.addEventListener('sortable:changed', (event) => {
                 output.textContent = JSON.stringify(event.detail.ids, null, 2);
+            });
+
+            const movedOutput = document.getElementById('sortable-moved-output');
+
+            ['preview-group-coluna-a', 'preview-group-coluna-b'].forEach((id) => {
+                document.getElementById(id)?.addEventListener('sortable:moved', (event) => {
+                    if (movedOutput) {
+                        movedOutput.textContent = JSON.stringify(event.detail, null, 2);
+                    }
+                });
             });
         });
     </script>

@@ -249,6 +249,29 @@ class GestaoMenus extends Component
         $this->dispatch('toast', variant: 'success', message: 'Registro restaurado ao padrão.');
     }
 
+    public function solicitarLimparOrfas(): void
+    {
+        $this->dispatch(
+            'confirm',
+            title: 'Limpar personalizações órfãs?',
+            text: 'As personalizações que apontam para itens removidos do registro do menu serão excluídas.',
+            destructive: true,
+            onConfirm: 'menus::limpar-orfas',
+            params: [],
+        );
+    }
+
+    #[On('menus::limpar-orfas')]
+    public function limparOrfas(RestaurarMenuAction $action): void
+    {
+        $removidas = $action->removerOrfas();
+
+        unset($this->estrutura);
+        $this->dispatch('toast', variant: 'success', message: $removidas > 0
+            ? 'Personalizações órfãs removidas.'
+            : 'Nenhuma personalização órfã encontrada.');
+    }
+
     public function solicitarRestaurarTudo(): void
     {
         $this->dispatch(
