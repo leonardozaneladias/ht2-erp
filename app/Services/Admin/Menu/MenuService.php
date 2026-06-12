@@ -139,6 +139,31 @@ final class MenuService
     }
 
     /**
+     * Valores padrão (do config) de um item ou seção — base da normalização
+     * das personalizações (valor igual ao padrão vira null).
+     *
+     * @return array{label: string, icone: string|null}|null
+     */
+    public function padraoDe(TipoPersonalizacaoMenu $tipo, string $key): ?array
+    {
+        foreach ($this->registro() as $secao) {
+            if ($tipo === TipoPersonalizacaoMenu::Secao && $secao['key'] === $key) {
+                return ['label' => $secao['title'], 'icone' => null];
+            }
+
+            if ($tipo === TipoPersonalizacaoMenu::Item) {
+                foreach ($secao['items'] as $item) {
+                    if ($item['key'] === $key) {
+                        return ['label' => $item['label'], 'icone' => $item['icon'] ?? null];
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Seção em que o item está registrado no config.
      */
     public function secaoNaturalDoItem(string $itemKey): ?string

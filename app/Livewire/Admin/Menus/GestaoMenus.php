@@ -4,18 +4,27 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Menus;
 
+use App\Actions\Admin\AlternarPermissaoPerfilAction;
 use App\Actions\Admin\Menu\ReordenarItensMenuAction;
 use App\Actions\Admin\Menu\ReordenarSecoesMenuAction;
 use App\Actions\Admin\Menu\RestaurarMenuAction;
+use App\Actions\Admin\Menu\SalvarPersonalizacaoMenuAction;
+use App\DTOs\Admin\MenuPersonalizacaoDTO;
+use App\Enums\TipoPersonalizacaoMenu;
+use App\Exceptions\AccessException;
 use App\Services\Admin\Menu\MenuService;
+use App\Support\Menu\IconesMenu;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\Rule;
 use InvalidArgumentException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 /**
  * Tela de Gestão de Menus: reordena (drag & drop), renomeia, troca ícones e
@@ -26,6 +35,16 @@ use Livewire\Component;
 #[Title('Gestão de menus')]
 class GestaoMenus extends Component
 {
+    public ?string $editandoTipo = null;
+
+    public ?string $editandoKey = null;
+
+    public string $label = '';
+
+    public string $icone = '';
+
+    public bool $ativo = true;
+
     public function mount(): void
     {
         $user = auth('admin')->user();
@@ -77,6 +96,159 @@ class GestaoMenus extends Component
         $this->dispatch('toast', variant: 'success', message: 'Ordem das seções atualizada.');
     }
 
+    /**
+     * Abre o drawer de edição com os valores efetivos do registro.
+     */
+    public function editar(string $tipo, string $key): void
+    {
+        $detalhe = $this->detalheDe($tipo, $key);
+
+        if ($detalhe === null) {
+            $this->dispatch('toast', variant: 'danger', message: 'Registro de menu não encontrado.');
+
+            return;
+        }
+
+        $this->resetValidation();
+        $this->editandoTipo = $tipo;
+        $this->editandoKey = $key;
+        $this->label = $detalhe['label'];
+        $this->icone = $detalhe['icone'] ?? '';
+        $this->ativo = $detalhe['ativo'] ?? true;
+
+        $this->dispatch('menus-abrir-editor');
+    }
+
+    public function salvarEdicao(SalvarPersonalizacaoMenuAction $action): void
+    {
+        if ($this->editandoTipo === null || $this->editandoKey === null) {
+            return;
+        }
+
+        $this->validate();
+
+        try {
+            $action->execute(MenuPersonalizacaoDTO::fromArray([
+                'tipo' => $this->editandoTipo,
+                'key' => $this->editandoKey,
+                'label' => $this->label,
+                'icone' => $this->editandoTipo === TipoPersonalizacaoMenu::Item->value ? $this->icone : null,
+                'ativo' => $this->ativo,
+            ]));
+        } catch (InvalidArgumentException) {
+            $this->dispatch('toast', variant: 'danger', message: 'Não foi possível salvar a personalização.');
+
+            return;
+        }
+
+        unset($this->estrutura);
+        $this->dispatch('menus-fechar-editor');
+        $this->dispatch('toast', variant: 'success', message: 'Menu atualizado.');
+    }
+
+    /**
+     * Liga/desliga um item globalmente (some do menu para todos; o acesso às
+     * páginas continua regido pelo ACL).
+     */
+    public function alternarAtivo(string $itemKey, SalvarPersonalizacaoMenuAction $action): void
+    {
+        $item = $this->detalheDe(TipoPersonalizacaoMenu::Item->value, $itemKey);
+
+        if ($item === null) {
+            return;
+        }
+
+        $action->execute(MenuPersonalizacaoDTO::fromArray([
+            'tipo' => TipoPersonalizacaoMenu::Item->value,
+            'key' => $itemKey,
+            'label' => $item['label'],
+            'icone' => $item['icone'],
+            'ativo' => ! $item['ativo'],
+        ]));
+
+        // Mantém o drawer coerente se o item editado foi alternado por fora.
+        if ($this->editandoKey === $itemKey) {
+            $this->ativo = ! $item['ativo'];
+        }
+
+        unset($this->estrutura);
+        $this->dispatch('toast', variant: 'success', message: $item['ativo']
+            ? 'Item desativado: não aparece mais no menu.'
+            : 'Item reativado no menu.');
+    }
+
+    /**
+     * Concede/revoga a permissão do item editado em um perfil (toggle de
+     * visibilidade — controla o módulo inteiro, menu e páginas).
+     */
+    public function alternarPerfil(int $roleId, AlternarPermissaoPerfilAction $action): void
+    {
+        $permissao = $this->permissaoDoItemEditado();
+
+        if ($permissao === null) {
+            return;
+        }
+
+        $role = Role::query()->where('guard_name', 'admin')->find($roleId);
+
+        if ($role === null) {
+            return;
+        }
+
+        // Mesmo gate do hub de Controle de Acesso (Policy direta — o bypass
+        // do super-admin no Gate não mascara role protegida/hierarquia).
+        $user = auth('admin')->user();
+
+        if (! $user instanceof \App\Models\AdminUser || ! app(\App\Policies\RolePolicy::class)->update($user, $role)) {
+            $this->dispatch('toast', variant: 'danger', message: 'Você não tem permissão para gerir este perfil.');
+
+            return;
+        }
+
+        $conceder = ! $role->hasPermissionTo($permissao);
+
+        try {
+            $action->execute($roleId, $permissao, $conceder);
+        } catch (AccessException $e) {
+            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+
+            return;
+        }
+
+        unset($this->perfis);
+        $this->dispatch('toast', variant: 'success', message: $conceder
+            ? "Permissão concedida ao perfil {$role->name}."
+            : "Permissão revogada do perfil {$role->name}.");
+    }
+
+    public function solicitarRestaurar(string $tipo, string $key): void
+    {
+        $this->dispatch(
+            'confirm',
+            title: 'Restaurar ao padrão?',
+            text: 'As personalizações deste registro do menu serão removidas.',
+            destructive: true,
+            onConfirm: 'menus::restaurar-registro',
+            params: ['tipo' => $tipo, 'key' => $key],
+        );
+    }
+
+    #[On('menus::restaurar-registro')]
+    public function restaurarRegistro(string $tipo, string $key, RestaurarMenuAction $action): void
+    {
+        $enumTipo = TipoPersonalizacaoMenu::tryFrom($tipo);
+
+        if ($enumTipo === null) {
+            return;
+        }
+
+        $action->execute($enumTipo, $key);
+
+        unset($this->estrutura);
+        $this->dispatch('menus-fechar-editor');
+        $this->dispatch('toast', variant: 'success', message: 'Registro restaurado ao padrão.');
+    }
+
     public function solicitarRestaurarTudo(): void
     {
         $this->dispatch(
@@ -109,8 +281,84 @@ class GestaoMenus extends Component
         return app(MenuService::class)->estruturaParaGestao();
     }
 
+    /**
+     * Perfis do guard admin (com permissões carregadas) para os toggles de
+     * visibilidade do drawer.
+     *
+     * @return Collection<int, Role>
+     */
+    #[Computed]
+    public function perfis(): Collection
+    {
+        return Role::query()
+            ->where('guard_name', 'admin')
+            ->orderByDesc('nivel')
+            ->orderBy('name')
+            ->with('permissions')
+            ->get();
+    }
+
+    /**
+     * Permissão vinculada ao item aberto no drawer (resolvida no servidor —
+     * o payload do cliente nunca escolhe a permissão).
+     */
+    public function permissaoDoItemEditado(): ?string
+    {
+        if ($this->editandoTipo !== TipoPersonalizacaoMenu::Item->value || $this->editandoKey === null) {
+            return null;
+        }
+
+        return app(MenuService::class)->permissaoDoItem($this->editandoKey);
+    }
+
     public function render(): View
     {
         return view('livewire.admin.menus.gestao-menus');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function rules(): array
+    {
+        return [
+            'label' => ['nullable', 'string', 'max:80'],
+            'icone' => ['nullable', 'string', Rule::in(IconesMenu::disponiveis())],
+            'ativo' => ['boolean'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function messages(): array
+    {
+        return [
+            'icone.in' => 'Escolha um ícone da lista de sugestões.',
+        ];
+    }
+
+    /**
+     * Valores efetivos (config + personalização) de um registro da estrutura.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function detalheDe(string $tipo, string $key): ?array
+    {
+        foreach ($this->estrutura()['secoes'] as $secao) {
+            if ($tipo === TipoPersonalizacaoMenu::Secao->value && $secao['key'] === $key) {
+                return ['label' => $secao['title'], 'icone' => null, 'ativo' => true];
+            }
+
+            if ($tipo === TipoPersonalizacaoMenu::Item->value) {
+                foreach ($secao['items'] as $item) {
+                    if ($item['key'] === $key) {
+                        return ['label' => $item['label'], 'icone' => $item['icon'], 'ativo' => $item['ativo']];
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
