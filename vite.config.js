@@ -33,6 +33,8 @@ export default defineConfig({
           if (id.includes('preline')) return 'vendor-preline';
           if (id.includes('sweetalert2')) return 'vendor-sweetalert';
           if (id.includes('dropzone') || id.includes('inputmask')) return 'vendor-forms';
+          // Chunk próprio: o avatar-cropper importa dinamicamente — só carrega no 1º uso.
+          if (id.includes('cropperjs')) return 'vendor-cropper';
 
           return 'vendor';
         },

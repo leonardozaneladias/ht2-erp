@@ -21,6 +21,7 @@ import './admin/row-actions';
 import './admin/toast';
 import './admin/confirm';
 import './admin/forms';
+import './admin/avatar-cropper';
 import './admin/sortable';
 import './admin/charts';
 import './admin/copy';

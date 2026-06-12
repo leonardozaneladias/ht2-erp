@@ -65,6 +65,7 @@
                     'sortable-list' => ['Drag-and-drop com SortableJS para termos e ordenação manual', 'tabler--drag-drop-2'],
                     'copy-button' => ['Botão nativo de copiar CPF, códigos e links com feedback visual', 'tabler--copy'],
                     'password-strength-meter' => ['Medidor visual de força com integração ao password-input', 'tabler--password-fingerprint'],
+                    'avatar-cropper' => ['Avatar com crop circular interativo (arrastar + zoom) antes do upload', 'tabler--camera-cog'],
                 ] as $route => $meta)
                     <a
                         href="{{ route('admin.dev.components.'.$route) }}"

@@ -112,3 +112,19 @@
     border-top-color: var(--color-primary) !important;
     border-left-color: var(--color-primary) !important;
 }
+
+/* =========================================================================
+   Avatar cropper (x-shared.avatar-cropper)
+   -------------------------------------------------------------------------
+   Mascara redonda sobre o crop box do cropperjs. O arquivo salvo e quadrado;
+   o circulo e puramente visual (todos os pontos exibem rounded-full).
+   ========================================================================= */
+[data-af-avatar-cropper-modal] .cropper-view-box,
+[data-af-avatar-cropper-modal] .cropper-face {
+    border-radius: 50%;
+}
+
+[data-af-avatar-cropper-modal] .cropper-view-box {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -1px;
+}

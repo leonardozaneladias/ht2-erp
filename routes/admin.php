@@ -76,6 +76,7 @@ if (app()->isLocal()) {
         Route::view('/sortable-list', 'admin.dev.components.sortable-list')->name('sortable-list');
         Route::view('/copy-button', 'admin.dev.components.copy-button')->name('copy-button');
         Route::view('/password-strength-meter', 'admin.dev.components.password-strength-meter')->name('password-strength-meter');
+        Route::view('/avatar-cropper', 'admin.dev.components.avatar-cropper')->name('avatar-cropper');
     });
 
     Route::view('/admin/dev/livewire', 'admin.dev.livewire')->name('admin.dev.livewire');

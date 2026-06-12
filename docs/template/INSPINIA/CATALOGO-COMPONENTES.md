@@ -315,16 +315,18 @@ As listagens de produção (`UsuariosTable`, `EmpresasTable`, `AuditoriaTable`) 
 
 ## 12. Plugins pontuais (P5)
 
-|  #  | Blade destino                      | Categoria              | Doc                                                      | Vai usar | Prioridade | Status |                         Decisão                         |
-| :-: | ---------------------------------- | ---------------------- | -------------------------------------------------------- | :------: | :--------: | :----: | :-----------------------------------------------------: |
-| 62  | `x-admin.sortable-list`            | Plugin (SortableJS)    | [sortable.md](template/INSPINIA/Plugins/sortable.md)     |    🟢    |     P5     |   🟢   |                           ✅                            |
-| 63  | `x-shared.copy-button`             | Plugin (clipboard API) | [clipboard.md](template/INSPINIA/Plugins/clipboard.md)   |    🟢    |     P5     |   🟢   |            ✅ (API nativa, sem clipboard.js)            |
-| 64  | `x-shared.password-strength-meter` | Plugin (custom Alpine) | [pass-meter.md](template/INSPINIA/Plugins/pass-meter.md) |    🟢    |     P5     |   🟢   | ➕ (subcomponente do `password-input` + uso standalone) |
+|  #  | Blade destino                      | Categoria              | Doc                                                      | Vai usar | Prioridade | Status |                                                                                 Decisão                                                                                  |
+| :-: | ---------------------------------- | ---------------------- | -------------------------------------------------------- | :------: | :--------: | :----: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| 62  | `x-admin.sortable-list`            | Plugin (SortableJS)    | [sortable.md](template/INSPINIA/Plugins/sortable.md)     |    🟢    |     P5     |   🟢   |                                                                                    ✅                                                                                    |
+| 63  | `x-shared.copy-button`             | Plugin (clipboard API) | [clipboard.md](template/INSPINIA/Plugins/clipboard.md)   |    🟢    |     P5     |   🟢   |                                                                    ✅ (API nativa, sem clipboard.js)                                                                     |
+| 64  | `x-shared.password-strength-meter` | Plugin (custom Alpine) | [pass-meter.md](template/INSPINIA/Plugins/pass-meter.md) |    🟢    |     P5     |   🟢   |                                                         ➕ (subcomponente do `password-input` + uso standalone)                                                          |
+| 65  | `x-shared.avatar-cropper`          | Plugin (cropperjs)     | —                                                        |    🟢    |     P5     |   🟢   | ✅ Avatar com crop circular (arrastar + zoom) antes do upload. Props: `model` (propriedade Livewire), `name`, `current`, `pending`, `size`, `max-size`, `remove-action`. |
 
 **Notas:**
 
 - `sortable-list` usa `wire:ignore` e chama `$wire.call(target, ids)` após `onEnd`.
 - `copy-button` usa `navigator.clipboard.writeText()` — dispensa `clipboard.js`.
+- `avatar-cropper`: `cropperjs` + CSS importados dinamicamente no 1º uso (zero custo no bundle); o recorte vira JPEG 512×512 enviado via `$wire.$upload` (a propriedade Livewire valida como upload normal). JS em `resources/js/admin/avatar-cropper.js` (delegação no document — sem re-init em `wire:navigate`). Máscara redonda é visual; o arquivo salvo é quadrado.
 - `password-strength-meter` reutiliza o helper JS dos forms base e também continua acessível via prop `with-meter` do `password-input`.
 
 ---
