@@ -2,44 +2,15 @@
     $user = auth('admin')->user();
     $showAllItems = $user === null || request()->routeIs('admin.dev.components.*');
 
-    $canView = static function (?string $permission) use ($showAllItems, $user): bool {
-        if ($permission === null || $showAllItems) {
-            return true;
-        }
-
-        return $user !== null && method_exists($user, 'can') && $user->can($permission);
-    };
-
     $displayUser = [
         'nome' => $user?->nomeExibicao() ?? config('branding.user_default_name'),
         'perfil' => $user?->perfilExibicao() ?? config('branding.user_default_role'),
     ];
 
-    $sections = collect(config('admin-menu', []))
-        ->map(function (array $section) use ($canView) {
-            $items = collect($section['items'])
-                ->map(function (array $item) use ($canView) {
-                    $children = collect($item['children'] ?? [])
-                        ->filter(fn (array $child) => $canView($child['permission'] ?? null))
-                        ->values()
-                        ->all();
-
-                    $isVisible = $children !== [] || $canView($item['permission'] ?? null);
-
-                    return array_merge($item, [
-                        'children' => $children,
-                        'visible' => $isVisible,
-                    ]);
-                })
-                ->filter(fn (array $item) => $item['visible'])
-                ->values()
-                ->all();
-
-            return array_merge($section, ['items' => $items]);
-        })
-        ->filter(fn (array $section) => $section['items'] !== [])
-        ->values()
-        ->all();
+    // Registro (config/admin-menu.php) + personalizações da tela de Gestão de
+    // Menus, com o filtro de permissão por usuário aplicado no serviço.
+    $sections = app(\App\Services\Admin\Menu\MenuService::class)
+        ->estruturaParaSidebar($user, $showAllItems);
 @endphp
 
 <aside class="app-menu" id="app-menu">
