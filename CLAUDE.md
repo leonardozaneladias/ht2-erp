@@ -135,10 +135,24 @@ por empresa ativa. Regras essenciais:
 | Laravel Pint        | Formata PHP (PSR-12 + Laravel)   | `./vendor/bin/pint`               |
 | Prettier            | Formata Blade, JS, CSS, JSON, MD | `npx prettier --write resources/` |
 | PHPStan/Larastan    | Análise estática PHP (level 6)   | `./vendor/bin/phpstan analyse`    |
-| Pest                | Testes                           | `php artisan test`                |
+| Pest                | Testes (unit/feature)            | `php artisan test`                |
+| Pest Browser        | Testes E2E (Playwright)          | `make test-e2e`                   |
 | Husky + lint-staged | Roda tudo no git commit          | Automático                        |
 
 **Verificação completa:** `npm run quality`
+
+### Testes E2E (browser)
+
+Testes de browser vivem em `tests/Browser/` (grupo `browser`) e rodam com
+**Playwright** via `pestphp/pest-plugin-browser`. Rodam no **host** (não no
+container DDEV, que não tem Chromium); `make test`/CI excluem o grupo. Cobrem
+smoke das telas (sem erros de JS) e regressões de UI (z-index dos dropdowns do
+PowerGrid, filtros multi-select).
+
+```bash
+make test-e2e            # build do Vite + pest --group=browser (host)
+npx playwright install chromium   # 1x, baixa o browser
+```
 
 ---
 
