@@ -89,6 +89,15 @@
     }
 }
 
+/* Dropdowns do header do PowerGrid (toggle de colunas / export) precisam
+   flutuar acima do thead sticky (.table-sticky th = z-10). Fica sem @layer
+   porque a utility z-10 do vendor vive na layer utilities e venceria um
+   override em components. 30 = degrau de dropdowns do projeto (Preline). */
+.toggle-columns-base,
+#pg-header-export .absolute {
+    z-index: 30;
+}
+
 /* =========================================================================
    Barra de progresso de navegacao (wire:navigate)
    -------------------------------------------------------------------------
