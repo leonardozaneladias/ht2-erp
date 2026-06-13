@@ -9,6 +9,11 @@
     'group' => null,
     // Identificador do container reportado no payload cross-list.
     'containerId' => null,
+    // data-tipo de linhas que este container NÃO aceita (group.put).
+    'putReject' => null,
+    // Recomendados pela doc do SortableJS para listas aninhadas.
+    'fallbackOnBody' => false,
+    'swapThreshold' => null,
     // Desligue (false) quando a lista é re-renderizada pelo Livewire — use
     // wire:key por linha nesse caso.
     'wireIgnore' => true,
@@ -22,6 +27,9 @@
         'animation' => (int) $animation,
         'ghostClass' => $ghostClass,
         'group' => $group,
+        'putReject' => $putReject,
+        'fallbackOnBody' => (bool) $fallbackOnBody,
+        'swapThreshold' => $swapThreshold !== null ? (float) $swapThreshold : null,
     ];
 @endphp
 

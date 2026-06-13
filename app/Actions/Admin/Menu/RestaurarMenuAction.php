@@ -61,11 +61,18 @@ class RestaurarMenuAction
         $removidas = DB::transaction(function () use ($chavesItens, $chavesSecoes): int {
             $orfas = MenuPersonalizacao::query()
                 ->get()
-                ->filter(fn (MenuPersonalizacao $personalizacao): bool => ! in_array(
-                    $personalizacao->key,
-                    $personalizacao->tipo === TipoPersonalizacaoMenu::Item ? $chavesItens : $chavesSecoes,
-                    true,
-                ));
+                ->filter(function (MenuPersonalizacao $personalizacao) use ($chavesItens, $chavesSecoes): bool {
+                    // Customs (seções/grupos criados pela tela) nunca são órfãs.
+                    if ($personalizacao->e_custom || $personalizacao->tipo === TipoPersonalizacaoMenu::Grupo) {
+                        return false;
+                    }
+
+                    return ! in_array(
+                        $personalizacao->key,
+                        $personalizacao->tipo === TipoPersonalizacaoMenu::Item ? $chavesItens : $chavesSecoes,
+                        true,
+                    );
+                });
 
             $orfas->each(fn (MenuPersonalizacao $personalizacao) => $personalizacao->delete());
 

@@ -11,41 +11,67 @@ use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
- * Persiste a nova ordem dos itens do menu após um drag & drop, incluindo a
- * movimentação entre seções. O payload vem do cliente e é hostil: toda key
- * é validada contra o registro do config antes de gravar.
+ * Persiste a nova ordem após um drag & drop de itens/grupos, incluindo a
+ * movimentação entre containers. Containers são prefixados: `secao:<key>`
+ * (nível raiz da seção — aceita itens e grupos) ou `grupo:<key>` (filhos do
+ * grupo — só itens). O payload vem do cliente e é hostil: toda key é
+ * validada contra o registro do config e os grupos do banco antes de gravar.
  */
 class ReordenarItensMenuAction
 {
     public function __construct(private readonly MenuService $menu) {}
 
     /**
-     * @param  array<string, list<string>>  $ordens  ordem completa dos itens por seção afetada
+     * @param  array<string, list<string>>  $ordens  ordem completa por container afetado
      */
-    public function execute(string $itemKey, string $secaoDestino, array $ordens): void
+    public function execute(string $movidoKey, string $containerDestino, array $ordens): void
     {
         $chavesItens = $this->menu->chavesDeItens();
-        $chavesSecoes = $this->menu->chavesDeSecoes();
+        $chavesGrupos = $this->menu->chavesDeGrupos();
+        $destinosSecao = $this->menu->destinosDeSecao();
 
-        if (! in_array($itemKey, $chavesItens, true) || ! in_array($secaoDestino, $chavesSecoes, true)) {
-            throw new InvalidArgumentException('Item ou seção de menu desconhecidos.');
+        $this->parseContainer($containerDestino, $destinosSecao, $chavesGrupos);
+
+        if (! in_array($movidoKey, $chavesItens, true) && ! in_array($movidoKey, $chavesGrupos, true)) {
+            throw new InvalidArgumentException('Registro de menu desconhecido.');
         }
 
-        foreach ($ordens as $secaoKey => $itens) {
-            if (! in_array($secaoKey, $chavesSecoes, true)) {
-                throw new InvalidArgumentException("Seção de menu desconhecida: {$secaoKey}");
-            }
+        foreach ($ordens as $container => $keys) {
+            [$tipoContainer] = $this->parseContainer((string) $container, $destinosSecao, $chavesGrupos);
 
-            foreach ($itens as $key) {
-                if (! is_string($key) || ! in_array($key, $chavesItens, true)) {
-                    throw new InvalidArgumentException('Item de menu desconhecido no payload de ordenação.');
+            foreach ($keys as $key) {
+                $ehItem = is_string($key) && in_array($key, $chavesItens, true);
+                $ehGrupo = is_string($key) && in_array($key, $chavesGrupos, true);
+
+                if (! $ehItem && ! $ehGrupo) {
+                    throw new InvalidArgumentException('Registro desconhecido no payload de ordenação.');
+                }
+
+                if ($tipoContainer === 'grupo' && $ehGrupo) {
+                    throw new InvalidArgumentException('Grupos não podem ficar dentro de grupos.');
                 }
             }
         }
 
-        DB::transaction(function () use ($itemKey, $secaoDestino, $ordens): void {
-            foreach ($ordens as $secaoKey => $itens) {
-                foreach (array_values($itens) as $posicao => $key) {
+        DB::transaction(function () use ($movidoKey, $containerDestino, $ordens, $destinosSecao, $chavesGrupos): void {
+            foreach ($ordens as $container => $keys) {
+                [$tipoContainer, $containerKey] = $this->parseContainer((string) $container, $destinosSecao, $chavesGrupos);
+
+                foreach (array_values($keys) as $posicao => $key) {
+                    if (in_array($key, $chavesGrupos, true)) {
+                        // Grupo reordenado/movido no nível raiz da seção.
+                        $grupo = MenuPersonalizacao::query()
+                            ->where('tipo', TipoPersonalizacaoMenu::Grupo)
+                            ->where('key', $key)
+                            ->firstOrFail();
+
+                        $grupo->ordem = $posicao + 1;
+                        $grupo->secao_key = $containerKey;
+                        $grupo->save();
+
+                        continue;
+                    }
+
                     $personalizacao = MenuPersonalizacao::query()->firstOrNew([
                         'tipo' => TipoPersonalizacaoMenu::Item,
                         'key' => $key,
@@ -53,11 +79,17 @@ class ReordenarItensMenuAction
 
                     $personalizacao->ordem = $posicao + 1;
 
-                    // Seção destino só é gravada quando difere da natural —
-                    // mantém o badge "Personalizado" significativo.
-                    $personalizacao->secao_key = $secaoKey === $this->menu->secaoNaturalDoItem($key)
-                        ? null
-                        : $secaoKey;
+                    if ($tipoContainer === 'grupo') {
+                        $personalizacao->grupo_key = $containerKey;
+                        $personalizacao->secao_key = null;
+                    } else {
+                        // Seção destino só é gravada quando difere da natural —
+                        // mantém o badge "Personalizado" significativo.
+                        $personalizacao->grupo_key = null;
+                        $personalizacao->secao_key = $containerKey === $this->menu->secaoNaturalDoItem($key)
+                            ? null
+                            : $containerKey;
+                    }
 
                     $personalizacao->save();
                 }
@@ -66,11 +98,33 @@ class ReordenarItensMenuAction
             // Resumo de domínio: a operação em massa que os diffs por linha
             // (trait Auditavel) não expressam de uma vez.
             activity('menus')
-                ->withProperties(['item' => $itemKey, 'secao_destino' => $secaoDestino, 'ordens' => $ordens])
+                ->withProperties(['item' => $movidoKey, 'container_destino' => $containerDestino, 'ordens' => $ordens])
                 ->event('menu_reordenado')
                 ->log('Itens do menu reordenados');
         });
 
         $this->menu->invalidarCache();
+    }
+
+    /**
+     * Valida e decompõe um container prefixado.
+     *
+     * @param  list<string>  $destinosSecao
+     * @param  list<string>  $chavesGrupos
+     * @return array{0: string, 1: string} [tipo, key]
+     */
+    private function parseContainer(string $container, array $destinosSecao, array $chavesGrupos): array
+    {
+        [$tipo, $key] = array_pad(explode(':', $container, 2), 2, '');
+
+        if ($tipo === 'secao' && in_array($key, $destinosSecao, true)) {
+            return ['secao', $key];
+        }
+
+        if ($tipo === 'grupo' && in_array($key, $chavesGrupos, true)) {
+            return ['grupo', $key];
+        }
+
+        throw new InvalidArgumentException("Container de menu desconhecido: {$container}");
     }
 }

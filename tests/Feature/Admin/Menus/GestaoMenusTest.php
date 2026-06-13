@@ -51,8 +51,8 @@ it('abre a página pela rota como super-admin', function () {
 it('reordena itens dentro da própria seção sem gravar secao_key', function () {
     Livewire::actingAs($this->admin, 'admin')
         ->test(GestaoMenus::class)
-        ->call('reordenarItens', 'usuarios', 'administracao', [
-            'administracao' => ['usuarios', 'empresas', 'acesso', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
+        ->call('reordenarItens', 'usuarios', 'secao:administracao', [
+            'secao:administracao' => ['usuarios', 'empresas', 'acesso', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
         ])
         ->assertHasNoErrors()
         ->assertDispatched('toast', variant: 'success');
@@ -72,9 +72,9 @@ it('reordena itens dentro da própria seção sem gravar secao_key', function ()
 it('move item para outra seção gravando secao_key', function () {
     Livewire::actingAs($this->admin, 'admin')
         ->test(GestaoMenus::class)
-        ->call('reordenarItens', 'empresas', 'principal', [
-            'principal' => ['dashboard', 'empresas'],
-            'administracao' => ['acesso', 'usuarios', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
+        ->call('reordenarItens', 'empresas', 'secao:principal', [
+            'secao:principal' => ['dashboard', 'empresas'],
+            'secao:administracao' => ['acesso', 'usuarios', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
         ])
         ->assertHasNoErrors();
 
@@ -103,7 +103,7 @@ it('reordena seções', function () {
 it('rejeita payload com keys desconhecidas sem persistir nada', function () {
     Livewire::actingAs($this->admin, 'admin')
         ->test(GestaoMenus::class)
-        ->call('reordenarItens', 'item-hacker', 'administracao', ['administracao' => ['usuarios']])
+        ->call('reordenarItens', 'item-hacker', 'secao:administracao', ['secao:administracao' => ['usuarios']])
         ->assertDispatched('toast', variant: 'danger');
 
     Livewire::actingAs($this->admin, 'admin')
@@ -145,8 +145,8 @@ it('limpa apenas as personalizações órfãs', function () {
 it('registra o resumo de domínio da reordenação na auditoria', function () {
     Livewire::actingAs($this->admin, 'admin')
         ->test(GestaoMenus::class)
-        ->call('reordenarItens', 'usuarios', 'administracao', [
-            'administracao' => ['usuarios', 'empresas', 'acesso', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
+        ->call('reordenarItens', 'usuarios', 'secao:administracao', [
+            'secao:administracao' => ['usuarios', 'empresas', 'acesso', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
         ]);
 
     $log = App\Models\Activity::query()

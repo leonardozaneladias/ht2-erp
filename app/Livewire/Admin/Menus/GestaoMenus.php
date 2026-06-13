@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Menus;
 
 use App\Actions\Admin\AlternarPermissaoPerfilAction;
+use App\Actions\Admin\Menu\CriarGrupoMenuAction;
+use App\Actions\Admin\Menu\CriarSecaoMenuAction;
+use App\Actions\Admin\Menu\ExcluirPersonalizacaoCustomAction;
 use App\Actions\Admin\Menu\ReordenarItensMenuAction;
 use App\Actions\Admin\Menu\ReordenarSecoesMenuAction;
 use App\Actions\Admin\Menu\RestaurarMenuAction;
@@ -12,6 +15,9 @@ use App\Actions\Admin\Menu\SalvarPersonalizacaoMenuAction;
 use App\DTOs\Admin\MenuPersonalizacaoDTO;
 use App\Enums\TipoPersonalizacaoMenu;
 use App\Exceptions\AccessException;
+use App\Models\AdminUser;
+use App\Models\MenuPersonalizacao;
+use App\Policies\RolePolicy;
 use App\Services\Admin\Menu\MenuService;
 use App\Support\Menu\IconesMenu;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -27,9 +33,10 @@ use Livewire\Component;
 use Spatie\Permission\Models\Role;
 
 /**
- * Tela de Gestão de Menus: reordena (drag & drop), renomeia, troca ícones e
- * ativa/desativa os itens registrados em config/admin-menu.php. A visibilidade
- * por perfil é o próprio ACL (permissão de cada item × perfis).
+ * Tela de Gestão de Menus: reordena (drag & drop em 3 níveis), cria seções e
+ * grupos (submenus), renomeia, troca ícones e ativa/desativa os registros.
+ * Itens vêm do config (registry); seções/grupos custom e todo o arranjo são
+ * apresentação no banco. A visibilidade por perfil é o próprio ACL.
  */
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Gestão de menus')]
@@ -39,11 +46,19 @@ class GestaoMenus extends Component
 
     public ?string $editandoKey = null;
 
+    public bool $editandoEhCustom = false;
+
     public string $label = '';
 
     public string $icone = '';
 
     public bool $ativo = true;
+
+    public string $novaSecaoLabel = '';
+
+    public string $novoGrupoLabel = '';
+
+    public string $novoGrupoIcone = 'tabler--folder';
 
     public function mount(): void
     {
@@ -55,18 +70,18 @@ class GestaoMenus extends Component
     }
 
     /**
-     * Drag & drop de itens — dentro da seção ou entre seções (group).
+     * Drag & drop de itens/grupos — containers `secao:<key>` | `grupo:<key>`.
      *
      * @param  array<string, list<string>>  $ordens
      */
     public function reordenarItens(
         string $itemKey,
-        string $secaoKey,
+        string $containerKey,
         array $ordens,
         ReordenarItensMenuAction $action,
     ): void {
         try {
-            $action->execute($itemKey, $secaoKey, $ordens);
+            $action->execute($itemKey, $containerKey, $ordens);
         } catch (InvalidArgumentException) {
             $this->dispatch('toast', variant: 'danger', message: 'Não foi possível reordenar o menu.');
 
@@ -96,6 +111,46 @@ class GestaoMenus extends Component
         $this->dispatch('toast', variant: 'success', message: 'Ordem das seções atualizada.');
     }
 
+    public function criarSecao(CriarSecaoMenuAction $action): void
+    {
+        $this->validate(
+            ['novaSecaoLabel' => ['required', 'string', 'max:60']],
+            attributes: ['novaSecaoLabel' => 'nome da seção'],
+        );
+
+        $action->execute($this->novaSecaoLabel);
+
+        $this->reset('novaSecaoLabel');
+        unset($this->estrutura);
+        $this->dispatch('menus-fechar-modais');
+        $this->dispatch('toast', variant: 'success', message: 'Seção criada.');
+    }
+
+    public function criarGrupo(string $secaoKey, CriarGrupoMenuAction $action): void
+    {
+        $this->validate(
+            [
+                'novoGrupoLabel' => ['required', 'string', 'max:60'],
+                'novoGrupoIcone' => ['required', Rule::in(IconesMenu::disponiveis())],
+            ],
+            attributes: ['novoGrupoLabel' => 'nome do grupo', 'novoGrupoIcone' => 'ícone'],
+        );
+
+        try {
+            $action->execute($this->novoGrupoLabel, $this->novoGrupoIcone, $secaoKey);
+        } catch (InvalidArgumentException $e) {
+            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+
+            return;
+        }
+
+        $this->reset('novoGrupoLabel');
+        $this->novoGrupoIcone = 'tabler--folder';
+        unset($this->estrutura);
+        $this->dispatch('menus-fechar-modais');
+        $this->dispatch('toast', variant: 'success', message: 'Grupo criado. Arraste itens para dentro dele.');
+    }
+
     /**
      * Abre o drawer de edição com os valores efetivos do registro.
      */
@@ -112,6 +167,7 @@ class GestaoMenus extends Component
         $this->resetValidation();
         $this->editandoTipo = $tipo;
         $this->editandoKey = $key;
+        $this->editandoEhCustom = $detalhe['eCustom'];
         $this->label = $detalhe['label'];
         $this->icone = $detalhe['icone'] ?? '';
         $this->ativo = $detalhe['ativo'] ?? true;
@@ -132,7 +188,7 @@ class GestaoMenus extends Component
                 'tipo' => $this->editandoTipo,
                 'key' => $this->editandoKey,
                 'label' => $this->label,
-                'icone' => $this->editandoTipo === TipoPersonalizacaoMenu::Item->value ? $this->icone : null,
+                'icone' => $this->editandoTipo === TipoPersonalizacaoMenu::Secao->value ? null : $this->icone,
                 'ativo' => $this->ativo,
             ]));
         } catch (InvalidArgumentException) {
@@ -178,6 +234,35 @@ class GestaoMenus extends Component
     }
 
     /**
+     * Liga/desliga um grupo (inativo esconde o grupo e os filhos da sidebar).
+     */
+    public function alternarAtivoGrupo(string $grupoKey): void
+    {
+        $grupo = MenuPersonalizacao::query()
+            ->where('tipo', TipoPersonalizacaoMenu::Grupo)
+            ->where('key', $grupoKey)
+            ->first();
+
+        if ($grupo === null) {
+            return;
+        }
+
+        $grupo->ativo = ! $grupo->ativo;
+        $grupo->save();
+
+        app(MenuService::class)->invalidarCache();
+
+        if ($this->editandoKey === $grupoKey) {
+            $this->ativo = $grupo->ativo;
+        }
+
+        unset($this->estrutura);
+        $this->dispatch('toast', variant: 'success', message: $grupo->ativo
+            ? 'Grupo reativado no menu.'
+            : 'Grupo desativado: ele e seus itens não aparecem mais no menu.');
+    }
+
+    /**
      * Concede/revoga a permissão do item editado em um perfil (toggle de
      * visibilidade — controla o módulo inteiro, menu e páginas).
      */
@@ -199,7 +284,7 @@ class GestaoMenus extends Component
         // do super-admin no Gate não mascara role protegida/hierarquia).
         $user = auth('admin')->user();
 
-        if (! $user instanceof \App\Models\AdminUser || ! app(\App\Policies\RolePolicy::class)->update($user, $role)) {
+        if (! $user instanceof AdminUser || ! app(RolePolicy::class)->update($user, $role)) {
             $this->dispatch('toast', variant: 'danger', message: 'Você não tem permissão para gerir este perfil.');
 
             return;
@@ -219,6 +304,44 @@ class GestaoMenus extends Component
         $this->dispatch('toast', variant: 'success', message: $conceder
             ? "Permissão concedida ao perfil {$role->name}."
             : "Permissão revogada do perfil {$role->name}.");
+    }
+
+    public function solicitarExcluirCustom(string $tipo, string $key): void
+    {
+        $rotulo = $tipo === TipoPersonalizacaoMenu::Grupo->value ? 'grupo' : 'seção';
+
+        $this->dispatch(
+            'confirm',
+            title: "Excluir {$rotulo}?",
+            text: $tipo === TipoPersonalizacaoMenu::Grupo->value
+                ? 'Os itens do grupo voltam para a posição original deles no menu.'
+                : 'Os itens desta seção voltam para a seção original deles no menu.',
+            destructive: true,
+            onConfirm: 'menus::excluir-custom',
+            params: ['tipo' => $tipo, 'key' => $key],
+        );
+    }
+
+    #[On('menus::excluir-custom')]
+    public function excluirCustom(string $tipo, string $key, ExcluirPersonalizacaoCustomAction $action): void
+    {
+        $enumTipo = TipoPersonalizacaoMenu::tryFrom($tipo);
+
+        if ($enumTipo === null) {
+            return;
+        }
+
+        try {
+            $action->execute($enumTipo, $key);
+        } catch (InvalidArgumentException $e) {
+            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+
+            return;
+        }
+
+        unset($this->estrutura);
+        $this->dispatch('menus-fechar-editor');
+        $this->dispatch('toast', variant: 'success', message: 'Registro excluído do menu.');
     }
 
     public function solicitarRestaurar(string $tipo, string $key): void
@@ -249,6 +372,29 @@ class GestaoMenus extends Component
         $this->dispatch('toast', variant: 'success', message: 'Registro restaurado ao padrão.');
     }
 
+    public function solicitarRestaurarTudo(): void
+    {
+        $this->dispatch(
+            'confirm',
+            title: 'Restaurar menu padrão?',
+            text: 'Todas as personalizações serão removidas — inclusive os grupos e seções criados por aqui, que serão excluídos.',
+            destructive: true,
+            onConfirm: 'menus::restaurar-tudo',
+            params: [],
+        );
+    }
+
+    #[On('menus::restaurar-tudo')]
+    public function restaurarTudo(RestaurarMenuAction $action): void
+    {
+        $removidas = $action->execute();
+
+        unset($this->estrutura);
+        $this->dispatch('toast', variant: 'success', message: $removidas > 0
+            ? 'Menu restaurado para o padrão.'
+            : 'O menu já está no padrão.');
+    }
+
     public function solicitarLimparOrfas(): void
     {
         $this->dispatch(
@@ -272,31 +418,8 @@ class GestaoMenus extends Component
             : 'Nenhuma personalização órfã encontrada.');
     }
 
-    public function solicitarRestaurarTudo(): void
-    {
-        $this->dispatch(
-            'confirm',
-            title: 'Restaurar menu padrão?',
-            text: 'Todas as personalizações (ordem, nomes, ícones e itens desativados) serão removidas.',
-            destructive: true,
-            onConfirm: 'menus::restaurar-tudo',
-            params: [],
-        );
-    }
-
-    #[On('menus::restaurar-tudo')]
-    public function restaurarTudo(RestaurarMenuAction $action): void
-    {
-        $removidas = $action->execute();
-
-        unset($this->estrutura);
-        $this->dispatch('toast', variant: 'success', message: $removidas > 0
-            ? 'Menu restaurado para o padrão.'
-            : 'O menu já está no padrão.');
-    }
-
     /**
-     * @return array{secoes: list<array<string, mixed>>, orfas: \Illuminate\Support\Collection<int, \App\Models\MenuPersonalizacao>}
+     * @return array{secoes: list<array<string, mixed>>, orfas: \Illuminate\Support\Collection<int, MenuPersonalizacao>}
      */
     #[Computed]
     public function estrutura(): array
@@ -344,9 +467,17 @@ class GestaoMenus extends Component
      */
     protected function rules(): array
     {
+        // Customs (grupos/seções criados pela tela) não têm padrão p/ herdar:
+        // o nome é obrigatório; grupo também exige ícone da lista curada.
+        $labelObrigatorio = $this->editandoEhCustom || $this->editandoTipo === TipoPersonalizacaoMenu::Grupo->value;
+
         return [
-            'label' => ['nullable', 'string', 'max:80'],
-            'icone' => ['nullable', 'string', Rule::in(IconesMenu::disponiveis())],
+            'label' => [$labelObrigatorio ? 'required' : 'nullable', 'string', 'max:80'],
+            'icone' => [
+                $this->editandoTipo === TipoPersonalizacaoMenu::Grupo->value ? 'required' : 'nullable',
+                'string',
+                Rule::in(IconesMenu::disponiveis()),
+            ],
             'ativo' => ['boolean'],
         ];
     }
@@ -357,6 +488,8 @@ class GestaoMenus extends Component
     protected function messages(): array
     {
         return [
+            'label.required' => 'Informe o nome.',
+            'icone.required' => 'Escolha um ícone da lista de sugestões.',
             'icone.in' => 'Escolha um ícone da lista de sugestões.',
         ];
     }
@@ -370,14 +503,48 @@ class GestaoMenus extends Component
     {
         foreach ($this->estrutura()['secoes'] as $secao) {
             if ($tipo === TipoPersonalizacaoMenu::Secao->value && $secao['key'] === $key) {
-                return ['label' => $secao['title'], 'icone' => null, 'ativo' => true];
+                return [
+                    'label' => $secao['title'],
+                    'icone' => null,
+                    'ativo' => true,
+                    'eCustom' => $secao['eCustom'],
+                ];
             }
 
-            if ($tipo === TipoPersonalizacaoMenu::Item->value) {
-                foreach ($secao['items'] as $item) {
-                    if ($item['key'] === $key) {
-                        return ['label' => $item['label'], 'icone' => $item['icon'], 'ativo' => $item['ativo']];
+            foreach ($secao['items'] as $entry) {
+                if ($entry['tipo'] === 'grupo') {
+                    if ($tipo === TipoPersonalizacaoMenu::Grupo->value && $entry['key'] === $key) {
+                        return [
+                            'label' => $entry['label'],
+                            'icone' => $entry['icon'],
+                            'ativo' => $entry['ativo'],
+                            'eCustom' => true,
+                        ];
                     }
+
+                    if ($tipo === TipoPersonalizacaoMenu::Item->value) {
+                        foreach ($entry['children'] as $filho) {
+                            if ($filho['key'] === $key) {
+                                return [
+                                    'label' => $filho['label'],
+                                    'icone' => $filho['icon'],
+                                    'ativo' => $filho['ativo'],
+                                    'eCustom' => false,
+                                ];
+                            }
+                        }
+                    }
+
+                    continue;
+                }
+
+                if ($tipo === TipoPersonalizacaoMenu::Item->value && $entry['key'] === $key) {
+                    return [
+                        'label' => $entry['label'],
+                        'icone' => $entry['icon'],
+                        'ativo' => $entry['ativo'],
+                        'eCustom' => false,
+                    ];
                 }
             }
         }

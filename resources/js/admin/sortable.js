@@ -60,11 +60,26 @@ function bindSortable(element) {
   const config = parseConfig(element);
   const handle = config.handle || '.drag-handle';
 
+  // `put` precisa ser função (não serializa em JSON): a config declara
+  // putReject com os data-tipo recusados e o group é montado aqui.
+  let group = config.group || undefined;
+
+  if (group && Array.isArray(config.putReject) && config.putReject.length > 0) {
+    const rejeitados = config.putReject;
+    group = {
+      name: config.group,
+      put: (to, from, dragEl) => !rejeitados.includes(dragEl.dataset?.tipo),
+    };
+  }
+
   const instance = new Sortable(element, {
     animation: Number(config.animation || 150),
     ghostClass: config.ghostClass || 'bg-primary/10',
     handle,
-    group: config.group || undefined,
+    group,
+    // Recomendados pela doc do SortableJS para listas aninhadas.
+    fallbackOnBody: Boolean(config.fallbackOnBody),
+    swapThreshold: Number(config.swapThreshold || 1),
     onEnd: (evt) => {
       // Com group (drag entre listas), o onEnd dispara na lista de ORIGEM:
       // o payload precisa ler evt.from/evt.to — nunca element.children.

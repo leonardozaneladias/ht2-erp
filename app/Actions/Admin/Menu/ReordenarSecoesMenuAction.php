@@ -22,7 +22,7 @@ class ReordenarSecoesMenuAction
      */
     public function execute(array $secaoKeys): void
     {
-        $conhecidas = $this->menu->chavesDeSecoes();
+        $conhecidas = $this->menu->destinosDeSecao();
 
         foreach ($secaoKeys as $key) {
             if (! is_string($key) || ! in_array($key, $conhecidas, true)) {

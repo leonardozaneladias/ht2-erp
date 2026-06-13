@@ -24,9 +24,19 @@ class SalvarPersonalizacaoMenuAction
 
     public function execute(MenuPersonalizacaoDTO $dto): ?MenuPersonalizacao
     {
+        // Grupos e seções custom não têm padrão no config: caminho próprio
+        // (label obrigatório, sem normalização-para-null nem delete-se-igual).
+        if ($dto->tipo === TipoPersonalizacaoMenu::Grupo) {
+            return $this->salvarCustom($dto);
+        }
+
         $padrao = $this->menu->padraoDe($dto->tipo, $dto->key);
 
         if ($padrao === null) {
+            if ($dto->tipo === TipoPersonalizacaoMenu::Secao) {
+                return $this->salvarCustom($dto);
+            }
+
             throw new InvalidArgumentException('Item ou seção de menu desconhecidos.');
         }
 
@@ -73,5 +83,39 @@ class SalvarPersonalizacaoMenuAction
         $this->menu->invalidarCache();
 
         return $personalizacao;
+    }
+
+    private function salvarCustom(MenuPersonalizacaoDTO $dto): MenuPersonalizacao
+    {
+        $registro = MenuPersonalizacao::query()
+            ->where('tipo', $dto->tipo)
+            ->where('key', $dto->key)
+            ->where('e_custom', true)
+            ->first();
+
+        if ($registro === null) {
+            throw new InvalidArgumentException('Item ou seção de menu desconhecidos.');
+        }
+
+        if ($dto->label === null) {
+            throw new InvalidArgumentException('Informe o nome.');
+        }
+
+        if ($dto->tipo === TipoPersonalizacaoMenu::Grupo) {
+            if ($dto->icone === null || ! IconesMenu::valido($dto->icone)) {
+                throw new InvalidArgumentException('Ícone fora da lista suportada.');
+            }
+
+            $registro->icone = $dto->icone;
+            $registro->ativo = $dto->ativo;
+        }
+
+        $registro->label = $dto->label;
+
+        DB::transaction(fn () => $registro->save());
+
+        $this->menu->invalidarCache();
+
+        return $registro;
     }
 }

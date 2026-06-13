@@ -1,13 +1,21 @@
 <div
-    x-data
+    x-data="{ grupoSecao: '' }"
     x-on:menus-abrir-editor.window="window.HSOverlay?.open(document.querySelector('#drawer-menu-editor'));"
     x-on:menus-fechar-editor.window="window.HSOverlay?.close(document.querySelector('#drawer-menu-editor'));"
+    x-on:menus-fechar-modais.window="
+        window.HSOverlay?.close(document.querySelector('#modal-menu-secao'));
+        window.HSOverlay?.close(document.querySelector('#modal-menu-grupo'));
+    "
 >
     <x-admin.page-header
         title="Gestão de menus"
-        subtitle="Arraste para reordenar seções e itens, renomeie, troque ícones e controle a visibilidade do menu lateral."
+        subtitle="Arraste para organizar seções, grupos e itens; renomeie, troque ícones e controle a visibilidade do menu lateral."
     >
         <x-slot:actions>
+            <x-shared.button variant="default" icon="tabler--layout-list" data-hs-overlay="#modal-menu-secao">
+                Nova seção
+            </x-shared.button>
+
             <x-shared.button variant="default" icon="tabler--restore" wire:click="solicitarRestaurarTudo">
                 Restaurar padrão
             </x-shared.button>
@@ -54,20 +62,37 @@
                             ></i>
 
                             <div class="min-w-0">
-                                <h4 class="card-title">{{ $secao['title'] }}</h4>
+                                <h4 class="card-title">
+                                    {{ $secao['title'] }}
+                                    <span class="text-default-400 text-xs font-normal">
+                                        ({{ count($secao['items']) }})
+                                    </span>
+                                </h4>
 
-                                @if ($secao['personalizado'] && $secao['title'] !== $secao['titlePadrao'])
+                                @if ($secao['personalizado'] && ! $secao['eCustom'] && $secao['title'] !== $secao['titlePadrao'])
                                     <p class="text-2xs text-default-400 mt-1">Padrão: {{ $secao['titlePadrao'] }}</p>
                                 @endif
                             </div>
 
-                            @if ($secao['personalizado'])
+                            @if ($secao['eCustom'])
+                                <x-shared.badge variant="secondary" size="sm">Criada aqui</x-shared.badge>
+                            @elseif ($secao['personalizado'])
                                 <x-shared.badge variant="info" size="sm">Personalizada</x-shared.badge>
                             @endif
                         </div>
                     </x-slot:header>
 
                     <x-slot:headerActions>
+                        <x-shared.button
+                            variant="default"
+                            appearance="ghost"
+                            size="sm"
+                            icon="tabler--folder-plus"
+                            x-on:click="grupoSecao = '{{ $secao['key'] }}'; window.HSOverlay?.open(document.querySelector('#modal-menu-grupo'))"
+                        >
+                            Grupo
+                        </x-shared.button>
+
                         <x-shared.button
                             variant="default"
                             appearance="ghost"
@@ -83,86 +108,104 @@
                         id="menu-itens-{{ $secao['key'] }}"
                         target="reordenarItens"
                         group="menu-itens"
-                        :container-id="$secao['key']"
+                        :container-id="'secao:' . $secao['key']"
                         :wire-ignore="false"
+                        fallback-on-body
+                        swap-threshold="0.65"
                         class="min-h-12"
                     >
-                        @forelse ($secao['items'] as $item)
-                            <div
-                                wire:key="menu-item-{{ $item['key'] }}"
-                                data-id="{{ $item['key'] }}"
-                                @class ([
-                                    'border-default-200 flex items-center gap-3 border-b px-2 py-3 last:border-b-0',
-                                    'opacity-60' => ! $item['ativo'],
-                                ])
-                            >
-                                <i
-                                    class="iconify tabler--grip-vertical drag-handle text-default-400 shrink-0 cursor-grab text-lg"
-                                ></i>
-
-                                <span
-                                    class="bg-light text-default-600 flex size-9 shrink-0 items-center justify-center rounded-lg"
+                        @forelse ($secao['items'] as $entry)
+                            @if ($entry['tipo'] === 'grupo')
+                                <div
+                                    wire:key="menu-grupo-{{ $entry['key'] }}"
+                                    data-id="{{ $entry['key'] }}"
+                                    data-tipo="grupo"
+                                    data-busca="{{ mb_strtolower($entry['label']) }}"
+                                    @class ([
+                                        'border-default-200 bg-light/40 my-1.5 rounded-lg border',
+                                        'opacity-60' => ! $entry['ativo'],
+                                    ])
                                 >
-                                    <i class="iconify {{ $item['icon'] }} text-lg"></i>
-                                </span>
+                                    <div class="flex items-center gap-2.5 px-2 py-2">
+                                        <i
+                                            class="iconify tabler--grip-vertical drag-handle text-default-400 shrink-0 cursor-grab text-lg"
+                                        ></i>
 
-                                <div class="min-w-0 grow">
-                                    <p class="text-body-color truncate text-sm font-semibold">
-                                        {{ $item['label'] }}
+                                        <span
+                                            class="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg"
+                                        >
+                                            <i class="iconify {{ $entry['icon'] }} text-base"></i>
+                                        </span>
 
-                                        @if ($item['personalizado'] && $item['label'] !== $item['labelPadrao'])
-                                            <span class="text-default-400 text-xs font-normal">
-                                                (padrão: {{ $item['labelPadrao'] }})
-                                            </span>
-                                        @endif
-                                    </p>
-                                    <p class="text-default-400 mt-0.5 truncate text-xs">{{ $item['route'] }}</p>
+                                        <div class="min-w-0 grow">
+                                            <p class="text-body-color truncate text-sm font-semibold">
+                                                {{ $entry['label'] }}
+                                                <span class="text-default-400 text-xs font-normal">
+                                                    ({{ count($entry['children']) }} {{ count($entry['children']) === 1 ? 'item' : 'itens' }})
+                                                </span>
+                                            </p>
+                                            <p class="text-default-400 truncate text-xs">Grupo — abre como submenu na sidebar</p>
+                                        </div>
+
+                                        <div class="flex shrink-0 items-center gap-1.5">
+                                            @unless ($entry['ativo'])
+                                                <x-shared.badge variant="danger" size="sm" icon="tabler--eye-off">
+                                                    Inativo
+                                                </x-shared.badge>
+                                            @endunless
+
+                                            <x-shared.button
+                                                variant="default"
+                                                appearance="ghost"
+                                                size="sm"
+                                                :icon="$entry['ativo'] ? 'tabler--eye' : 'tabler--eye-off'"
+                                                icon-only
+                                                aria-label="{{ $entry['ativo'] ? 'Desativar' : 'Reativar' }} grupo {{ $entry['label'] }}"
+                                                wire:click="alternarAtivoGrupo('{{ $entry['key'] }}')"
+                                            />
+
+                                            <x-shared.button
+                                                variant="default"
+                                                appearance="ghost"
+                                                size="sm"
+                                                icon="tabler--pencil"
+                                                icon-only
+                                                aria-label="Editar grupo {{ $entry['label'] }}"
+                                                wire:click="editar('grupo', '{{ $entry['key'] }}')"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <x-admin.sortable-list
+                                        id="menu-grupo-{{ $entry['key'] }}"
+                                        target="reordenarItens"
+                                        group="menu-itens"
+                                        :container-id="'grupo:' . $entry['key']"
+                                        handle=".drag-handle-filho"
+                                        :put-reject="['grupo']"
+                                        :wire-ignore="false"
+                                        fallback-on-body
+                                        swap-threshold="0.65"
+                                        class="border-default-200 ms-9 min-h-10 border-s ps-1 pb-1"
+                                    >
+                                        @forelse ($entry['children'] as $filho)
+                                            @include ('livewire.admin.menus.partials.linha-item', [
+                                                'item' => $filho,
+                                                'handle' => 'drag-handle-filho',
+                                            ])
+                                        @empty
+                                            <p class="text-default-400 px-2 py-3 text-center text-xs">Arraste itens para este grupo.</p>
+                                        @endforelse
+                                    </x-admin.sortable-list>
                                 </div>
-
-                                <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
-                                    @unless ($item['ativo'])
-                                        <x-shared.badge variant="danger" size="sm" icon="tabler--eye-off">
-                                            Inativo
-                                        </x-shared.badge>
-                                    @endunless
-
-                                    @if ($item['personalizado'])
-                                        <x-shared.badge variant="info" size="sm">Personalizado</x-shared.badge>
-                                    @endif
-
-                                    @if (($item['permission'] ?? null) !== null)
-                                        <x-shared.badge variant="default" size="sm" icon="tabler--lock">
-                                            {{ $item['permission'] }}
-                                        </x-shared.badge>
-                                    @else
-                                        <x-shared.badge variant="success" size="sm" icon="tabler--world">
-                                            Visível para todos
-                                        </x-shared.badge>
-                                    @endif
-
-                                    <x-shared.button
-                                        variant="default"
-                                        appearance="ghost"
-                                        size="sm"
-                                        :icon="$item['ativo'] ? 'tabler--eye' : 'tabler--eye-off'"
-                                        icon-only
-                                        aria-label="{{ $item['ativo'] ? 'Desativar' : 'Reativar' }} item {{ $item['label'] }}"
-                                        wire:click="alternarAtivo('{{ $item['key'] }}')"
-                                    />
-
-                                    <x-shared.button
-                                        variant="default"
-                                        appearance="ghost"
-                                        size="sm"
-                                        icon="tabler--pencil"
-                                        icon-only
-                                        aria-label="Editar item {{ $item['label'] }}"
-                                        wire:click="editar('item', '{{ $item['key'] }}')"
-                                    />
-                                </div>
-                            </div>
+                            @else
+                                @include ('livewire.admin.menus.partials.linha-item', [
+                                    'item' => $entry,
+                                    'handle' => 'drag-handle',
+                                ])
+                            @endif
                         @empty
-                            <p class="text-default-400 px-2 py-4 text-center text-sm">Arraste itens para esta seção.</p>
+                            <p class="text-default-400 px-2 py-4 text-center text-sm">Arraste itens ou grupos para esta seção.</p>
                         @endforelse
                     </x-admin.sortable-list>
                 </x-shared.card>
@@ -170,10 +213,83 @@
         @endforeach
     </x-admin.sortable-list>
 
+    {{-- Modal: nova seção --}}
+    <x-shared.modal id="modal-menu-secao" title="Nova seção" size="sm">
+        <div class="space-y-4">
+            <x-shared.input
+                name="novaSecaoLabel"
+                label="Nome da seção"
+                wire:model="novaSecaoLabel"
+                wire:keydown.enter="criarSecao"
+                maxlength="60"
+                required
+            />
+
+            <div class="flex justify-end gap-2">
+                <x-shared.button variant="default" data-hs-overlay="#modal-menu-secao">Cancelar</x-shared.button>
+                <x-shared.button variant="primary" icon="tabler--plus" wire:click="criarSecao">
+                    Criar seção
+                </x-shared.button>
+            </div>
+        </div>
+    </x-shared.modal>
+
+    {{-- Modal: novo grupo (a seção destino vem do botão que abriu) --}}
+    <x-shared.modal id="modal-menu-grupo" title="Novo grupo (submenu)" size="md">
+        <div class="space-y-4">
+            <x-shared.alert variant="info">
+                O grupo abre como submenu na sidebar e só aparece quando tem itens visíveis ao usuário. Depois de criar,
+                arraste itens para dentro dele.
+            </x-shared.alert>
+
+            <x-shared.input
+                name="novoGrupoLabel"
+                label="Nome do grupo"
+                wire:model="novoGrupoLabel"
+                maxlength="60"
+                required
+            />
+
+            <div>
+                <p class="text-body-color mb-2 text-sm font-medium">Ícone</p>
+
+                <div class="mb-3 flex items-center gap-3">
+                    <span
+                        class="bg-light text-default-600 flex size-10 shrink-0 items-center justify-center rounded-lg"
+                    >
+                        <i class="iconify {{ $novoGrupoIcone }} text-xl"></i>
+                    </span>
+                    <p class="text-default-400 truncate text-xs">{{ $novoGrupoIcone }}</p>
+                </div>
+
+                @include ('livewire.admin.menus.partials.grade-icones', [
+                    'modelo' => 'novoGrupoIcone',
+                    'selecionado' => $novoGrupoIcone,
+                ])
+
+                @error ('novoGrupoIcone')
+                    <p class="text-danger mt-2 text-xs">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <x-shared.button variant="default" data-hs-overlay="#modal-menu-grupo">Cancelar</x-shared.button>
+                <x-shared.button variant="primary" icon="tabler--plus" x-on:click="$wire.criarGrupo(grupoSecao);">
+                    Criar grupo
+                </x-shared.button>
+            </div>
+        </div>
+    </x-shared.modal>
+
+    {{-- Drawer de edição (item, grupo ou seção) --}}
     <x-admin.drawer
         id="drawer-menu-editor"
         size="lg"
-        :title="$editandoTipo === 'secao' ? 'Editar seção' : 'Editar item do menu'"
+        :title="match ($editandoTipo) {
+            'secao' => 'Editar seção',
+            'grupo' => 'Editar grupo',
+            default => 'Editar item do menu',
+        }"
         wire:ignore.self
     >
         @if ($editandoKey !== null)
@@ -183,10 +299,10 @@
                     label="Nome exibido"
                     wire:model="label"
                     maxlength="80"
-                    hint="Deixe igual ao padrão para voltar a herdar o nome do módulo."
+                    :hint="$editandoEhCustom ? null : 'Deixe igual ao padrão para voltar a herdar o nome do módulo.'"
                 />
 
-                @if ($editandoTipo === 'item')
+                @if (in_array($editandoTipo, ['item', 'grupo'], true))
                     <div>
                         <p class="text-body-color mb-2 text-sm font-medium">Ícone</p>
 
@@ -199,22 +315,10 @@
                             <p class="text-default-400 truncate text-xs">{{ $icone }}</p>
                         </div>
 
-                        <div class="grid grid-cols-8 gap-1.5">
-                            @foreach (\App\Support\Menu\IconesMenu::disponiveis() as $opcao)
-                                <button
-                                    type="button"
-                                    wire:click="$set('icone', '{{ $opcao }}')"
-                                    title="{{ $opcao }}"
-                                    @class ([
-                                        'border-default-200 hover:border-primary/60 hover:bg-light flex size-9 items-center justify-center rounded-lg border transition',
-                                        'border-primary bg-primary/10 text-primary' => $icone === $opcao,
-                                        'text-default-600' => $icone !== $opcao,
-                                    ])
-                                >
-                                    <i class="iconify {{ $opcao }} text-lg"></i>
-                                </button>
-                            @endforeach
-                        </div>
+                        @include ('livewire.admin.menus.partials.grade-icones', [
+                            'modelo' => 'icone',
+                            'selecionado' => $icone,
+                        ])
 
                         @error ('icone')
                             <p class="text-danger mt-2 text-xs">{{ $message }}</p>
@@ -222,26 +326,47 @@
                     </div>
                     <x-shared.toggle
                         name="ativo"
-                        label="Item ativo no menu"
+                        :label="$editandoTipo === 'grupo' ? 'Grupo ativo no menu' : 'Item ativo no menu'"
                         wire:model="ativo"
-                        hint="Desativado, some do menu para todos os usuários (o acesso às páginas continua regido pelo ACL)."
+                        :hint="$editandoTipo === 'grupo'
+                            ? 'Desativado, o grupo e os itens dele somem do menu para todos (o acesso às páginas continua regido pelo ACL).'
+                            : 'Desativado, some do menu para todos os usuários (o acesso às páginas continua regido pelo ACL).'"
                     />
                 @endif
 
                 <div class="flex items-center justify-between gap-2">
-                    <x-shared.button
-                        variant="default"
-                        size="sm"
-                        icon="tabler--restore"
-                        wire:click="solicitarRestaurar('{{ $editandoTipo }}', '{{ $editandoKey }}')"
-                    >
-                        Restaurar padrão
-                    </x-shared.button>
+                    @if ($editandoEhCustom)
+                        <x-shared.button
+                            variant="danger"
+                            appearance="outline"
+                            size="sm"
+                            icon="tabler--trash"
+                            wire:click="solicitarExcluirCustom('{{ $editandoTipo }}', '{{ $editandoKey }}')"
+                        >
+                            Excluir {{ $editandoTipo === 'grupo' ? 'grupo' : 'seção' }}
+                        </x-shared.button>
+                    @else
+                        <x-shared.button
+                            variant="default"
+                            size="sm"
+                            icon="tabler--restore"
+                            wire:click="solicitarRestaurar('{{ $editandoTipo }}', '{{ $editandoKey }}')"
+                        >
+                            Restaurar padrão
+                        </x-shared.button>
+                    @endif
 
                     <x-shared.button variant="primary" icon="tabler--device-floppy" wire:click="salvarEdicao">
                         Salvar
                     </x-shared.button>
                 </div>
+
+                @if ($editandoTipo === 'grupo')
+                    <x-shared.alert variant="info">
+                        Grupos não têm permissão própria: a visibilidade é herdada dos itens — o grupo só aparece para
+                        quem enxerga pelo menos um item dele.
+                    </x-shared.alert>
+                @endif
 
                 @if ($editandoTipo === 'item')
                     <div class="border-default-200 border-t pt-5">
