@@ -14,6 +14,13 @@ pest()->extend(TestCase::class)
 pest()->extend(TestCase::class)
     ->in('Unit');
 
+// Testes de browser (E2E): rodam no host com Playwright (`make test-e2e`).
+// O grupo permite excluí-los nos ambientes sem Chromium (DDEV/CI padrão).
+pest()->extend(TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->group('browser')
+    ->in('Browser');
+
 // Por padrão, considera o sistema já instalado para não acionar o middleware do
 // Setup Wizard nos testes HTTP. Os testes do próprio wizard sobrescrevem isto.
 pest()->beforeEach(function () {
@@ -24,7 +31,7 @@ pest()->beforeEach(function () {
     } catch (Throwable) {
         // Settings indisponíveis neste teste — nada a fazer.
     }
-})->in('Feature');
+})->in('Feature', 'Browser');
 
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);

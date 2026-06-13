@@ -6,7 +6,7 @@
 ARGS = $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: up down restart bash artisan migrate fresh seed horizon test \
-        composer npm dev lint quality logs status setup
+        test-e2e composer npm dev lint quality logs status setup
 
 up:
 	ddev start
@@ -36,7 +36,13 @@ horizon:
 	ddev exec supervisorctl restart webextradaemons:horizon
 
 test:
-	ddev artisan test
+	ddev artisan test --exclude-group=browser
+
+# E2E (browser real via Playwright). Roda no HOST, não no container:
+# o Chromium do Playwright vive no macOS e o vendor/ é compartilhado.
+# O build do Vite é obrigatório (layout usa @vite e precisa do manifest).
+test-e2e:
+	npm run build && ./vendor/bin/pest --group=browser
 
 composer:
 	ddev composer $(ARGS)

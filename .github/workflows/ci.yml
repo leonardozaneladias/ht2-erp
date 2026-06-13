@@ -80,7 +80,7 @@ jobs:
               run: php artisan key:generate
 
             - name: Rodar testes
-              run: php artisan test --compact
+              run: php artisan test --compact --exclude-group=browser
               env:
                   APP_ENV: testing
                   DB_CONNECTION: sqlite

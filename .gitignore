@@ -57,3 +57,6 @@ __pycache__/
 
 # Playwright MCP (screenshots/snapshots de validação local)
 /.playwright-mcp
+
+# Testes de browser (Pest + Playwright)
+/tests/Browser/Screenshots
