@@ -5,12 +5,16 @@
     data-id="{{ $item['key'] }}"
     data-tipo="item"
     data-busca="{{ mb_strtolower($item['label'] . ' ' . $item['labelPadrao'] . ' ' . $item['route']) }}"
+    x-show="casaOuPaiCasa($el)"
     @class ([
         'border-default-200 flex items-center gap-2.5 border-b px-2 py-2 last:border-b-0',
         'opacity-60' => ! $item['ativo'],
     ])
 >
-    <i class="iconify tabler--grip-vertical {{ $handle }} text-default-400 cursor-grab text-lg shrink-0"></i>
+    <i
+        class="iconify tabler--grip-vertical {{ $handle }} text-default-400 shrink-0 cursor-grab text-lg"
+        x-bind:class="busca.trim() !== '' ? 'pointer-events-none opacity-30' : ''"
+    ></i>
 
     <span class="bg-light text-default-600 flex size-8 shrink-0 items-center justify-center rounded-lg">
         <i class="iconify {{ $item['icon'] }} text-base"></i>

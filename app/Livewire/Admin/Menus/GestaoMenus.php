@@ -88,7 +88,7 @@ class GestaoMenus extends Component
             return;
         }
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('toast', variant: 'success', message: 'Ordem do menu atualizada.');
     }
 
@@ -107,7 +107,7 @@ class GestaoMenus extends Component
             return;
         }
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('toast', variant: 'success', message: 'Ordem das seções atualizada.');
     }
 
@@ -121,7 +121,7 @@ class GestaoMenus extends Component
         $action->execute($this->novaSecaoLabel);
 
         $this->reset('novaSecaoLabel');
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-modais');
         $this->dispatch('toast', variant: 'success', message: 'Seção criada.');
     }
@@ -146,7 +146,7 @@ class GestaoMenus extends Component
 
         $this->reset('novoGrupoLabel');
         $this->novoGrupoIcone = 'tabler--folder';
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-modais');
         $this->dispatch('toast', variant: 'success', message: 'Grupo criado. Arraste itens para dentro dele.');
     }
@@ -197,7 +197,7 @@ class GestaoMenus extends Component
             return;
         }
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-editor');
         $this->dispatch('toast', variant: 'success', message: 'Menu atualizado.');
     }
@@ -227,7 +227,7 @@ class GestaoMenus extends Component
             $this->ativo = ! $item['ativo'];
         }
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('toast', variant: 'success', message: $item['ativo']
             ? 'Item desativado: não aparece mais no menu.'
             : 'Item reativado no menu.');
@@ -256,7 +256,7 @@ class GestaoMenus extends Component
             $this->ativo = $grupo->ativo;
         }
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('toast', variant: 'success', message: $grupo->ativo
             ? 'Grupo reativado no menu.'
             : 'Grupo desativado: ele e seus itens não aparecem mais no menu.');
@@ -339,7 +339,7 @@ class GestaoMenus extends Component
             return;
         }
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-editor');
         $this->dispatch('toast', variant: 'success', message: 'Registro excluído do menu.');
     }
@@ -367,7 +367,7 @@ class GestaoMenus extends Component
 
         $action->execute($enumTipo, $key);
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-editor');
         $this->dispatch('toast', variant: 'success', message: 'Registro restaurado ao padrão.');
     }
@@ -389,7 +389,7 @@ class GestaoMenus extends Component
     {
         $removidas = $action->execute();
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('toast', variant: 'success', message: $removidas > 0
             ? 'Menu restaurado para o padrão.'
             : 'O menu já está no padrão.');
@@ -412,7 +412,7 @@ class GestaoMenus extends Component
     {
         $removidas = $action->removerOrfas();
 
-        unset($this->estrutura);
+        $this->recarregarEstrutura();
         $this->dispatch('toast', variant: 'success', message: $removidas > 0
             ? 'Personalizações órfãs removidas.'
             : 'Nenhuma personalização órfã encontrada.');
@@ -425,6 +425,18 @@ class GestaoMenus extends Component
     public function estrutura(): array
     {
         return app(MenuService::class)->estruturaParaGestao();
+    }
+
+    /**
+     * Estrutura efetiva para o preview ao vivo da sidebar: sem filtro de ACL
+     * (visão "tudo que existe"), mas respeitando inativos e grupos vazios.
+     *
+     * @return list<array<string, mixed>>
+     */
+    #[Computed]
+    public function previewSidebar(): array
+    {
+        return app(MenuService::class)->estruturaParaSidebar(null, mostrarTudo: true);
     }
 
     /**
@@ -492,6 +504,15 @@ class GestaoMenus extends Component
             'icone.required' => 'Escolha um ícone da lista de sugestões.',
             'icone.in' => 'Escolha um ícone da lista de sugestões.',
         ];
+    }
+
+    /**
+     * Descarta os computeds de estrutura após uma mutação (a tela e o
+     * preview re-renderizam na mesma request).
+     */
+    private function recarregarEstrutura(): void
+    {
+        unset($this->estrutura, $this->previewSidebar);
     }
 
     /**

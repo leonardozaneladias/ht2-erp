@@ -1,5 +1,31 @@
 <div
-    x-data="{ grupoSecao: '' }"
+    x-data="{
+        grupoSecao: '',
+        busca: '',
+        colapsadas: {},
+        alternar(key) {
+            this.colapsadas[key] = !this.colapsadas[key];
+        },
+        colapsada(key) {
+            // Busca ativa expande tudo para mostrar os resultados.
+            return this.busca.trim() === '' && this.colapsadas[key] === true;
+        },
+        casaOuPaiCasa(el) {
+            const termo = this.busca.trim().toLowerCase();
+            if (termo === '') return true;
+            if ((el.dataset.busca || '').includes(termo)) return true;
+            const grupo = el.closest('[data-tipo=grupo]');
+            return grupo !== null && (grupo.dataset.busca || '').includes(termo);
+        },
+        grupoCasa(el) {
+            const termo = this.busca.trim().toLowerCase();
+            if (termo === '') return true;
+            if ((el.dataset.busca || '').includes(termo)) return true;
+            return Array.from(el.querySelectorAll('[data-busca]')).some((linha) =>
+                (linha.dataset.busca || '').includes(termo),
+            );
+        },
+    }"
     x-on:menus-abrir-editor.window="window.HSOverlay?.open(document.querySelector('#drawer-menu-editor'));"
     x-on:menus-fechar-editor.window="window.HSOverlay?.close(document.querySelector('#drawer-menu-editor'));"
     x-on:menus-fechar-modais.window="
@@ -44,174 +70,236 @@
         </x-shared.alert>
     @endif
 
-    <x-admin.sortable-list
-        id="menu-secoes"
-        target="reordenarSecoes"
-        handle=".secao-drag-handle"
-        :wire-ignore="false"
-        class="space-y-5"
-    >
-        @foreach ($gestao['secoes'] as $secao)
-            <div wire:key="menu-secao-{{ $secao['key'] }}" data-id="{{ $secao['key'] }}">
-                <x-shared.card>
-                    <x-slot:header>
-                        <div class="flex min-w-0 items-center gap-3">
-                            <i
-                                class="iconify tabler--grip-vertical secao-drag-handle text-default-400 shrink-0 cursor-grab text-xl"
-                                title="Arraste para reordenar a seção"
-                            ></i>
+    <div class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <div>
+            <div class="relative mb-4 max-w-sm">
+                <i
+                    class="iconify tabler--search text-default-400 absolute start-3 top-1/2 -translate-y-1/2 text-base"
+                ></i>
+                <input
+                    type="search"
+                    x-model.debounce.150ms="busca"
+                    placeholder="Buscar item do menu..."
+                    aria-label="Buscar item do menu"
+                    class="border-default-300 bg-card text-body-color placeholder:text-default-400 focus:border-primary focus:ring-primary/40 w-full rounded-lg border py-2 ps-9 pe-3 text-sm focus:ring-2 focus:outline-none"
+                />
+            </div>
 
-                            <div class="min-w-0">
-                                <h4 class="card-title">
-                                    {{ $secao['title'] }}
-                                    <span class="text-default-400 text-xs font-normal">
-                                        ({{ count($secao['items']) }})
-                                    </span>
-                                </h4>
+            <p
+                x-show="busca.trim() !== ''"
+                x-cloak
+                class="text-default-400 -mt-2 mb-3 text-xs"
+            >Arrastar fica desativado durante a busca.</p>
 
-                                @if ($secao['personalizado'] && ! $secao['eCustom'] && $secao['title'] !== $secao['titlePadrao'])
-                                    <p class="text-2xs text-default-400 mt-1">Padrão: {{ $secao['titlePadrao'] }}</p>
-                                @endif
-                            </div>
+            <x-admin.sortable-list
+                id="menu-secoes"
+                target="reordenarSecoes"
+                handle=".secao-drag-handle"
+                :wire-ignore="false"
+                class="space-y-5"
+            >
+                @foreach ($gestao['secoes'] as $secao)
+                    <div wire:key="menu-secao-{{ $secao['key'] }}" data-id="{{ $secao['key'] }}">
+                        <x-shared.card>
+                            <x-slot:header>
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <i
+                                        class="iconify tabler--grip-vertical secao-drag-handle text-default-400 shrink-0 cursor-grab text-xl"
+                                        title="Arraste para reordenar a seção"
+                                        x-bind:class="busca.trim() !== '' ? 'pointer-events-none opacity-30' : ''"
+                                    ></i>
 
-                            @if ($secao['eCustom'])
-                                <x-shared.badge variant="secondary" size="sm">Criada aqui</x-shared.badge>
-                            @elseif ($secao['personalizado'])
-                                <x-shared.badge variant="info" size="sm">Personalizada</x-shared.badge>
-                            @endif
-                        </div>
-                    </x-slot:header>
+                                    <button
+                                        type="button"
+                                        class="text-default-400 hover:bg-light hover:text-body-color flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors duration-200"
+                                        aria-label="Recolher ou expandir a seção {{ $secao['title'] }}"
+                                        x-on:click="alternar('secao-{{ $secao['key'] }}')"
+                                    >
+                                        <i
+                                            class="iconify tabler--chevron-down text-base transition-transform duration-200"
+                                            x-bind:class="colapsada('secao-{{ $secao['key'] }}') ? '-rotate-90' : ''"
+                                        ></i>
+                                    </button>
 
-                    <x-slot:headerActions>
-                        <x-shared.button
-                            variant="default"
-                            appearance="ghost"
-                            size="sm"
-                            icon="tabler--folder-plus"
-                            x-on:click="grupoSecao = '{{ $secao['key'] }}'; window.HSOverlay?.open(document.querySelector('#modal-menu-grupo'))"
-                        >
-                            Grupo
-                        </x-shared.button>
+                                    <div class="min-w-0">
+                                        <h4 class="card-title">
+                                            {{ $secao['title'] }}
+                                            <span class="text-default-400 text-xs font-normal">
+                                                ({{ count($secao['items']) }})
+                                            </span>
+                                        </h4>
 
-                        <x-shared.button
-                            variant="default"
-                            appearance="ghost"
-                            size="sm"
-                            icon="tabler--pencil"
-                            icon-only
-                            aria-label="Editar seção {{ $secao['title'] }}"
-                            wire:click="editar('secao', '{{ $secao['key'] }}')"
-                        />
-                    </x-slot:headerActions>
+                                        @if ($secao['personalizado'] && ! $secao['eCustom'] && $secao['title'] !== $secao['titlePadrao'])
+                                            <p class="text-2xs text-default-400 mt-1">Padrão: {{ $secao['titlePadrao'] }}</p>
+                                        @endif
+                                    </div>
 
-                    <x-admin.sortable-list
-                        id="menu-itens-{{ $secao['key'] }}"
-                        target="reordenarItens"
-                        group="menu-itens"
-                        :container-id="'secao:' . $secao['key']"
-                        :wire-ignore="false"
-                        fallback-on-body
-                        swap-threshold="0.65"
-                        class="min-h-12"
-                    >
-                        @forelse ($secao['items'] as $entry)
-                            @if ($entry['tipo'] === 'grupo')
-                                <div
-                                    wire:key="menu-grupo-{{ $entry['key'] }}"
-                                    data-id="{{ $entry['key'] }}"
-                                    data-tipo="grupo"
-                                    data-busca="{{ mb_strtolower($entry['label']) }}"
-                                    @class ([
+                                    @if ($secao['eCustom'])
+                                        <x-shared.badge variant="secondary" size="sm">Criada aqui</x-shared.badge>
+                                    @elseif ($secao['personalizado'])
+                                        <x-shared.badge variant="info" size="sm">Personalizada</x-shared.badge>
+                                    @endif
+                                </div>
+                            </x-slot:header>
+
+                            <x-slot:headerActions>
+                                <x-shared.button
+                                    variant="default"
+                                    appearance="ghost"
+                                    size="sm"
+                                    icon="tabler--folder-plus"
+                                    x-on:click="grupoSecao = '{{ $secao['key'] }}'; window.HSOverlay?.open(document.querySelector('#modal-menu-grupo'))"
+                                >
+                                    Grupo
+                                </x-shared.button>
+
+                                <x-shared.button
+                                    variant="default"
+                                    appearance="ghost"
+                                    size="sm"
+                                    icon="tabler--pencil"
+                                    icon-only
+                                    aria-label="Editar seção {{ $secao['title'] }}"
+                                    wire:click="editar('secao', '{{ $secao['key'] }}')"
+                                />
+                            </x-slot:headerActions>
+
+                            <x-admin.sortable-list
+                                id="menu-itens-{{ $secao['key'] }}"
+                                target="reordenarItens"
+                                group="menu-itens"
+                                :container-id="'secao:' . $secao['key']"
+                                :wire-ignore="false"
+                                fallback-on-body
+                                swap-threshold="0.65"
+                                class="min-h-12"
+                                x-show="! colapsada('secao-{{ $secao['key'] }}')"
+                            >
+                                @forelse ($secao['items'] as $entry)
+                                    @if ($entry['tipo'] === 'grupo')
+                                        <div
+                                            wire:key="menu-grupo-{{ $entry['key'] }}"
+                                            data-id="{{ $entry['key'] }}"
+                                            data-tipo="grupo"
+                                            data-busca="{{ mb_strtolower($entry['label']) }}"
+                                            x-show="grupoCasa($el)"
+                                            @class ([
                                         'border-default-200 bg-light/40 my-1.5 rounded-lg border',
                                         'opacity-60' => ! $entry['ativo'],
                                     ])
-                                >
-                                    <div class="flex items-center gap-2.5 px-2 py-2">
-                                        <i
-                                            class="iconify tabler--grip-vertical drag-handle text-default-400 shrink-0 cursor-grab text-lg"
-                                        ></i>
-
-                                        <span
-                                            class="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg"
                                         >
-                                            <i class="iconify {{ $entry['icon'] }} text-base"></i>
-                                        </span>
+                                            <div class="flex items-center gap-2.5 px-2 py-2">
+                                                <i
+                                                    class="iconify tabler--grip-vertical drag-handle text-default-400 shrink-0 cursor-grab text-lg"
+                                                    x-bind:class="
+                                                        busca.trim() !== '' ? 'pointer-events-none opacity-30' : ''
+                                                    "
+                                                ></i>
 
-                                        <div class="min-w-0 grow">
-                                            <p class="text-body-color truncate text-sm font-semibold">
-                                                {{ $entry['label'] }}
-                                                <span class="text-default-400 text-xs font-normal">
-                                                    ({{ count($entry['children']) }} {{ count($entry['children']) === 1 ? 'item' : 'itens' }})
+                                                <button
+                                                    type="button"
+                                                    class="text-default-400 hover:bg-light hover:text-body-color flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors duration-200"
+                                                    aria-label="Recolher ou expandir o grupo {{ $entry['label'] }}"
+                                                    x-on:click="alternar('grupo-{{ $entry['key'] }}')"
+                                                >
+                                                    <i
+                                                        class="iconify tabler--chevron-down text-sm transition-transform duration-200"
+                                                        x-bind:class="colapsada('grupo-{{ $entry['key'] }}') ? '-rotate-90' : ''"
+                                                    ></i>
+                                                </button>
+
+                                                <span
+                                                    class="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg"
+                                                >
+                                                    <i class="iconify {{ $entry['icon'] }} text-base"></i>
                                                 </span>
-                                            </p>
-                                            <p class="text-default-400 truncate text-xs">Grupo — abre como submenu na sidebar</p>
-                                        </div>
 
-                                        <div class="flex shrink-0 items-center gap-1.5">
-                                            @unless ($entry['ativo'])
-                                                <x-shared.badge variant="danger" size="sm" icon="tabler--eye-off">
-                                                    Inativo
-                                                </x-shared.badge>
-                                            @endunless
+                                                <div class="min-w-0 grow">
+                                                    <p class="text-body-color truncate text-sm font-semibold">
+                                                        {{ $entry['label'] }}
+                                                        <span class="text-default-400 text-xs font-normal">
+                                                            ({{ count($entry['children']) }} {{ count($entry['children']) === 1 ? 'item' : 'itens' }})
+                                                        </span>
+                                                    </p>
+                                                    <p class="text-default-400 truncate text-xs">Grupo — abre como submenu na sidebar</p>
+                                                </div>
 
-                                            <x-shared.button
-                                                variant="default"
-                                                appearance="ghost"
-                                                size="sm"
-                                                :icon="$entry['ativo'] ? 'tabler--eye' : 'tabler--eye-off'"
-                                                icon-only
-                                                aria-label="{{ $entry['ativo'] ? 'Desativar' : 'Reativar' }} grupo {{ $entry['label'] }}"
-                                                wire:click="alternarAtivoGrupo('{{ $entry['key'] }}')"
-                                            />
+                                                <div class="flex shrink-0 items-center gap-1.5">
+                                                    @unless ($entry['ativo'])
+                                                        <x-shared.badge
+                                                            variant="danger"
+                                                            size="sm"
+                                                            icon="tabler--eye-off"
+                                                        >
+                                                            Inativo
+                                                        </x-shared.badge>
+                                                    @endunless
 
-                                            <x-shared.button
-                                                variant="default"
-                                                appearance="ghost"
-                                                size="sm"
-                                                icon="tabler--pencil"
-                                                icon-only
-                                                aria-label="Editar grupo {{ $entry['label'] }}"
-                                                wire:click="editar('grupo', '{{ $entry['key'] }}')"
-                                            />
-                                        </div>
-                                    </div>
+                                                    <x-shared.button
+                                                        variant="default"
+                                                        appearance="ghost"
+                                                        size="sm"
+                                                        :icon="$entry['ativo'] ? 'tabler--eye' : 'tabler--eye-off'"
+                                                        icon-only
+                                                        aria-label="{{ $entry['ativo'] ? 'Desativar' : 'Reativar' }} grupo {{ $entry['label'] }}"
+                                                        wire:click="alternarAtivoGrupo('{{ $entry['key'] }}')"
+                                                    />
 
-                                    <x-admin.sortable-list
-                                        id="menu-grupo-{{ $entry['key'] }}"
-                                        target="reordenarItens"
-                                        group="menu-itens"
-                                        :container-id="'grupo:' . $entry['key']"
-                                        handle=".drag-handle-filho"
-                                        :put-reject="['grupo']"
-                                        :wire-ignore="false"
-                                        fallback-on-body
-                                        swap-threshold="0.65"
-                                        class="border-default-200 ms-9 min-h-10 border-s ps-1 pb-1"
-                                    >
-                                        @forelse ($entry['children'] as $filho)
-                                            @include ('livewire.admin.menus.partials.linha-item', [
+                                                    <x-shared.button
+                                                        variant="default"
+                                                        appearance="ghost"
+                                                        size="sm"
+                                                        icon="tabler--pencil"
+                                                        icon-only
+                                                        aria-label="Editar grupo {{ $entry['label'] }}"
+                                                        wire:click="editar('grupo', '{{ $entry['key'] }}')"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <x-admin.sortable-list
+                                                id="menu-grupo-{{ $entry['key'] }}"
+                                                target="reordenarItens"
+                                                group="menu-itens"
+                                                :container-id="'grupo:' . $entry['key']"
+                                                handle=".drag-handle-filho"
+                                                :put-reject="['grupo']"
+                                                :wire-ignore="false"
+                                                fallback-on-body
+                                                swap-threshold="0.65"
+                                                class="border-default-200 ms-9 min-h-10 border-s ps-1 pb-1"
+                                                x-show="! colapsada('grupo-{{ $entry['key'] }}')"
+                                            >
+                                                @forelse ($entry['children'] as $filho)
+                                                    @include ('livewire.admin.menus.partials.linha-item', [
                                                 'item' => $filho,
                                                 'handle' => 'drag-handle-filho',
                                             ])
-                                        @empty
-                                            <p class="text-default-400 px-2 py-3 text-center text-xs">Arraste itens para este grupo.</p>
-                                        @endforelse
-                                    </x-admin.sortable-list>
-                                </div>
-                            @else
-                                @include ('livewire.admin.menus.partials.linha-item', [
+                                                @empty
+                                                    <p class="text-default-400 px-2 py-3 text-center text-xs">Arraste itens para este grupo.</p>
+                                                @endforelse
+                                            </x-admin.sortable-list>
+                                        </div>
+                                    @else
+                                        @include ('livewire.admin.menus.partials.linha-item', [
                                     'item' => $entry,
                                     'handle' => 'drag-handle',
                                 ])
-                            @endif
-                        @empty
-                            <p class="text-default-400 px-2 py-4 text-center text-sm">Arraste itens ou grupos para esta seção.</p>
-                        @endforelse
-                    </x-admin.sortable-list>
-                </x-shared.card>
-            </div>
-        @endforeach
-    </x-admin.sortable-list>
+                                    @endif
+                                @empty
+                                    <p class="text-default-400 px-2 py-4 text-center text-sm">Arraste itens ou grupos para esta seção.</p>
+                                @endforelse
+                            </x-admin.sortable-list>
+                        </x-shared.card>
+                    </div>
+                @endforeach
+            </x-admin.sortable-list>
+        </div>
+
+        <div class="hidden xl:block">
+            @include ('livewire.admin.menus.partials.preview-sidebar')
+        </div>
+    </div>
 
     {{-- Modal: nova seção --}}
     <x-shared.modal id="modal-menu-secao" title="Nova seção" size="sm">
@@ -226,7 +314,7 @@
             />
 
             <div class="flex justify-end gap-2">
-                <x-shared.button variant="default" data-hs-overlay="#modal-menu-secao">Cancelar</x-shared.button>
+                <x-shared.button variant="default" data-hs-overlay="#modal-menu-secao"> Cancelar</x-shared.button>
                 <x-shared.button variant="primary" icon="tabler--plus" wire:click="criarSecao">
                     Criar seção
                 </x-shared.button>
@@ -273,7 +361,7 @@
             </div>
 
             <div class="flex justify-end gap-2">
-                <x-shared.button variant="default" data-hs-overlay="#modal-menu-grupo">Cancelar</x-shared.button>
+                <x-shared.button variant="default" data-hs-overlay="#modal-menu-grupo"> Cancelar</x-shared.button>
                 <x-shared.button variant="primary" icon="tabler--plus" x-on:click="$wire.criarGrupo(grupoSecao);">
                     Criar grupo
                 </x-shared.button>
