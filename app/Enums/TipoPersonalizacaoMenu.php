@@ -11,9 +11,11 @@ enum TipoPersonalizacaoMenu: string
         return match ($this) {
             self::Item => 'Item de menu',
             self::Secao => 'Seção de menu',
+            self::Grupo => 'Grupo de menu',
         };
     }
 
     case Item = 'item';
     case Secao = 'secao';
+    case Grupo = 'grupo';
 }

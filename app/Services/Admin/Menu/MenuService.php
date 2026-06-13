@@ -16,10 +16,12 @@ use LogicException;
  * Composição do menu lateral do admin.
  *
  * O registro dos itens vive em config/admin-menu.php (fonte de verdade dos
- * módulos — toda seção e item exigem uma `key` estável); as personalizações
- * do administrador (ordem, rótulo, ícone, seção, ativo) vivem na tabela
- * menu_personalizacoes e são mescladas por cima. Personalização cuja key
- * sumiu do config é órfã: ignorada na sidebar, listada na tela de gestão.
+ * módulos — sempre FLAT; toda seção e item exigem uma `key` estável). TODO o
+ * agrupamento é apresentação no banco (menu_personalizacoes): overrides de
+ * itens/seções do config, seções custom e grupos (submenus) criados pela
+ * tela — estes com `e_custom = true`, nunca tratados como órfãos. Grupo é
+ * apresentação pura: sem rota/permissão, só aparece na sidebar quando tem
+ * filho visível ao usuário.
  *
  * A visibilidade por usuário não mora aqui além do filtro `can()`: ela é o
  * próprio ACL (permissão de cada item × perfis), via AccessResolver.
@@ -32,7 +34,8 @@ final class MenuService
 
     /**
      * Estrutura pronta para a sidebar: inativos removidos (decisão global,
-     * vale até no preview), órfãs ignoradas e filtro de permissão aplicado.
+     * vale até no preview), órfãs ignoradas, grupos sem filho visível
+     * removidos e filtro de permissão aplicado.
      *
      * @return list<array<string, mixed>>
      */
@@ -47,21 +50,32 @@ final class MenuService
         foreach ($this->estruturaMesclada() as $secao) {
             $itens = [];
 
-            foreach ($secao['items'] as $item) {
-                if (! $item['ativo']) {
+            foreach ($secao['items'] as $entry) {
+                if (! $entry['ativo']) {
                     continue;
                 }
 
-                $children = array_values(array_filter(
-                    $item['children'] ?? [],
-                    fn (array $filho): bool => $podeVer($filho['permission'] ?? null),
-                ));
+                if ($entry['tipo'] === 'grupo') {
+                    $children = array_values(array_filter(
+                        $entry['children'],
+                        fn (array $filho): bool => $filho['ativo'] && $podeVer($filho['permission'] ?? null),
+                    ));
 
-                if ($children === [] && ! $podeVer($item['permission'] ?? null)) {
+                    // Grupo é apresentação pura: sem filho visível, some.
+                    if ($children === []) {
+                        continue;
+                    }
+
+                    $itens[] = array_merge($entry, ['children' => $children]);
+
                     continue;
                 }
 
-                $itens[] = array_merge($item, ['children' => $children]);
+                if (! $podeVer($entry['permission'] ?? null)) {
+                    continue;
+                }
+
+                $itens[] = array_merge($entry, ['children' => []]);
             }
 
             if ($itens !== []) {
@@ -73,8 +87,8 @@ final class MenuService
     }
 
     /**
-     * Estrutura completa para a tela de gestão: inclui itens inativos e as
-     * personalizações órfãs (key que não existe mais no config).
+     * Estrutura completa para a tela de gestão: inclui itens/grupos inativos
+     * e as personalizações órfãs (key fora do config — customs nunca contam).
      *
      * @return array{secoes: list<array<string, mixed>>, orfas: Collection<int, MenuPersonalizacao>}
      */
@@ -84,11 +98,17 @@ final class MenuService
         $chavesSecoes = $this->chavesDeSecoes();
 
         $orfas = $this->personalizacoes()
-            ->filter(fn (MenuPersonalizacao $personalizacao): bool => ! in_array(
-                $personalizacao->key,
-                $personalizacao->tipo === TipoPersonalizacaoMenu::Item ? $chavesItens : $chavesSecoes,
-                true,
-            ))
+            ->filter(function (MenuPersonalizacao $personalizacao) use ($chavesItens, $chavesSecoes): bool {
+                if ($personalizacao->e_custom || $personalizacao->tipo === TipoPersonalizacaoMenu::Grupo) {
+                    return false;
+                }
+
+                return ! in_array(
+                    $personalizacao->key,
+                    $personalizacao->tipo === TipoPersonalizacaoMenu::Item ? $chavesItens : $chavesSecoes,
+                    true,
+                );
+            })
             ->values();
 
         return [
@@ -114,11 +134,43 @@ final class MenuService
     }
 
     /**
+     * Keys das seções REGISTRADAS no config (não inclui seções custom —
+     * para destinos de drag/criação use destinosDeSecao()).
+     *
      * @return list<string>
      */
     public function chavesDeSecoes(): array
     {
         return array_column($this->registro(), 'key');
+    }
+
+    /**
+     * Keys dos grupos existentes (sempre criados pela tela).
+     *
+     * @return list<string>
+     */
+    public function chavesDeGrupos(): array
+    {
+        return $this->personalizacoes()
+            ->filter(fn (MenuPersonalizacao $p): bool => $p->tipo === TipoPersonalizacaoMenu::Grupo)
+            ->pluck('key')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Seções válidas como destino (config + custom).
+     *
+     * @return list<string>
+     */
+    public function destinosDeSecao(): array
+    {
+        $customs = $this->personalizacoes()
+            ->filter(fn (MenuPersonalizacao $p): bool => $p->tipo === TipoPersonalizacaoMenu::Secao && $p->e_custom)
+            ->pluck('key')
+            ->all();
+
+        return array_values(array_unique(array_merge($this->chavesDeSecoes(), $customs)));
     }
 
     /**
@@ -140,7 +192,8 @@ final class MenuService
 
     /**
      * Valores padrão (do config) de um item ou seção — base da normalização
-     * das personalizações (valor igual ao padrão vira null).
+     * das personalizações (valor igual ao padrão vira null). Grupos e seções
+     * custom não têm padrão (retorna null).
      *
      * @return array{label: string, icone: string|null}|null
      */
@@ -202,14 +255,17 @@ final class MenuService
     private function mesclar(): array
     {
         $registro = $this->registro();
+        $personalizacoes = $this->personalizacoes();
 
-        $porChave = $this->personalizacoes()->keyBy(
+        $porChave = $personalizacoes->keyBy(
             fn (MenuPersonalizacao $personalizacao): string => $personalizacao->tipo->value . ':' . $personalizacao->key,
         );
 
+        // 1. Seções do config (com overrides) + seções custom ao fim.
         $secoes = [];
+        $indiceSecao = 0;
 
-        foreach ($registro as $indice => $secao) {
+        foreach ($registro as $secao) {
             $ajuste = $porChave->get('secao:' . $secao['key']);
 
             $secoes[$secao['key']] = [
@@ -217,40 +273,122 @@ final class MenuService
                 'title' => $ajuste->label ?? $secao['title'],
                 'titlePadrao' => $secao['title'],
                 'personalizado' => $ajuste !== null,
-                'posicao' => [$ajuste->ordem ?? PHP_INT_MAX, $indice],
+                'eCustom' => false,
+                'posicao' => [$ajuste->ordem ?? PHP_INT_MAX, $indiceSecao],
                 'items' => [],
             ];
+
+            $indiceSecao++;
         }
 
+        foreach ($personalizacoes as $personalizacao) {
+            if ($personalizacao->tipo !== TipoPersonalizacaoMenu::Secao || ! $personalizacao->e_custom) {
+                continue;
+            }
+
+            $secoes[$personalizacao->key] = [
+                'key' => $personalizacao->key,
+                'title' => $personalizacao->label ?? $personalizacao->key,
+                'titlePadrao' => null,
+                'personalizado' => true,
+                'eCustom' => true,
+                'posicao' => [$personalizacao->ordem ?? PHP_INT_MAX, $indiceSecao],
+                'items' => [],
+            ];
+
+            $indiceSecao++;
+        }
+
+        if ($secoes === []) {
+            return [];
+        }
+
+        // 2. Grupos (sempre custom): seção destino com fallback na 1ª seção.
+        $grupos = [];
+        $indiceGrupo = 0;
+
+        foreach ($personalizacoes as $personalizacao) {
+            if ($personalizacao->tipo !== TipoPersonalizacaoMenu::Grupo) {
+                continue;
+            }
+
+            $destino = $personalizacao->secao_key !== null && isset($secoes[$personalizacao->secao_key])
+                ? $personalizacao->secao_key
+                : array_key_first($secoes);
+
+            $grupos[$personalizacao->key] = [
+                'tipo' => 'grupo',
+                'key' => $personalizacao->key,
+                'label' => $personalizacao->label ?? $personalizacao->key,
+                'icon' => $personalizacao->icone ?? 'tabler--folder',
+                'ativo' => $personalizacao->ativo,
+                'eCustom' => true,
+                'personalizado' => true,
+                'destinoSecao' => $destino,
+                // Tie-break alto: grupo sem ordem cai depois dos itens sem ordem.
+                'posicao' => [$personalizacao->ordem ?? PHP_INT_MAX, 100000 + $indiceGrupo],
+                'children' => [],
+            ];
+
+            $indiceGrupo++;
+        }
+
+        // 3. Itens do config: container = grupo > seção personalizada > natural.
+        //    Duas passadas: filhos coletados primeiro, anexados na montagem.
+        $childrenPorGrupo = [];
         $indiceNatural = 0;
 
         foreach ($registro as $secao) {
             foreach ($secao['items'] as $item) {
                 $ajuste = $porChave->get('item:' . $item['key']);
 
-                // Seção destino só vale se ainda existir no config; senão o
-                // item volta para a seção natural (sem quebrar a sidebar).
-                $destino = $ajuste?->secao_key !== null && isset($secoes[$ajuste->secao_key])
-                    ? $ajuste->secao_key
-                    : $secao['key'];
+                // O registry é flat: agrupamento é apresentação (banco).
+                unset($item['children']);
 
-                $secoes[$destino]['items'][] = array_merge($item, [
+                $entry = array_merge($item, [
+                    'tipo' => 'item',
                     'label' => $ajuste->label ?? $item['label'],
                     'labelPadrao' => $item['label'],
                     'icon' => $ajuste->icone ?? $item['icon'],
                     'iconPadrao' => $item['icon'],
                     'ativo' => $ajuste->ativo ?? true,
                     'secaoNaturalKey' => $secao['key'],
+                    'grupoKey' => null,
                     'personalizado' => $ajuste !== null,
                     'posicao' => [$ajuste->ordem ?? PHP_INT_MAX, $indiceNatural],
                 ]);
 
                 $indiceNatural++;
+
+                if ($ajuste?->grupo_key !== null && isset($grupos[$ajuste->grupo_key])) {
+                    $entry['grupoKey'] = $ajuste->grupo_key;
+                    $childrenPorGrupo[$ajuste->grupo_key][] = $entry;
+
+                    continue;
+                }
+
+                $destino = $ajuste?->secao_key !== null && isset($secoes[$ajuste->secao_key])
+                    ? $ajuste->secao_key
+                    : $secao['key'];
+
+                $secoes[$destino]['items'][] = $entry;
             }
         }
 
-        // Ordena por [ordem personalizada, posição natural no config]: item
-        // novo de módulo futuro cai no fim de uma seção já reordenada.
+        // 4. Grupos entram na sequência de itens da seção destino.
+        foreach ($grupos as $key => $grupo) {
+            $children = $childrenPorGrupo[$key] ?? [];
+            usort($children, fn (array $a, array $b): int => $a['posicao'] <=> $b['posicao']);
+
+            $grupo['children'] = $children;
+            $destino = $grupo['destinoSecao'];
+            unset($grupo['destinoSecao']);
+
+            $secoes[$destino]['items'][] = $grupo;
+        }
+
+        // 5. Ordena por [ordem personalizada, posição natural]: registro novo
+        //    de módulo futuro cai no fim de um container já reordenado.
         $secoes = array_values($secoes);
         usort($secoes, fn (array $a, array $b): int => $a['posicao'] <=> $b['posicao']);
 
@@ -258,10 +396,17 @@ final class MenuService
             usort($secao['items'], fn (array $a, array $b): int => $a['posicao'] <=> $b['posicao']);
             unset($secao['posicao']);
 
-            foreach ($secao['items'] as &$item) {
-                unset($item['posicao']);
+            foreach ($secao['items'] as &$entry) {
+                unset($entry['posicao']);
+
+                if ($entry['tipo'] === 'grupo') {
+                    foreach ($entry['children'] as &$filho) {
+                        unset($filho['posicao']);
+                    }
+                    unset($filho);
+                }
             }
-            unset($item);
+            unset($entry);
         }
         unset($secao);
 

@@ -183,6 +183,134 @@ it('cacheia a estrutura mesclada e invalida sob demanda', function () {
     expect($atualizado['label'])->toBe('Mudou');
 });
 
+it('agrupa itens pelo grupo_key e posiciona o grupo na seção destino', function () {
+    MenuPersonalizacao::create([
+        'tipo' => 'grupo', 'key' => 'grupo-pessoas', 'label' => 'Pessoas',
+        'icone' => 'tabler--users-group', 'secao_key' => 'gestao', 'ordem' => 1, 'e_custom' => true,
+    ]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'usuarios', 'grupo_key' => 'grupo-pessoas', 'ordem' => 1]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'empresas', 'grupo_key' => 'grupo-pessoas', 'ordem' => 2]);
+
+    $secoes = $this->service->estruturaParaSidebar(null, mostrarTudo: true);
+    $gestao = collect($secoes)->firstWhere('key', 'gestao');
+    $grupo = collect($gestao['items'])->firstWhere('key', 'grupo-pessoas');
+
+    expect($grupo['tipo'])->toBe('grupo')
+        ->and($grupo['label'])->toBe('Pessoas')
+        ->and(array_column($grupo['children'], 'key'))->toBe(['usuarios', 'empresas'])
+        ->and(collect($gestao['items'])->firstWhere('key', 'usuarios'))->toBeNull();
+});
+
+it('esconde grupo sem filho visível e grupo inativo esconde os filhos', function () {
+    $this->seed(RolePermissionSeeder::class);
+
+    MenuPersonalizacao::create([
+        'tipo' => 'grupo', 'key' => 'grupo-vazio', 'label' => 'Vazio',
+        'secao_key' => 'principal', 'e_custom' => true,
+    ]);
+    MenuPersonalizacao::create([
+        'tipo' => 'grupo', 'key' => 'grupo-gestao', 'label' => 'Gestão Restrita',
+        'secao_key' => 'gestao', 'e_custom' => true,
+    ]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'empresas', 'grupo_key' => 'grupo-gestao']);
+
+    // Grupo sem nenhum filho some até no preview.
+    $preview = $this->service->estruturaParaSidebar(null, mostrarTudo: true);
+    expect(itemDaEstrutura($preview, 'grupo-vazio'))->toBeNull()
+        ->and(itemDaEstrutura($preview, 'grupo-gestao'))->not->toBeNull();
+
+    // Usuário sem permissão dos filhos não vê o grupo.
+    $semAcesso = criarAdminUser('cego@teste.com');
+    $secoes = $this->service->estruturaParaSidebar($semAcesso);
+    expect(itemDaEstrutura($secoes, 'grupo-gestao'))->toBeNull();
+
+    // Grupo inativo esconde a si e aos filhos.
+    MenuPersonalizacao::query()->where('key', 'grupo-gestao')->update(['ativo' => false]);
+    $this->service->invalidarCache();
+
+    $aposInativar = $this->service->estruturaParaSidebar(null, mostrarTudo: true);
+    expect(itemDaEstrutura($aposInativar, 'grupo-gestao'))->toBeNull()
+        ->and(itemDaEstrutura($aposInativar, 'empresas'))->toBeNull();
+});
+
+it('aplica fallbacks: grupo com seção inválida vai à primeira e grupo_key morto volta ao natural', function () {
+    MenuPersonalizacao::create([
+        'tipo' => 'grupo', 'key' => 'grupo-solto', 'label' => 'Solto',
+        'secao_key' => 'nao-existe', 'e_custom' => true,
+    ]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'dashboard', 'grupo_key' => 'grupo-solto']);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'usuarios', 'grupo_key' => 'grupo-excluido']);
+
+    $secoes = $this->service->estruturaParaSidebar(null, mostrarTudo: true);
+    $principal = collect($secoes)->firstWhere('key', 'principal');
+    $grupo = collect($principal['items'])->firstWhere('key', 'grupo-solto');
+
+    // Grupo caiu na 1ª seção; o filho continua dentro dele.
+    expect($grupo)->not->toBeNull()
+        ->and(array_column($grupo['children'], 'key'))->toBe(['dashboard']);
+
+    // grupo_key apontando para grupo inexistente → item volta à seção natural.
+    $gestao = collect($secoes)->firstWhere('key', 'gestao');
+    expect(array_column($gestao['items'], 'key'))->toContain('usuarios');
+});
+
+it('renderiza seção custom com itens e a esconde quando vazia', function () {
+    MenuPersonalizacao::create([
+        'tipo' => 'secao', 'key' => 'secao-operacoes', 'label' => 'Operações', 'e_custom' => true,
+    ]);
+
+    // Vazia: some da sidebar, aparece na gestão.
+    $sidebar = $this->service->estruturaParaSidebar(null, mostrarTudo: true);
+    $gestao = $this->service->estruturaParaGestao();
+
+    expect(collect($sidebar)->firstWhere('key', 'secao-operacoes'))->toBeNull()
+        ->and(collect($gestao['secoes'])->firstWhere('key', 'secao-operacoes')['eCustom'])->toBeTrue();
+
+    // Com item movido para ela, renderiza.
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'empresas', 'secao_key' => 'secao-operacoes']);
+    $this->service->invalidarCache();
+
+    $comItem = $this->service->estruturaParaSidebar(null, mostrarTudo: true);
+    $secao = collect($comItem)->firstWhere('key', 'secao-operacoes');
+
+    expect($secao['title'])->toBe('Operações')
+        ->and(array_column($secao['items'], 'key'))->toBe(['empresas']);
+});
+
+it('nunca trata customs como órfãs e expõe os helpers de destino', function () {
+    MenuPersonalizacao::create(['tipo' => 'secao', 'key' => 'secao-extra', 'label' => 'Extra', 'e_custom' => true]);
+    MenuPersonalizacao::create([
+        'tipo' => 'grupo', 'key' => 'grupo-extra', 'label' => 'Grupo Extra',
+        'secao_key' => 'principal', 'e_custom' => true,
+    ]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'item-removido', 'label' => 'Órfã Real']);
+
+    $gestao = $this->service->estruturaParaGestao();
+
+    expect($gestao['orfas']->pluck('key')->all())->toBe(['item-removido'])
+        ->and($this->service->chavesDeGrupos())->toBe(['grupo-extra'])
+        ->and($this->service->destinosDeSecao())->toBe(['principal', 'gestao', 'secao-extra']);
+});
+
+it('ordena grupos e itens na mesma sequência dentro da seção', function () {
+    MenuPersonalizacao::create([
+        'tipo' => 'grupo', 'key' => 'grupo-meio', 'label' => 'No Meio',
+        'secao_key' => 'gestao', 'ordem' => 2, 'e_custom' => true,
+    ]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'usuarios', 'ordem' => 1]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'empresas', 'ordem' => 3]);
+
+    $secoes = $this->service->estruturaParaSidebar(null, mostrarTudo: true);
+    $gestao = collect($secoes)->firstWhere('key', 'gestao');
+
+    // Grupo vazio some da sidebar, então valido pela estrutura de gestão.
+    $estrutura = $this->service->estruturaParaGestao();
+    $gestaoCompleta = collect($estrutura['secoes'])->firstWhere('key', 'gestao');
+
+    expect(array_column($gestaoCompleta['items'], 'key'))->toBe(['usuarios', 'grupo-meio', 'empresas'])
+        ->and(array_column($gestao['items'], 'key'))->toBe(['usuarios', 'empresas']);
+});
+
 it('expõe permissão e seção natural do item pelo registro', function () {
     expect($this->service->permissaoDoItem('empresas'))->toBe('empresas.listar')
         ->and($this->service->permissaoDoItem('dashboard'))->toBeNull()

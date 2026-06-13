@@ -21,8 +21,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $label
  * @property string|null $icone
  * @property string|null $secao_key
+ * @property string|null $grupo_key
  * @property int|null $ordem
  * @property bool $ativo
+ * @property bool $e_custom
  */
 class MenuPersonalizacao extends Model
 {
@@ -39,8 +41,10 @@ class MenuPersonalizacao extends Model
         'label',
         'icone',
         'secao_key',
+        'grupo_key',
         'ordem',
         'ativo',
+        'e_custom',
     ];
 
     public function rotuloAuditoria(): string
@@ -54,6 +58,7 @@ class MenuPersonalizacao extends Model
             'tipo' => TipoPersonalizacaoMenu::class,
             'ordem' => 'integer',
             'ativo' => 'boolean',
+            'e_custom' => 'boolean',
         ];
     }
 }

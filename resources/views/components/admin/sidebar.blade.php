@@ -69,8 +69,13 @@
                             @php
                                 $activePatterns = $item['active'] ?? [];
                                 $isGroup = $item['children'] !== [];
-                                $isActive = $activePatterns !== [] && request()->routeIs(...$activePatterns);
-                                $submenuId = 'menu-' . \Illuminate\Support\Str::slug($item['label']);
+                                // Grupo não tem rota própria: fica ativo quando algum filho casa a rota atual.
+                                $isActive = $isGroup
+                                    ? collect($item['children'])->contains(
+                                        fn (array $child) => request()->routeIs(...($child['active'] ?? [$child['route']])),
+                                    )
+                                    : ($activePatterns !== [] && request()->routeIs(...$activePatterns));
+                                $submenuId = 'menu-' . $item['key'];
                             @endphp
                             @if ($isGroup)
                                 <li @class (['menu-item hs-accordion', 'active' => $isActive])>

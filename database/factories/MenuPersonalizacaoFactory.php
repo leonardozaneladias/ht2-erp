@@ -26,8 +26,32 @@ final class MenuPersonalizacaoFactory extends Factory
             'label' => null,
             'icone' => null,
             'secao_key' => null,
+            'grupo_key' => null,
             'ordem' => null,
             'ativo' => true,
+            'e_custom' => false,
         ];
+    }
+
+    public function grupo(string $secaoKey): self
+    {
+        return $this->state(fn (): array => [
+            'tipo' => TipoPersonalizacaoMenu::Grupo,
+            'key' => 'grupo-' . fake()->unique()->slug(2),
+            'label' => fake()->words(2, true),
+            'icone' => 'tabler--folder',
+            'secao_key' => $secaoKey,
+            'e_custom' => true,
+        ]);
+    }
+
+    public function secaoCustom(): self
+    {
+        return $this->state(fn (): array => [
+            'tipo' => TipoPersonalizacaoMenu::Secao,
+            'key' => 'secao-' . fake()->unique()->slug(2),
+            'label' => fake()->words(2, true),
+            'e_custom' => true,
+        ]);
     }
 }

@@ -56,6 +56,23 @@ it('não quebra com personalização órfã e a omite do menu', function () {
         ->assertDontSee('Fantasma');
 });
 
+it('renderiza grupo como accordion com filho ativo destacado', function () {
+    MenuPersonalizacao::create([
+        'tipo' => 'grupo', 'key' => 'grupo-pessoas', 'label' => 'Pessoas',
+        'icone' => 'tabler--users-group', 'secao_key' => 'administracao', 'e_custom' => true,
+    ]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'usuarios', 'grupo_key' => 'grupo-pessoas']);
+
+    // Página real: a rota ativa (usuários) está dentro do grupo → accordion aberto.
+    $resposta = $this->actingAs($this->admin, 'admin')->get(route('admin.usuarios.index'));
+
+    $resposta->assertOk()
+        ->assertSee('Pessoas')
+        ->assertSee('menu-grupo-pessoas')
+        ->assertSee('aria-expanded="true"', escape: false)
+        ->assertSee('hs-accordion');
+});
+
 it('mantém o filtro de permissão por usuário', function () {
     $comum = criarAdminUser('comum@teste.com');
 
