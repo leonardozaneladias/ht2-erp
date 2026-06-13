@@ -35,14 +35,13 @@
 
     <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-3">
         <div class="lg:col-span-2">
-            <x-admin.chart-card title="Novos usuários" subtitle="Últimos 6 meses">
-                <x-admin.chart-line
-                    title="Novos usuários"
-                    :series="[['name' => 'Novos usuários', 'data' => $metricas->serie]]"
-                    :categories="$metricas->categorias"
-                    :colors="['--color-primary']"
-                />
-            </x-admin.chart-card>
+            <x-admin.chart-line
+                title="Novos usuários"
+                subtitle="Últimos 6 meses"
+                :series="[['name' => 'Novos usuários', 'data' => $metricas->serie]]"
+                :categories="$metricas->categorias"
+                :colors="['--color-primary']"
+            />
         </div>
         <div>
             <livewire:admin.exemplo-counter />

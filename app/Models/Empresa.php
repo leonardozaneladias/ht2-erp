@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Concerns\Auditavel;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -78,5 +79,36 @@ class Empresa extends Model
         return [
             'ativo' => 'boolean',
         ];
+    }
+
+    /**
+     * CNPJ com máscara (XX.XXX.XXX/XXXX-XX). Mantém o valor original quando não
+     * houver 14 dígitos — entrada parcial/legada não é mascarada à força.
+     *
+     * @return Attribute<string|null, never>
+     */
+    protected function cnpjFormatado(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?string {
+                $cnpj = $this->cnpj;
+
+                if ($cnpj === null || $cnpj === '') {
+                    return null;
+                }
+
+                $digitos = preg_replace('/\D/', '', $cnpj) ?? '';
+
+                if (strlen($digitos) !== 14) {
+                    return $cnpj;
+                }
+
+                return preg_replace(
+                    '/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/',
+                    '$1.$2.$3/$4-$5',
+                    $digitos,
+                );
+            },
+        );
     }
 }

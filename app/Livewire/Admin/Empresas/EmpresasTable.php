@@ -66,7 +66,7 @@ final class EmpresasTable extends PowerGridComponent
     {
         return PowerGrid::fields()
             ->add('nome')
-            ->add('cnpj_formatado', fn (Empresa $e): string => $e->cnpj !== null && $e->cnpj !== '' ? $e->cnpj : '—')
+            ->add('cnpj_formatado', fn (Empresa $e): string => $e->cnpjFormatado ?? '—')
             ->add('filiais_count')
             ->add('status', fn (Empresa $e): string => $this->renderStatus($e));
     }

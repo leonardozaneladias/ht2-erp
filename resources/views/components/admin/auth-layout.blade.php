@@ -9,7 +9,7 @@
 
 @php
     $pageTitle = filled($title)
-        ? sprintf('%s | %s', $title, $brandingService->nomeSistema())
+        ? sprintf('%s — %s', $title, $brandingService->nomeSistema())
         : $brandingService->nomeSistema();
 
     $heroFundo = $loginSettings->fundo_imagem_arquivo !== ''
