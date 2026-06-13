@@ -26,6 +26,9 @@
 @endphp
 
 <div
+    {{-- Atributos extras (ex.: wire:ignore.self em modais dentro de Livewire,
+         para o morph não apagar as classes runtime do HSOverlay). --}}
+    {{ $attributes->except('class') }}
     id="{{ $id }}"
     class="{{ $overlayClasses }}"
     role="dialog"

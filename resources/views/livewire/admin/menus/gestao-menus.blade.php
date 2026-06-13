@@ -302,7 +302,7 @@
     </div>
 
     {{-- Modal: nova seção --}}
-    <x-shared.modal id="modal-menu-secao" title="Nova seção" size="sm">
+    <x-shared.modal id="modal-menu-secao" title="Nova seção" size="sm" wire:ignore.self>
         <div class="space-y-4">
             <x-shared.input
                 name="novaSecaoLabel"
@@ -323,7 +323,7 @@
     </x-shared.modal>
 
     {{-- Modal: novo grupo (a seção destino vem do botão que abriu) --}}
-    <x-shared.modal id="modal-menu-grupo" title="Novo grupo (submenu)" size="md">
+    <x-shared.modal id="modal-menu-grupo" title="Novo grupo (submenu)" size="md" wire:ignore.self>
         <div class="space-y-4">
             <x-shared.alert variant="info">
                 O grupo abre como submenu na sidebar e só aparece quando tem itens visíveis ao usuário. Depois de criar,
