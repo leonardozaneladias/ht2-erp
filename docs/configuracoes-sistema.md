@@ -52,7 +52,8 @@ para reaplicar logo/cores no chrome.
 Enquanto `GeneralSettings::instalado === false`, o middleware
 `EnsureSystemConfigured` redireciona o painel para `/admin/setup`. O assistente
 coleta empresa, marca e cria o primeiro super-admin (`ConcluirSetupAction`),
-então marca `instalado = true`.
+aplica a disposição padrão do menu (`AplicarMenuPadraoAction` — grupos
+Cadastros/Segurança; deploy não roda seeders) e então marca `instalado = true`.
 
 - **Dev**: `migrate:fresh --seed` marca `instalado = true` (pula o wizard).
 - **Cliente novo**: `migrate` sem `--seed` deixa `instalado = false` → o wizard roda.

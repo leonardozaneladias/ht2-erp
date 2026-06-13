@@ -6,6 +6,7 @@ namespace App\Actions\Admin\Settings;
 
 use App\Actions\Admin\CreateAdminUserAction;
 use App\Actions\Admin\CreateEmpresaAction;
+use App\Actions\Admin\Menu\AplicarMenuPadraoAction;
 use App\DTOs\Admin\AdminUserDTO;
 use App\DTOs\Admin\EmpresaDTO;
 use App\DTOs\Admin\Settings\SetupDTO;
@@ -24,6 +25,7 @@ final class ConcluirSetupAction
     public function __construct(
         private readonly CreateAdminUserAction $criarAdmin,
         private readonly CreateEmpresaAction $criarEmpresa,
+        private readonly AplicarMenuPadraoAction $aplicarMenuPadrao,
     ) {}
 
     public function execute(SetupDTO $dto): void
@@ -62,6 +64,9 @@ final class ConcluirSetupAction
                 $empresa->id => ['todas_filiais' => true],
             ]);
             $admin->update(['empresa_ativa_id' => $empresa->id]);
+
+            // Disposição padrão do menu (produção não roda seeders).
+            $this->aplicarMenuPadrao->execute();
 
             activity('configuracoes')
                 ->withProperties(['nome_cliente' => $dto->nome_cliente])

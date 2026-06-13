@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             EmpresaSeeder::class,
             AdminUserSeeder::class,
+            MenuPadraoSeeder::class,
         ]);
 
         // O ambiente semeado representa um sistema já configurado: pula o Setup Wizard.

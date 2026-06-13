@@ -352,8 +352,10 @@ Decididos no fechamento da fase base. Todo CRUD/tela nova segue estas regras —
 
 O menu do admin tem duas camadas, mescladas pelo `App\Services\Admin\Menu\MenuService` (cache de 10 min, invalidado nas Actions de menu):
 
-- **Registro** (`config/admin-menu.php`) — fonte de verdade dos módulos. Toda seção e item exigem uma **`key` estável** (o serviço lança `LogicException` sem ela); o item declara `label`, `icon` (tabler), `route`, `permission` e `active`. Módulo novo = item novo aqui — ele aparece automaticamente na sidebar e na tela de gestão.
-- **Personalizações** (`menu_personalizacoes`, tela `/admin/menus`, permissão `configuracoes.menus`) — ordem, label, ícone, seção e `ativo` por cima do registro. Valores iguais ao padrão viram `null` (linha 100% padrão é removida); key que sumiu do config vira personalização **órfã** (ignorada na sidebar, listada na gestão para limpeza).
+- **Registro** (`config/admin-menu.php`) — fonte de verdade dos módulos, sempre **FLAT**. Toda seção e item exigem uma **`key` estável** (o serviço lança `LogicException` sem ela); o item declara `label`, `icon` (tabler), `route`, `permission` e `active`. Módulo novo = item novo aqui — ele aparece automaticamente na sidebar e na tela de gestão.
+- **Personalizações** (`menu_personalizacoes`, tela `/admin/menus`, permissão `configuracoes.menus`) — ordem, label, ícone, container e `ativo` por cima do registro, além de **seções custom** e **grupos (submenus)** criados pela tela (`e_custom = true`, keys `secao-*`/`grupo-*` geradas por slug). Valores iguais ao padrão viram `null` (linha 100% padrão é removida); key que sumiu do config vira personalização **órfã** (ignorada na sidebar, listada na gestão para limpeza) — customs nunca são órfãs.
+- **Grupos** são apresentação pura: sem rota/permissão, só aparecem na sidebar quando têm filho visível ao usuário; inativo esconde o grupo e os filhos. Excluir grupo/seção custom devolve os registros ao fallback natural. Um item pertence a `grupo_key` (prioridade) > `secao_key` > seção natural do config.
+- **Disposição padrão do starter kit** (grupos Cadastros e Segurança): `AplicarMenuPadraoAction` — idempotente e não-destrutiva (no-op se já existe grupo; `firstOrCreate` por linha). Chamada pelo `MenuPadraoSeeder` (dev) e pelo `ConcluirSetupAction` (produção — deploy não roda seeders).
 
 Regras:
 
