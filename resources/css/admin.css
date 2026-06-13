@@ -11,6 +11,11 @@
 @import "../../vendor/power-components/livewire-powergrid/resources/css/base.css";
 @import "../../vendor/power-components/livewire-powergrid/resources/css/editable.css";
 
+/* CSS estrutural do TomSelect (filtros multi-select com busca). Importado em
+   layer(components) para que a skin Inspinia (.ts-* mais abaixo, mesmo layer)
+   venca por ordem de origem e ajuste apenas cores/bordas. */
+@import "tom-select/dist/css/tom-select.css" layer(components);
+
 /* dark mode deste projeto = atributo data-theme (nao a classe .dark) */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 

@@ -116,12 +116,12 @@ final class AuditoriaTable extends PowerGridComponent
     public function filters(): array
     {
         $filtros = [
-            Filter::select('log_name')
+            Filter::multiSelect('log_name')
                 ->dataSource($this->opcoes('log_name'))
                 ->optionValue('valor')
                 ->optionLabel('valor'),
 
-            Filter::select('event')
+            Filter::multiSelect('event')
                 ->dataSource($this->opcoes('event'))
                 ->optionValue('valor')
                 ->optionLabel('valor'),
@@ -130,7 +130,7 @@ final class AuditoriaTable extends PowerGridComponent
         ];
 
         if ($this->podeVerTodasEmpresas()) {
-            $filtros[] = Filter::select('empresa', 'empresa_id')
+            $filtros[] = Filter::multiSelect('empresa', 'empresa_id')
                 ->dataSource(Empresa::query()->orderBy('nome')->get(['id', 'nome'])->all())
                 ->optionValue('id')
                 ->optionLabel('nome');

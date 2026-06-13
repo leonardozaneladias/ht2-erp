@@ -142,14 +142,25 @@ final class UsuariosTable extends PowerGridComponent
             Filter::boolean('ativo')
                 ->label('Ativo', 'Inativo'),
 
-            Filter::select('perfis', 'perfil')
+            Filter::multiSelect('perfis', 'perfil')
                 ->dataSource($this->opcoesDePerfil())
                 ->optionValue('perfil')
                 ->optionLabel('perfil')
-                ->builder(fn (Builder $query, string $value): Builder => $query->whereHas(
-                    'roles',
-                    fn (Builder $q): Builder => $q->where('name', $value),
-                )),
+                ->builder(function (Builder $query, array|int|string|null $values): Builder {
+                    $perfis = array_values(array_filter(
+                        (array) $values,
+                        static fn (mixed $v): bool => $v !== '' && $v !== null,
+                    ));
+
+                    if ($perfis === []) {
+                        return $query;
+                    }
+
+                    return $query->whereHas(
+                        'roles',
+                        fn (Builder $q): Builder => $q->whereIn('name', $perfis),
+                    );
+                }),
         ];
     }
 

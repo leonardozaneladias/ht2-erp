@@ -73,9 +73,12 @@ return [
              * https://tom-select.js.org
              */
             'tom' => [
+                // Renderiza o dropdown no <body> para escapar do overflow-x-auto
+                // do wrapper da tabela (senao o menu seria recortado).
+                'dropdownParent' => 'body',
                 'plugins' => [
                     'clear_button' => [
-                        'title' => 'Remove all selected options',
+                        'title' => 'Limpar seleção',
                     ],
                 ],
             ],
