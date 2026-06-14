@@ -39,12 +39,12 @@ return new class extends SettingsMigration
         $this->migrator->add('branding.favicon_arquivo', '');
         $this->migrator->add('branding.nome_sistema', (string) config('app.name', 'ERP'));
         $this->migrator->add('branding.slogan', '');
-        $this->migrator->add('branding.cor_primaria', '#1ab394');
-        $this->migrator->add('branding.cor_secundaria', '#1c84c6');
-        $this->migrator->add('branding.cor_sucesso', '#0acf97');
-        $this->migrator->add('branding.cor_warning', '#f8ac59');
-        $this->migrator->add('branding.cor_perigo', '#ed5565');
-        $this->migrator->add('branding.cor_info', '#23c6c8');
+        $this->migrator->add('branding.cor_primaria', '#1577ce');
+        $this->migrator->add('branding.cor_secundaria', '#2b3a67');
+        $this->migrator->add('branding.cor_sucesso', '#12b886');
+        $this->migrator->add('branding.cor_warning', '#f5a623');
+        $this->migrator->add('branding.cor_perigo', '#e5384b');
+        $this->migrator->add('branding.cor_info', '#36a8ff');
 
         // ── Tela de login ───────────────────────────────────────────────────
         $this->migrator->add('login.fundo_imagem_arquivo', '');

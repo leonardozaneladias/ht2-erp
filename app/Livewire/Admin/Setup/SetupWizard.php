@@ -32,7 +32,7 @@ class SetupWizard extends Component
 
     public string $nome_sistema = '';
 
-    public string $cor_primaria = '#1ab394';
+    public string $cor_primaria = '#1577ce';
 
     public string $admin_nome = '';
 
