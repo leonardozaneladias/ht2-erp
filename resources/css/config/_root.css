@@ -9,22 +9,22 @@
 
     --color-card: var(--color-white);
 
-    --color-primary: #1ab394;
-    --color-secondary: #1c84c6;
-    --color-success: #0acf97;
-    --color-info: #23c6c8;
-    --color-warning: #f8ac59;
-    --color-danger: #ed5565;
+    --color-primary: #1577ce;
+    --color-secondary: #2b3a67;
+    --color-success: #12b886;
+    --color-info: #36a8ff;
+    --color-warning: #f5a623;
+    --color-danger: #e5384b;
     --color-purple: #7b70ef;
     --color-light: #eef2f7;
     --color-dark: #313a46;
 
-    --color-primary-hover: #179f84;
-    --color-secondary-hover: #1977b2;
-    --color-success-hover: #09ba88;
-    --color-info-hover: #20b2b4;
-    --color-warning-hover: #e19950;
-    --color-danger-hover: #d54d5b;
+    --color-primary-hover: #1269b5;
+    --color-secondary-hover: #26335b;
+    --color-success-hover: #10a276;
+    --color-info-hover: #3094e0;
+    --color-warning-hover: #d8921f;
+    --color-danger-hover: #ca3142;
     --color-purple-hover: #6f65d7;
     --color-light-hover: #d6dbe0;
     --color-dark-hover: #2c3440;
@@ -108,12 +108,12 @@
 :root {
     color-scheme: light;
 
-    --color-chart-primary: #1ab394;
-    --color-chart-secondary: #1c84c6;
-    --color-chart-alpha: #23c6c8;
-    --color-chart-beta: #ed5565;
+    --color-chart-primary: #1577ce;
+    --color-chart-secondary: #2b3a67;
+    --color-chart-alpha: #36a8ff;
+    --color-chart-beta: #e5384b;
     --color-chart-gamma: #7b70ef;
-    --color-chart-delta: #f8ac59;
+    --color-chart-delta: #f5a623;
     --color-chart-zeta: #ff679b;
     --color-chart-gray: #edeff3;
     --color-chart-dark: #1A57A1;
