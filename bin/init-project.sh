@@ -151,7 +151,7 @@ Mantido no padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [Unreleased]
 
-- Início do projeto a partir do boilerplate Laravel Admin + Inspinia.
+- Início do projeto a partir do boilerplate HT2 ERP + Inspinia.
 EOF
         echo -e "  ${GREEN}✓${NC} CHANGELOG.md resetado"
     fi

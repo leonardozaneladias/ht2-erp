@@ -1,4 +1,4 @@
-# Laravel Admin Boilerplate — Inspinia + Livewire
+# HT2 ERP — Inspinia + Livewire
 
 Starter kit para sistemas administrativos com **Laravel + Blade + Livewire + Inspinia**. Um único ambiente admin (backoffice desktop-first), server-side, com guard `admin`, ACL via Spatie, auditoria, filas (Horizon) e monitoramento (Pulse).
 
