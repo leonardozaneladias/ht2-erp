@@ -24,26 +24,48 @@ cacheadas.
 | UI       | `app/Livewire/Admin/Configuracao/`                                                | Shell (`ConfiguracaoSistema`) + uma `Aba*` por grupo |
 | Gravação | `app/Actions/Admin/Settings/Save*Action.php` + `app/DTOs/Admin/Settings/*DTO.php` | Persistência transacional + activity log             |
 
-Grupos disponíveis: **Empresa** (`general`), **Marca e tema** (`branding`),
-**Tela de login** (`login`), **E-mail** (`email`), **Localização**
-(`localizacao`), **Segurança** (`seguranca`).
+Grupos disponíveis: **Empresa** (`general`), **Aparência** (`appearance` +
+`branding`), **Tela de login** (`login`), **E-mail** (`email`), **Localização**
+(`localizacao`), **Segurança** (`seguranca`). A navegação é uma **sidebar
+vertical com busca** (`SettingsGroup::correspondeBusca()`, sem acento) e renderiza
+apenas a aba ativa (troca server-side via `?aba=`). Há ainda a **Zona de perigo**
+(`AbaDangerZone`) com ações destrutivas e reconfirmação por digitação.
 
 Acesso protegido pela permissão `configuracoes.editar`.
 
 ---
 
-## Branding dinâmico
+## Aparência (Centro de Aparência)
+
+A aba **Aparência** (`AbaAparencia`) unifica identidade, cores e layout, com
+**preview ao vivo** no chrome real + painel de pré-visualização.
 
 - **Logo/favicon**: enviados pela aba e guardados no disco `public`
-  (`storage/app/public/branding`). Quando ausentes, usa o fallback de
-  `config/branding.php`. Resolvidos por `BrandingService::logoUrl()`/`faviconUrl()`.
-- **Cores**: `BrandingService::cssVariables()` gera CSS custom properties (com
-  `color-mix` nos estados hover) injetadas em `<x-admin.branding-css>` **após o
-  `@vite`** — sobrescrevendo o `@theme` do Tailwind em runtime, **sem rebuild**.
-  Só valores hex `#RRGGBB` válidos são emitidos (proteção contra injeção de CSS).
+  (`storage/app/public/branding`). Sem upload, usa o fallback de
+  `config/branding.php` (assets HT2 em `public/images`). Resolvidos por
+  `BrandingService::logoUrl()`/`faviconUrl()`.
+- **Cores → paleta**: `BrandingService::cssVariables()` deriva de 1 cor a escala
+  tonal `--color-primary-50…950` (via `color-mix`) + `--color-<cor>-foreground`
+  (texto de maior contraste WCAG). Injetadas em `<x-admin.branding-css>` no
+  seletor `:root, html[data-skin]` **após o `@vite`** — vencem inclusive os skins,
+  sem rebuild. Só hex `#RRGGBB` válido é emitido (proteção contra injeção de CSS).
+- **Layout/tema server-driven** (`AppearanceSettings` + `AppearanceService`):
+  tema padrão, skin, cores de topbar/menu, largura e tamanho do menu alimentam os
+  atributos `data-*` do `<html>` (antes fixos) e o `theme-bootstrap`
+  (`paraThemeConfig()`). O serviço é tolerante a falhas — cai no padrão sem banco
+  (páginas de erro/instalação), como o `SettingsRuntimeApplier`.
+- **Presets** (`ThemePreset` + `ThemePresetCatalog`): HT2 ERP (padrão), Grafite,
+  Esmeralda e Violeta, aplicáveis em 1 clique.
+- **Preview ao vivo** (`resources/js/admin/appearance-preview.js`, exposto em
+  `window.AppearancePreview`): replica a fórmula do `BrandingService` no cliente,
+  aplica os `data-*` e injeta a paleta num `<style>`. **Aplicar** salva sem reload;
+  **Descartar** restaura.
 
-Após salvar a aba de marca, a página recarrega (mantendo a aba via `?aba=branding`)
-para reaplicar logo/cores no chrome.
+A identidade padrão do starter é **HT2 ERP**: `config/app.php`, seed inicial e a
+migração condicional `database/settings/*_rebrand_ht2_defaults.php` (que só troca a
+paleta Inspinia antiga, preservando customizações do cliente). A **Zona de perigo**
+restaura tudo ao padrão (`ResetarAparenciaAction`) ou expurga logs antigos
+(`ExpurgarLogsAction`).
 
 ---
 
@@ -64,7 +86,9 @@ Cadastros/Segurança; deploy não roda seeders) e então marca `instalado = true
 
 1. **Settings class** em `app/Settings/FooSettings.php` (estende `Settings`,
    define `group()` e, se houver segredos, `encrypted()`).
-2. **Enum**: adicione um case em `App\Enums\Admin\SettingsGroup` (rótulo + ícone).
+2. **Enum**: adicione um case em `App\Enums\Admin\SettingsGroup` (rótulo, ícone,
+   descrição), inclua-o em `abas()` (ordem na navegação) e em `palavrasChave()`
+   (termos para a busca).
 3. **Defaults**: crie uma settings migration em `database/settings/` semeando
    **todas** as propriedades (`php artisan make:settings-migration` ou manual) —
    senão o pacote lança `MissingSettings`.
