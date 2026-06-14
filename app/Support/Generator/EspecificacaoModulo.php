@@ -442,6 +442,37 @@ final class EspecificacaoModulo
         return $this->bloco($linhas, $espacos);
     }
 
+    // ---- Blocos: Export PDF ----------------------------------------------
+
+    public function pdfColunas(): string
+    {
+        $labels = [];
+
+        foreach ($this->campos as $campo) {
+            if ($campo->ehColunaVisivel()) {
+                $labels[] = "'{$campo->label()}'";
+            }
+        }
+        $labels[] = "'Status'";
+
+        return implode(', ', $labels);
+    }
+
+    public function pdfMapRow(int $espacos = 16): string
+    {
+        $linhas = [];
+
+        foreach ($this->campos as $campo) {
+            if (! $campo->ehColunaVisivel()) {
+                continue;
+            }
+            $linhas[] = "(string) \$registro->{$campo->nome},";
+        }
+        $linhas[] = '$registro->status->label(),';
+
+        return $this->bloco($linhas, $espacos);
+    }
+
     // ---- Blocos: Blade form ----------------------------------------------
 
     public function formViewFields(int $espacos = 12): string

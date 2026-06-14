@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Empresas;
 
+use App\DTOs\Admin\Export\ExportavelDTO;
+use App\Livewire\Concerns\ExportaPdf;
 use App\Models\Empresa;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,6 +21,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class EmpresasTable extends PowerGridComponent
 {
+    use ExportaPdf;
     use WithExport;
 
     public string $tableName = 'empresas-table';
@@ -44,7 +47,8 @@ final class EmpresasTable extends PowerGridComponent
         return [
             PowerGrid::header()
                 ->showSearchInput()
-                ->showToggleColumns(),
+                ->showToggleColumns()
+                ->includeViewOnTop('livewire.admin.empresas._export-pdf'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -122,6 +126,24 @@ final class EmpresasTable extends PowerGridComponent
         }
 
         return view('livewire.admin.empresas._acoes', ['row' => $row]);
+    }
+
+    /**
+     * Monta os dados da listagem para exportação em PDF (trait ExportaPdf).
+     */
+    protected function dadosParaExportacao(): ExportavelDTO
+    {
+        $linhas = $this->datasource()->get()
+            ->map(fn (Empresa $e): array => [
+                (string) $e->nome,
+                $e->cnpjFormatado ?? '—',
+                (string) (int) $e->getAttribute('filiais_count'),
+                $e->ativo ? 'Ativa' : 'Inativa',
+            ])
+            ->values()
+            ->all();
+
+        return new ExportavelDTO('Empresas', ['Nome', 'CNPJ', 'Filiais', 'Status'], $linhas);
     }
 
     protected function renderStatus(Empresa $e): string

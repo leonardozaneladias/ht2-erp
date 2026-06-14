@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Produtos;
 
+use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Enums\StatusProduto;
+use App\Livewire\Concerns\ExportaPdf;
 use App\Models\Produto;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,6 +22,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class ProdutoTable extends PowerGridComponent
 {
+    use ExportaPdf;
     use WithExport;
 
     public string $tableName = 'produtos-table';
@@ -32,7 +35,8 @@ final class ProdutoTable extends PowerGridComponent
         return [
             PowerGrid::header()
                 ->showSearchInput()
-                ->showToggleColumns(),
+                ->showToggleColumns()
+                ->includeViewOnTop('livewire.admin.produtos._export-pdf'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -107,6 +111,24 @@ final class ProdutoTable extends PowerGridComponent
         }
 
         return view('livewire.admin.produtos._acoes', ['row' => $row]);
+    }
+
+    /**
+     * Dados da listagem para exportação em PDF (trait ExportaPdf).
+     */
+    protected function dadosParaExportacao(): ExportavelDTO
+    {
+        $linhas = $this->datasource()->get()
+            ->map(fn (Produto $registro): array => [
+                (string) $registro->nome,
+                (string) $registro->sku,
+                (string) $registro->preco,
+                $registro->status->label(),
+            ])
+            ->values()
+            ->all();
+
+        return new ExportavelDTO('Produtos', ['Nome', 'Sku', 'Preco', 'Status'], $linhas);
     }
 
     protected function renderStatus(Produto $registro): string

@@ -123,6 +123,8 @@ final class MakeModuloCommand extends Command
             '__ENUM_VARIANT_ARMS__' => $spec->enumVariantArms(),
             '__TEST_TENANT_SETUP__' => $spec->testTenantSetup(),
             '__TEST_SET_CAMPOS__' => $spec->testSets(),
+            '__PDF_COLUNAS__' => $spec->pdfColunas(),
+            '__PDF_MAP_ROW__' => $spec->pdfMapRow(),
         ];
     }
 
@@ -158,6 +160,7 @@ final class MakeModuloCommand extends Command
             'view-index.stub' => "resources/views/livewire/admin/{$snakePlural}/index-{$snakePlural}.blade.php",
             'view-form.stub' => "resources/views/livewire/admin/{$snakePlural}/form-{$snake}.blade.php",
             'view-acoes.stub' => "resources/views/livewire/admin/{$snakePlural}/_acoes.blade.php",
+            'view-export-pdf.stub' => "resources/views/livewire/admin/{$snakePlural}/_export-pdf.blade.php",
             'test.stub' => "tests/Feature/Admin/{$studlyPlural}/{$studly}CrudTest.php",
         ];
     }

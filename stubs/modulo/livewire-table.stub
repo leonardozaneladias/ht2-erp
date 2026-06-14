@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\__MODULO_STUDLY_PLURAL__;
 
+use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Enums\__STATUS_ENUM__;
+use App\Livewire\Concerns\ExportaPdf;
 use App\Models\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,6 +22,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class __MODULO_STUDLY__Table extends PowerGridComponent
 {
+    use ExportaPdf;
     use WithExport;
 
     public string $tableName = '__MODULO_ROTA_NOME__-table';
@@ -32,7 +35,8 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
         return [
             PowerGrid::header()
                 ->showSearchInput()
-                ->showToggleColumns(),
+                ->showToggleColumns()
+                ->includeViewOnTop('livewire.admin.__MODULO_SNAKE_PLURAL__._export-pdf'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -83,6 +87,21 @@ __PG_FILTERS__
         }
 
         return view('livewire.admin.__MODULO_SNAKE_PLURAL__._acoes', ['row' => $row]);
+    }
+
+    /**
+     * Dados da listagem para exportação em PDF (trait ExportaPdf).
+     */
+    protected function dadosParaExportacao(): ExportavelDTO
+    {
+        $linhas = $this->datasource()->get()
+            ->map(fn (__MODULO_STUDLY__ $registro): array => [
+__PDF_MAP_ROW__
+            ])
+            ->values()
+            ->all();
+
+        return new ExportavelDTO('__MODULO_LABEL_PLURAL__', [__PDF_COLUNAS__], $linhas);
     }
 
     protected function renderStatus(__MODULO_STUDLY__ $registro): string
