@@ -20,8 +20,9 @@
                     @case ('general')
                         <livewire:admin.configuracao.aba-empresa />
                         @break
+                    @case ('appearance')
                     @case ('branding')
-                        <livewire:admin.configuracao.aba-branding />
+                        <livewire:admin.configuracao.aba-aparencia />
                         @break
                     @case ('login')
                         <livewire:admin.configuracao.aba-login />

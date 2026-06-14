@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Configuracao\AbaBranding;
+use App\Livewire\Admin\Configuracao\AbaAparencia;
 use App\Services\Admin\Settings\BrandingService;
 use App\Settings\BrandingSettings;
 use Database\Seeders\RolePermissionSeeder;
@@ -42,13 +42,13 @@ it('salva branding com upload de logo e recarrega na aba', function () {
     $admin->assignRole('super-admin');
 
     Livewire::actingAs($admin, 'admin')
-        ->test(AbaBranding::class)
+        ->test(AbaAparencia::class)
         ->set('nome_sistema', 'ERP do Cliente')
         ->set('cor_primaria', '#123abc')
         ->set('logo', UploadedFile::fake()->image('logo.png', 200, 60))
         ->call('salvar')
         ->assertHasNoErrors()
-        ->assertRedirect(route('admin.configuracoes.index', ['aba' => 'branding']));
+        ->assertDispatched('appearance-applied');
 
     $settings = app(BrandingSettings::class);
 
@@ -64,7 +64,7 @@ it('rejeita cor em formato inválido', function () {
     $admin->assignRole('super-admin');
 
     Livewire::actingAs($admin, 'admin')
-        ->test(AbaBranding::class)
+        ->test(AbaAparencia::class)
         ->set('cor_primaria', 'vermelho')
         ->call('salvar')
         ->assertHasErrors(['cor_primaria']);

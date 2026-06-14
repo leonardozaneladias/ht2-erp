@@ -58,7 +58,7 @@ enum SettingsGroup: string
     {
         return [
             self::GERAL,
-            self::BRANDING,
+            self::APARENCIA,
             self::LOGIN,
             self::EMAIL,
             self::LOCALIZACAO,
