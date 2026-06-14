@@ -312,13 +312,23 @@ URLs locais: App `https://gdf-erp.ddev.site`, Horizon `/horizon`, Pulse `/pulse`
 
 ### Adicionando um módulo de negócio
 
-1. Criar migration: `php artisan make:migration create_clientes_table`
-2. Criar model: `php artisan make:model Cliente`
-3. Criar controller: `php artisan make:controller Admin/ClienteController`
-4. Criar FormRequest: `php artisan make:request StoreClienteRequest`
-5. Adicionar rotas em `routes/admin.php` no bloco `// Adicione aqui as rotas do seu módulo`
-6. Criar views em `resources/views/admin/clientes/`
-7. Criar componente Livewire se necessário: `php artisan make:livewire Admin/ClienteForm`
+**Use o gerador** — ele cria a stack CRUD inteira já no padrão (migration, factory,
+model, enum de status, DTO, FormRequests+Rules, actions, service, policy, Livewire
+Index/Form/Table, views, teste) e injeta rotas + permissões:
+
+```bash
+php artisan make:modulo Cliente \
+  --fields="nome:string, cnpj:cnpj, email:email:nullable, status:enum(ativo|inativo)" \
+  --tenant
+./vendor/bin/pint && npx prettier --write resources/views/livewire/admin/clientes/
+php artisan migrate && php artisan access:sync
+```
+
+Depois, atribua as permissões (`/admin/acesso`) e adicione o item ao menu lateral.
+Guia completo (tipos de campo, flags, customização dos stubs):
+[`docs/criar-modulo.md`](docs/criar-modulo.md). O módulo **Produto** (gerado por este
+comando) é a referência viva — copie/apague à vontade. Os stubs ficam em
+`stubs/modulo/`.
 
 ---
 

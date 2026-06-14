@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\Admin;
+
+use App\DTOs\Admin\__MODULO_STUDLY__DTO;
+use App\Models\__MODULO_STUDLY__;
+use Illuminate\Support\Facades\DB;
+
+class Create__MODULO_STUDLY__Action
+{
+    public function execute(__MODULO_STUDLY__DTO $dto): __MODULO_STUDLY__
+    {
+        return DB::transaction(function () use ($dto): __MODULO_STUDLY__ {
+            // Auditoria automática (created com diff) via trait Auditavel.
+            return __MODULO_STUDLY__::create($dto->paraModel());
+        });
+    }
+}

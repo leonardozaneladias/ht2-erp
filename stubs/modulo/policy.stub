@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Policies;
+
+use App\Models\AdminUser;
+use App\Models\__MODULO_STUDLY__;
+
+class __MODULO_STUDLY__Policy
+{
+    public function viewAny(AdminUser $auth): bool
+    {
+        return $auth->can('__MODULO_ROTA_NOME__.listar');
+    }
+
+    public function view(AdminUser $auth, __MODULO_STUDLY__ $registro): bool
+    {
+        return $auth->can('__MODULO_ROTA_NOME__.listar');
+    }
+
+    public function create(AdminUser $auth): bool
+    {
+        return $auth->can('__MODULO_ROTA_NOME__.criar');
+    }
+
+    public function update(AdminUser $auth, __MODULO_STUDLY__ $registro): bool
+    {
+        return $auth->can('__MODULO_ROTA_NOME__.editar');
+    }
+
+    public function delete(AdminUser $auth, __MODULO_STUDLY__ $registro): bool
+    {
+        return $auth->can('__MODULO_ROTA_NOME__.deletar');
+    }
+}

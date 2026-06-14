@@ -17,6 +17,7 @@ enum ModuloAcesso: string
             self::Auditoria => 'Auditoria',
             self::Configuracoes => 'Configurações',
             self::Notificacoes => 'Notificações',
+            self::Negocio => 'Negócio',
             self::Sistema => 'Sistema',
         };
     }
@@ -32,6 +33,7 @@ enum ModuloAcesso: string
             self::Auditoria => 'Trilhas de auditoria e histórico de mudanças.',
             self::Configuracoes => 'Configurações gerais do sistema.',
             self::Notificacoes => 'Envio de comunicados in-app aos usuários.',
+            self::Negocio => 'Módulos de negócio do cliente.',
             self::Sistema => 'Ferramentas operacionais (filas, monitoramento).',
         };
     }
@@ -46,6 +48,7 @@ enum ModuloAcesso: string
             self::Acessos => 'warning',
             self::Auditoria, self::Configuracoes, self::Sistema => 'neutral',
             self::Notificacoes => 'info',
+            self::Negocio => 'primary',
         };
     }
 
@@ -60,6 +63,7 @@ enum ModuloAcesso: string
             self::Auditoria => 'tabler--history',
             self::Configuracoes => 'tabler--settings',
             self::Notificacoes => 'tabler--bell',
+            self::Negocio => 'tabler--box',
             self::Sistema => 'tabler--server-cog',
         };
     }
@@ -83,5 +87,6 @@ enum ModuloAcesso: string
     case Auditoria = 'auditoria';
     case Configuracoes = 'configuracoes';
     case Notificacoes = 'notificacoes';
+    case Negocio = 'negocio';
     case Sistema = 'sistema';
 }

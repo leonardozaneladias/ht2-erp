@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Livewire\Admin\__MODULO_STUDLY_PLURAL__\Form__MODULO_STUDLY__;
+use App\Livewire\Admin\__MODULO_STUDLY_PLURAL__\Index__MODULO_STUDLY__;
+use App\Models\AdminUser;
+use App\Models\__MODULO_STUDLY__;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use Livewire\Livewire;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->seed(RolePermissionSeeder::class);
+
+    $this->admin = AdminUser::create([
+        'nome' => 'Super',
+        'email' => 'super@teste.com',
+        'password' => Hash::make('password'),
+        'ativo' => true,
+    ]);
+    $this->admin->assignRole('super-admin');
+__TEST_TENANT_SETUP__});
+
+it('renderiza a listagem de __MODULO_LABEL_PLURAL__', function () {
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(Index__MODULO_STUDLY__::class)
+        ->assertOk();
+});
+
+it('cria um registro de __MODULO_LABEL__ pelo formulário', function () {
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(Form__MODULO_STUDLY__::class)
+__TEST_SET_CAMPOS__
+        ->call('salvar')
+        ->assertHasNoErrors()
+        ->assertRedirect(route('admin.__MODULO_ROTA_NOME__.index'));
+
+    expect(__MODULO_STUDLY__::query()->count())->toBe(1);
+});
+
+it('abre o formulário de edição de __MODULO_LABEL__', function () {
+    $registro = __MODULO_STUDLY__::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(Form__MODULO_STUDLY__::class, ['__MODULO_PARAM__' => $registro->id])
+        ->assertOk()
+        ->assertSet('__MODULO_CAMEL__Id', $registro->id);
+});

@@ -209,6 +209,32 @@ return [
             ],
         ],
 
+        /*
+        | Módulos de negócio gerados via `php artisan make:modulo`. Cada módulo
+        | declara aqui suas permissões (listar/criar/editar/deletar). Para dar a
+        | um módulo a própria seção na matriz, crie um case em ModuloAcesso e
+        | mova suas permissões para a chave correspondente.
+        */
+        ModuloAcesso::Negocio->value => [
+            'produtos.listar' => [
+                'label' => 'Listar produtos',
+                'descricao' => 'Ver a listagem de produtos.',
+            ],
+            'produtos.criar' => [
+                'label' => 'Criar produtos',
+                'descricao' => 'Cadastrar novos registros de produto.',
+            ],
+            'produtos.editar' => [
+                'label' => 'Editar produtos',
+                'descricao' => 'Alterar dados e status de produtos.',
+            ],
+            'produtos.deletar' => [
+                'label' => 'Excluir produtos',
+                'descricao' => 'Remover produtos.',
+            ],
+            // make:modulo insere permissões de negócio acima desta linha
+        ],
+
         ModuloAcesso::Sistema->value => [
             'sistema.horizon' => [
                 'label' => 'Acessar Horizon',

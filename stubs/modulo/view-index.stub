@@ -1,0 +1,13 @@
+<div class="space-y-6">
+    <x-admin.page-header title="__MODULO_LABEL_PLURAL__" subtitle="Cadastro de __MODULO_LABEL_PLURAL__.">
+        <x-slot:actions>
+            @if ($podeCriar)
+                <x-shared.button :href="route('admin.__MODULO_ROTA_NOME__.create')" icon="tabler--plus" wire:navigate>
+                    Novo registro
+                </x-shared.button>
+            @endif
+        </x-slot:actions>
+    </x-admin.page-header>
+
+    <livewire:admin.__MODULO_KEBAB_PLURAL__.__MODULO_KEBAB__-table />
+</div>

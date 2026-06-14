@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests\Admin;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class Update__MODULO_STUDLY__Request extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return $this->user('admin')?->can('__MODULO_ROTA_NOME__.editar') ?? false;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        $id = $this->route('__MODULO_PARAM__');
+
+        return __MODULO_STUDLY__Rules::regras(is_numeric($id) ? (int) $id : null);
+    }
+}

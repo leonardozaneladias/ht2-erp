@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use App\Enums\__STATUS_ENUM__;
+use App\Models\Concerns\Auditavel;
+__MODEL_USE_TENANT__
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * @property __STATUS_ENUM__ $status
+ */
+class __MODULO_STUDLY__ extends Model
+{
+    use Auditavel;
+    __MODEL_TRAIT_TENANT__
+
+    /** @use HasFactory<\Database\Factories\__MODULO_STUDLY__Factory> */
+    use HasFactory;
+
+    protected $table = '__MODULO_TABELA__';
+
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+__MODEL_FILLABLE__
+    ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+__MODEL_CASTS__
+        ];
+    }
+}

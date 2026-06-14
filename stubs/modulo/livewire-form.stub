@@ -1,0 +1,76 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire\Admin\__MODULO_STUDLY_PLURAL__;
+
+use App\Actions\Admin\Create__MODULO_STUDLY__Action;
+use App\Actions\Admin\Update__MODULO_STUDLY__Action;
+use App\DTOs\Admin\__MODULO_STUDLY__DTO;
+use App\Http\Requests\Admin\__MODULO_STUDLY__Rules;
+use App\Models\__MODULO_STUDLY__;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
+use Livewire\Component;
+
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
+class Form__MODULO_STUDLY__ extends Component
+{
+    #[Locked]
+    public ?int $__MODULO_CAMEL__Id = null;
+
+__FORM_PROPS__
+
+    public function mount(?int $__MODULO_PARAM__ = null): void
+    {
+        if ($__MODULO_PARAM__ !== null) {
+            $registro = __MODULO_STUDLY__::findOrFail($__MODULO_PARAM__);
+            $this->authorize('update', $registro);
+
+            $this->__MODULO_CAMEL__Id = $registro->id;
+__FORM_MOUNT_LOAD__
+
+            return;
+        }
+
+        $this->authorize('create', __MODULO_STUDLY__::class);
+    }
+
+    public function salvar(Create__MODULO_STUDLY__Action $criar, Update__MODULO_STUDLY__Action $atualizar): void
+    {
+        $dados = $this->validate(
+            __MODULO_STUDLY__Rules::regras($this->__MODULO_CAMEL__Id),
+            attributes: $this->validationAttributes(),
+        );
+
+        $dto = __MODULO_STUDLY__DTO::fromArray($dados);
+
+        if ($this->__MODULO_CAMEL__Id === null) {
+            $criar->execute($dto);
+            session()->flash('toast.success', '__MODULO_LABEL__ criado(a) com sucesso.');
+        } else {
+            $atualizar->execute(__MODULO_STUDLY__::findOrFail($this->__MODULO_CAMEL__Id), $dto);
+            session()->flash('toast.success', '__MODULO_LABEL__ atualizado(a) com sucesso.');
+        }
+
+        $this->redirect(route('admin.__MODULO_ROTA_NOME__.index'), navigate: true);
+    }
+
+    public function render(): View
+    {
+        return view('livewire.admin.__MODULO_SNAKE_PLURAL__.form-__MODULO_SNAKE__', [
+            'modo' => $this->__MODULO_CAMEL__Id === null ? 'criar' : 'editar',
+        ])->title($this->__MODULO_CAMEL__Id === null ? 'Novo registro' : 'Editar registro');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function validationAttributes(): array
+    {
+        return [
+__VALIDATION_ATTRS__
+        ];
+    }
+}

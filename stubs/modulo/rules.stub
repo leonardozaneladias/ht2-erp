@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests\Admin;
+
+use App\Enums\__STATUS_ENUM__;
+__RULE_IMPORT__
+
+/**
+ * Regras de validação de __MODULO_LABEL__ reutilizadas pelos FormRequests
+ * (Store/Update) e pelo componente Livewire de formulário (§5.2). Centralizar
+ * aqui mantém a validação fora do controller/componente e pronta para API.
+ */
+final class __MODULO_STUDLY__Rules
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public static function regras(?int $ignorarId = null): array
+    {
+        return [
+__RULES_BODY__
+        ];
+    }
+}

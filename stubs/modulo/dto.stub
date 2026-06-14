@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\DTOs\Admin;
+
+use App\Enums\__STATUS_ENUM__;
+
+final readonly class __MODULO_STUDLY__DTO
+{
+    public function __construct(
+__DTO_PROPS__
+    ) {}
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public static function fromArray(array $data): self
+    {
+        __DTO_TEXTO_HELPER__return new self(
+__DTO_FROMARRAY__
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function paraModel(): array
+    {
+        return [
+__DTO_PARAMODEL__
+        ];
+    }
+}

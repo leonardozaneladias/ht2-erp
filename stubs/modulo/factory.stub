@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Database\Factories;
+
+use App\Enums\__STATUS_ENUM__;
+use App\Models\__MODULO_STUDLY__;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<__MODULO_STUDLY__>
+ */
+final class __MODULO_STUDLY__Factory extends Factory
+{
+    protected $model = __MODULO_STUDLY__::class;
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+__FACTORY_DEF__
+        ];
+    }
+}
