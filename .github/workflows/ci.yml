@@ -46,6 +46,15 @@ jobs:
             - name: Análise estática (PHPStan level 6)
               run: ./vendor/bin/phpstan analyse --no-progress --error-format=github
 
+            - name: Lint JS (ESLint)
+              run: npm run lint:js:check
+
+            # Informativo: surfa advisories sem reprovar o build. Há advisories
+            # transitivas pré-existentes; o Dependabot abre PRs de remediação.
+            - name: Auditoria de dependências (Composer)
+              run: composer audit --no-interaction
+              continue-on-error: true
+
             - name: Verificar formatação (Prettier)
               run: npx prettier --check "resources/**/*.{js,ts,tsx,css,json}" "*.{json,md,yaml,yml}" --ignore-path .prettierignore
 
