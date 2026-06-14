@@ -39,6 +39,23 @@
                 @empty
                     <p class="text-default-400 px-3 py-6 text-center text-sm">Nenhuma configuração encontrada.</p>
                 @endforelse
+
+                {{-- Zona de perigo (ações destrutivas) --}}
+                <div class="border-default-200 my-1 border-t"></div>
+                <button
+                    type="button"
+                    wire:key="nav-danger"
+                    wire:click="irPara('danger')"
+                    @class ([
+                        'flex items-center gap-2.5 rounded-lg px-3 py-2 text-start text-sm font-medium transition-colors',
+                        'bg-danger/10 text-danger' => $abaAtiva === 'danger',
+                        'text-danger/80 hover:bg-danger/5' => $abaAtiva !== 'danger',
+                    ])
+                    aria-current="{{ $abaAtiva === 'danger' ? 'page' : 'false' }}"
+                >
+                    <i class="iconify tabler--alert-triangle size-4 shrink-0"></i>
+                    <span class="truncate">Zona de perigo</span>
+                </button>
             </nav>
         </x-shared.card>
 
@@ -63,6 +80,9 @@
                     @break
                 @case ('seguranca')
                     <livewire:admin.configuracao.aba-seguranca wire:key="aba-seguranca" />
+                    @break
+                @case ('danger')
+                    <livewire:admin.configuracao.aba-danger-zone wire:key="aba-danger-zone" />
                     @break
             @endswitch
         </div>

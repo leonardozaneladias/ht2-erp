@@ -67,6 +67,9 @@ class ConfiguracaoSistema extends Component
      */
     private function valoresValidos(): array
     {
-        return array_map(static fn (SettingsGroup $aba): string => $aba->value, SettingsGroup::abas());
+        return [
+            ...array_map(static fn (SettingsGroup $aba): string => $aba->value, SettingsGroup::abas()),
+            'danger',
+        ];
     }
 }
