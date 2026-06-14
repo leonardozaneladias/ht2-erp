@@ -9,19 +9,21 @@
 @php
     // Título com a empresa ativa (white-label) — fallback: nome do sistema.
     $pageTitle = app(\App\Services\Admin\Settings\BrandingService::class)->tituloPagina($title);
+    // Aparência/layout vinda dos settings da instância (antes fixa aqui).
+    $appearance = app(\App\Services\Admin\Settings\AppearanceService::class);
 @endphp
 
 <!DOCTYPE html>
 <html
     lang="pt-BR"
-    data-theme="light"
-    data-skin="default"
-    data-layout-width="fluid"
+    data-theme="{{ $appearance->temaPadrao() }}"
+    data-skin="{{ $appearance->skin() }}"
+    data-layout-width="{{ $appearance->layoutWidth() }}"
     data-layout-position="fixed"
-    data-topbar-color="light"
-    data-menu-color="dark"
-    data-sidenav-size="default"
-    data-sidenav-user="true"
+    data-topbar-color="{{ $appearance->topbarColor() }}"
+    data-menu-color="{{ $appearance->menuColor() }}"
+    data-sidenav-size="{{ $appearance->sidenavSizePadrao() }}"
+    @if ($appearance->sidenavUser()) data-sidenav-user="true" @endif
 >
 <head>
     <meta charset="utf-8" />

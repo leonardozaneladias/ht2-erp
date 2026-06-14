@@ -6,6 +6,7 @@
 
 @inject ('brandingService', 'App\Services\Admin\Settings\BrandingService')
 @inject ('loginSettings', 'App\Settings\LoginSettings')
+@inject ('appearanceService', 'App\Services\Admin\Settings\AppearanceService')
 
 @php
     $pageTitle = filled($title)
@@ -20,7 +21,7 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light" data-skin="default">
+<html lang="pt-BR" data-theme="{{ $appearanceService->temaPadrao() }}" data-skin="{{ $appearanceService->skin() }}">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

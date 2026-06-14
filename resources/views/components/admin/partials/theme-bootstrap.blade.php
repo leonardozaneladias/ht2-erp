@@ -1,3 +1,9 @@
+@php
+    // Defaults da instância (AppearanceSettings) — fonte da verdade do servidor.
+    // O sessionStorage só sobrescreve a preferência de sessão (dark mode, colapso).
+    $appearanceConfig = app(\App\Services\Admin\Settings\AppearanceService::class)->paraThemeConfig();
+@endphp
+
 {{-- Script crítico de tema: precisa rodar antes de CSS/JS para evitar FOUC no shell admin. --}}
 <script>
     (function () {
@@ -5,18 +11,7 @@
         const storageKey = '__THEME_CONFIG__';
         const savedConfig = sessionStorage.getItem(storageKey);
 
-        const defaultConfig = {
-            dir: 'ltr',
-            skin: 'default',
-            theme: 'light',
-            width: 'fluid',
-            position: 'fixed',
-            orientation: 'vertical',
-            'sidenav-size': 'default',
-            'sidenav-user': true,
-            'topbar-color': 'light',
-            'sidenav-color': 'dark',
-        };
+        const defaultConfig = @json ($appearanceConfig);
 
         function getSystemTheme() {
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

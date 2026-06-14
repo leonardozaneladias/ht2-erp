@@ -1,13 +1,14 @@
 @props (['title' => 'Configuração inicial'])
 
 @inject ('brandingService', 'App\Services\Admin\Settings\BrandingService')
+@inject ('appearanceService', 'App\Services\Admin\Settings\AppearanceService')
 
 @php
     $pageTitle = sprintf('%s | %s', $title, $brandingService->nomeSistema());
 @endphp
 
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light" data-skin="default">
+<html lang="pt-BR" data-theme="{{ $appearanceService->temaPadrao() }}" data-skin="{{ $appearanceService->skin() }}">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
