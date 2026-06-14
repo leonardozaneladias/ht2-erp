@@ -124,15 +124,70 @@ final class BrandingService
 
             $linhas[] = "--color-{$nome}: {$hex};";
             $linhas[] = "--color-{$nome}-hover: color-mix(in srgb, {$hex} 88%, #000);";
+            // Cor de texto legível sobre a cor (maior contraste entre claro/escuro).
+            $linhas[] = "--color-{$nome}-foreground: {$this->corDeContraste($hex)};";
         }
 
-        // PowerGrid (focus ring / checkbox) usa a escala primary-500/600.
+        // Escala tonal da primária (50–950): motor "1 cor → paleta". Inclui o
+        // 500/600 que o PowerGrid (focus ring / checkbox) consome.
         if ($this->hexValido($cores['primary'])) {
-            $linhas[] = "--color-primary-500: {$cores['primary']};";
-            $linhas[] = "--color-primary-600: color-mix(in srgb, {$cores['primary']} 85%, #000);";
+            foreach ($this->escalaTonal($cores['primary']) as $tom => $valor) {
+                $linhas[] = "--color-primary-{$tom}: {$valor};";
+            }
         }
 
         return implode("\n", $linhas);
+    }
+
+    /**
+     * Escala tonal 50–950 derivada de 1 cor, via color-mix (avaliado no browser).
+     * 50–400 clareiam (mix com branco); 600–950 escurecem (mix com preto).
+     *
+     * @return array<int, string>
+     */
+    private function escalaTonal(string $hex): array
+    {
+        return [
+            50 => "color-mix(in srgb, {$hex} 8%, #fff)",
+            100 => "color-mix(in srgb, {$hex} 16%, #fff)",
+            200 => "color-mix(in srgb, {$hex} 30%, #fff)",
+            300 => "color-mix(in srgb, {$hex} 50%, #fff)",
+            400 => "color-mix(in srgb, {$hex} 72%, #fff)",
+            500 => $hex,
+            600 => "color-mix(in srgb, {$hex} 85%, #000)",
+            700 => "color-mix(in srgb, {$hex} 70%, #000)",
+            800 => "color-mix(in srgb, {$hex} 55%, #000)",
+            900 => "color-mix(in srgb, {$hex} 42%, #000)",
+            950 => "color-mix(in srgb, {$hex} 30%, #000)",
+        ];
+    }
+
+    /**
+     * Texto legível sobre a cor: escolhe branco ou escuro pelo maior contraste
+     * WCAG (color-contrast() do CSS ainda tem suporte irregular).
+     */
+    private function corDeContraste(string $hex): string
+    {
+        $lumCor = $this->luminancia($hex);
+        $contrasteBranco = (1.0 + 0.05) / ($lumCor + 0.05);
+        $contrasteEscuro = ($lumCor + 0.05) / ($this->luminancia('#1c2531') + 0.05);
+
+        return $contrasteBranco >= $contrasteEscuro ? '#ffffff' : '#1c2531';
+    }
+
+    /** Luminância relativa WCAG (0 = preto, 1 = branco). */
+    private function luminancia(string $hex): float
+    {
+        $hex = ltrim($hex, '#');
+        $canal = static function (int $valor): float {
+            $c = $valor / 255;
+
+            return $c <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
+        };
+
+        return 0.2126 * $canal((int) hexdec(substr($hex, 0, 2)))
+            + 0.7152 * $canal((int) hexdec(substr($hex, 2, 2)))
+            + 0.0722 * $canal((int) hexdec(substr($hex, 4, 2)));
     }
 
     private function corResolvida(?string $empresaCor, string $settingsCor): string
