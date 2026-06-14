@@ -72,16 +72,14 @@
 
     <div class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
         <div>
-            <div class="relative mb-4 max-w-sm">
-                <i
-                    class="iconify tabler--search text-default-400 absolute start-3 top-1/2 -translate-y-1/2 text-base"
-                ></i>
-                <input
+            <div class="[&_.mb-4]:mb-0 mb-4 max-w-sm">
+                <x-shared.input
                     type="search"
+                    name="busca-menu"
+                    icon="tabler--search"
                     x-model.debounce.150ms="busca"
                     placeholder="Buscar item do menu..."
                     aria-label="Buscar item do menu"
-                    class="border-default-300 bg-card text-body-color placeholder:text-default-400 focus:border-primary focus:ring-primary/40 w-full rounded-lg border py-2 ps-9 pe-3 text-sm focus:ring-2 focus:outline-none"
                 />
             </div>
 

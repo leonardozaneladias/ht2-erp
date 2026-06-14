@@ -1,6 +1,6 @@
 @extends ('admin.dev.components.shell', [
     'title' => 'Preview • x-shared.select-search',
-    'description' => 'Wrapper Choices.js para relacionamentos, listas maiores, múltipla seleção e agrupamentos.',
+    'description' => 'Combobox (gatilho compacto + busca + checkbox) para relacionamentos, listas maiores, múltipla seleção e agrupamentos.',
 ])
 
 @section ('preview')

@@ -22,12 +22,12 @@
                         required
                     />
 
-                    <x-shared.textarea
+                    <x-shared.rich-editor
                         name="mensagem"
                         label="Mensagem"
                         wire:model="mensagem"
-                        :rows="5"
-                        hint="Até 1000 caracteres."
+                        hint="Use negrito, itálico, listas e links. Até 1000 caracteres."
+                        placeholder="Escreva o comunicado..."
                         required
                     />
 

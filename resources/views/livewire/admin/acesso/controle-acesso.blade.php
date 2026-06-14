@@ -38,19 +38,15 @@
                 @endif
 
                 {{-- Busca --}}
-                <div class="border-default-200 border-b p-3">
-                    <div class="relative">
-                        <span
-                            class="iconify tabler--search text-default-400 absolute start-3 top-1/2 size-4 -translate-y-1/2"
-                        ></span>
-                        <input
-                            type="search"
-                            wire:model.live.debounce.300ms="busca"
-                            placeholder="{{ $lente === 'perfis' ? 'Buscar perfil...' : 'Buscar pessoa...' }}"
-                            class="form-input ps-9"
-                            aria-label="Buscar na lista"
-                        />
-                    </div>
+                <div class="border-default-200 [&_.mb-4]:mb-0 border-b p-3">
+                    <x-shared.input
+                        type="search"
+                        name="busca"
+                        icon="tabler--search"
+                        wire:model.live.debounce.300ms="busca"
+                        placeholder="{{ $lente === 'perfis' ? 'Buscar perfil...' : 'Buscar pessoa...' }}"
+                        aria-label="Buscar na lista"
+                    />
                 </div>
 
                 {{-- Itens --}}

@@ -23,29 +23,43 @@ beforeEach(function () {
     activity('canalbeta')->log('Registro do canal beta');
 });
 
-it('filtra a auditoria por um log via multi-select com busca', function () {
+it('filtra a auditoria por um log via combobox (gatilho + opção)', function () {
     $page = visit('/admin/auditoria');
 
     $page->assertSee('Registro do canal alpha')
         ->assertSee('Registro do canal beta');
 
-    // O filtro de Log é o multi-select da coluna "Log" (TomSelect). Abrir e
-    // selecionar a opção pelo data-value (deterministico — independe de qual
-    // opção fica ativa por padrão).
-    $page->click('.ts-control >> nth=1')
-        ->click('.ts-dropdown [data-value="canalalpha"]')
+    // Abre o combobox da coluna "Log" e marca a opção pelo data-value
+    // (deterministico). Os seletores sao escopados por data-combobox-field
+    // porque ha 3 comboboxes na tela (empresa, log, evento).
+    $page->click('[data-testid="combobox-trigger"][data-combobox-field="log_name"]')
+        ->click('[data-testid="combobox-panel"][data-combobox-field="log_name"] [data-value="canalalpha"]')
         ->wait(1);
 
     $page->assertSee('Registro do canal alpha')
         ->assertDontSee('Registro do canal beta');
 });
 
-it('inicializa o TomSelect nos filtros multi-select da auditoria', function () {
+it('filtra usando o campo de busca do combobox', function () {
+    $page = visit('/admin/auditoria');
+
+    $page->click('[data-testid="combobox-trigger"][data-combobox-field="log_name"]')
+        ->fill('[data-testid="combobox-panel"][data-combobox-field="log_name"] [data-testid="combobox-search"]', 'alpha')
+        ->wait(1)
+        // Apos buscar "alpha", so a opcao canalalpha permanece na lista.
+        ->click('[data-testid="combobox-panel"][data-combobox-field="log_name"] [data-value="canalalpha"]')
+        ->wait(1);
+
+    $page->assertSee('Registro do canal alpha')
+        ->assertDontSee('Registro do canal beta');
+});
+
+it('inicializa os 3 filtros combobox da auditoria', function () {
     $page = visit('/admin/auditoria');
 
     // Super-admin enxerga 3 filtros multi-select (empresa, log, evento),
-    // todos transformados em TomSelect (busca embutida).
-    $controls = (int) $page->script("document.querySelectorAll('.ts-control').length");
+    // todos renderizados como combobox custom (busca + checkbox).
+    $controls = (int) $page->script('document.querySelectorAll(\'[data-testid="combobox-trigger"]\').length');
 
     expect($controls)->toBe(3);
 });

@@ -7,6 +7,9 @@
     'multiple' => false,
     'preview' => null,
     'mode' => 'livewire',
+    // 'card' = área tracejada grande (padrão); 'compact' = thumbnail + botão
+    // (para logos/favicons em grids densos, ex.: branding).
+    'variant' => 'card',
     'uploadUrl' => null,
     'hint' => null,
     'required' => false,
@@ -100,6 +103,51 @@
                 </div>
             </div>
         </template>
+    @elseif ($variant === 'compact')
+        {{-- Thumbnail + botão (mesmos data-af-file-* do modo card; só muda o layout). --}}
+        <div
+            data-af-file-trigger
+            class="group border-default-300 hover:border-primary flex cursor-pointer items-center gap-4 rounded-lg border p-2 transition {{ $hasError ? 'border-danger!' : '' }}"
+            @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
+            aria-invalid="{{ $hasError ? 'true' : 'false' }}"
+        >
+            <input
+                id="{{ $fieldId }}"
+                name="{{ $multiple ? $name.'[]' : $name }}"
+                type="file"
+                class="hidden"
+                data-af-file-input
+                accept="{{ $accept }}"
+                @if ($multiple) multiple @endif
+                @required ($required)
+                {{ $attributes }}
+            />
+
+            <div class="bg-light/40 flex h-14 w-24 shrink-0 items-center justify-center overflow-hidden rounded-md">
+                <img
+                    src="{{ $preview }}"
+                    alt="Preview"
+                    class="max-h-full max-w-full object-contain @if (blank($preview)) hidden @endif"
+                    data-af-file-preview-image
+                />
+                <span class="text-default-400 @if (filled($preview)) hidden @endif" data-af-file-preview-icon>
+                    <i class="iconify tabler--photo text-xl"></i>
+                </span>
+            </div>
+
+            <div class="min-w-0 grow">
+                <span
+                    class="text-primary group-hover:text-primary-600 inline-flex items-center gap-1 text-sm font-medium"
+                >
+                    <i class="iconify tabler--upload text-base"></i>
+                    Selecionar arquivo
+                </span>
+                <p class="text-default-400 truncate text-xs" data-af-file-name>
+                    {{ filled($preview) ? 'Arquivo atual' : '' }}
+                </p>
+                <p class="text-default-400 text-xs">Máx. {{ $maxSize }}MB</p>
+            </div>
+        </div>
     @else
         <div
             data-af-file-trigger

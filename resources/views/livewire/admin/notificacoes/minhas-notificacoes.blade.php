@@ -82,7 +82,11 @@
                                 @endif
                             </div>
 
-                            <p class="text-default-500 mt-1 text-sm">{{ $dados['mensagem'] ?? '' }}</p>
+                            <div
+                                class="text-default-500 [&_a]:text-primary [&_a]:underline [&_ol]:list-decimal [&_ol]:ps-5 [&_ul]:list-disc [&_ul]:ps-5 mt-1 text-sm"
+                            >
+                                {!! \App\Support\Html\HtmlSanitizer::clean($dados['mensagem'] ?? '') !!}
+                            </div>
 
                             <div class="text-default-400 mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                                 <span>{{ $notificacao->created_at->diffForHumans() }}</span>

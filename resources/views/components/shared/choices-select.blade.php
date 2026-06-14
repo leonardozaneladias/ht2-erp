@@ -1,12 +1,11 @@
 {{--
-    Select com busca (single/multiple) sobre o x-shared.combobox: gatilho compacto
-    com contagem + dropdown com busca e checkbox. A API e preservada para os
-    consumidores; o <select> nativo abaixo (sr-only, x-ref="native") segue sendo a
-    fonte para POST tradicional, wire:model e old(). O combobox so o pilota.
+    Select com busca baseado em Choices.js (data-af-choices -> initChoiceFields).
 
-    Props sem efeito no combobox v1 (mantidas por compatibilidade): removeItem
-    (sempre removivel), allowCreate / maxItems / shouldSort. Entrada livre (chips)
-    continua no x-shared.tags-input (Choices.js).
+    LEGADO: e a base do x-shared.tags-input (chips + entrada livre via
+    allowCreate), o unico caso que ainda nao migrou para o x-shared.combobox.
+    Os selects de formulario comuns usam x-shared.select-search (combobox).
+    Quando o combobox ganhar um modo "chips", este componente e o Choices.js
+    serao aposentados.
 --}}
 
 @props ([
@@ -27,7 +26,7 @@
 ])
 
 @php
-    $viewErrors = $errors ?? new \Illuminate\Support\ViewErrorBag();
+    $viewErrors = $errors ?? new \Illuminate\Support\ViewErrorBag;
     $fieldId = $id ?: \Illuminate\Support\Str::of($name)->replace(['[]', '[', ']', '.'], ['', '-', '', '-'])->trim('-')->toString();
     $baseName = str_replace('[]', '', $name);
     $errorKey = $baseName;
@@ -96,6 +95,15 @@
             'disabled' => false,
         ];
     })->values();
+    $config = [
+        'multiple' => $multiple,
+        'searchable' => $searchable,
+        'removeItem' => $removeItem,
+        'allowCreate' => $allowCreate,
+        'maxItems' => $maxItems,
+        'shouldSort' => $shouldSort,
+        'placeholder' => $placeholder,
+    ];
 @endphp
 
 <div class="mb-4">
@@ -109,58 +117,53 @@
         </label>
     @endif
 
-    <x-shared.combobox
-        mode="form"
-        :id="$fieldId"
-        :multiple="$multiple"
-        :searchable="$searchable"
-        :placeholder="$placeholder"
-        :required="$required"
-        :invalid="$hasError"
+    <select
+        id="{{ $fieldId }}"
+        name="{{ $multiple ? $baseName.'[]' : $baseName }}"
+        data-af-choices="{{ \Illuminate\Support\Js::encode($config) }}"
+        {{
+$attributes->class([
+            'form-input',
+            'border-danger!' => $hasError,
+        ])
+}}
+        @if ($multiple) multiple @endif
+        @required ($required)
+        @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
+        aria-invalid="{{ $hasError ? 'true' : 'false' }}"
     >
-        <select
-            id="{{ $fieldId }}"
-            name="{{ $multiple ? $baseName . '[]' : $baseName }}"
-            x-ref="native"
-            class="sr-only"
-            tabindex="-1"
-            aria-hidden="true"
-            {{ $attributes }}
-            @if ($multiple) multiple @endif
-            @required ($required)
-            @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
-        >
-            @if (! $multiple && $placeholder !== null)
-                <option value="" @selected (blank($selectedValues[0] ?? null))>{{ $placeholder }}</option>
-            @endif
+        @if (! $multiple && $placeholder !== null)
+            <option value="" @selected (blank($selectedValues[0] ?? null))>{{ $placeholder }}</option>
+        @endif
 
-            @if ($options !== null)
-                @foreach ($normalizedOptions as $option)
-                    @if (isset($option['group']))
-                        <optgroup label="{{ $option['group'] }}">
-                            @foreach ($option['options'] as $groupOption)
-                                <option
-                                    value="{{ $groupOption['value'] }}"
-                                    @selected (isset($selectedLookup[(string) $groupOption['value']]))
-                                    @disabled ($groupOption['disabled'])
-                                >
-                                    {{ $groupOption['label'] }}
-                                </option>
-                            @endforeach
-                        </optgroup>
-                    @else
-                        <option
-                            value="{{ $option['value'] }}"
-                            @selected (isset($selectedLookup[(string) $option['value']]))
-                            @disabled ($option['disabled'])
-                        >
-                            {{ $option['label'] }}
-                        </option>
-                    @endif
-                @endforeach
-            @endif
-        </select>
-    </x-shared.combobox>
+        @if ($options !== null)
+            @foreach ($normalizedOptions as $option)
+                @if (isset($option['group']))
+                    <optgroup label="{{ $option['group'] }}">
+                        @foreach ($option['options'] as $groupOption)
+                            <option
+                                value="{{ $groupOption['value'] }}"
+                                @selected (isset($selectedLookup[(string) $groupOption['value']]))
+                                @disabled ($groupOption['disabled'])
+                            >
+                                {{ $groupOption['label'] }}
+                            </option>
+                        @endforeach
+                    </optgroup>
+                @else
+                    <option
+                        value="{{ $option['value'] }}"
+                        @selected (isset($selectedLookup[(string) $option['value']]))
+                        @disabled ($option['disabled'])
+                    >
+                        {{ $option['label'] }}
+                    </option>
+                @endif
+            @endforeach
+        @else
+            {{ $slot ?? '' }}
+        @endif
+    </select>
 
     @if ($hasError)
         <small class="text-danger mt-1 block text-xs" id="{{ $errorId }}">{{ $viewErrors->first($errorKey) }}</small>

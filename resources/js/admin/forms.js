@@ -2,7 +2,9 @@ import Choices from 'choices.js';
 import Dropzone from 'dropzone';
 import flatpickr from 'flatpickr';
 import Inputmask from 'inputmask';
+import Quill from 'quill';
 import { Portuguese } from 'flatpickr/dist/l10n/pt.js';
+import 'quill/dist/quill.snow.css';
 
 const passwordMeterStates = [
   {
@@ -569,6 +571,46 @@ function initDropzones(root = document) {
   });
 }
 
+function initRichEditors(root = document) {
+  collectElements(root, '[data-af-quill]').forEach((wrapper) => {
+    if (wrapper.dataset.afFormsQuillBound === 'true') {
+      return;
+    }
+
+    const editorEl = wrapper.querySelector('[data-af-quill-editor]');
+    const input = wrapper.querySelector('[data-af-quill-input]');
+
+    if (!editorEl || !input) {
+      return;
+    }
+
+    const config = parseJsonDataset(wrapper, 'afQuillConfig');
+    wrapper.dataset.afFormsQuillBound = 'true';
+
+    const quill = new Quill(editorEl, {
+      theme: 'snow',
+      placeholder: config.placeholder ?? '',
+      modules: {
+        // Toolbar mínima: formatação inline + listas + link (sem mídia/embeds).
+        toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']],
+      },
+    });
+
+    // Conteúdo inicial vem do textarea (POST/wire:model/old()).
+    if (input.value.trim() !== '') {
+      quill.clipboard.dangerouslyPasteHTML(input.value.trim());
+    }
+
+    quill.on('text-change', () => {
+      // Editor vazio gera "<p><br></p>"; normaliza para string vazia.
+      input.value = quill.getText().trim() === '' ? '' : quill.root.innerHTML;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    wrapper._afQuill = quill;
+  });
+}
+
 function bootAdminForms(root = document) {
   initPasswordFields(root);
   initStandalonePasswordMeters(root);
@@ -578,6 +620,7 @@ function bootAdminForms(root = document) {
   initCepFields(root);
   initSimpleFileUploads(root);
   initDropzones(root);
+  initRichEditors(root);
 }
 
 function startMutationObserver() {

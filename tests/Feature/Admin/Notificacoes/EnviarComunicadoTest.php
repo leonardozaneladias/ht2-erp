@@ -94,6 +94,47 @@ it('nega acesso a quem não tem a permissão de enviar', function (): void {
         ->assertForbidden();
 });
 
+it('sanitiza o HTML da mensagem (remove script e atributos de evento)', function (): void {
+    $super = superAdminLogado();
+
+    Livewire::test(EnviarComunicado::class)
+        ->set('tipo', 'info')
+        ->set('titulo', 'Rich text')
+        ->set('mensagem', '<p>Olá <strong>time</strong></p><script>alert(1)</script><a href="https://x.com" onclick="evil()">link</a>')
+        ->set('publico', 'todos')
+        ->call('enviar')
+        ->assertHasNoErrors();
+
+    $mensagem = (string) $super->notifications()->first()?->data['mensagem'];
+
+    expect($mensagem)
+        ->toContain('<strong>time</strong>')
+        ->not->toContain('<script')
+        ->not->toContain('onclick');
+});
+
+it('rejeita mensagem só com HTML vazio (texto em branco)', function (): void {
+    superAdminLogado();
+
+    Livewire::test(EnviarComunicado::class)
+        ->set('titulo', 'X')
+        ->set('mensagem', '<p><br></p>')
+        ->set('publico', 'todos')
+        ->call('enviar')
+        ->assertHasErrors(['mensagem']);
+});
+
+it('rejeita mensagem com texto acima de 1000 caracteres', function (): void {
+    superAdminLogado();
+
+    Livewire::test(EnviarComunicado::class)
+        ->set('titulo', 'X')
+        ->set('mensagem', '<p>' . str_repeat('a', 1001) . '</p>')
+        ->set('publico', 'todos')
+        ->call('enviar')
+        ->assertHasErrors(['mensagem']);
+});
+
 it('registra o envio na auditoria', function (): void {
     superAdminLogado();
     criarAdminUser('destino@teste.com');

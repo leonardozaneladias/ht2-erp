@@ -20,6 +20,7 @@ import './admin/fullscreen';
 import './admin/row-actions';
 import './admin/toast';
 import './admin/confirm';
+import './admin/combobox';
 import './admin/forms';
 import './admin/avatar-cropper';
 import './admin/sortable';

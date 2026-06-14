@@ -8,6 +8,7 @@ use App\Actions\Admin\Notificacoes\EnviarComunicadoAction;
 use App\DTOs\Admin\ComunicadoDTO;
 use App\Enums\PublicoComunicado;
 use App\Enums\TipoNotificacao;
+use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -55,7 +56,21 @@ final class EnviarComunicado extends Component
         return [
             'tipo' => ['required', Rule::enum(TipoNotificacao::class)],
             'titulo' => ['required', 'string', 'max:120'],
-            'mensagem' => ['required', 'string', 'max:1000'],
+            // A mensagem é HTML (rich text). Mede obrigatoriedade e limite pelo
+            // texto puro (strip_tags), não pelas tags.
+            'mensagem' => ['required', 'string', function (string $attribute, mixed $value, Closure $fail): void {
+                $texto = trim(strip_tags((string) $value));
+
+                if ($texto === '') {
+                    $fail('A mensagem é obrigatória.');
+
+                    return;
+                }
+
+                if (mb_strlen($texto) > 1000) {
+                    $fail('A mensagem deve ter no máximo 1000 caracteres.');
+                }
+            }],
             'publico' => ['required', Rule::enum(PublicoComunicado::class)],
             'papel' => ['nullable', 'required_if:publico,papel', Rule::in($this->papeis->all())],
         ];

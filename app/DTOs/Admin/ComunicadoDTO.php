@@ -6,6 +6,7 @@ namespace App\DTOs\Admin;
 
 use App\Enums\PublicoComunicado;
 use App\Enums\TipoNotificacao;
+use App\Support\Html\HtmlSanitizer;
 
 final readonly class ComunicadoDTO
 {
@@ -25,7 +26,8 @@ final readonly class ComunicadoDTO
         return new self(
             tipo: TipoNotificacao::from($data['tipo']),
             titulo: $data['titulo'],
-            mensagem: $data['mensagem'],
+            // Sanitiza o HTML do editor rich text antes de qualquer persistência.
+            mensagem: HtmlSanitizer::clean($data['mensagem']),
             publico: PublicoComunicado::from($data['publico']),
             papel: $data['papel'] ?? null,
         );

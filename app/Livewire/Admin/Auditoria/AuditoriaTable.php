@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Auditoria;
 
 use App\Models\Activity;
+use App\Models\AdminUser;
 use App\Models\Empresa;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -127,6 +128,25 @@ final class AuditoriaTable extends PowerGridComponent
                 ->optionLabel('valor'),
 
             Filter::datepicker('created_at_formatted', 'created_at'),
+
+            Filter::multiSelect('causer', 'causer_id')
+                ->dataSource($this->opcoesDeAutor())
+                ->optionValue('id')
+                ->optionLabel('nome')
+                ->builder(function (Builder $query, array|int|string|null $values): Builder {
+                    $ids = array_values(array_filter(
+                        (array) $values,
+                        static fn (mixed $v): bool => $v !== '' && $v !== null,
+                    ));
+
+                    if ($ids === []) {
+                        return $query;
+                    }
+
+                    return $query
+                        ->where('causer_type', (new AdminUser)->getMorphClass())
+                        ->whereIn('causer_id', $ids);
+                }),
         ];
 
         if ($this->podeVerTodasEmpresas()) {
@@ -202,10 +222,33 @@ final class AuditoriaTable extends PowerGridComponent
     }
 
     /**
+     * Autores (causers do tipo AdminUser) que aparecem na auditoria visível —
+     * para o filtro "Quem". Mesmo escopo por empresa das demais opções.
+     *
+     * @return list<array{id: int, nome: string}>
+     */
+    protected function opcoesDeAutor(): array
+    {
+        $ids = Activity::query()
+            ->visiveisPara($this->usuario())
+            ->where('causer_type', (new AdminUser)->getMorphClass())
+            ->whereNotNull('causer_id')
+            ->distinct()
+            ->pluck('causer_id');
+
+        return AdminUser::query()
+            ->whereIn('id', $ids)
+            ->orderBy('nome')
+            ->get(['id', 'nome'])
+            ->map(static fn (AdminUser $u): array => ['id' => $u->id, 'nome' => (string) $u->nome])
+            ->all();
+    }
+
+    /**
      * O isolamento por empresa vive no scope Activity::visiveisPara — único
      * ponto reusado pelo grid, pelas opções de filtro e pelo drawer de detalhe.
      */
-    private function usuario(): \App\Models\AdminUser
+    private function usuario(): AdminUser
     {
         $user = Auth::guard('admin')->user();
 

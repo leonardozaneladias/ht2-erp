@@ -42,6 +42,8 @@ if (app()->isLocal()) {
         Route::view('/password-input', 'admin.dev.components.password-input')->name('password-input');
         Route::view('/date-picker', 'admin.dev.components.date-picker')->name('date-picker');
         Route::view('/select-search', 'admin.dev.components.select-search')->name('select-search');
+        Route::view('/color-picker', 'admin.dev.components.color-picker')->name('color-picker');
+        Route::view('/rich-editor', 'admin.dev.components.rich-editor')->name('rich-editor');
         Route::view('/tags-input', 'admin.dev.components.tags-input')->name('tags-input');
         Route::view('/date-range-picker', 'admin.dev.components.date-range-picker')->name('date-range-picker');
         Route::view('/cpf-input', 'admin.dev.components.cpf-input')->name('cpf-input');

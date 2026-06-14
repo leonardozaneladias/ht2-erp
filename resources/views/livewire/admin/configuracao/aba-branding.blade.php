@@ -40,35 +40,20 @@
             <div class="grid gap-5 md:grid-cols-2">
                 @foreach ($logos as $item)
                     <div wire:key="upload-{{ $item['campo'] }}">
-                        <label class="form-label">{{ $item['rotulo'] }}</label>
-                        <div class="flex items-center gap-4">
-                            <div
-                                class="border-default-300 bg-light/40 flex h-16 w-32 shrink-0 items-center justify-center overflow-hidden rounded-lg border p-2"
-                            >
-                                <img
-                                    src="{{ $previewUrl(${$item['campo']} ?? null, $item['atual']) }}"
-                                    alt="{{ $item['rotulo'] }}"
-                                    class="max-h-full max-w-full object-contain"
-                                />
-                            </div>
-                            <div class="grow">
-                                <input
-                                    type="file"
-                                    wire:model="{{ $item['campo'] }}"
-                                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                                    class="form-input text-sm"
-                                />
-                                <div
-                                    wire:loading
-                                    wire:target="{{ $item['campo'] }}"
-                                    class="text-default-400 mt-1 text-xs"
-                                >
-                                    Enviando…
-                                </div>
-                                @error ($item['campo'])
-                                    <small class="text-danger mt-1 block text-xs">{{ $message }}</small>
-                                @enderror
-                            </div>
+                        <x-shared.file-upload
+                            variant="compact"
+                            :name="$item['campo']"
+                            :label="$item['rotulo']"
+                            wire:model="{{ $item['campo'] }}"
+                            :preview="$previewUrl(${$item['campo']} ?? null, $item['atual'])"
+                            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                        />
+                        <div
+                            wire:loading
+                            wire:target="{{ $item['campo'] }}"
+                            class="text-default-400 -mt-3 mb-2 text-xs"
+                        >
+                            Enviando…
                         </div>
                     </div>
                 @endforeach
@@ -79,22 +64,12 @@
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($cores as $campo => $rotulo)
                     <div wire:key="cor-{{ $campo }}">
-                        <label class="form-label">{{ $rotulo }}</label>
-                        <div class="border-default-300 flex items-center gap-3 rounded-lg border p-2">
-                            <input
-                                type="color"
-                                x-model="$wire.{{ $campo }}"
-                                class="size-9 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
-                                aria-label="{{ $rotulo }}"
-                            />
-                            <span
-                                class="text-body-color font-mono text-sm uppercase"
-                                x-text="$wire.{{ $campo }}"
-                            ></span>
-                        </div>
-                        @error ($campo)
-                            <small class="text-danger mt-1 block text-xs">{{ $message }}</small>
-                        @enderror
+                        <x-shared.color-picker
+                            :name="$campo"
+                            :label="$rotulo"
+                            wire:model="{{ $campo }}"
+                            :value="${$campo} ?? '#000000'"
+                        />
                     </div>
                 @endforeach
             </div>

@@ -82,7 +82,7 @@
                         <span class="text-body-color block font-medium">{{ $dados['titulo'] ?? 'Notificação' }}</span>
                         <span
                             class="text-default-500 block text-xs"
-                            >{{ \Illuminate\Support\Str::limit($dados['mensagem'] ?? '', 80) }}</span
+                            >{{ \Illuminate\Support\Str::limit(strip_tags($dados['mensagem'] ?? ''), 80) }}</span
                         >
                         <span class="text-default-400 text-2xs">{{ $notificacao->created_at->diffForHumans() }}</span>
                     </span>

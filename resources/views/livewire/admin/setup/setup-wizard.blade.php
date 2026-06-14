@@ -48,21 +48,12 @@
         @if ($passo === 2)
             <div class="grid gap-4">
                 <x-shared.input name="nome_sistema" label="Nome do sistema" wire:model="nome_sistema" required />
-                <div>
-                    <label class="form-label">Cor primária</label>
-                    <div class="border-default-300 flex w-full max-w-xs items-center gap-3 rounded-lg border p-2">
-                        <input
-                            type="color"
-                            x-model="$wire.cor_primaria"
-                            class="size-9 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
-                            aria-label="Cor primária"
-                        />
-                        <span class="text-body-color font-mono text-sm uppercase" x-text="$wire.cor_primaria"></span>
-                    </div>
-                    @error ('cor_primaria')
-                        <small class="text-danger mt-1 block text-xs">{{ $message }}</small>
-                    @enderror
-                </div>
+                <x-shared.color-picker
+                    name="cor_primaria"
+                    label="Cor primária"
+                    wire:model="cor_primaria"
+                    :value="$cor_primaria"
+                />
             </div>
         @endif
 

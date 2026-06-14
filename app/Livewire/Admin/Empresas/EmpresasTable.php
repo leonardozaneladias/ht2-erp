@@ -103,6 +103,9 @@ final class EmpresasTable extends PowerGridComponent
             Filter::inputText('nome')
                 ->placeholder('Filtrar por nome'),
 
+            Filter::inputText('cnpj')
+                ->placeholder('Filtrar por CNPJ (só dígitos)'),
+
             Filter::boolean('ativo')
                 ->label('Ativa', 'Inativa'),
         ];

@@ -19,10 +19,10 @@
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <x-shared.input name="nome" label="Nome" wire:model="nome" required />
             <x-shared.input name="razao_social" label="Razão social" wire:model="razao_social" />
-            <x-shared.input name="cnpj" label="CNPJ" placeholder="00.000.000/0000-00" wire:model="cnpj" />
+            <x-shared.cnpj-input name="cnpj" wire:model="cnpj" />
             <x-shared.input name="inscricao_estadual" label="Inscrição estadual" wire:model="inscricao_estadual" />
             <x-shared.input type="email" name="email" label="E-mail" wire:model="email" />
-            <x-shared.input name="telefone" label="Telefone" wire:model="telefone" />
+            <x-shared.phone-input name="telefone" wire:model="telefone" />
             <x-shared.input name="site_url" label="Site" placeholder="https://" wire:model="site_url" />
             <x-shared.toggle name="ativo" label="Empresa ativa" wire:model="ativo" />
         </div>
@@ -33,17 +33,48 @@
         subtitle="Cores no formato #RRGGBB. Em branco, herdam o tema da instância."
     >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <x-shared.input name="cor_primaria" label="Cor primária" placeholder="#RRGGBB" wire:model="cor_primaria" />
-            <x-shared.input
+            <x-shared.color-picker
+                name="cor_primaria"
+                label="Cor primária"
+                wire:model="cor_primaria"
+                :value="$cor_primaria"
+                clearable
+            />
+            <x-shared.color-picker
                 name="cor_secundaria"
                 label="Cor secundária"
-                placeholder="#RRGGBB"
                 wire:model="cor_secundaria"
+                :value="$cor_secundaria"
+                clearable
             />
-            <x-shared.input name="cor_sucesso" label="Cor de sucesso" placeholder="#RRGGBB" wire:model="cor_sucesso" />
-            <x-shared.input name="cor_warning" label="Cor de alerta" placeholder="#RRGGBB" wire:model="cor_warning" />
-            <x-shared.input name="cor_perigo" label="Cor de perigo" placeholder="#RRGGBB" wire:model="cor_perigo" />
-            <x-shared.input name="cor_info" label="Cor de informação" placeholder="#RRGGBB" wire:model="cor_info" />
+            <x-shared.color-picker
+                name="cor_sucesso"
+                label="Cor de sucesso"
+                wire:model="cor_sucesso"
+                :value="$cor_sucesso"
+                clearable
+            />
+            <x-shared.color-picker
+                name="cor_warning"
+                label="Cor de alerta"
+                wire:model="cor_warning"
+                :value="$cor_warning"
+                clearable
+            />
+            <x-shared.color-picker
+                name="cor_perigo"
+                label="Cor de perigo"
+                wire:model="cor_perigo"
+                :value="$cor_perigo"
+                clearable
+            />
+            <x-shared.color-picker
+                name="cor_info"
+                label="Cor de informação"
+                wire:model="cor_info"
+                :value="$cor_info"
+                clearable
+            />
         </div>
     </x-shared.card>
 
@@ -64,18 +95,13 @@
                 <div class="border-default-200 bg-default-50 mb-5 rounded-lg border p-4">
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <x-shared.input name="filial_nome" label="Nome" wire:model="filial_nome" required />
-                        <x-shared.input
-                            name="filial_cnpj"
-                            label="CNPJ"
-                            placeholder="00.000.000/0000-00"
-                            wire:model="filial_cnpj"
-                        />
+                        <x-shared.cnpj-input name="filial_cnpj" wire:model="filial_cnpj" />
                         <x-shared.input
                             name="filial_inscricao_estadual"
                             label="Inscrição estadual"
                             wire:model="filial_inscricao_estadual"
                         />
-                        <x-shared.input name="filial_telefone" label="Telefone" wire:model="filial_telefone" />
+                        <x-shared.phone-input name="filial_telefone" wire:model="filial_telefone" />
                         <x-shared.input name="filial_cidade" label="Cidade" wire:model="filial_cidade" />
                         <x-shared.input
                             name="filial_estado"

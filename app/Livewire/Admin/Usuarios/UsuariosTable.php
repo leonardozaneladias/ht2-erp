@@ -161,6 +161,8 @@ final class UsuariosTable extends PowerGridComponent
                         fn (Builder $q): Builder => $q->whereIn('name', $perfis),
                     );
                 }),
+
+            Filter::datepicker('last_login_at_formatted', 'last_login_at'),
         ];
     }
 
