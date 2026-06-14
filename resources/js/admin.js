@@ -16,6 +16,7 @@ import moment from 'moment';
 import './admin/preline';
 import './admin/sidebar';
 import './admin/theme';
+import './admin/appearance-preview';
 import './admin/fullscreen';
 import './admin/row-actions';
 import './admin/toast';
