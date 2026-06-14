@@ -24,4 +24,21 @@
             </div>
         </x-shared.card>
     </div>
+    <x-shared.card
+        class="mt-6"
+        title="Modo stacked (em formulários)"
+        subtitle="Rótulo no topo e altura alinhada aos inputs do grid (use o prop stacked)"
+    >
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <x-shared.input name="demo_nome" label="Nome" placeholder="Ex.: Acme Ltda." />
+            <x-shared.toggle
+                name="demo_ativo"
+                label="Registro ativo"
+                stacked
+                onText="Ativo"
+                offText="Inativo"
+                checked
+            />
+        </div>
+    </x-shared.card>
 @endsection

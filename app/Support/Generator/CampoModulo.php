@@ -293,7 +293,7 @@ final class CampoModulo
             // form, o gerador usa input numérico (centavos) para ficar correto
             // ponta a ponta. Troque por money-input quando adicionar o caster.
             'money' => "<x-shared.input type=\"number\" min=\"0\" step=\"1\" name=\"{$nome}\" label=\"{$label} (centavos)\" wire:model=\"{$nome}\"{$req} />",
-            'boolean' => "<x-shared.toggle name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\" />",
+            'boolean' => "<x-shared.toggle name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\" stacked />",
             'date', 'datetime' => "<x-shared.date-picker name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
             'cnpj' => "<x-shared.cnpj-input name=\"{$nome}\" wire:model=\"{$nome}\"{$req} />",
             'cpf' => "<x-shared.cpf-input name=\"{$nome}\" wire:model=\"{$nome}\"{$req} />",

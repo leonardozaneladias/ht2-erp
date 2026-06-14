@@ -96,7 +96,14 @@
                         />
                     @endif
 
-                    <x-shared.toggle name="ativo" label="Usuário ativo" wire:model="ativo" />
+                    <x-shared.toggle
+                        name="ativo"
+                        label="Usuário ativo"
+                        wire:model="ativo"
+                        stacked
+                        onText="Ativo"
+                        offText="Inativo"
+                    />
 
                     @if ($modo === 'editar' && $this->emailNaoVerificado)
                         <div class="md:col-span-2">

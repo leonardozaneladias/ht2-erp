@@ -24,7 +24,14 @@
             <x-shared.input type="email" name="email" label="E-mail" wire:model="email" />
             <x-shared.phone-input name="telefone" wire:model="telefone" />
             <x-shared.input name="site_url" label="Site" placeholder="https://" wire:model="site_url" />
-            <x-shared.toggle name="ativo" label="Empresa ativa" wire:model="ativo" />
+            <x-shared.toggle
+                name="ativo"
+                label="Empresa ativa"
+                wire:model="ativo"
+                stacked
+                onText="Ativa"
+                offText="Inativa"
+            />
         </div>
     </x-shared.card>
 
@@ -110,7 +117,14 @@
                             maxlength="2"
                             wire:model="filial_estado"
                         />
-                        <x-shared.toggle name="filial_ativo" label="Filial ativa" wire:model="filial_ativo" />
+                        <x-shared.toggle
+                            name="filial_ativo"
+                            label="Filial ativa"
+                            wire:model="filial_ativo"
+                            stacked
+                            onText="Ativa"
+                            offText="Inativa"
+                        />
                     </div>
                     <div class="mt-4 flex justify-end gap-2">
                         <x-shared.button

@@ -115,18 +115,36 @@ Switch on/off estilo iOS. Alternativa a checkbox para estados booleanos (ativo/i
 
 ### API final
 
-- props: `name`, `id`, `label`, `hint`, `checked`
+- props: `name`, `id`, `label`, `hint`, `checked`, `stacked`, `required`, `onText`, `offText`
 - ajustes aplicados:
     - ganhou suporte a erro, `checked` inicial e `aria-invalid`
     - permaneceu sem JS extra, usando a semântica booleana esperada para o backoffice
+    - **modo `stacked`** (default `false`): renderiza o rótulo no topo (`.form-label`) e o switch
+      dentro de um controle de altura `h-9.25`, alinhado verticalmente aos `x-shared.input`/`select`
+      vizinhos quando o toggle está num **grid de formulário**. Sem `stacked`, mantém o layout inline
+      (switch + rótulo lado a lado) usado em listas de configurações/menus.
+    - `required` exibe o `*` no rótulo (paridade com `x-shared.input`); `onText`/`offText` (default
+      `Sim`/`Não`) mostram o estado on/off ao lado do switch no modo `stacked`, via `peer-checked`
+      (puro CSS, sem Alpine).
+
+### Quando usar `stacked`
+
+| Contexto                                                 | Modo             |
+| -------------------------------------------------------- | ---------------- |
+| Toggle dentro de um `grid` ao lado de inputs (form CRUD) | `stacked`        |
+| Lista vertical de preferências (Configurações, Menus)    | default (inline) |
 
 ### Exemplo final
 
 ```blade
+{{-- Em listas de configurações (inline) --}}
 <x-shared.toggle
     name="exige_aprovacao"
     label="Exige aprovação"
     hint="Ative para registros que precisam de revisão manual."
     checked
 />
+
+{{-- Dentro de um grid de formulário (alinhado aos demais campos) --}}
+<x-shared.toggle name="ativo" label="Empresa ativa" wire:model="ativo" stacked onText="Ativa" offText="Inativa" />
 ```
