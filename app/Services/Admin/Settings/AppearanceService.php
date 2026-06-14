@@ -11,6 +11,7 @@ use App\Enums\Admin\Appearance\Skin;
 use App\Enums\Admin\Appearance\TemaPadrao;
 use App\Enums\Admin\Appearance\TopbarColor;
 use App\Settings\AppearanceSettings;
+use Throwable;
 
 /**
  * Resolve os atributos de aparência/layout (data-*) para as views.
@@ -26,42 +27,42 @@ final class AppearanceService
 
     public function temaPadrao(): string
     {
-        return (TemaPadrao::tryFrom($this->settings->tema_padrao) ?? TemaPadrao::padrao())->value;
+        return (TemaPadrao::tryFrom($this->texto('tema_padrao')) ?? TemaPadrao::padrao())->value;
     }
 
     public function skin(): string
     {
-        return (Skin::tryFrom($this->settings->skin) ?? Skin::padrao())->value;
+        return (Skin::tryFrom($this->texto('skin')) ?? Skin::padrao())->value;
     }
 
     public function topbarColor(): string
     {
-        return (TopbarColor::tryFrom($this->settings->topbar_color) ?? TopbarColor::padrao())->value;
+        return (TopbarColor::tryFrom($this->texto('topbar_color')) ?? TopbarColor::padrao())->value;
     }
 
     public function menuColor(): string
     {
-        return (MenuColor::tryFrom($this->settings->menu_color) ?? MenuColor::padrao())->value;
+        return (MenuColor::tryFrom($this->texto('menu_color')) ?? MenuColor::padrao())->value;
     }
 
     public function layoutWidth(): string
     {
-        return (LayoutWidth::tryFrom($this->settings->layout_width) ?? LayoutWidth::padrao())->value;
+        return (LayoutWidth::tryFrom($this->texto('layout_width')) ?? LayoutWidth::padrao())->value;
     }
 
     public function sidenavSizePadrao(): string
     {
-        return (SidenavSize::tryFrom($this->settings->sidenav_size_padrao) ?? SidenavSize::padrao())->value;
+        return (SidenavSize::tryFrom($this->texto('sidenav_size_padrao')) ?? SidenavSize::padrao())->value;
     }
 
     public function sidenavUser(): bool
     {
-        return $this->settings->sidenav_user;
+        return $this->booleano('sidenav_user', true);
     }
 
     public function permitirPreferenciaUsuario(): bool
     {
-        return $this->settings->permitir_preferencia_usuario;
+        return $this->booleano('permitir_preferencia_usuario', true);
     }
 
     /**
@@ -84,5 +85,30 @@ final class AppearanceService
             'topbar-color' => $this->topbarColor(),
             'sidenav-color' => $this->menuColor(),
         ];
+    }
+
+    /**
+     * Lê uma propriedade string dos settings com tolerância a falhas (sem banco,
+     * tabela settings ausente etc.) — assim o tema funciona em páginas de erro
+     * e durante a instalação. Retorna '' no erro (cai no padrão via enum).
+     */
+    private function texto(string $propriedade): string
+    {
+        try {
+            $valor = $this->settings->{$propriedade};
+
+            return is_string($valor) ? $valor : '';
+        } catch (Throwable) {
+            return '';
+        }
+    }
+
+    private function booleano(string $propriedade, bool $padrao): bool
+    {
+        try {
+            return (bool) $this->settings->{$propriedade};
+        } catch (Throwable) {
+            return $padrao;
+        }
     }
 }
