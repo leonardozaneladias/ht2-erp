@@ -80,3 +80,25 @@ it('rejeita e-mail de contato inválido', function () {
         ->call('salvar')
         ->assertHasErrors(['email_contato']);
 });
+
+it('filtra as seções da navegação pela busca', function () {
+    $admin = criarAdminUser('busca@config.test');
+    $admin->assignRole('super-admin');
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(App\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)
+        ->set('busca', 'fuso')
+        ->assertSee('Localização')
+        ->assertDontSee('Tela de login');
+});
+
+it('troca a aba ativa via irPara', function () {
+    $admin = criarAdminUser('navega@config.test');
+    $admin->assignRole('super-admin');
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(App\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)
+        ->call('irPara', 'seguranca')
+        ->assertSet('abaAtiva', 'seguranca')
+        ->assertSee('Política de senha');
+});

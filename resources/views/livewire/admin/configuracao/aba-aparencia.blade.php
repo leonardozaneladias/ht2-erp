@@ -76,7 +76,6 @@
     <div class="grid content-start gap-6">
         {{-- Presets --}}
         <x-shared.card
-            class="rounded-t-none border-t-0"
             title="Presets de tema"
             subtitle="Comece por um preset e ajuste o que quiser. Aplica cores e chrome (não salva sozinho)."
         >

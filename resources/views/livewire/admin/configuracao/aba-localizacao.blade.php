@@ -1,6 +1,6 @@
 <div>
     <form wire:submit="salvar" class="grid gap-6">
-        <x-shared.card class="rounded-t-none border-t-0" title="Idioma e fuso" subtitle="Aplicados a toda a aplicação.">
+        <x-shared.card title="Idioma e fuso" subtitle="Aplicados a toda a aplicação.">
             <div class="grid gap-x-4 md:grid-cols-2">
                 <x-shared.select
                     name="idioma"

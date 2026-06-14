@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Enums\Admin;
 
+use Illuminate\Support\Str;
+
 /**
  * Grupos de configuração do sistema.
  *
@@ -49,6 +51,34 @@ enum SettingsGroup: string
             self::LOCALIZACAO => 'Idioma, fuso horário, moeda e formatos.',
             self::SEGURANCA => 'Política de senha, sessão e retenção de logs.',
         };
+    }
+
+    /**
+     * Palavras-chave para a busca de configurações (encontra seções por campos
+     * internos, não só pelo rótulo). Sem acento/maiúsculas na comparação.
+     *
+     * @return array<int, string>
+     */
+    public function palavrasChave(): array
+    {
+        return match ($this) {
+            self::GERAL => ['empresa', 'cliente', 'cnpj', 'razao social', 'inscricao estadual', 'endereco', 'telefone', 'cep', 'site'],
+            self::BRANDING, self::APARENCIA => ['tema', 'cor', 'cores', 'paleta', 'logo', 'logotipo', 'favicon', 'icone', 'skin', 'escuro', 'claro', 'menu', 'barra', 'topbar', 'marca', 'branding', 'preset'],
+            self::LOGIN => ['login', 'tela de login', 'fundo', 'titulo', 'subtitulo'],
+            self::EMAIL => ['e-mail', 'email', 'smtp', 'servidor', 'remetente', 'porta', 'senha smtp'],
+            self::LOCALIZACAO => ['idioma', 'fuso', 'fuso horario', 'timezone', 'moeda', 'formato', 'data', 'decimais'],
+            self::SEGURANCA => ['senha', 'sessao', 'timeout', '2fa', 'auditoria', 'retencao', 'logs', 'lockout', 'tentativas', 'bloqueio'],
+        };
+    }
+
+    /** Casa o termo de busca contra rótulo + descrição + palavras-chave (sem acento). */
+    public function correspondeBusca(string $termo): bool
+    {
+        $normalizar = static fn (string $valor): string => Str::lower(Str::ascii($valor));
+
+        $alvo = $normalizar(implode(' ', [$this->label(), $this->descricao(), ...$this->palavrasChave()]));
+
+        return str_contains($alvo, $normalizar(trim($termo)));
     }
 
     /**
