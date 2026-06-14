@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property __STATUS_ENUM__ $status
+ * @property __STATUS_ENUM__ $status__MODEL_DATE_PROPERTIES__
  */
 class __MODULO_STUDLY__ extends Model
 {

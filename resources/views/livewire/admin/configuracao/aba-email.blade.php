@@ -1,6 +1,10 @@
 <div>
     <form wire:submit="salvar" class="grid gap-6">
-        <x-shared.card title="Servidor SMTP" subtitle="Credenciais do servidor de envio de e-mails.">
+        <x-shared.card
+            class="rounded-t-none border-t-0"
+            title="Servidor SMTP"
+            subtitle="Credenciais do servidor de envio de e-mails."
+        >
             <div class="grid gap-x-4 md:grid-cols-2">
                 <x-shared.input
                     name="smtp_host"

@@ -17,7 +17,7 @@ __DTO_PROPS__
      */
     public static function fromArray(array $data): self
     {
-        __DTO_TEXTO_HELPER__return new self(
+        __DTO_HTML_HELPER____DTO_TEXTO_HELPER__return new self(
 __DTO_FROMARRAY__
         );
     }

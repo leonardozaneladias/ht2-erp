@@ -1,5 +1,9 @@
 <div>
-    <x-shared.card title="Dados da empresa" subtitle="Informações do cliente dono desta instalação.">
+    <x-shared.card
+        class="rounded-t-none border-t-0"
+        title="Dados da empresa"
+        subtitle="Informações do cliente dono desta instalação."
+    >
         <form wire:submit="salvar" class="grid gap-4">
             <div class="grid gap-x-4 md:grid-cols-2">
                 <x-shared.input name="nome_cliente" label="Nome do cliente" wire:model="nome_cliente" required />

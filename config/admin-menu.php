@@ -81,4 +81,22 @@ return [
             ],
         ],
     ],
+    [
+        // Módulos de negócio gerados pelo make:modulo. Cada item nasce com
+        // `permission => '{modulo}.listar'`: visível só para super-admin (bypass)
+        // até a permissão ser atribuída a outros perfis.
+        'key' => 'negocio',
+        'title' => 'Negócio',
+        'items' => [
+            [
+                'key' => 'exemplos',
+                'label' => 'Exemplo (demo)',
+                'icon' => 'tabler--components',
+                'route' => 'admin.exemplos.index',
+                'permission' => 'exemplos.listar',
+                'active' => ['admin.exemplos.*'],
+            ],
+            // make:modulo insere itens de menu acima desta linha
+        ],
+    ],
 ];

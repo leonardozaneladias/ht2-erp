@@ -35,7 +35,11 @@ class HistoricoRegistro extends Component
     #[Locked]
     public int $subjectId;
 
-    public function mount(string $subjectType, int $subjectId): void
+    /** Sem moldura própria (card/cabeçalho): para embutir dentro de um x-shared.tab-body. */
+    #[Locked]
+    public bool $bare = false;
+
+    public function mount(string $subjectType, int $subjectId, bool $bare = false): void
     {
         $user = Auth::guard('admin')->user();
 
@@ -45,6 +49,7 @@ class HistoricoRegistro extends Component
 
         $this->subjectType = $subjectType;
         $this->subjectId = $subjectId;
+        $this->bare = $bare;
     }
 
     public function placeholder(): View

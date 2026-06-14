@@ -241,6 +241,9 @@ final class EspecificacaoModulo
         $linhas = [];
 
         foreach ($this->campos as $campo) {
+            if ($campo->tipo === 'multiselect') {
+                $linhas[] = '/** @var list<string> */';
+            }
             $linhas[] = "public {$campo->tipoPhp()} \${$campo->camel()}{$campo->defaultPhp()},";
         }
         // Default no status garante que nenhum parâmetro obrigatório siga um
@@ -277,7 +280,19 @@ final class EspecificacaoModulo
     public function dtoUsaTextoHelper(): bool
     {
         foreach ($this->campos as $campo) {
-            if ($campo->nullable && ! in_array($campo->tipo, ['integer', 'money', 'boolean'], true)) {
+            if ($campo->nullable && ! in_array($campo->tipo, ['integer', 'money', 'boolean', 'multiselect', 'richtext'], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** Há richtext nullable? (usa o helper $html com HtmlSanitizer no fromArray). */
+    public function dtoUsaHtmlHelper(): bool
+    {
+        foreach ($this->campos as $campo) {
+            if ($campo->tipo === 'richtext' && $campo->nullable) {
                 return true;
             }
         }
@@ -292,6 +307,10 @@ final class EspecificacaoModulo
         $linhas = [];
 
         foreach ($this->campos as $campo) {
+            // PHPStan (nível 6) exige tipo de valor em arrays.
+            if ($campo->tipo === 'multiselect') {
+                $linhas[] = '/** @var list<string> */';
+            }
             $linhas[] = "public {$campo->tipoLivewire()} \${$campo->nome} = {$campo->defaultLivewire()};";
         }
         $linhas[] = "public string \$status = '{$this->statusValueDefault()}';";
@@ -299,17 +318,42 @@ final class EspecificacaoModulo
         return $this->bloco($linhas, $espacos);
     }
 
+    /**
+     * Linhas @property (Carbon) para os campos de data — larastan não infere o
+     * tipo a partir do cast, então anotamos no docblock do model (token
+     * __MODEL_DATE_PROPERTIES__). Vazio quando o módulo não tem datas.
+     */
+    public function modelDateProperties(): string
+    {
+        $linhas = [];
+
+        foreach ($this->campos as $campo) {
+            if (in_array($campo->tipo, ['date', 'datetime'], true)) {
+                $tipo = $campo->nullable ? '\Illuminate\Support\Carbon|null' : '\Illuminate\Support\Carbon';
+                $linhas[] = " * @property {$tipo} \${$campo->nome}";
+            }
+        }
+
+        return $linhas === [] ? '' : "\n" . implode("\n", $linhas);
+    }
+
     public function formMountLoad(int $espacos = 8): string
     {
         $linhas = [];
 
         foreach ($this->campos as $campo) {
-            $cast = match ($campo->tipo) {
-                'integer', 'money' => '(int) ',
-                'boolean' => '(bool) ',
-                default => $campo->nullable ? '' : '(string) ',
+            // RHS por tipo. Datas voltam como Carbon (cast date/datetime) e
+            // precisam virar string no formato do input antes de cair na prop.
+            $col = "\$registro->{$campo->nome}";
+            $rhs = match ($campo->tipo) {
+                'integer', 'money' => "(int) {$col}",
+                'boolean' => "(bool) {$col}",
+                'multiselect' => "(array) {$col}",
+                'date' => $campo->nullable ? "{$col}?->format('Y-m-d')" : "{$col}->format('Y-m-d')",
+                'datetime' => $campo->nullable ? "{$col}?->format('Y-m-d H:i')" : "{$col}->format('Y-m-d H:i')",
+                default => $campo->nullable ? $col : "(string) {$col}",
             };
-            $linhas[] = "\$this->{$campo->nome} = {$cast}\$registro->{$campo->nome};";
+            $linhas[] = "\$this->{$campo->nome} = {$rhs};";
         }
         $linhas[] = '$this->status = $registro->status->value;';
 
@@ -477,16 +521,70 @@ final class EspecificacaoModulo
 
     public function formViewFields(int $espacos = 12): string
     {
-        $linhas = [];
-
-        foreach ($this->campos as $campo) {
-            $linhas[] = $campo->componenteBlade();
-        }
-
-        // status: select pesquisável com options do Enum (FQCN no Blade)
-        $linhas[] = '<x-shared.select name="status" label="Status" wire:model="status" :options="\App\Enums\\' . $this->statusEnumShort() . '::options()" required />';
+        $linhas = array_map(
+            fn (CampoModulo $campo): string => $this->campoBladeLinha($campo),
+            [...$this->campos, $this->status],
+        );
 
         return $this->bloco($linhas, $espacos);
+    }
+
+    /** Algum campo (incl. status) declara uma aba(...)? Decide card único × abas. */
+    public function temAbas(): bool
+    {
+        if ($this->status->aba !== null) {
+            return true;
+        }
+
+        foreach ($this->campos as $campo) {
+            if ($campo->aba !== null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Campos (incl. status) agrupados por aba, na ordem de primeira aparição.
+     * Campos regulares sem aba caem na primeira aba; o status sem aba, na última.
+     *
+     * @return array<string, list<CampoModulo>>
+     */
+    public function abas(): array
+    {
+        $ordem = [];
+        foreach ([...$this->campos, $this->status] as $campo) {
+            if ($campo->aba !== null && ! in_array($campo->aba, $ordem, true)) {
+                $ordem[] = $campo->aba;
+            }
+        }
+
+        if ($ordem === []) {
+            return [];
+        }
+
+        $primeira = $ordem[0];
+        $ultima = $ordem[count($ordem) - 1];
+
+        /** @var array<string, list<CampoModulo>> $grupos */
+        $grupos = array_fill_keys($ordem, []);
+
+        foreach ($this->campos as $campo) {
+            $grupos[$campo->aba ?? $primeira][] = $campo;
+        }
+        $grupos[$this->status->aba ?? $ultima][] = $this->status;
+
+        return $grupos;
+    }
+
+    /**
+     * Corpo do formulário (token __FORM_BODY__): card único quando não há abas,
+     * ou abas conectadas (x-shared.tab-nav + tab-body) quando algum campo tem aba(...).
+     */
+    public function formBody(): string
+    {
+        return $this->temAbas() ? $this->formBodyAbas() : $this->formBodyCardUnico();
     }
 
     // ---- Blocos: Enum de status ------------------------------------------
@@ -566,6 +664,73 @@ final class EspecificacaoModulo
         return $this->bloco($linhas, $espacos);
     }
 
+    private function formBodyCardUnico(): string
+    {
+        return implode("\n", [
+            '    <x-shared.card title="Dados">',
+            '        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">',
+            $this->formViewFields(12),
+            '        </div>',
+            '    </x-shared.card>',
+        ]);
+    }
+
+    private function formBodyAbas(): string
+    {
+        $triggers = [];
+        $panels = [];
+        $primeira = true;
+
+        foreach ($this->abas() as $rotulo => $campos) {
+            $id = 'aba-' . Str::slug($rotulo);
+            $active = $primeira ? ' active' : '';
+
+            $nomes = implode(', ', array_map(
+                static fn (CampoModulo $campo): string => "'{$campo->nome}'",
+                $campos,
+            ));
+
+            $triggers[] = "        <x-shared.tab-trigger id=\"{$id}\"{$active} :has-error=\"\$errors->hasAny([{$nomes}])\">{$rotulo}</x-shared.tab-trigger>";
+
+            $campoLinhas = implode("\n", array_map(
+                fn (CampoModulo $campo): string => '                ' . $this->campoBladeLinha($campo),
+                $campos,
+            ));
+
+            $panels[] = implode("\n", [
+                "        <x-shared.tab-panel id=\"{$id}\"{$active}>",
+                '            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">',
+                $campoLinhas,
+                '            </div>',
+                '        </x-shared.tab-panel>',
+            ]);
+
+            $primeira = false;
+        }
+
+        // A conexão sem gap é garantida pelo próprio x-shared.tab-nav (mb-0!),
+        // que anula o space-y-6 da view-pai e cola a nav no tab-body.
+        return implode("\n", [
+            '    <x-shared.tab-nav>',
+            implode("\n", $triggers),
+            '    </x-shared.tab-nav>',
+            '',
+            '    <x-shared.tab-body>',
+            implode("\n\n", $panels),
+            '    </x-shared.tab-body>',
+        ]);
+    }
+
+    /** Linha Blade de um campo no formulário (status é select com options do Enum). */
+    private function campoBladeLinha(CampoModulo $campo): string
+    {
+        if ($campo->ehStatus()) {
+            return '<x-shared.select-search name="status" label="Status" wire:model="status" :options="\App\Enums\\' . $this->statusEnumShort() . '::options()" required />';
+        }
+
+        return $campo->componenteBlade();
+    }
+
     // ---- Helpers de bloco -------------------------------------------------
 
     /**
@@ -590,6 +755,10 @@ final class EspecificacaoModulo
         return match ($campo->tipo) {
             'integer', 'money' => "{$prop}: (int) (\$data['{$chave}'] ?? 0),",
             'boolean' => "{$prop}: (bool) (\$data['{$chave}'] ?? false),",
+            'multiselect' => "{$prop}: (array) (\$data['{$chave}'] ?? []),",
+            'richtext' => $campo->nullable
+                ? "{$prop}: \$html('{$chave}'),"
+                : "{$prop}: \App\Support\Html\HtmlSanitizer::clean((string) (\$data['{$chave}'] ?? '')),",
             default => $campo->nullable
                 ? "{$prop}: \$texto('{$chave}'),"
                 : "{$prop}: (string) (\$data['{$chave}'] ?? ''),",

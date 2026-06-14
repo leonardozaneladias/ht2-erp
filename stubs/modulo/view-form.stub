@@ -15,11 +15,7 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    <x-shared.card title="Dados">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-__FORM_VIEW_FIELDS__
-        </div>
-    </x-shared.card>
+__FORM_BODY__
 
     <x-admin.form-footer
         :cancel-href="route('admin.__MODULO_ROTA_NOME__.index')"

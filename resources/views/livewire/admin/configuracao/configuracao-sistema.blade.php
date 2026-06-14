@@ -12,7 +12,8 @@
         @endforeach
     </x-shared.tab-nav>
 
-    <div class="mt-5">
+    {{-- Sem gap: a aba ativa conecta no topo do card de cada aba (rounded-t-none border-t-0). --}}
+    <div>
         @foreach ($abas as $aba)
             <x-shared.tab-panel :id="$aba->value" :active="$aba->value === $abaAtiva">
                 @switch ($aba->value)
@@ -35,7 +36,11 @@
                         <livewire:admin.configuracao.aba-seguranca />
                         @break
                     @default
-                        <x-shared.card :title="$aba->label()" :subtitle="$aba->descricao()">
+                        <x-shared.card
+                            class="rounded-t-none border-t-0"
+                            :title="$aba->label()"
+                            :subtitle="$aba->descricao()"
+                        >
                             <x-shared.empty-state
                                 size="sm"
                                 :icon="$aba->icon()"

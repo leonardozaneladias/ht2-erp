@@ -9,7 +9,8 @@
         @endforeach
     </x-shared.tab-nav>
 
-    <div class="mt-5">
+    {{-- Sem gap: a aba ativa conecta no topo do primeiro card de cada aba. --}}
+    <div>
         <x-shared.tab-panel id="perfil" :active="$abaAtiva === 'perfil'">
             <livewire:admin.conta.perfil-conta />
         </x-shared.tab-panel>

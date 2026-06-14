@@ -1,10 +1,12 @@
-<div class="bg-card border-default-200 overflow-hidden rounded-lg border">
-    <div class="border-default-200 border-b p-5">
-        <h3 class="text-lg font-semibold">Histórico de mudanças</h3>
-        <p class="text-default-500 mt-0.5 text-sm">Trilha de auditoria deste registro (quem mudou o quê, e quando).</p>
-    </div>
+<div @class (['bg-card border-default-200 overflow-hidden rounded-lg border' => ! $bare])>
+    @unless ($bare)
+        <div class="border-default-200 border-b p-5">
+            <h3 class="text-lg font-semibold">Histórico de mudanças</h3>
+            <p class="text-default-500 mt-0.5 text-sm">Trilha de auditoria deste registro (quem mudou o quê, e quando).</p>
+        </div>
+    @endunless
 
-    <div class="p-5">
+    <div @class (['p-5' => ! $bare])>
         @if ($atividades->isEmpty())
             <x-shared.empty-state
                 icon="tabler--history-off"

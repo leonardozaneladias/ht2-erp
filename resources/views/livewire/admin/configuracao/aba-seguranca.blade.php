@@ -1,6 +1,7 @@
 <div>
     <form wire:submit="salvar" class="grid gap-6">
         <x-shared.card
+            class="rounded-t-none border-t-0"
             title="Política de senha"
             subtitle="Exigências aplicadas ao cadastrar ou alterar senhas de usuários."
         >

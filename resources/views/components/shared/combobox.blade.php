@@ -67,7 +67,11 @@
         @if ($field !== null) data-combobox-field="{{ $field }}" @endif
         @if ($tableName !== null) data-combobox-table="{{ $tableName }}" @endif
         @class ([
-            'text-body-color bg-card flex min-h-[1.875rem] w-full items-center justify-between gap-1.5 rounded border px-2 text-start text-[0.8125rem] transition-colors focus:outline-0',
+            'text-body-color bg-card flex w-full items-center justify-between gap-1.5 rounded border text-start transition-colors focus:outline-0',
+            // Modo form: casa com a altura/padding/fonte dos demais inputs (form-input: h-9.25, px-3, text-sm).
+            'h-9.25 px-3 text-sm' => $mode === 'form',
+            // Modo pg-filter (filtros de tabela): compacto.
+            'min-h-[1.875rem] px-2 text-[0.8125rem]' => $mode !== 'form',
             'border-default-300 hover:border-default-400 focus:border-default-500' => ! $invalid,
             'border-danger!' => $invalid,
             $triggerClass,

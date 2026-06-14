@@ -1,4 +1,4 @@
-<x-shared.card title="Senha" subtitle="Troque sua senha de acesso ao painel.">
+<x-shared.card class="rounded-t-none border-t-0" title="Senha" subtitle="Troque sua senha de acesso ao painel.">
     <form wire:submit="trocar" class="grid max-w-md gap-4">
         <x-shared.password-input
             name="senhaAtual"

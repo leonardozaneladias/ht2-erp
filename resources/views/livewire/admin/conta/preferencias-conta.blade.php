@@ -1,4 +1,8 @@
-<x-shared.card title="Preferências" subtitle="Idioma e fuso horário aplicados à sua experiência.">
+<x-shared.card
+    class="rounded-t-none border-t-0"
+    title="Preferências"
+    subtitle="Idioma e fuso horário aplicados à sua experiência."
+>
     <form wire:submit="salvar" class="grid max-w-md gap-4">
         <x-shared.select
             name="locale"

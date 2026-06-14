@@ -29,10 +29,13 @@ final class MakeModuloCommand extends Command
         {nome : Nome do módulo no singular, PascalCase (ex.: Produto)}
         {--fields= : Lista "nome:tipo:modificador" separada por vírgula}
         {--tenant : Vincula o módulo à empresa ativa (trait BelongsToEmpresa)}
+        {--menu= : Rótulo do item de menu (default: nome no plural)}
+        {--menu-icon=tabler--folder : Ícone do item de menu (Tabler)}
+        {--skip-menu : Não injeta o item no menu lateral (config/admin-menu.php)}
         {--soft-delete : Reservado para evolução futura}
         {--force : Sobrescreve arquivos existentes}';
 
-    protected $description = 'Gera um módulo CRUD completo no padrão do projeto (model, DTO, actions, Livewire, PowerGrid, views, teste, rotas e permissões).';
+    protected $description = 'Gera um módulo CRUD completo no padrão do projeto (model, DTO, actions, Livewire, PowerGrid, views, teste, rotas, permissões e item de menu).';
 
     /** @var list<string> caminhos gerados (para o resumo final) */
     private array $criados = [];
@@ -70,6 +73,7 @@ final class MakeModuloCommand extends Command
 
         $this->injetarRotas($spec);
         $this->injetarPermissoes($spec);
+        $this->injetarMenu($spec);
 
         $this->resumo($spec);
 
@@ -98,13 +102,19 @@ final class MakeModuloCommand extends Command
             ? "\$texto = static fn (string \$chave): ?string => isset(\$data[\$chave]) && \$data[\$chave] !== ''\n            ? (string) \$data[\$chave]\n            : null;\n\n        "
             : '';
 
+        $htmlHelper = $spec->dtoUsaHtmlHelper()
+            ? "\$html = static fn (string \$chave): ?string => isset(\$data[\$chave]) && trim((string) \$data[\$chave]) !== ''\n            ? \\App\\Support\\Html\\HtmlSanitizer::clean((string) \$data[\$chave])\n            : null;\n\n        "
+            : '';
+
         return [
             ...$spec->tokens(),
             '__MIGRATION_COLUNAS__' => $spec->migrationColunas(),
             '__MIGRATION_INDICES__' => $spec->migrationIndices(),
             '__MODEL_FILLABLE__' => $spec->modelFillable(),
+            '__MODEL_DATE_PROPERTIES__' => $spec->modelDateProperties(),
             '__MODEL_CASTS__' => $spec->modelCasts(),
             '__DTO_PROPS__' => $spec->dtoProps(),
+            '__DTO_HTML_HELPER__' => $htmlHelper,
             '__DTO_TEXTO_HELPER__' => $textoHelper,
             '__DTO_FROMARRAY__' => $spec->dtoFromArray(),
             '__DTO_PARAMODEL__' => $spec->dtoParaModel(),
@@ -117,7 +127,7 @@ final class MakeModuloCommand extends Command
             '__PG_FIELDS__' => $spec->pgFields(),
             '__PG_COLUMNS__' => $spec->pgColumns(),
             '__PG_FILTERS__' => $spec->pgFilters(),
-            '__FORM_VIEW_FIELDS__' => $spec->formViewFields(),
+            '__FORM_BODY__' => $spec->formBody(),
             '__ENUM_CASES__' => $spec->enumCases(),
             '__ENUM_LABEL_ARMS__' => $spec->enumLabelArms(),
             '__ENUM_VARIANT_ARMS__' => $spec->enumVariantArms(),
@@ -297,6 +307,67 @@ PHP;
         return implode("\n", $linhas);
     }
 
+    /**
+     * Injeta o item de menu do módulo na seção "Negócio" de config/admin-menu.php
+     * (mesma técnica de âncora + str_replace). `permission => '{modulo}.listar'`
+     * deixa o item visível só para super-admin até a permissão ser atribuída.
+     */
+    private function injetarMenu(EspecificacaoModulo $spec): void
+    {
+        if ($this->option('skip-menu')) {
+            return;
+        }
+
+        $arquivo = base_path('config/admin-menu.php');
+        $conteudo = (string) File::get($arquivo);
+
+        $base = $spec->snakePlural();
+
+        if (str_contains($conteudo, "'key' => '{$base}'")) {
+            $this->pulados[] = 'config/admin-menu.php (item de menu já existe)';
+
+            return;
+        }
+
+        $marcador = '            // make:modulo insere itens de menu acima desta linha';
+
+        if (! str_contains($conteudo, $marcador)) {
+            $this->warn("Seção 'negocio'/âncora ausente em config/admin-menu.php — adicione o item manualmente:");
+            $this->line($this->snippetMenu($spec));
+
+            return;
+        }
+
+        $label = (string) ($this->option('menu') ?: $spec->studlyPlural);
+        $icon = (string) $this->option('menu-icon');
+
+        $bloco = implode("\n", [
+            '            [',
+            "                'key' => '{$base}',",
+            "                'label' => '{$label}',",
+            "                'icon' => '{$icon}',",
+            "                'route' => 'admin.{$base}.index',",
+            "                'permission' => '{$base}.listar',",
+            "                'active' => ['admin.{$base}.*'],",
+            '            ],',
+            $marcador,
+        ]);
+
+        $conteudo = str_replace($marcador, $bloco, $conteudo);
+        File::put($arquivo, $conteudo);
+
+        $this->criados[] = 'config/admin-menu.php (item de menu, seção Negócio)';
+    }
+
+    private function snippetMenu(EspecificacaoModulo $spec): string
+    {
+        $base = $spec->snakePlural();
+        $label = (string) ($this->option('menu') ?: $spec->studlyPlural);
+        $icon = (string) $this->option('menu-icon');
+
+        return "    ['key' => '{$base}', 'label' => '{$label}', 'icon' => '{$icon}', 'route' => 'admin.{$base}.index', 'permission' => '{$base}.listar', 'active' => ['admin.{$base}.*']],";
+    }
+
     private function resumo(EspecificacaoModulo $spec): void
     {
         $this->newLine();
@@ -315,9 +386,8 @@ PHP;
         $this->line('  2. Revise a migration e os campos gerados.');
         $this->line('  3. php artisan migrate');
         $this->line('  4. php artisan access:sync   (publica as permissões do módulo)');
-        $this->line('  5. Atribua as permissões aos perfis desejados (ou use super-admin).');
-        $this->line("  6. Adicione o item ao menu lateral apontando para route('admin.{$spec->snakePlural()}.index').");
-        $this->line("  7. Acesse /admin/{$spec->kebabPlural()}.");
+        $this->line('  5. Atribua as permissões aos perfis desejados (o item de menu já aparece para super-admin).');
+        $this->line("  6. Acesse /admin/{$spec->kebabPlural()}.");
         $this->newLine();
     }
 }

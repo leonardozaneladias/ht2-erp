@@ -6,7 +6,11 @@
 
 <div>
     <form wire:submit="salvar" class="grid gap-6">
-        <x-shared.card title="Textos" subtitle="Cabeçalho exibido no formulário de login.">
+        <x-shared.card
+            class="rounded-t-none border-t-0"
+            title="Textos"
+            subtitle="Cabeçalho exibido no formulário de login."
+        >
             <div class="grid gap-x-4 md:grid-cols-2">
                 <x-shared.input name="titulo" label="Título" wire:model="titulo" required />
                 <x-shared.input name="subtitulo" label="Subtítulo" wire:model="subtitulo" />

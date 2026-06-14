@@ -1,0 +1,149 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire\Admin\Exemplos;
+
+use App\Actions\Admin\CreateExemploAction;
+use App\Actions\Admin\UpdateExemploAction;
+use App\DTOs\Admin\ExemploDTO;
+use App\Http\Requests\Admin\ExemploRules;
+use App\Models\Exemplo;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
+use Livewire\Component;
+
+#[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
+class FormExemplo extends Component
+{
+    #[Locked]
+    public ?int $exemploId = null;
+
+    public string $nome = '';
+
+    public string $slug = '';
+
+    public ?string $site = null;
+
+    public ?string $descricao = null;
+
+    public string $email = '';
+
+    public ?string $telefone = null;
+
+    public ?string $cep = null;
+
+    public ?string $cnpj = null;
+
+    public ?string $cpf = null;
+
+    public int $preco = 0;
+
+    public string $custo = '';
+
+    public int $quantidade = 0;
+
+    public ?string $cor = null;
+
+    public string $categoria = '';
+
+    /** @var list<string> */
+    public array $tags = [];
+
+    public bool $destaque = false;
+
+    public string $data_inicio = '';
+
+    public ?string $publicado_em = null;
+
+    public string $status = 'rascunho';
+
+    public function mount(?int $exemplo = null): void
+    {
+        if ($exemplo !== null) {
+            $registro = Exemplo::findOrFail($exemplo);
+            $this->authorize('update', $registro);
+
+            $this->exemploId = $registro->id;
+            $this->nome = (string) $registro->nome;
+            $this->slug = (string) $registro->slug;
+            $this->site = $registro->site;
+            $this->descricao = $registro->descricao;
+            $this->email = (string) $registro->email;
+            $this->telefone = $registro->telefone;
+            $this->cep = $registro->cep;
+            $this->cnpj = $registro->cnpj;
+            $this->cpf = $registro->cpf;
+            $this->preco = (int) $registro->preco;
+            $this->custo = (string) $registro->custo;
+            $this->quantidade = (int) $registro->quantidade;
+            $this->cor = $registro->cor;
+            $this->categoria = (string) $registro->categoria;
+            $this->tags = (array) $registro->tags;
+            $this->destaque = (bool) $registro->destaque;
+            $this->data_inicio = $registro->data_inicio->format('Y-m-d');
+            $this->publicado_em = $registro->publicado_em?->format('Y-m-d H:i');
+            $this->status = $registro->status->value;
+
+            return;
+        }
+
+        $this->authorize('create', Exemplo::class);
+    }
+
+    public function salvar(CreateExemploAction $criar, UpdateExemploAction $atualizar): void
+    {
+        $dados = $this->validate(
+            ExemploRules::regras($this->exemploId),
+            attributes: $this->validationAttributes(),
+        );
+
+        $dto = ExemploDTO::fromArray($dados);
+
+        if ($this->exemploId === null) {
+            $criar->execute($dto);
+            session()->flash('toast.success', 'Exemplo criado(a) com sucesso.');
+        } else {
+            $atualizar->execute(Exemplo::findOrFail($this->exemploId), $dto);
+            session()->flash('toast.success', 'Exemplo atualizado(a) com sucesso.');
+        }
+
+        $this->redirect(route('admin.exemplos.index'), navigate: true);
+    }
+
+    public function render(): View
+    {
+        return view('livewire.admin.exemplos.form-exemplo', [
+            'modo' => $this->exemploId === null ? 'criar' : 'editar',
+        ])->title($this->exemploId === null ? 'Novo registro' : 'Editar registro');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function validationAttributes(): array
+    {
+        return [
+            'nome' => 'nome',
+            'slug' => 'slug',
+            'site' => 'site',
+            'descricao' => 'descricao',
+            'email' => 'email',
+            'telefone' => 'telefone',
+            'cep' => 'cep',
+            'cnpj' => 'cnpj',
+            'cpf' => 'cpf',
+            'preco' => 'preco',
+            'custo' => 'custo',
+            'quantidade' => 'quantidade',
+            'cor' => 'cor',
+            'categoria' => 'categoria',
+            'tags' => 'tags',
+            'destaque' => 'destaque',
+            'data_inicio' => 'data inicio',
+            'publicado_em' => 'publicado em',
+            'status' => 'status',
+        ];
+    }
+}

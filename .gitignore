@@ -55,6 +55,9 @@ __pycache__/
 # Visual companion
 /.superpowers/
 
+# Estado local de orquestração de workflows (tooling do desenvolvedor)
+/.workflows/
+
 # Playwright MCP (screenshots/snapshots de validação local)
 /.playwright-mcp
 

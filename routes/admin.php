@@ -166,5 +166,11 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         Route::get('/{produto}/editar', App\Livewire\Admin\Produtos\FormProduto::class)->name('edit');
     });
 
+    Route::prefix('exemplos')->name('exemplos.')->group(function (): void {
+        Route::get('/', App\Livewire\Admin\Exemplos\IndexExemplo::class)->name('index');
+        Route::get('/criar', App\Livewire\Admin\Exemplos\FormExemplo::class)->name('create');
+        Route::get('/{exemplo}/editar', App\Livewire\Admin\Exemplos\FormExemplo::class)->name('edit');
+    });
+
     // Adicione aqui as rotas do seu módulo de negócio
 });

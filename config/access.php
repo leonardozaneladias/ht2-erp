@@ -232,6 +232,22 @@ return [
                 'label' => 'Excluir produtos',
                 'descricao' => 'Remover produtos.',
             ],
+            'exemplos.listar' => [
+                'label' => 'Listar exemplos',
+                'descricao' => 'Ver a listagem de exemplos.',
+            ],
+            'exemplos.criar' => [
+                'label' => 'Criar exemplos',
+                'descricao' => 'Cadastrar novos registros de exemplo.',
+            ],
+            'exemplos.editar' => [
+                'label' => 'Editar exemplos',
+                'descricao' => 'Alterar dados e status de exemplos.',
+            ],
+            'exemplos.deletar' => [
+                'label' => 'Excluir exemplos',
+                'descricao' => 'Remover exemplos.',
+            ],
             // make:modulo insere permissões de negócio acima desta linha
         ],
 

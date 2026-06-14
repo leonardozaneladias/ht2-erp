@@ -29,7 +29,11 @@
 
 <div>
     <form wire:submit="salvar" class="grid gap-6">
-        <x-shared.card title="Identidade" subtitle="Nome e assinatura exibidos no sistema.">
+        <x-shared.card
+            class="rounded-t-none border-t-0"
+            title="Identidade"
+            subtitle="Nome e assinatura exibidos no sistema."
+        >
             <div class="grid gap-x-4 md:grid-cols-2">
                 <x-shared.input name="nome_sistema" label="Nome do sistema" wire:model="nome_sistema" required />
                 <x-shared.input name="slogan" label="Slogan" wire:model="slogan" hint="Texto curto de apoio à marca." />

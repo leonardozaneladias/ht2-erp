@@ -1,4 +1,4 @@
-<x-shared.card title="Perfil" subtitle="Sua foto, nome e identificação no painel.">
+<x-shared.card class="rounded-t-none border-t-0" title="Perfil" subtitle="Sua foto, nome e identificação no painel.">
     <form wire:submit="salvar" class="grid gap-5">
         <x-shared.avatar-cropper
             model="avatar"
