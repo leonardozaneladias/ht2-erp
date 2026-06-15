@@ -99,7 +99,15 @@ return [
             ],
             'empresas.deletar' => [
                 'label' => 'Excluir empresas',
-                'descricao' => 'Remover empresas e suas filiais.',
+                'descricao' => 'Mover empresas para a lixeira.',
+            ],
+            'empresas.restaurar' => [
+                'label' => 'Restaurar empresas',
+                'descricao' => 'Restaurar empresas (e filiais) da lixeira.',
+            ],
+            'empresas.excluir_permanente' => [
+                'label' => 'Excluir empresas permanentemente',
+                'descricao' => 'Remover empresas definitivamente (cascateia para filiais e vínculos).',
             ],
             'empresas.acessos' => [
                 'label' => 'Gerenciar acesso a empresas',

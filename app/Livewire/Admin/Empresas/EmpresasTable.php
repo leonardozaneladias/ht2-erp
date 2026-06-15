@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Empresas;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
+use App\Livewire\Concerns\ComLixeira;
 use App\Livewire\Concerns\ExportaPdf;
 use App\Models\Empresa;
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
@@ -21,6 +24,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class EmpresasTable extends PowerGridComponent
 {
+    use ComLixeira;
     use ExportaPdf;
     use WithExport;
 
@@ -48,7 +52,7 @@ final class EmpresasTable extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.empresas._export-pdf'),
+                ->includeViewOnTop('livewire.admin.empresas._lixeira-toggle'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -63,7 +67,7 @@ final class EmpresasTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return Empresa::query()->withCount('filiais');
+        return $this->aplicarLixeira(Empresa::query()->withCount('filiais'));
     }
 
     public function fields(): PowerGridFields
@@ -125,7 +129,38 @@ final class EmpresasTable extends PowerGridComponent
             return null;
         }
 
-        return view('livewire.admin.empresas._acoes', ['row' => $row]);
+        return view('livewire.admin.empresas._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
+    }
+
+    /**
+     * @return class-string<Empresa>
+     */
+    protected function modelClassLixeira(): string
+    {
+        return Empresa::class;
+    }
+
+    /**
+     * Guarda D1: não permite mover para a lixeira a empresa ativa nem a última
+     * restante — sempre resta ao menos uma empresa operacional.
+     */
+    protected function bloqueioExclusao(Model $registro): ?string
+    {
+        if ((int) $registro->getKey() === app(TenantContext::class)->empresaAtivaId()) {
+            return 'Não é possível excluir a empresa ativa. Troque de empresa antes.';
+        }
+
+        if (Empresa::query()->count() <= 1) {
+            return 'Não é possível excluir a última empresa do sistema.';
+        }
+
+        return null;
+    }
+
+    /** Aviso D1: o force-delete cascateia fisicamente para filiais, acessos e vínculos. */
+    protected function textoExcluirDefinitivo(Model $registro): string
+    {
+        return 'Ação irreversível: remove a empresa e CASCATEIA para filiais, acessos e todos os registros vinculados.';
     }
 
     /**

@@ -28,4 +28,14 @@ final class EmpresaFactory extends Factory
             'ativo' => true,
         ];
     }
+
+    /**
+     * Estado "na lixeira" (soft-deleted) para exercitar a restauração.
+     */
+    public function trashed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'deleted_at' => now()->subDay(),
+        ]);
+    }
 }

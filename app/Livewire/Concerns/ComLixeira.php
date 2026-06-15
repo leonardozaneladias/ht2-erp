@@ -72,6 +72,13 @@ trait ComLixeira
         $registro = $this->registroAtivo($id);
         $this->authorize('delete', $registro);
 
+        $bloqueio = $this->bloqueioExclusao($registro);
+        if ($bloqueio !== null) {
+            $this->notificarErro($bloqueio);
+
+            return;
+        }
+
         $registro->delete();
         $this->notificarSucesso('Registro movido para a lixeira.');
     }
@@ -106,12 +113,13 @@ trait ComLixeira
 
     public function solicitarExcluirDefinitivo(int $id): void
     {
-        $this->authorize('forceDelete', $this->registroNaLixeira($id));
+        $registro = $this->registroNaLixeira($id);
+        $this->authorize('forceDelete', $registro);
 
         $this->dispatch(
             'confirm',
             title: 'Excluir definitivamente?',
-            text: 'Ação irreversível: o registro é removido do banco de dados.',
+            text: $this->textoExcluirDefinitivo($registro),
             destructive: true,
             confirmText: 'Sim, excluir definitivamente',
             onConfirm: $this->tableName . '::excluir-definitivo',
@@ -135,6 +143,22 @@ trait ComLixeira
      * @return class-string<Model&UsaSoftDeletes>
      */
     abstract protected function modelClassLixeira(): string;
+
+    /**
+     * Hook: mensagem que IMPEDE a exclusão (soft-delete) deste registro, ou null
+     * para permitir. Regras de negócio (ex.: não excluir a empresa ativa/última,
+     * não excluir a si mesmo) vivem aqui — surgem como toast de erro.
+     */
+    protected function bloqueioExclusao(Model $registro): ?string
+    {
+        return null;
+    }
+
+    /** Texto do confirm de exclusão definitiva. Sobrescreva para avisar de cascata física. */
+    protected function textoExcluirDefinitivo(Model $registro): string
+    {
+        return 'Ação irreversível: o registro é removido do banco de dados.';
+    }
 
     /**
      * Compõe o escopo de lixeira ao datasource: ativos por padrão

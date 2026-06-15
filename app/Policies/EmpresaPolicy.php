@@ -33,6 +33,16 @@ class EmpresaPolicy
         return $auth->can('empresas.deletar');
     }
 
+    public function restore(AdminUser $auth): bool
+    {
+        return $auth->can('empresas.restaurar');
+    }
+
+    public function forceDelete(AdminUser $auth): bool
+    {
+        return $auth->can('empresas.excluir_permanente');
+    }
+
     public function gerenciarAcessos(AdminUser $auth): bool
     {
         return $auth->can('empresas.acessos');
