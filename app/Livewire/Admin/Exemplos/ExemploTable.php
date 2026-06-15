@@ -212,6 +212,7 @@ final class ExemploTable extends PowerGridComponent
     {
         $linhas = $this->datasource()->get()
             ->map(fn (Exemplo $registro): array => [
+                ...$this->linhaMultiEmpresa($registro),
                 (string) $registro->nome,
                 (string) $registro->slug,
                 (string) $registro->site,
@@ -233,7 +234,11 @@ final class ExemploTable extends PowerGridComponent
             ->values()
             ->all();
 
-        return new ExportavelDTO('Exemplos', ['Nome', 'Slug', 'Site', 'Email', 'Telefone', 'Cep', 'Cnpj', 'Cpf', 'Preco', 'Custo', 'Quantidade', 'Cor', 'Categoria', 'Destaque', 'Data inicio', 'Publicado em', 'Status'], $linhas);
+        return new ExportavelDTO(
+            'Exemplos',
+            [...$this->cabecalhosMultiEmpresa(), 'Nome', 'Slug', 'Site', 'Email', 'Telefone', 'Cep', 'Cnpj', 'Cpf', 'Preco', 'Custo', 'Quantidade', 'Cor', 'Categoria', 'Destaque', 'Data inicio', 'Publicado em', 'Status'],
+            $linhas,
+        );
     }
 
     protected function renderStatus(Exemplo $registro): string

@@ -87,22 +87,25 @@ trait FiltraPorMultiEmpresa
         // eager-load evita N+1 mesmo sem seleção (escopo = empresa ativa).
         $query->with('empresa');
 
-        if ($this->temColunaFilial()) {
+        $temFilial = $this->temColunaFilial();
+
+        if ($temFilial) {
             $query->with('filial');
         }
 
+        $tabela = $query->getModel()->getTable();
         $empresaIds = $this->empresasSelecionadas();
 
-        if ($empresaIds === []) {
-            return $query;
+        if ($empresaIds !== []) {
+            $query->withoutGlobalScope('empresa')->whereIn($tabela . '.empresa_id', $empresaIds);
         }
 
-        $tabela = $query->getModel()->getTable();
-
-        $query->withoutGlobalScope('empresa')->whereIn($tabela . '.empresa_id', $empresaIds);
-
-        if ($this->temColunaFilial()) {
-            $filialIds = $this->filiaisSelecionadas($empresaIds);
+        if ($temFilial) {
+            // Com empresas selecionadas, a filial fica restrita a elas; sem
+            // seleção, o global scope mantém a empresa ativa e o filtro de
+            // filial atua dentro dela (filiais ∩ acessíveis da empresa ativa).
+            $escopoFilial = $empresaIds !== [] ? $empresaIds : $this->empresaAtivaComoEscopo();
+            $filialIds = $this->filiaisSelecionadas($escopoFilial);
 
             if ($filialIds !== []) {
                 $query->whereIn($tabela . '.filial_id', $filialIds);
@@ -176,6 +179,44 @@ trait FiltraPorMultiEmpresa
     }
 
     /**
+     * Cabeçalhos das colunas multi-empresa para exportação (PDF), alinhados às
+     * colunas exibidas na tela. Vazio quando o recurso não está ativo — assim a
+     * exportação herda o mesmo conjunto de colunas da listagem.
+     *
+     * @return list<string>
+     */
+    protected function cabecalhosMultiEmpresa(): array
+    {
+        if (! $this->multiEmpresaAtivo()) {
+            return [];
+        }
+
+        return $this->temColunaFilial() ? ['Empresa', 'Filial'] : ['Empresa'];
+    }
+
+    /**
+     * Células das colunas multi-empresa para uma linha da exportação (PDF),
+     * na mesma ordem de cabecalhosMultiEmpresa(). Vazio quando o recurso não
+     * está ativo.
+     *
+     * @return list<string>
+     */
+    protected function linhaMultiEmpresa(Model $registro): array
+    {
+        if (! $this->multiEmpresaAtivo()) {
+            return [];
+        }
+
+        $celulas = [$this->nomeRelacao($registro, 'empresa')];
+
+        if ($this->temColunaFilial()) {
+            $celulas[] = $this->nomeRelacao($registro, 'filial');
+        }
+
+        return $celulas;
+    }
+
+    /**
      * Recurso disponível: usuário com a capacidade e acesso (com a permissão
      * `listar`) a 2+ empresas. Com 0/1 empresa elegível, comporta-se como hoje.
      */
@@ -237,6 +278,20 @@ trait FiltraPorMultiEmpresa
             ->all();
 
         return array_values(array_intersect($selecionados, $elegiveis));
+    }
+
+    /**
+     * Empresa ativa como lista de escopo para o filtro de filial quando nenhuma
+     * empresa foi selecionada (o global scope ainda restringe à empresa ativa).
+     * Vazio quando não há empresa ativa no contexto.
+     *
+     * @return list<int>
+     */
+    private function empresaAtivaComoEscopo(): array
+    {
+        $id = app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId();
+
+        return $id === null ? [] : [$id];
     }
 
     /**
@@ -330,15 +385,25 @@ trait FiltraPorMultiEmpresa
      */
     private function opcoesFilial(): array
     {
-        $empresaIds = $this->empresasElegiveis()
-            ->map(static fn (Empresa $e): int => (int) $e->getKey())
+        $empresas = $this->empresasElegiveis();
+        $empresaIds = $empresas->map(static fn (Empresa $e): int => (int) $e->getKey())->all();
+
+        // Mapa empresa_id => nome (reusa as empresas já carregadas) para rotular
+        // cada filial como "Empresa — Filial" e desambiguar filiais homônimas.
+        $nomePorEmpresa = $empresas
+            ->mapWithKeys(static fn (Empresa $e): array => [(int) $e->getKey() => (string) $e->getAttribute('nome')])
             ->all();
 
         return $this->filiaisAcessiveis($empresaIds)
-            ->map(static fn (Filial $f): array => [
-                'id' => (int) $f->getKey(),
-                'nome' => (string) $f->getAttribute('nome'),
-            ])
+            ->map(static function (Filial $f) use ($nomePorEmpresa): array {
+                $nomeFilial = (string) $f->getAttribute('nome');
+                $nomeEmpresa = $nomePorEmpresa[(int) $f->getAttribute('empresa_id')] ?? null;
+
+                return [
+                    'id' => (int) $f->getKey(),
+                    'nome' => $nomeEmpresa !== null ? sprintf('%s — %s', $nomeEmpresa, $nomeFilial) : $nomeFilial,
+                ];
+            })
             ->all();
     }
 

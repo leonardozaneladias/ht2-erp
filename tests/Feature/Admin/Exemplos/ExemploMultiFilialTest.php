@@ -168,6 +168,72 @@ it('o escopo por filial filtra os registros da filial selecionada', function () 
         ->assertDontSee($exemploA2->nome);
 });
 
+it('sem empresa selecionada, o filtro de filial atua dentro da empresa ativa', function () {
+    $a = Empresa::factory()->create(['nome' => 'Empresa A', 'ativo' => true]);
+    $b = Empresa::factory()->create(['nome' => 'Empresa B', 'ativo' => true]);
+
+    $a1 = filialDe($a, 'Filial A1');
+    $a2 = filialDe($a, 'Filial A2');
+
+    $exemploA1 = exemploEm($a, 'Exemplo na A1', $a1);
+    $exemploA2 = exemploEm($a, 'Exemplo na A2', $a2);
+
+    $user = gestorComExemplos([['empresa' => $a], ['empresa' => $b]]);
+
+    $this->actingAs($user, 'admin');
+    session(['tenant.empresa_id' => $a->id]);
+
+    // Nenhuma empresa selecionada: o global scope mantém a empresa ativa (A) e o
+    // filtro de filial estreita para a filial A1 dentro dela.
+    Livewire::test(ExemploTable::class)
+        ->set('filters.multi_select.filial_id', [$a1->id])
+        ->assertSee($exemploA1->nome)
+        ->assertDontSee($exemploA2->nome);
+});
+
+it('o filtro de filial rotula as opções como "Empresa — Filial"', function () {
+    $a = Empresa::factory()->create(['nome' => 'Empresa A', 'ativo' => true]);
+    $b = Empresa::factory()->create(['nome' => 'Empresa B', 'ativo' => true]);
+
+    filialDe($a, 'Centro');
+
+    $user = gestorComExemplos([['empresa' => $a], ['empresa' => $b]]);
+
+    $this->actingAs($user, 'admin');
+    session(['tenant.empresa_id' => $a->id]);
+
+    $tabela = Livewire::test(ExemploTable::class)->instance();
+
+    $filtroFilial = collect($tabela->filters())
+        ->first(static fn ($f): bool => $f->column === 'filial_nome');
+
+    $rotulos = collect($filtroFilial->dataSource)->pluck('nome')->all();
+
+    expect($rotulos)->toContain('Empresa A — Centro');
+});
+
+it('a exportação PDF inclui as colunas Empresa e Filial quando o multi-empresa está ativo', function () {
+    $a = Empresa::factory()->create(['nome' => 'Empresa A', 'ativo' => true]);
+    $b = Empresa::factory()->create(['nome' => 'Empresa B', 'ativo' => true]);
+
+    $a1 = filialDe($a, 'Filial A1');
+    exemploEm($a, 'Exemplo na A1', $a1);
+
+    $user = gestorComExemplos([['empresa' => $a], ['empresa' => $b]]);
+
+    $this->actingAs($user, 'admin');
+    session(['tenant.empresa_id' => $a->id]);
+
+    $tabela = Livewire::test(ExemploTable::class)->instance();
+
+    $dto = (function () {
+        return $this->dadosParaExportacao();
+    })->call($tabela);
+
+    expect($dto->colunas[0])->toBe('Empresa')
+        ->and($dto->colunas[1])->toBe('Filial');
+});
+
 it('injeção: filial de empresa não selecionada é contida pelo escopo de empresa', function () {
     $a = Empresa::factory()->create(['nome' => 'Empresa A', 'ativo' => true]);
     $b = Empresa::factory()->create(['nome' => 'Empresa B', 'ativo' => true]);

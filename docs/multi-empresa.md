@@ -106,9 +106,11 @@ O recurso aparece somente quando o usuário **tem a permissão global `listagens
 2. **Escopo da query = `selecionadas ∩ elegíveis`** (e filiais `∩ acessíveis`). A intersecção é
    aplicada no `datasource()` após `withoutGlobalScope('empresa')` — valores de `empresa_id`/
    `filial_id` vindos do cliente **nunca** ampliam o escopo.
-3. O **filtro de filial** só existe em models com coluna `filial_id` + relação `filial()`, e a
-   filial só **estreita** dentro das empresas selecionadas (o escopo base continua por empresa,
-   como no sistema atual — filial não restringe linhas por si só).
+3. O **filtro de filial** só existe em models com coluna `filial_id` + relação `filial()`. A
+   filial **estreita** dentro das empresas selecionadas; sem empresa selecionada, atua dentro da
+   **empresa ativa** (o escopo base segue por empresa — filial não restringe linhas por si só). As
+   opções do multiselect são rotuladas como **"Empresa — Filial"** para desambiguar filiais
+   homônimas em empresas diferentes.
 
 **Como aplicar numa tabela tenant** (o gerador `make:modulo --tenant` já injeta isto):
 
@@ -133,9 +135,14 @@ final class ProdutoTable extends PowerGridComponent
 }
 ```
 
-Como o escopo é aplicado no `datasource()`, a paginação/busca e a **exportação** (PDF/Excel)
-herdam o mesmo filtro automaticamente. A permissão `listagens.multi_empresa` é única e global
-(libera o recurso em todas as listagens) — concedida ao `gestor` no seeder; super-admin já bypassa.
+Como o escopo é aplicado no `datasource()`, a paginação/busca e a **exportação** (Excel/CSV nativo
+e PDF) herdam o mesmo filtro automaticamente. No PDF, as colunas **Empresa**/**Filial** são
+adicionadas via os helpers `cabecalhosMultiEmpresa()`/`linhaMultiEmpresa()` quando o recurso está
+ativo, alinhadas às colunas da tela.
+
+A permissão `listagens.multi_empresa` é única e global (libera o recurso em todas as listagens) —
+concedida ao `gestor` no seeder, que recebe também `produtos.listar`/`exemplos.listar` e acesso às
+2 empresas de demonstração (assim o filtro fica de fato demonstrável); super-admin já bypassa.
 
 ---
 

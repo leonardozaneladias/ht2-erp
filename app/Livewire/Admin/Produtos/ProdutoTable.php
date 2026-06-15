@@ -132,6 +132,7 @@ final class ProdutoTable extends PowerGridComponent
     {
         $linhas = $this->datasource()->get()
             ->map(fn (Produto $registro): array => [
+                ...$this->linhaMultiEmpresa($registro),
                 (string) $registro->nome,
                 (string) $registro->sku,
                 (string) $registro->preco,
@@ -140,7 +141,11 @@ final class ProdutoTable extends PowerGridComponent
             ->values()
             ->all();
 
-        return new ExportavelDTO('Produtos', ['Nome', 'Sku', 'Preco', 'Status'], $linhas);
+        return new ExportavelDTO(
+            'Produtos',
+            [...$this->cabecalhosMultiEmpresa(), 'Nome', 'Sku', 'Preco', 'Status'],
+            $linhas,
+        );
     }
 
     protected function renderStatus(Produto $registro): string

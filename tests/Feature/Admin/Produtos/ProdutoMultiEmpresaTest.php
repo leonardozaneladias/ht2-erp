@@ -190,6 +190,44 @@ it('injeção: selecionar empresa sem acesso não vaza linhas (cai na empresa at
         ->assertDontSee($produtoB->nome);
 });
 
+it('a exportação PDF inclui a coluna Empresa (sem Filial) quando o multi-empresa está ativo', function () {
+    [$a] = empresaComProduto('A');
+    [$b] = empresaComProduto('B');
+
+    $user = usuarioMultiEmpresa([$a, $b], [$a, $b]);
+
+    $this->actingAs($user, 'admin');
+    session(['tenant.empresa_id' => $a->id]);
+
+    $tabela = Livewire::test(ProdutoTable::class)->instance();
+
+    $dto = (function () {
+        return $this->dadosParaExportacao();
+    })->call($tabela);
+
+    expect($dto->colunas[0])->toBe('Empresa')
+        ->and($dto->colunas)->not->toContain('Filial');
+});
+
+it('a exportação PDF não inclui a coluna Empresa quando o recurso não está ativo', function () {
+    [$a] = empresaComProduto('A');
+    [$b] = empresaComProduto('B');
+
+    // Sem a capacidade → recurso inativo → PDF mantém apenas as colunas do módulo.
+    $user = usuarioMultiEmpresa([$a, $b], [$a, $b], comCapacidade: false);
+
+    $this->actingAs($user, 'admin');
+    session(['tenant.empresa_id' => $a->id]);
+
+    $tabela = Livewire::test(ProdutoTable::class)->instance();
+
+    $dto = (function () {
+        return $this->dadosParaExportacao();
+    })->call($tabela);
+
+    expect($dto->colunas)->not->toContain('Empresa');
+});
+
 it('super-admin enxerga o recurso quando há 2+ empresas', function () {
     [$a] = empresaComProduto('A');
     [$b] = empresaComProduto('B');
