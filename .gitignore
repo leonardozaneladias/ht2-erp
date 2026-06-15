@@ -64,3 +64,7 @@ __pycache__/
 # Testes de browser (Pest + Playwright)
 /tests/Browser/Screenshots
 .workflows/.cache/
+
+# Módulos-pacote em desenvolvimento local (cada um tem seu próprio repo Git).
+# Ver ADR-0015 e docs/distribuicao-manutencao.md.
+/packages/
