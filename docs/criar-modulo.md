@@ -136,6 +136,10 @@ php artisan migrate && php artisan access:sync
 - `--skip-menu` — não injeta o item no menu lateral.
 - `--force` — sobrescreve arquivos existentes (re-geração). A migration é
   idempotente (pula/limpa pela tabela, não cria duplicada).
+- `--module=Rh` — gera o CRUD dentro de um módulo-pacote existente (ver
+  "Gerar dentro de um módulo-pacote" abaixo) em vez de `app/`.
+- `--sem-soft-delete` — desativa o soft-delete. **Por padrão** os módulos usam
+  soft-delete (`deleted_at`): registros ficam recuperáveis em vez de apagados.
 
 O item de menu entra na seção **Negócio** de `config/admin-menu.php` com
 `permission => '{modulo}.listar'` — **visível só para o super-admin** (bypass) até
