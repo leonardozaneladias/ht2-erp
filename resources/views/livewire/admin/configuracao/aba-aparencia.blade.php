@@ -11,10 +11,10 @@
     };
 
     $logos = [
-        ['campo' => 'logo', 'rotulo' => 'Logo — fundo escuro', 'atual' => $logoAtual],
-        ['campo' => 'logo_dark', 'rotulo' => 'Logo — fundo claro', 'atual' => $logoDarkAtual],
-        ['campo' => 'logo_sm', 'rotulo' => 'Ícone (menu recolhido)', 'atual' => $logoSmAtual],
-        ['campo' => 'favicon', 'rotulo' => 'Favicon', 'atual' => $faviconAtual],
+        ['campo' => 'logo',      'rotulo' => 'Logo — fundo escuro',   'atual' => $logoAtual,    'dica' => '240 × 60 px · PNG transparente · exibido na sidebar (tema claro)'],
+        ['campo' => 'logo_dark', 'rotulo' => 'Logo — fundo claro',    'atual' => $logoDarkAtual,'dica' => '240 × 60 px · PNG transparente · exibido na sidebar (tema escuro)'],
+        ['campo' => 'logo_sm',   'rotulo' => 'Ícone (menu recolhido)','atual' => $logoSmAtual,  'dica' => '48 × 48 px · quadrado · exibido quando o menu está recolhido'],
+        ['campo' => 'favicon',   'rotulo' => 'Favicon',               'atual' => $faviconAtual, 'dica' => '32 × 32 px · ICO ou PNG · recomendado incluir resoluções 16, 32 e 48 px'],
     ];
 
     $cores = [
@@ -120,11 +120,8 @@
                             :preview="$previewUrl(${$item['campo']} ?? null, $item['atual'])"
                             accept="image/png,image/jpeg,image/webp,image/svg+xml"
                         />
-                        <div
-                            wire:loading
-                            wire:target="{{ $item['campo'] }}"
-                            class="text-default-400 -mt-3 mb-2 text-xs"
-                        >
+                        <p class="text-default-400 mt-1 text-xs">{{ $item['dica'] }}</p>
+                        <div wire:loading wire:target="{{ $item['campo'] }}" class="text-default-400 mt-1 text-xs">
                             Enviando…
                         </div>
                     </div>
