@@ -210,13 +210,9 @@ final class AccessResolver
     }
 
     /**
-     * Nome da role ativa (lente) — só para o próprio usuário logado e se ele a possui.
-     *
-     * @param  list<string>  $rolesDoUsuario
-     */
-    /**
      * Nome da role ativa (lente). Lido da sessão a cada chamada para refletir a
-     * troca de chapéu no mesmo request. Só vale para o próprio usuário logado.
+     * troca de chapéu no mesmo request. Só vale para o próprio usuário logado e
+     * se ele de fato a possui.
      *
      * @param  list<string>  $rolesDoUsuario
      */
