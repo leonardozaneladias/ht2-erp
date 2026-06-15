@@ -1,8 +1,24 @@
 @php
     $selecionados = count($this->checkboxValues);
+    $ator = auth('admin')->user();
+    $podeVerLixeira = $ator?->can('usuarios.restaurar') ?? false;
 @endphp
 
-@if ($selecionados > 0)
+@if ($podeVerLixeira)
+    <div class="mb-3">
+        <x-shared.button
+            :variant="$this->verLixeira ? 'primary' : 'default'"
+            appearance="outline"
+            size="sm"
+            :icon="$this->verLixeira ? 'tabler--arrow-back-up' : 'tabler--trash'"
+            wire:click="alternarLixeira"
+        >
+            {{ $this->verLixeira ? 'Ver ativos' : 'Ver lixeira' }}
+        </x-shared.button>
+    </div>
+@endif
+
+@if ($selecionados > 0 && ! $this->verLixeira)
     <div class="border-primary/25 bg-primary/8 mb-3 flex flex-wrap items-center gap-2 rounded-[10px] border px-3 py-2">
         <span class="text-default-700 inline-flex items-center gap-2 text-sm font-medium">
             <span

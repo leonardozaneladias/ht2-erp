@@ -122,7 +122,7 @@ class SetupWizard extends Component
             ],
             3 => [
                 'admin_nome' => ['required', 'string', 'min:3', 'max:120'],
-                'admin_email' => ['required', 'email', 'max:191', Rule::unique('admin_users', 'email')],
+                'admin_email' => ['required', 'email', 'max:191', Rule::unique('admin_users', 'email')->whereNull('deleted_at')],
                 'admin_senha' => ['required', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'],
             ],
             default => [],

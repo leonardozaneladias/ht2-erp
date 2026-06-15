@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\Auditavel;
+use App\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -20,8 +22,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $bloqueado_ate
  * @property \Illuminate\Support\Carbon|null $anonimizado_em
  * @property \Illuminate\Support\Carbon|null $last_login_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  */
-class AdminUser extends Authenticatable
+class AdminUser extends Authenticatable implements UsaSoftDeletes
 {
     use Auditavel;
 
@@ -30,6 +33,7 @@ class AdminUser extends Authenticatable
 
     use HasRoles;
     use Notifiable;
+    use SoftDeletes;
 
     protected $table = 'admin_users';
 

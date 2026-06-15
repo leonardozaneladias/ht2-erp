@@ -27,6 +27,14 @@ final class AdminUserFactory extends Factory
         ];
     }
 
+    /**
+     * Estado "na lixeira" (soft-deleted) para exercitar a restauração.
+     */
+    public function trashed(): static
+    {
+        return $this->state(['deleted_at' => now()->subDay()]);
+    }
+
     public function inativo(): static
     {
         return $this->state(['ativo' => false]);

@@ -134,7 +134,15 @@ return [
             ],
             'usuarios.deletar' => [
                 'label' => 'Excluir usuários',
-                'descricao' => 'Remover usuários administrativos.',
+                'descricao' => 'Mover usuários para a lixeira.',
+            ],
+            'usuarios.restaurar' => [
+                'label' => 'Restaurar usuários',
+                'descricao' => 'Restaurar usuários da lixeira.',
+            ],
+            'usuarios.excluir_permanente' => [
+                'label' => 'Excluir usuários permanentemente',
+                'descricao' => 'Remover usuários definitivamente do banco (irreversível).',
             ],
             'usuarios.impersonar' => [
                 'label' => 'Personificar usuários',

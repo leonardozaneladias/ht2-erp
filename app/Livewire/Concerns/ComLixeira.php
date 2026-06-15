@@ -105,6 +105,13 @@ trait ComLixeira
         $registro = $this->registroNaLixeira($id);
         $this->authorize('restore', $registro);
 
+        $bloqueio = $this->bloqueioRestauracao($registro);
+        if ($bloqueio !== null) {
+            $this->notificarErro($bloqueio);
+
+            return;
+        }
+
         $registro->restore();
         $this->notificarSucesso('Registro restaurado.');
     }
@@ -150,6 +157,12 @@ trait ComLixeira
      * não excluir a si mesmo) vivem aqui — surgem como toast de erro.
      */
     protected function bloqueioExclusao(Model $registro): ?string
+    {
+        return null;
+    }
+
+    /** Hook: mensagem que IMPEDE a restauração (ex.: e-mail já em uso por um ativo), ou null. */
+    protected function bloqueioRestauracao(Model $registro): ?string
     {
         return null;
     }

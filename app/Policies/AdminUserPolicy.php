@@ -57,4 +57,21 @@ class AdminUserPolicy
     {
         return $auth->can('usuarios.anonimizar') && $this->hierarchy->podeGerir($auth, $usuario);
     }
+
+    public function delete(AdminUser $auth, AdminUser $usuario): bool
+    {
+        return $auth->can('usuarios.deletar')
+            && ! $auth->is($usuario)
+            && $this->hierarchy->podeGerir($auth, $usuario);
+    }
+
+    public function restore(AdminUser $auth, AdminUser $usuario): bool
+    {
+        return $auth->can('usuarios.restaurar') && $this->hierarchy->podeGerir($auth, $usuario);
+    }
+
+    public function forceDelete(AdminUser $auth, AdminUser $usuario): bool
+    {
+        return $auth->can('usuarios.excluir_permanente') && $this->hierarchy->podeGerir($auth, $usuario);
+    }
 }

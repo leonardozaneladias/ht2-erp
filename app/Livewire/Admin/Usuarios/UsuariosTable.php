@@ -9,12 +9,14 @@ use App\Actions\Admin\BulkUserStatusAction;
 use App\Actions\Admin\ToggleAdminUserStatusAction;
 use App\DTOs\Admin\AtribuicaoPerfilMassaDTO;
 use App\Exceptions\AccessException;
+use App\Livewire\Concerns\ComLixeira;
 use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Services\Admin\HierarchyResolver;
 use App\Services\Admin\Security\ControleLockout;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
@@ -34,6 +36,7 @@ use Spatie\Permission\Models\Role;
 
 final class UsuariosTable extends PowerGridComponent
 {
+    use ComLixeira;
     use EmiteNotificacoes;
     use WithExport;
 
@@ -81,7 +84,7 @@ final class UsuariosTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return AdminUser::query()->with('roles');
+        return $this->aplicarLixeira(AdminUser::query()->with('roles'));
     }
 
     /**
@@ -180,7 +183,7 @@ final class UsuariosTable extends PowerGridComponent
             return null;
         }
 
-        return view('livewire.admin.usuarios._acoes', ['row' => $row]);
+        return view('livewire.admin.usuarios._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
     }
 
     /**
@@ -338,6 +341,38 @@ final class UsuariosTable extends PowerGridComponent
             ->map(static fn (Role $role): array => ['value' => $role->name, 'label' => $role->name])
             ->values()
             ->all();
+    }
+
+    /**
+     * @return class-string<AdminUser>
+     */
+    protected function modelClassLixeira(): string
+    {
+        return AdminUser::class;
+    }
+
+    /**
+     * D3: bloqueia restaurar se já houver um usuário ATIVO com o mesmo e-mail
+     * (o índice unique parcial libera o e-mail enquanto o usuário está na lixeira).
+     */
+    protected function bloqueioRestauracao(Model $registro): ?string
+    {
+        $emailEmUso = AdminUser::query()
+            ->where('email', $registro->getAttribute('email'))
+            ->whereKeyNot($registro->getKey())
+            ->exists();
+
+        return $emailEmUso
+            ? 'Já existe um usuário ativo com este e-mail. Não é possível restaurar.'
+            : null;
+    }
+
+    /** Anti-self-delete: vale até para super-admin (o bypass do Gate::before não passa pelo handler). */
+    protected function bloqueioExclusao(Model $registro): ?string
+    {
+        return (int) $registro->getKey() === auth('admin')->id()
+            ? 'Você não pode excluir a si mesmo.'
+            : null;
     }
 
     /**
