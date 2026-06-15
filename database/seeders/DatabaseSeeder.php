@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // Dados de referência (reais, via CSV) antes dos seeders de demo.
+        $this->call(Referencia\DadosReferenciaSeeder::class);
+
         $this->call([
             RolePermissionSeeder::class,
             EmpresaSeeder::class,
