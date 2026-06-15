@@ -7,29 +7,40 @@
 ])
 
 @php
-    $inputmaskConfig = [
-        'alias' => 'currency',
-        'prefix' => $prefix,
-        'groupSeparator' => '.',
-        'radixPoint' => ',',
-        'digits' => 2,
-        'digitsOptional' => false,
-        'autoGroup' => true,
-        'rightAlign' => false,
-        'removeMaskOnSubmit' => false,
-        'unmaskAsNumber' => false,
-        'clearMaskOnLostFocus' => false,
-    ];
+    // Extrai o nome da prop Livewire do atributo wire:model (ex: wire:model="preco" → "preco")
+    $wireModelKey = collect($attributes->all())
+        ->keys()
+        ->first(fn(string $k) => str_starts_with($k, 'wire:model'));
+    $livewireProp = $wireModelKey !== null ? $attributes->get($wireModelKey) : null;
 @endphp
 
-<x-shared.input
-    :name="$name"
-    :label="$label"
-    :hint="$hint"
-    :required="$required"
-    type="text"
-    :placeholder="$prefix.'0,00'"
-    :data-af-inputmask="\Illuminate\Support\Js::encode($inputmaskConfig)"
-    class="font-mono"
-    {{ $attributes }}
-/>
+<div
+    x-data="{
+        cents: {{ $livewireProp !== null ? "\$wire.entangle('" . e($livewireProp) . "')" : '0' }},
+        get display() {
+            const v = typeof this.cents === 'number' ? this.cents : parseInt(this.cents) || 0;
+            return new Intl.NumberFormat('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(v / 100);
+        },
+        handleInput(value) {
+            const digits = value.replace(/\D/g, '');
+            this.cents = digits.length ? parseInt(digits, 10) : 0;
+        }
+    }"
+>
+    <x-shared.input
+        :name="$name"
+        :label="$label"
+        :hint="$hint"
+        :required="$required"
+        type="text"
+        inputmode="numeric"
+        :placeholder="$prefix . '0,00'"
+        class="font-mono"
+        x-bind:value="display"
+        @input="handleInput($event.target.value);"
+        {{ $attributes->except($wireModelKey !== null ? [$wireModelKey] : []) }}
+    />
+</div>

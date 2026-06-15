@@ -169,7 +169,8 @@ final class CampoModulo
         return match (true) {
             $this->ehStatus() && $enumFqcn !== null => "'{$this->nome}' => {$enumFqcn}::class",
             $this->tipo === 'boolean' => "'{$this->nome}' => 'boolean'",
-            $this->tipo === 'integer' || $this->tipo === 'money' => "'{$this->nome}' => 'integer'",
+            $this->tipo === 'integer' => "'{$this->nome}' => 'integer'",
+            $this->tipo === 'money' => "'{$this->nome}' => \\App\\Casts\\MoneyCast::class",
             $this->tipo === 'decimal' => "'{$this->nome}' => 'decimal:2'",
             $this->tipo === 'date' => "'{$this->nome}' => 'date'",
             $this->tipo === 'datetime' => "'{$this->nome}' => 'datetime'",
@@ -355,11 +356,7 @@ final class CampoModulo
         return match ($this->tipo) {
             'text' => "<x-shared.textarea name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
             'richtext' => "<x-shared.rich-editor name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
-            // Valor monetário em centavos (§5.3). A máscara x-shared.money-input
-            // grava string formatada; até existir um caster string->centavos no
-            // form, o gerador usa input numérico (centavos) para ficar correto
-            // ponta a ponta. Troque por money-input quando adicionar o caster.
-            'money' => "<x-shared.input type=\"number\" min=\"0\" step=\"1\" name=\"{$nome}\" label=\"{$label} (centavos)\" wire:model=\"{$nome}\"{$req} />",
+            'money' => "<x-shared.money-input name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
             'decimal' => "<x-shared.input type=\"number\" step=\"0.01\" name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
             'boolean' => "<x-shared.toggle name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\" stacked />",
             'date', 'datetime' => "<x-shared.date-picker name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
