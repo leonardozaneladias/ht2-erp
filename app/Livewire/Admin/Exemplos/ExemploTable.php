@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Exemplos;
 use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Enums\StatusExemplo;
 use App\Livewire\Concerns\ExportaPdf;
+use App\Livewire\Concerns\FiltraPorMultiEmpresa;
 use App\Models\Exemplo;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,6 +24,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 final class ExemploTable extends PowerGridComponent
 {
     use ExportaPdf;
+    use FiltraPorMultiEmpresa;
     use WithExport;
 
     public string $tableName = 'exemplos-table';
@@ -51,30 +53,32 @@ final class ExemploTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return Exemplo::query();
+        return $this->aplicarEscopoMultiEmpresa(Exemplo::query());
     }
 
     public function fields(): PowerGridFields
     {
-        return PowerGrid::fields()
-            ->add('id')
-            ->add('nome')
-            ->add('slug')
-            ->add('site')
-            ->add('email')
-            ->add('telefone')
-            ->add('cep')
-            ->add('cnpj')
-            ->add('cpf')
-            ->add('preco')
-            ->add('custo')
-            ->add('quantidade')
-            ->add('cor')
-            ->add('categoria')
-            ->add('destaque')
-            ->add('data_inicio')
-            ->add('publicado_em')
-            ->add('status_badge', fn (Exemplo $registro): string => $this->renderStatus($registro));
+        return $this->camposMultiEmpresa(
+            PowerGrid::fields()
+                ->add('id')
+                ->add('nome')
+                ->add('slug')
+                ->add('site')
+                ->add('email')
+                ->add('telefone')
+                ->add('cep')
+                ->add('cnpj')
+                ->add('cpf')
+                ->add('preco')
+                ->add('custo')
+                ->add('quantidade')
+                ->add('cor')
+                ->add('categoria')
+                ->add('destaque')
+                ->add('data_inicio')
+                ->add('publicado_em')
+                ->add('status_badge', fn (Exemplo $registro): string => $this->renderStatus($registro)),
+        );
     }
 
     /**
@@ -83,6 +87,8 @@ final class ExemploTable extends PowerGridComponent
     public function columns(): array
     {
         return [
+            ...$this->colunasMultiEmpresa(),
+
             Column::make('Nome', 'nome')
                 ->searchable()
                 ->sortable(),
@@ -160,6 +166,7 @@ final class ExemploTable extends PowerGridComponent
     public function filters(): array
     {
         return [
+            ...$this->filtrosMultiEmpresa(),
             Filter::inputText('nome')->placeholder('Filtrar por Nome'),
             Filter::inputText('slug')->placeholder('Filtrar por Slug'),
             Filter::inputText('site')->placeholder('Filtrar por Site'),
@@ -183,6 +190,11 @@ final class ExemploTable extends PowerGridComponent
         }
 
         return view('livewire.admin.exemplos._acoes', ['row' => $row]);
+    }
+
+    protected function permissaoListagem(): string
+    {
+        return 'exemplos.listar';
     }
 
     /**

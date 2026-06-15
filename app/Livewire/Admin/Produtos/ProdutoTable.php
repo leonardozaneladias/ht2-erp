@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Produtos;
 use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Enums\StatusProduto;
 use App\Livewire\Concerns\ExportaPdf;
+use App\Livewire\Concerns\FiltraPorMultiEmpresa;
 use App\Models\Produto;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,6 +24,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 final class ProdutoTable extends PowerGridComponent
 {
     use ExportaPdf;
+    use FiltraPorMultiEmpresa;
     use WithExport;
 
     public string $tableName = 'produtos-table';
@@ -51,17 +53,19 @@ final class ProdutoTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return Produto::query();
+        return $this->aplicarEscopoMultiEmpresa(Produto::query());
     }
 
     public function fields(): PowerGridFields
     {
-        return PowerGrid::fields()
-            ->add('id')
-            ->add('nome')
-            ->add('sku')
-            ->add('preco')
-            ->add('status_badge', fn (Produto $registro): string => $this->renderStatus($registro));
+        return $this->camposMultiEmpresa(
+            PowerGrid::fields()
+                ->add('id')
+                ->add('nome')
+                ->add('sku')
+                ->add('preco')
+                ->add('status_badge', fn (Produto $registro): string => $this->renderStatus($registro)),
+        );
     }
 
     /**
@@ -70,6 +74,8 @@ final class ProdutoTable extends PowerGridComponent
     public function columns(): array
     {
         return [
+            ...$this->colunasMultiEmpresa(),
+
             Column::make('Nome', 'nome')
                 ->searchable()
                 ->sortable(),
@@ -95,6 +101,7 @@ final class ProdutoTable extends PowerGridComponent
     public function filters(): array
     {
         return [
+            ...$this->filtrosMultiEmpresa(),
             Filter::inputText('nome')->placeholder('Filtrar por Nome'),
             Filter::inputText('sku')->placeholder('Filtrar por Sku'),
             Filter::multiSelect('status', 'status')
@@ -111,6 +118,11 @@ final class ProdutoTable extends PowerGridComponent
         }
 
         return view('livewire.admin.produtos._acoes', ['row' => $row]);
+    }
+
+    protected function permissaoListagem(): string
+    {
+        return 'produtos.listar';
     }
 
     /**
