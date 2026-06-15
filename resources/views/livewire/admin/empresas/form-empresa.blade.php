@@ -91,11 +91,25 @@
             subtitle="Unidades da empresa. A Matriz é criada automaticamente e não pode ser desativada."
         >
             <x-slot:headerActions>
-                @unless ($mostrarFormFilial)
-                    <x-shared.button variant="primary" size="sm" icon="tabler--plus" wire:click="abrirFormFilial">
-                        Adicionar filial
-                    </x-shared.button>
-                @endunless
+                <div class="flex flex-wrap items-center gap-2">
+                    @if (auth('admin')->user()?->can('empresas.restaurar'))
+                        <x-shared.button
+                            :variant="$verFiliaisLixeira ? 'primary' : 'default'"
+                            appearance="outline"
+                            size="sm"
+                            :icon="$verFiliaisLixeira ? 'tabler--arrow-back-up' : 'tabler--trash'"
+                            wire:click="alternarFiliaisLixeira"
+                        >
+                            {{ $verFiliaisLixeira ? 'Ver ativas' : 'Ver lixeira' }}
+                        </x-shared.button>
+                    @endif
+
+                    @unless ($mostrarFormFilial || $verFiliaisLixeira)
+                        <x-shared.button variant="primary" size="sm" icon="tabler--plus" wire:click="abrirFormFilial">
+                            Adicionar filial
+                        </x-shared.button>
+                    @endunless
+                </div>
             </x-slot:headerActions>
 
             @if ($mostrarFormFilial)
@@ -182,15 +196,53 @@
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <x-shared.button
-                                        variant="default"
-                                        appearance="outline"
-                                        size="sm"
-                                        icon="tabler--pencil"
-                                        wire:click="abrirFormFilial({{ $filial->id }})"
-                                    >
-                                        Editar
-                                    </x-shared.button>
+                                    <div class="inline-flex flex-wrap justify-end gap-2">
+                                        @if (! $verFiliaisLixeira)
+                                            <x-shared.button
+                                                variant="default"
+                                                appearance="outline"
+                                                size="sm"
+                                                icon="tabler--pencil"
+                                                wire:click="abrirFormFilial({{ $filial->id }})"
+                                            >
+                                                Editar
+                                            </x-shared.button>
+                                            @unless ($filial->e_matriz)
+                                                <x-shared.button
+                                                    variant="danger"
+                                                    appearance="outline"
+                                                    size="sm"
+                                                    icon="tabler--trash"
+                                                    wire:click="solicitarExcluirFilial({{ $filial->id }})"
+                                                >
+                                                    Excluir
+                                                </x-shared.button>
+                                            @endunless
+                                        @else
+                                            @if (auth('admin')->user()?->can('empresas.restaurar'))
+                                                <x-shared.button
+                                                    variant="default"
+                                                    appearance="outline"
+                                                    size="sm"
+                                                    icon="tabler--arrow-back-up"
+                                                    wire:click="solicitarRestaurarFilial({{ $filial->id }})"
+                                                >
+                                                    Restaurar
+                                                </x-shared.button>
+                                            @endif
+                                            @if (auth('admin')->user()?->can('empresas.excluir_permanente'))
+                                                <x-shared.button
+                                                    variant="danger"
+                                                    appearance="outline"
+                                                    size="sm"
+                                                    icon="tabler--trash-x"
+                                                    wire:click="solicitarExcluirDefinitivoFilial({{ $filial->id }})"
+                                                >
+                                                    Excluir def.
+                                                </x-shared.button>
+                                            @endif
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -199,8 +251,12 @@
                                     <x-shared.empty-state
                                         size="sm"
                                         icon="tabler--building-off"
-                                        title="Nenhuma filial"
-                                        description="A Matriz é criada junto com a empresa."
+                                        :title="$verFiliaisLixeira ? 'Lixeira vazia' : 'Nenhuma filial'"
+                                        :description="
+                                            $verFiliaisLixeira
+                                                ? 'Nenhuma filial na lixeira.'
+                                                : 'A Matriz é criada junto com a empresa.'
+                                        "
                                     />
                                 </td>
                             </tr>

@@ -20,6 +20,7 @@ use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
@@ -77,6 +78,10 @@ class FormEmpresa extends Component
 
     public bool $filial_ativo = true;
 
+    // Lixeira de filiais (D2): a gestão da lixeira de Filial vive aqui, no form
+    // da empresa, reusando as permissões empresas.* (sem módulo ACL próprio).
+    public bool $verFiliaisLixeira = false;
+
     public function mount(?int $empresa = null): void
     {
         if ($empresa !== null) {
@@ -133,8 +138,13 @@ class FormEmpresa extends Component
             return collect();
         }
 
-        return Filial::query()
-            ->where('empresa_id', $this->empresaId)
+        $query = Filial::query()->where('empresa_id', $this->empresaId);
+
+        if ($this->verFiliaisLixeira) {
+            $query->onlyTrashed();
+        }
+
+        return $query
             ->orderByDesc('e_matriz')
             ->orderBy('nome')
             ->get();
@@ -216,6 +226,124 @@ class FormEmpresa extends Component
         $this->cancelarFormFilial();
     }
 
+    public function alternarFiliaisLixeira(): void
+    {
+        $this->verFiliaisLixeira = ! $this->verFiliaisLixeira;
+        $this->cancelarFormFilial();
+        unset($this->filiais);
+    }
+
+    public function solicitarExcluirFilial(int $filialId): void
+    {
+        if ($this->empresaId === null) {
+            return;
+        }
+
+        $this->authorize('update', Empresa::findOrFail($this->empresaId));
+
+        if ($this->localizarFilial($filialId)->e_matriz) {
+            $this->notificarErro('A Matriz não pode ser excluída.');
+
+            return;
+        }
+
+        $this->dispatch(
+            'confirm',
+            title: 'Mover filial para a lixeira?',
+            text: 'A filial sai da lista, mas pode ser restaurada da lixeira.',
+            destructive: true,
+            onConfirm: 'empresas::filial-excluir',
+            params: ['id' => $filialId],
+        );
+    }
+
+    #[On('empresas::filial-excluir')]
+    public function excluirFilial(int $id): void
+    {
+        if ($this->empresaId === null) {
+            return;
+        }
+
+        $this->authorize('update', Empresa::findOrFail($this->empresaId));
+
+        $filial = $this->localizarFilial($id);
+
+        if ($filial->e_matriz) {
+            $this->notificarErro('A Matriz não pode ser excluída.');
+
+            return;
+        }
+
+        $filial->delete();
+        unset($this->filiais);
+        $this->notificarSucesso('Filial movida para a lixeira.');
+    }
+
+    public function solicitarRestaurarFilial(int $filialId): void
+    {
+        if ($this->empresaId === null) {
+            return;
+        }
+
+        $this->authorize('restore', Empresa::findOrFail($this->empresaId));
+
+        $this->dispatch(
+            'confirm',
+            title: 'Restaurar filial?',
+            text: 'A filial volta para a lista de ativas.',
+            destructive: false,
+            onConfirm: 'empresas::filial-restaurar',
+            params: ['id' => $filialId],
+        );
+    }
+
+    #[On('empresas::filial-restaurar')]
+    public function restaurarFilial(int $id): void
+    {
+        if ($this->empresaId === null) {
+            return;
+        }
+
+        $this->authorize('restore', Empresa::findOrFail($this->empresaId));
+
+        $this->localizarFilialNaLixeira($id)->restore();
+        unset($this->filiais);
+        $this->notificarSucesso('Filial restaurada.');
+    }
+
+    public function solicitarExcluirDefinitivoFilial(int $filialId): void
+    {
+        if ($this->empresaId === null) {
+            return;
+        }
+
+        $this->authorize('forceDelete', Empresa::findOrFail($this->empresaId));
+
+        $this->dispatch(
+            'confirm',
+            title: 'Excluir filial definitivamente?',
+            text: 'Ação irreversível: a filial é removida do banco de dados.',
+            destructive: true,
+            confirmText: 'Sim, excluir definitivamente',
+            onConfirm: 'empresas::filial-force',
+            params: ['id' => $filialId],
+        );
+    }
+
+    #[On('empresas::filial-force')]
+    public function excluirDefinitivoFilial(int $id): void
+    {
+        if ($this->empresaId === null) {
+            return;
+        }
+
+        $this->authorize('forceDelete', Empresa::findOrFail($this->empresaId));
+
+        $this->localizarFilialNaLixeira($id)->forceDelete();
+        unset($this->filiais);
+        $this->notificarSucesso('Filial excluída definitivamente.');
+    }
+
     public function render(): View
     {
         return view('livewire.admin.empresas.form-empresa', [
@@ -251,6 +379,14 @@ class FormEmpresa extends Component
     protected function localizarFilial(int $filialId): Filial
     {
         return Filial::query()
+            ->where('empresa_id', $this->empresaId)
+            ->findOrFail($filialId);
+    }
+
+    protected function localizarFilialNaLixeira(int $filialId): Filial
+    {
+        return Filial::query()
+            ->onlyTrashed()
             ->where('empresa_id', $this->empresaId)
             ->findOrFail($filialId);
     }
