@@ -8,6 +8,7 @@ use App\Actions\Admin\CreateExemploAction;
 use App\Actions\Admin\UpdateExemploAction;
 use App\DTOs\Admin\ExemploDTO;
 use App\Http\Requests\Admin\ExemploRules;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Exemplo;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -17,6 +18,8 @@ use Livewire\Component;
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 class FormExemplo extends Component
 {
+    use EmiteNotificacoes;
+
     #[Locked]
     public ?int $exemploId = null;
 
@@ -106,10 +109,10 @@ class FormExemplo extends Component
 
         if ($this->exemploId === null) {
             $criar->execute($dto);
-            session()->flash('toast.success', 'Exemplo criado(a) com sucesso.');
+            $this->notificarAposRedirect('success', 'Exemplo criado(a) com sucesso.');
         } else {
             $atualizar->execute(Exemplo::findOrFail($this->exemploId), $dto);
-            session()->flash('toast.success', 'Exemplo atualizado(a) com sucesso.');
+            $this->notificarAposRedirect('success', 'Exemplo atualizado(a) com sucesso.');
         }
 
         $this->redirect(route('admin.exemplos.index'), navigate: true);

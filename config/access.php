@@ -220,22 +220,6 @@ return [
         | mova suas permissões para a chave correspondente.
         */
         ModuloAcesso::Negocio->value => [
-            'produtos.listar' => [
-                'label' => 'Listar produtos',
-                'descricao' => 'Ver a listagem de produtos.',
-            ],
-            'produtos.criar' => [
-                'label' => 'Criar produtos',
-                'descricao' => 'Cadastrar novos registros de produto.',
-            ],
-            'produtos.editar' => [
-                'label' => 'Editar produtos',
-                'descricao' => 'Alterar dados e status de produtos.',
-            ],
-            'produtos.deletar' => [
-                'label' => 'Excluir produtos',
-                'descricao' => 'Remover produtos.',
-            ],
             'exemplos.listar' => [
                 'label' => 'Listar exemplos',
                 'descricao' => 'Ver a listagem de exemplos.',

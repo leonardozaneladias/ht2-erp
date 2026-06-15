@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Exemplos\ExemploTable;
-use App\Livewire\Admin\Produtos\ProdutoTable;
 use App\Models\AdminUser;
 use App\Models\Empresa;
 use App\Models\Exemplo;
@@ -98,23 +97,6 @@ it('Exemplo expõe a coluna e o filtro de filial quando o multi-empresa está at
         ->first(static fn ($f): bool => $f->column === 'filial_nome');
 
     expect($filtroFilial)->not->toBeNull();
-});
-
-it('Produto (sem filial_id) não expõe a dimensão filial', function () {
-    $a = Empresa::factory()->create(['nome' => 'Empresa A', 'ativo' => true]);
-    Empresa::factory()->create(['nome' => 'Empresa B', 'ativo' => true]);
-
-    $super = criarAdminUser('super@teste.com');
-    Role::findOrCreate('super-admin', 'admin');
-    $super->assignRole('super-admin');
-
-    $this->actingAs($super, 'admin');
-    session(['tenant.empresa_id' => $a->id]);
-
-    $tabela = Livewire::test(ProdutoTable::class)->instance();
-
-    expect(camposDaTabela($tabela))->toContain('empresa_nome')
-        ->not->toContain('filial_nome');
 });
 
 it('o filtro de filial lista apenas as filiais acessíveis', function () {

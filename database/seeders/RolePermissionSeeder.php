@@ -44,7 +44,6 @@ class RolePermissionSeeder extends Seeder
         $gestor->syncPermissions([
             'dashboard.view',
             'usuarios.listar',
-            'produtos.listar',
             'exemplos.listar',
             'listagens.multi_empresa',
         ]);

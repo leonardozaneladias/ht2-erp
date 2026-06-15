@@ -117,18 +117,18 @@ O recurso aparece somente quando o usuário **tem a permissão global `listagens
 ```php
 use App\Livewire\Concerns\FiltraPorMultiEmpresa;
 
-final class ProdutoTable extends PowerGridComponent
+final class ExemploTable extends PowerGridComponent
 {
     use ExportaPdf;
     use FiltraPorMultiEmpresa;
     use WithExport;
 
-    protected function permissaoListagem(): string { return 'produtos.listar'; }
+    protected function permissaoListagem(): string { return 'exemplos.listar'; }
 
     // Opcional: habilita a dimensão filial (model com filial_id + relação filial()).
-    // protected function modeloMultiEmpresa(): string { return Produto::class; }
+    // protected function modeloMultiEmpresa(): string { return Exemplo::class; }
 
-    public function datasource(): Builder { return $this->aplicarEscopoMultiEmpresa(Produto::query()); }
+    public function datasource(): Builder { return $this->aplicarEscopoMultiEmpresa(Exemplo::query()); }
     public function fields(): PowerGridFields { return $this->camposMultiEmpresa(PowerGrid::fields()->add('id')/* ... */); }
     public function columns(): array { return [...$this->colunasMultiEmpresa(), /* ... */]; }
     public function filters(): array { return [...$this->filtrosMultiEmpresa(), /* ... */]; }
@@ -141,7 +141,7 @@ adicionadas via os helpers `cabecalhosMultiEmpresa()`/`linhaMultiEmpresa()` quan
 ativo, alinhadas às colunas da tela.
 
 A permissão `listagens.multi_empresa` é única e global (libera o recurso em todas as listagens) —
-concedida ao `gestor` no seeder, que recebe também `produtos.listar`/`exemplos.listar` e acesso às
+concedida ao `gestor` no seeder, que recebe também `exemplos.listar` e acesso às
 2 empresas de demonstração (assim o filtro fica de fato demonstrável); super-admin já bypassa.
 
 ---

@@ -31,7 +31,7 @@ it('semeia 2+ empresas e habilita o filtro multi-empresa para o gestor', functio
 
     $gestor = AdminUser::query()->where('email', 'gestor@example.com')->firstOrFail();
 
-    // O gestor acessa 2+ empresas e tem produtos.listar em todas elas (papel
+    // O gestor acessa 2+ empresas e tem exemplos.listar em todas elas (papel
     // global) → o filtro multi-empresa fica de fato disponível na demo.
     expect($gestor->empresasAcessiveis()->count())->toBeGreaterThanOrEqual(2);
 
@@ -39,7 +39,7 @@ it('semeia 2+ empresas e habilita o filtro multi-empresa para o gestor', functio
 
     $elegiveis = Empresa::query()
         ->pluck('id')
-        ->filter(fn (int $id): bool => $resolver->permiteNaEmpresa($gestor, 'produtos.listar', $id));
+        ->filter(fn (int $id): bool => $resolver->permiteNaEmpresa($gestor, 'exemplos.listar', $id));
 
     expect($elegiveis->count())->toBeGreaterThanOrEqual(2);
 });

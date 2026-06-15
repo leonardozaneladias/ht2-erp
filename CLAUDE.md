@@ -180,7 +180,7 @@ Exemplos de uso comum:
 
 - Layout / chrome: `x-admin.layout`, `x-admin.auth-layout`, `x-admin.sidebar`, `x-admin.topbar`, `x-admin.page-header`, `x-admin.drawer`
 - Tabelas / dashboards: `x-admin.data-table`, `x-admin.kpi-card`, `x-admin.chart-*`
-- Formulários: `x-shared.input`, `x-shared.select`, `x-shared.toggle`, `x-shared.money-input`, `x-shared.cpf-input`, `x-shared.password-input`
+- Formulários: `x-shared.input`, `x-shared.select-search`, `x-shared.toggle`, `x-shared.money-input`, `x-shared.cpf-input`, `x-shared.password-input`
 - Feedback: `x-shared.alert`, `x-shared.toast`, `x-shared.modal`, `x-shared.empty-state`
 
 ### Showcase interativo (só em local)
@@ -326,8 +326,8 @@ php artisan migrate && php artisan access:sync
 
 Depois, atribua as permissões (`/admin/acesso`) e adicione o item ao menu lateral.
 Guia completo (tipos de campo, flags, customização dos stubs):
-[`docs/criar-modulo.md`](docs/criar-modulo.md). O módulo **Produto** (gerado por este
-comando) é a referência viva — copie/apague à vontade. Os stubs ficam em
+[`docs/criar-modulo.md`](docs/criar-modulo.md). O módulo **Exemplo** (em
+`app/Livewire/Admin/Exemplos/`) é a referência viva — copie/apague à vontade. Os stubs ficam em
 `stubs/modulo/`.
 
 ---
@@ -379,4 +379,6 @@ Implementar em batches pequenos e controlados. Não componentizar tudo de uma ve
 ❌ Commit sem rodar Pint + Prettier
 ❌ Misturar guard admin com outros guards
 ❌ Dados sensíveis em logs (senhas, tokens)
+❌ <select> HTML direto nas views (usar x-shared.select-search)
+❌ x-shared.select nativo (usar x-shared.select-search para single ou :multiple=true para multi)
 ```

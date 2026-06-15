@@ -34,7 +34,7 @@ use PowerComponents\LivewirePowerGrid\PowerGridFields;
  * A tabela informa a permissão via permissaoListagem() e compõe os helpers em
  * datasource()/fields()/columns()/filters():
  *
- *   public function datasource(): Builder { return $this->aplicarEscopoMultiEmpresa(Produto::query()); }
+ *   public function datasource(): Builder { return $this->aplicarEscopoMultiEmpresa(Exemplo::query()); }
  *   public function fields(): PowerGridFields { return $this->camposMultiEmpresa(PowerGrid::fields()->add('id')...); }
  *   public function columns(): array { return [...$this->colunasMultiEmpresa(), Column::make('Nome', 'nome'), ...]; }
  *   public function filters(): array { return [...$this->filtrosMultiEmpresa(), Filter::inputText('nome'), ...]; }
@@ -49,7 +49,7 @@ trait FiltraPorMultiEmpresa
     private ?bool $temColunaFilialCache = null;
 
     /**
-     * Permissão `listar` do módulo (ex.: 'produtos.listar'). É o que o RBAC
+     * Permissão `listar` do módulo (ex.: 'exemplos.listar'). É o que o RBAC
      * estrito checa por empresa para decidir a elegibilidade de cada empresa.
      */
     abstract protected function permissaoListagem(): string;

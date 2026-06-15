@@ -7,36 +7,36 @@
 ## TL;DR
 
 ```bash
-php artisan make:modulo Produto \
-  --fields="nome:string, sku:string:unique, preco:money, descricao:text:nullable, status:enum(rascunho|publicado|arquivado)" \
+php artisan make:modulo Cliente \
+  --fields="nome:string, cnpj:cnpj, email:email:nullable, status:enum(ativo|inativo)" \
   --tenant
 
-./vendor/bin/pint && npx prettier --write resources/views/livewire/admin/produtos/
+./vendor/bin/pint && npx prettier --write resources/views/livewire/admin/clientes/
 php artisan migrate
 php artisan access:sync
 ```
 
-Acesse `/admin/produtos`. Pronto: listagem (PowerGrid com busca/filtros/export), criar/editar, validação, DTO, Actions, Policy, auditoria automática e um teste Feature verde.
+Acesse `/admin/clientes`. Pronto: listagem (PowerGrid com busca/filtros/export), criar/editar, validação, DTO, Actions, Policy, auditoria automática e um teste Feature verde.
 
 ## O que é gerado
 
-Para `make:modulo Produto` o gerador cria (tudo com `declare(strict_types=1)`):
+Para `make:modulo Cliente` o gerador cria (tudo com `declare(strict_types=1)`):
 
 | Camada                | Arquivo                                                                                                          |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Migration + Factory   | `database/migrations/*_create_produtos_table.php`, `database/factories/ProdutoFactory.php`                       |
-| Model                 | `app/Models/Produto.php` (traits `Auditavel` + `BelongsToEmpresa` se `--tenant`)                                 |
-| Enum de status (§5.4) | `app/Enums/StatusProduto.php` (backed, `label()`/`variant()`/`options()`)                                        |
-| DTO readonly (§5.5)   | `app/DTOs/Admin/ProdutoDTO.php` (`fromArray()` / `paraModel()`)                                                  |
-| Validação (§5.2)      | `app/Http/Requests/Admin/ProdutoRules.php` + `Store/UpdateProdutoRequest.php`                                    |
-| Actions (§6)          | `app/Actions/Admin/Create                                                                                        | UpdateProdutoAction.php` (`execute()` + transação) |
-| Service (§5.6)        | `app/Services/Admin/ProdutoService.php`                                                                          |
-| Policy                | `app/Policies/ProdutoPolicy.php` (auto-descoberta por convenção)                                                 |
-| Livewire              | `app/Livewire/Admin/Produtos/{IndexProduto,FormProduto,ProdutoTable}.php`                                        |
-| Views                 | `resources/views/livewire/admin/produtos/{index-produtos,form-produto,_acoes}.blade.php`                         |
-| Teste Feature         | `tests/Feature/Admin/Produtos/ProdutoCrudTest.php`                                                               |
-| Rotas                 | injetadas em `routes/admin.php` (`admin.produtos.{index,create,edit}`)                                           |
-| Permissões            | injetadas em `config/access.php` (`produtos.{listar,criar,editar,deletar}`)                                      |
+| Migration + Factory   | `database/migrations/*_create_clientes_table.php`, `database/factories/ClienteFactory.php`                       |
+| Model                 | `app/Models/Cliente.php` (traits `Auditavel` + `BelongsToEmpresa` se `--tenant`)                                 |
+| Enum de status (§5.4) | `app/Enums/StatusCliente.php` (backed, `label()`/`variant()`/`options()`)                                        |
+| DTO readonly (§5.5)   | `app/DTOs/Admin/ClienteDTO.php` (`fromArray()` / `paraModel()`)                                                  |
+| Validação (§5.2)      | `app/Http/Requests/Admin/ClienteRules.php` + `Store/UpdateClienteRequest.php`                                    |
+| Actions (§6)          | `app/Actions/Admin/Create                                                                                        | UpdateClienteAction.php` (`execute()` + transação) |
+| Service (§5.6)        | `app/Services/Admin/ClienteService.php`                                                                          |
+| Policy                | `app/Policies/ClientePolicy.php` (auto-descoberta por convenção)                                                 |
+| Livewire              | `app/Livewire/Admin/Clientes/{IndexCliente,FormCliente,ClienteTable}.php`                                        |
+| Views                 | `resources/views/livewire/admin/clientes/{index-clientes,form-cliente,_acoes}.blade.php`                         |
+| Teste Feature         | `tests/Feature/Admin/Clientes/ClienteCrudTest.php`                                                               |
+| Rotas                 | injetadas em `routes/admin.php` (`admin.clientes.{index,create,edit}`)                                           |
+| Permissões            | injetadas em `config/access.php` (`clientes.{listar,criar,editar,deletar}`)                                      |
 | Menu lateral          | item injetado em `config/admin-menu.php` (seção **Negócio**), visível só p/ super-admin até atribuir a permissão |
 
 ## Gramática de `--fields`

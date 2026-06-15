@@ -160,12 +160,6 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
 
     Route::get('/comunicados', App\Livewire\Admin\Notificacoes\EnviarComunicado::class)->name('comunicados');
 
-    Route::prefix('produtos')->name('produtos.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Produtos\IndexProduto::class)->name('index');
-        Route::get('/criar', App\Livewire\Admin\Produtos\FormProduto::class)->name('create');
-        Route::get('/{produto}/editar', App\Livewire\Admin\Produtos\FormProduto::class)->name('edit');
-    });
-
     Route::prefix('exemplos')->name('exemplos.')->group(function (): void {
         Route::get('/', App\Livewire\Admin\Exemplos\IndexExemplo::class)->name('index');
         Route::get('/criar', App\Livewire\Admin\Exemplos\FormExemplo::class)->name('create');
