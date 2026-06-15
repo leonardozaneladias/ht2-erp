@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Exemplos;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Enums\StatusExemplo;
+use App\Livewire\Concerns\ComLixeira;
 use App\Livewire\Concerns\ExportaPdf;
 use App\Livewire\Concerns\FiltraPorMultiEmpresa;
 use App\Models\Exemplo;
@@ -23,6 +24,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class ExemploTable extends PowerGridComponent
 {
+    use ComLixeira;
     use ExportaPdf;
     use FiltraPorMultiEmpresa;
     use WithExport;
@@ -38,7 +40,7 @@ final class ExemploTable extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.exemplos._export-pdf'),
+                ->includeViewOnTop('livewire.admin.exemplos._lixeira-toggle'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -53,7 +55,7 @@ final class ExemploTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return $this->aplicarEscopoMultiEmpresa(Exemplo::query());
+        return $this->aplicarLixeira($this->aplicarEscopoMultiEmpresa(Exemplo::query()));
     }
 
     public function fields(): PowerGridFields
@@ -189,7 +191,7 @@ final class ExemploTable extends PowerGridComponent
             return null;
         }
 
-        return view('livewire.admin.exemplos._acoes', ['row' => $row]);
+        return view('livewire.admin.exemplos._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
     }
 
     protected function permissaoListagem(): string
@@ -201,6 +203,14 @@ final class ExemploTable extends PowerGridComponent
      * @return class-string<Exemplo>
      */
     protected function modeloMultiEmpresa(): string
+    {
+        return Exemplo::class;
+    }
+
+    /**
+     * @return class-string<Exemplo>
+     */
+    protected function modelClassLixeira(): string
     {
         return Exemplo::class;
     }

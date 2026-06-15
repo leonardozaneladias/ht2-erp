@@ -33,4 +33,14 @@ class ExemploPolicy
     {
         return $auth->can('exemplos.deletar');
     }
+
+    public function restore(AdminUser $auth, Exemplo $registro): bool
+    {
+        return $auth->can('exemplos.restaurar');
+    }
+
+    public function forceDelete(AdminUser $auth, Exemplo $registro): bool
+    {
+        return $auth->can('exemplos.excluir_permanente');
+    }
 }

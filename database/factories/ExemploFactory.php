@@ -46,4 +46,14 @@ final class ExemploFactory extends Factory
             'status' => fake()->randomElement(StatusExemplo::cases()),
         ];
     }
+
+    /**
+     * Estado "na lixeira" (soft-deleted) para exercitar o fluxo de restauração.
+     */
+    public function trashed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'deleted_at' => now()->subDay(),
+        ]);
+    }
 }

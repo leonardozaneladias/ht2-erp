@@ -7,22 +7,27 @@ namespace App\Models;
 use App\Enums\StatusExemplo;
 use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
+use App\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property StatusExemplo $status
  * @property \Illuminate\Support\Carbon $data_inicio
  * @property \Illuminate\Support\Carbon|null $publicado_em
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  */
-class Exemplo extends Model
+class Exemplo extends Model implements UsaSoftDeletes
 {
     use Auditavel;
     use BelongsToEmpresa;
 
     /** @use HasFactory<\Database\Factories\ExemploFactory> */
     use HasFactory;
+
+    use SoftDeletes;
 
     protected $table = 'exemplos';
 

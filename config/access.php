@@ -234,7 +234,15 @@ return [
             ],
             'exemplos.deletar' => [
                 'label' => 'Excluir exemplos',
-                'descricao' => 'Remover exemplos.',
+                'descricao' => 'Mover exemplos para a lixeira.',
+            ],
+            'exemplos.restaurar' => [
+                'label' => 'Restaurar exemplos',
+                'descricao' => 'Restaurar exemplos da lixeira.',
+            ],
+            'exemplos.excluir_permanente' => [
+                'label' => 'Excluir exemplos permanentemente',
+                'descricao' => 'Remover exemplos definitivamente do banco (irreversível).',
             ],
             // make:modulo insere permissões de negócio acima desta linha
         ],
