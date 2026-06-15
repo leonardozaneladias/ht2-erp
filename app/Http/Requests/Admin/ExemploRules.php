@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin;
 
 use App\Enums\StatusExemplo;
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Validation\Rule;
 
 /**
@@ -20,6 +21,12 @@ final class ExemploRules
     public static function regras(?int $ignorarId = null): array
     {
         return [
+            // Filial opcional, restrita às filiais da empresa ativa (tenant).
+            'filial_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('filiais', 'id')->where('empresa_id', app(TenantContext::class)->empresaAtivaId()),
+            ],
             'nome' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', Rule::unique('exemplos', 'slug')->ignore($ignorarId)],
             'site' => ['nullable', 'url', 'max:255'],

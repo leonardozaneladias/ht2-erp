@@ -198,6 +198,14 @@ final class ExemploTable extends PowerGridComponent
     }
 
     /**
+     * @return class-string<Exemplo>
+     */
+    protected function modeloMultiEmpresa(): string
+    {
+        return Exemplo::class;
+    }
+
+    /**
      * Dados da listagem para exportação em PDF (trait ExportaPdf).
      */
     protected function dadosParaExportacao(): ExportavelDTO

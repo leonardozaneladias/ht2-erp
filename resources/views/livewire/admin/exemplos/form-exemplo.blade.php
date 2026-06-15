@@ -19,7 +19,7 @@
         <x-shared.tab-trigger
             id="aba-identificacao"
             active
-            :has-error="$errors->hasAny(['nome', 'slug', 'site', 'descricao'])"
+            :has-error="$errors->hasAny(['nome', 'slug', 'site', 'descricao', 'filial_id'])"
         >
             Identificação</x-shared.tab-trigger
         >
@@ -48,6 +48,15 @@
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <x-shared.input name="nome" label="Nome" wire:model="nome" required />
                 <x-shared.input name="slug" label="Slug" wire:model="slug" required />
+                @if (! empty($filiais))
+                    <x-shared.select-search
+                        name="filial_id"
+                        label="Filial"
+                        wire:model="filial_id"
+                        :options="$filiais"
+                        placeholder="Sem filial"
+                    />
+                @endif
                 <x-shared.input type="url" name="site" label="Site" wire:model="site" placeholder="https://" />
                 <x-shared.rich-editor name="descricao" label="Descricao" wire:model="descricao" />
             </div>

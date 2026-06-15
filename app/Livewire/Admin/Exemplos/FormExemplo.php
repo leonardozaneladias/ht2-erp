@@ -20,6 +20,8 @@ class FormExemplo extends Component
     #[Locked]
     public ?int $exemploId = null;
 
+    public ?int $filial_id = null;
+
     public string $nome = '';
 
     public string $slug = '';
@@ -66,6 +68,7 @@ class FormExemplo extends Component
             $this->authorize('update', $registro);
 
             $this->exemploId = $registro->id;
+            $this->filial_id = $registro->filial_id === null ? null : (int) $registro->filial_id;
             $this->nome = (string) $registro->nome;
             $this->slug = (string) $registro->slug;
             $this->site = $registro->site;
@@ -116,7 +119,30 @@ class FormExemplo extends Component
     {
         return view('livewire.admin.exemplos.form-exemplo', [
             'modo' => $this->exemploId === null ? 'criar' : 'editar',
+            'filiais' => $this->filiaisDaEmpresaAtiva(),
         ])->title($this->exemploId === null ? 'Novo registro' : 'Editar registro');
+    }
+
+    /**
+     * Filiais ativas da empresa ativa (opções do select de filial). Vazio quando
+     * não há empresa ativa no contexto.
+     *
+     * @return array<int, string>
+     */
+    protected function filiaisDaEmpresaAtiva(): array
+    {
+        $empresaId = app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId();
+
+        if ($empresaId === null) {
+            return [];
+        }
+
+        return \App\Models\Filial::query()
+            ->where('empresa_id', $empresaId)
+            ->where('ativo', true)
+            ->orderBy('nome')
+            ->pluck('nome', 'id')
+            ->all();
     }
 
     /**
@@ -125,6 +151,7 @@ class FormExemplo extends Component
     protected function validationAttributes(): array
     {
         return [
+            'filial_id' => 'filial',
             'nome' => 'nome',
             'slug' => 'slug',
             'site' => 'site',

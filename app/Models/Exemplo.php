@@ -9,6 +9,7 @@ use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property StatusExemplo $status
@@ -29,6 +30,7 @@ class Exemplo extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'filial_id',
         'nome',
         'slug',
         'site',
@@ -53,6 +55,14 @@ class Exemplo extends Model
     /**
      * @return array<string, string>
      */
+    /**
+     * @return BelongsTo<Filial, $this>
+     */
+    public function filial(): BelongsTo
+    {
+        return $this->belongsTo(Filial::class);
+    }
+
     protected function casts(): array
     {
         return [

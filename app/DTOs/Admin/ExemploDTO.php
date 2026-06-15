@@ -9,6 +9,7 @@ use App\Enums\StatusExemplo;
 final readonly class ExemploDTO
 {
     public function __construct(
+        public ?int $filialId = null,
         public string $nome = '',
         public string $slug = '',
         public ?string $site = null,
@@ -45,6 +46,7 @@ final readonly class ExemploDTO
             : null;
 
         return new self(
+            filialId: isset($data['filial_id']) && $data['filial_id'] !== '' ? (int) $data['filial_id'] : null,
             nome: (string) ($data['nome'] ?? ''),
             slug: (string) ($data['slug'] ?? ''),
             site: $texto('site'),
@@ -73,6 +75,7 @@ final readonly class ExemploDTO
     public function paraModel(): array
     {
         return [
+            'filial_id' => $this->filialId,
             'nome' => $this->nome,
             'slug' => $this->slug,
             'site' => $this->site,

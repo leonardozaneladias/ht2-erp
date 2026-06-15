@@ -22,6 +22,9 @@ final class ExemploFactory extends Factory
     {
         return [
             'empresa_id' => app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \App\Models\Empresa::factory(),
+            // Filial é opcional; os testes que exercitam a dimensão filial a definem
+            // explicitamente (deve pertencer à mesma empresa do registro).
+            'filial_id' => null,
             'nome' => fake()->words(2, true),
             'slug' => fake()->words(2, true),
             'site' => fake()->url(),
