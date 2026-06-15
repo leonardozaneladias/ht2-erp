@@ -190,7 +190,7 @@ final class EspecificacaoModulo
         $singular = mb_strtolower($this->studly);
         $plural = mb_strtolower($this->studlyPlural);
 
-        return [
+        $permissoes = [
             "{$base}.listar" => [
                 'label' => "Listar {$plural}",
                 'descricao' => "Ver a listagem de {$plural}.",
@@ -205,9 +205,24 @@ final class EspecificacaoModulo
             ],
             "{$base}.deletar" => [
                 'label' => "Excluir {$plural}",
-                'descricao' => "Remover {$plural}.",
+                'descricao' => $this->softDelete ? "Mover {$plural} para a lixeira." : "Remover {$plural}.",
             ],
         ];
+
+        // Soft-delete: a exclusão vai para a lixeira; restaurar e excluir
+        // definitivamente (force-delete) ganham permissões próprias.
+        if ($this->softDelete) {
+            $permissoes["{$base}.restaurar"] = [
+                'label' => "Restaurar {$plural}",
+                'descricao' => "Restaurar {$plural} da lixeira.",
+            ];
+            $permissoes["{$base}.excluir_permanente"] = [
+                'label' => "Excluir {$plural} permanentemente",
+                'descricao' => "Remover {$plural} definitivamente do banco (irreversível).",
+            ];
+        }
+
+        return $permissoes;
     }
 
     // ---- Tokens escalares -------------------------------------------------
@@ -263,6 +278,16 @@ final class EspecificacaoModulo
             '__FILTROS_MULTI_EMPRESA__' => $this->tenant ? '...$this->filtrosMultiEmpresa(),' : '',
             '__PDF_LINHA_MULTI_EMPRESA__' => $this->tenant ? '...$this->linhaMultiEmpresa($registro),' : '',
             '__PDF_CABECALHOS_MULTI_EMPRESA__' => $this->tenant ? '...$this->cabecalhosMultiEmpresa(), ' : '',
+            // Lixeira (soft-delete): vazios quando !softDelete → saída idêntica à antiga.
+            '__USE_COM_LIXEIRA__' => $this->softDelete ? 'use App\Livewire\Concerns\ComLixeira;' : '',
+            '__TRAIT_COM_LIXEIRA__' => $this->softDelete ? 'use ComLixeira;' : '',
+            '__DS_LIXEIRA_OPEN__' => $this->softDelete ? '$this->aplicarLixeira(' : '',
+            '__DS_LIXEIRA_CLOSE__' => $this->softDelete ? ')' : '',
+            '__HEADER_LIXEIRA_VIEW__' => $this->softDelete ? '_lixeira-toggle' : '_export-pdf',
+            '__VERLIXEIRA_PARAM__' => $this->softDelete ? ", 'verLixeira' => \$this->verLixeira" : '',
+            '__MODEL_USE_LIXEIRA__' => $this->softDelete ? 'use App\Models\Contracts\UsaSoftDeletes;' : '',
+            '__MODEL_IMPLEMENTS_LIXEIRA__' => $this->softDelete ? ' implements UsaSoftDeletes' : '',
+            '__MODEL_DELETED_AT_PROPERTY__' => $this->softDelete ? "\n * @property \Illuminate\Support\Carbon|null \$deleted_at" : '',
         ];
     }
 
@@ -762,6 +787,108 @@ final class EspecificacaoModulo
         $linhas[] = "->set('status', '{$this->statusValueDefault()}')";
 
         return $this->bloco($linhas, $espacos);
+    }
+
+    // ---- Blocos: Lixeira (soft-delete) ------------------------------------
+    // Vazios quando !softDelete. A indentação é normalizada pelo Pint/Prettier
+    // após a geração (o gerador não formata a saída).
+
+    /** Método modelClassLixeira() exigido pelo trait ComLixeira (Table). */
+    public function metodoModelClassLixeira(): string
+    {
+        if (! $this->softDelete) {
+            return '';
+        }
+
+        return <<<PHP
+    /**
+         * @return class-string<{$this->studly}>
+         */
+        protected function modelClassLixeira(): string
+        {
+            return {$this->studly}::class;
+        }
+    PHP;
+    }
+
+    /** Métodos restore()/forceDelete() da Policy. */
+    public function metodosPolicyLixeira(): string
+    {
+        if (! $this->softDelete) {
+            return '';
+        }
+
+        $base = $this->permissaoBase();
+
+        return <<<PHP
+
+
+        public function restore(AdminUser \$auth, {$this->studly} \$registro): bool
+        {
+            return \$auth->can('{$base}.restaurar');
+        }
+
+        public function forceDelete(AdminUser \$auth, {$this->studly} \$registro): bool
+        {
+            return \$auth->can('{$base}.excluir_permanente');
+        }
+    PHP;
+    }
+
+    /** State trashed() da factory para exercitar a restauração. */
+    public function factoryTrashed(): string
+    {
+        if (! $this->softDelete) {
+            return '';
+        }
+
+        return <<<'PHP'
+
+
+    /**
+     * Estado "na lixeira" (soft-deleted) para exercitar o fluxo de restauração.
+     */
+    public function trashed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'deleted_at' => now()->subDay(),
+        ]);
+    }
+    PHP;
+    }
+
+    /** Teste de soft-delete (excluir → lixeira → restaurar) no módulo gerado. */
+    public function testeSoftDelete(): string
+    {
+        if (! $this->softDelete) {
+            return '';
+        }
+
+        $studly = $this->studly;
+        $label = mb_strtolower($this->studly);
+        $tableFqn = '\\' . $this->nsLivewire() . '\\' . $studly . 'Table';
+
+        return <<<PHP
+
+
+    it('move um registro de {$label} para a lixeira e o restaura', function () {
+        \$registro = {$studly}::factory()->create();
+
+        Livewire::actingAs(\$this->admin, 'admin')
+            ->test({$tableFqn}::class)
+            ->call('excluir', \$registro->id)
+            ->assertHasNoErrors();
+
+        expect({$studly}::query()->whereKey(\$registro->id)->exists())->toBeFalse();
+
+        Livewire::actingAs(\$this->admin, 'admin')
+            ->test({$tableFqn}::class)
+            ->call('restaurar', \$registro->id)
+            ->assertHasNoErrors();
+
+        expect({$studly}::query()->whereKey(\$registro->id)->exists())->toBeTrue();
+    });
+    PHP;
     }
 
     // ---- Destino: namespaces, views e rotas (app vs pacote) ---------------

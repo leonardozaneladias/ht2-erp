@@ -50,3 +50,4 @@ it('abre o formulário de edição de __MODULO_LABEL__', function () {
         ->assertOk()
         ->assertSet('__MODULO_CAMEL__Id', $registro->id);
 });
+__TEST_SOFT_DELETE__

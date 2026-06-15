@@ -120,3 +120,71 @@ it('sem --tenant, os tokens multi-empresa ficam vazios', function (): void {
         ->and($tokens['__PDF_LINHA_MULTI_EMPRESA__'])->toBe('')
         ->and($tokens['__PDF_CABECALHOS_MULTI_EMPRESA__'])->toBe('');
 });
+
+it('com soft-delete, permissoes adiciona restaurar/excluir_permanente e deletar vira lixeira', function (): void {
+    $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], softDelete: true);
+    $perms = $spec->permissoes();
+
+    expect(array_keys($perms))->toBe([
+        'exemplos.listar',
+        'exemplos.criar',
+        'exemplos.editar',
+        'exemplos.deletar',
+        'exemplos.restaurar',
+        'exemplos.excluir_permanente',
+    ])
+        ->and($perms['exemplos.deletar']['descricao'])->toBe('Mover exemplos para a lixeira.')
+        ->and($perms['exemplos.restaurar']['label'])->toBe('Restaurar exemplos')
+        ->and($perms['exemplos.excluir_permanente']['descricao'])->toContain('irreversível');
+});
+
+it('sem soft-delete, permissoes tem só as 4 base e deletar é remover', function (): void {
+    $perms = specDeTokens(['nome:string'])->permissoes();
+
+    expect(array_keys($perms))->toBe([
+        'exemplos.listar',
+        'exemplos.criar',
+        'exemplos.editar',
+        'exemplos.deletar',
+    ])
+        ->and($perms['exemplos.deletar']['descricao'])->toBe('Remover exemplos.');
+});
+
+it('com soft-delete, os tokens e blocos de lixeira são preenchidos', function (): void {
+    $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], softDelete: true);
+    $tokens = $spec->tokens();
+
+    expect($tokens['__USE_COM_LIXEIRA__'])->toBe('use App\Livewire\Concerns\ComLixeira;')
+        ->and($tokens['__TRAIT_COM_LIXEIRA__'])->toBe('use ComLixeira;')
+        ->and($tokens['__DS_LIXEIRA_OPEN__'])->toBe('$this->aplicarLixeira(')
+        ->and($tokens['__DS_LIXEIRA_CLOSE__'])->toBe(')')
+        ->and($tokens['__HEADER_LIXEIRA_VIEW__'])->toBe('_lixeira-toggle')
+        ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe(", 'verLixeira' => \$this->verLixeira")
+        ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('use App\Models\Contracts\UsaSoftDeletes;')
+        ->and($tokens['__MODEL_IMPLEMENTS_LIXEIRA__'])->toBe(' implements UsaSoftDeletes')
+        ->and($tokens['__MODEL_DELETED_AT_PROPERTY__'])->toContain('@property \Illuminate\Support\Carbon|null $deleted_at')
+        ->and($spec->metodoModelClassLixeira())->toContain('modelClassLixeira')
+        ->and($spec->metodosPolicyLixeira())->toContain('exemplos.restaurar')
+        ->and($spec->metodosPolicyLixeira())->toContain('exemplos.excluir_permanente')
+        ->and($spec->factoryTrashed())->toContain('public function trashed(): static')
+        ->and($spec->testeSoftDelete())->toContain("->call('excluir'");
+});
+
+it('sem soft-delete, os tokens de lixeira ficam vazios e o header usa _export-pdf', function (): void {
+    $spec = specDeTokens(['nome:string']);
+    $tokens = $spec->tokens();
+
+    expect($tokens['__USE_COM_LIXEIRA__'])->toBe('')
+        ->and($tokens['__TRAIT_COM_LIXEIRA__'])->toBe('')
+        ->and($tokens['__DS_LIXEIRA_OPEN__'])->toBe('')
+        ->and($tokens['__DS_LIXEIRA_CLOSE__'])->toBe('')
+        ->and($tokens['__HEADER_LIXEIRA_VIEW__'])->toBe('_export-pdf')
+        ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe('')
+        ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('')
+        ->and($tokens['__MODEL_IMPLEMENTS_LIXEIRA__'])->toBe('')
+        ->and($tokens['__MODEL_DELETED_AT_PROPERTY__'])->toBe('')
+        ->and($spec->metodoModelClassLixeira())->toBe('')
+        ->and($spec->metodosPolicyLixeira())->toBe('')
+        ->and($spec->factoryTrashed())->toBe('')
+        ->and($spec->testeSoftDelete())->toBe('');
+});

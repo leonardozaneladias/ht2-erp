@@ -154,6 +154,10 @@ final class MakeModuloCommand extends Command
             '__TEST_SET_CAMPOS__' => $spec->testSets(),
             '__PDF_COLUNAS__' => $spec->pdfColunas(),
             '__PDF_MAP_ROW__' => $spec->pdfMapRow(),
+            '__MODEL_CLASS_LIXEIRA__' => $spec->metodoModelClassLixeira(),
+            '__POLICY_RESTORE_FORCE__' => $spec->metodosPolicyLixeira(),
+            '__FACTORY_TRASHED__' => $spec->factoryTrashed(),
+            '__TEST_SOFT_DELETE__' => $spec->testeSoftDelete(),
         ];
     }
 
@@ -174,7 +178,10 @@ final class MakeModuloCommand extends Command
         $snakePlural = $spec->snakePlural();
         $migracao = now()->format('Y_m_d_His');
 
-        return [
+        // Com soft-delete, o _acoes vem do stub com a estrutura de lixeira.
+        $acoesStub = $spec->softDelete ? 'view-acoes-lixeira.stub' : 'view-acoes.stub';
+
+        $mapa = [
             'migration.stub' => "database/migrations/{$migracao}_create_{$spec->tabela()}_table.php",
             'factory.stub' => "database/factories/{$studly}Factory.php",
             'model.stub' => "app/Models/{$studly}.php",
@@ -192,10 +199,16 @@ final class MakeModuloCommand extends Command
             'livewire-table.stub' => "app/Livewire/Admin/{$studlyPlural}/{$studly}Table.php",
             'view-index.stub' => "resources/views/livewire/admin/{$snakePlural}/index-{$snakePlural}.blade.php",
             'view-form.stub' => "resources/views/livewire/admin/{$snakePlural}/form-{$snake}.blade.php",
-            'view-acoes.stub' => "resources/views/livewire/admin/{$snakePlural}/_acoes.blade.php",
+            $acoesStub => "resources/views/livewire/admin/{$snakePlural}/_acoes.blade.php",
             'view-export-pdf.stub' => "resources/views/livewire/admin/{$snakePlural}/_export-pdf.blade.php",
             'test.stub' => "tests/Feature/Admin/{$studlyPlural}/{$studly}CrudTest.php",
         ];
+
+        if ($spec->softDelete) {
+            $mapa['view-lixeira-toggle.stub'] = "resources/views/livewire/admin/{$snakePlural}/_lixeira-toggle.blade.php";
+        }
+
+        return $mapa;
     }
 
     /**
@@ -410,7 +423,10 @@ PHP;
         $snakePlural = $spec->snakePlural();
         $migracao = now()->format('Y_m_d_His');
 
-        return [
+        // Com soft-delete, o _acoes vem do stub com a estrutura de lixeira.
+        $acoesStub = $spec->softDelete ? 'view-acoes-lixeira.stub' : 'view-acoes.stub';
+
+        $mapa = [
             'migration.stub' => "{$dir}/database/migrations/{$migracao}_create_{$spec->tabela()}_table.php",
             'factory.stub' => "{$dir}/database/factories/{$studly}Factory.php",
             'model.stub' => "{$dir}/src/Models/{$studly}.php",
@@ -428,10 +444,16 @@ PHP;
             'livewire-table.stub' => "{$dir}/src/Livewire/{$studlyPlural}/{$studly}Table.php",
             'view-index.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/index-{$snakePlural}.blade.php",
             'view-form.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/form-{$snake}.blade.php",
-            'view-acoes.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/_acoes.blade.php",
+            $acoesStub => "{$dir}/resources/views/livewire/{$snakePlural}/_acoes.blade.php",
             'view-export-pdf.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/_export-pdf.blade.php",
             'test.stub' => "{$dir}/tests/Feature/{$studlyPlural}/{$studly}CrudTest.php",
         ];
+
+        if ($spec->softDelete) {
+            $mapa['view-lixeira-toggle.stub'] = "{$dir}/resources/views/livewire/{$snakePlural}/_lixeira-toggle.blade.php";
+        }
+
+        return $mapa;
     }
 
     /**

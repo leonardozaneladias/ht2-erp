@@ -6,14 +6,15 @@ namespace __NS_MODELS__;
 
 use __NS_ENUMS__\__STATUS_ENUM__;
 use App\Models\Concerns\Auditavel;__MODEL_USE_SOFT_DELETE__
+__MODEL_USE_LIXEIRA__
 __MODEL_USE_TENANT__
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property __STATUS_ENUM__ $status__MODEL_DATE_PROPERTIES__
+ * @property __STATUS_ENUM__ $status__MODEL_DATE_PROPERTIES____MODEL_DELETED_AT_PROPERTY__
  */
-class __MODULO_STUDLY__ extends Model
+class __MODULO_STUDLY__ extends Model__MODEL_IMPLEMENTS_LIXEIRA__
 {
     use Auditavel;__MODEL_TRAIT_SOFT_DELETE__
     __MODEL_TRAIT_TENANT__

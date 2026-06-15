@@ -6,6 +6,7 @@ namespace __NS_LIVEWIRE__;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
 use __NS_ENUMS__\__STATUS_ENUM__;
+__USE_COM_LIXEIRA__
 use App\Livewire\Concerns\ExportaPdf;
 __USE_MULTI_EMPRESA__
 use __NS_MODELS__\__MODULO_STUDLY__;
@@ -23,6 +24,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class __MODULO_STUDLY__Table extends PowerGridComponent
 {
+    __TRAIT_COM_LIXEIRA__
     use ExportaPdf;
     __TRAIT_MULTI_EMPRESA__
     use WithExport;
@@ -30,6 +32,8 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
     public string $tableName = '__MODULO_ROTA_NOME__-table';
 
     __PERMISSAO_LISTAGEM__
+
+    __MODEL_CLASS_LIXEIRA__
 
     /**
      * @return array<int, mixed>
@@ -40,7 +44,7 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('__VIEW_PREFIX__._export-pdf'),
+                ->includeViewOnTop('__VIEW_PREFIX__.__HEADER_LIXEIRA_VIEW__'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -55,7 +59,7 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return __DS_OPEN____MODULO_STUDLY__::query()__DS_CLOSE__;
+        return __DS_LIXEIRA_OPEN____DS_OPEN____MODULO_STUDLY__::query()__DS_CLOSE____DS_LIXEIRA_CLOSE__;
     }
 
     public function fields(): PowerGridFields
@@ -92,7 +96,7 @@ __PG_FILTERS__
             return null;
         }
 
-        return view('__VIEW_PREFIX__._acoes', ['row' => $row]);
+        return view('__VIEW_PREFIX__._acoes', ['row' => $row__VERLIXEIRA_PARAM__]);
     }
 
     /**

@@ -32,5 +32,5 @@ class __MODULO_STUDLY__Policy
     public function delete(AdminUser $auth, __MODULO_STUDLY__ $registro): bool
     {
         return $auth->can('__MODULO_ROTA_NOME__.deletar');
-    }
+    }__POLICY_RESTORE_FORCE__
 }

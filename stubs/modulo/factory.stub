@@ -23,5 +23,5 @@ final class __MODULO_STUDLY__Factory extends Factory
         return [
 __FACTORY_DEF__
         ];
-    }
+    }__FACTORY_TRASHED__
 }
