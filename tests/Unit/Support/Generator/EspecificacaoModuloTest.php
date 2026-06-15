@@ -91,3 +91,28 @@ it('formata date/datetime no mount load e anota @property Carbon', function (): 
 it('anota @var list<string> na prop multiselect do formulário', function (): void {
     expect(specDeTokens(['tags:multiselect(a|b|c)'])->formProps())->toContain('@var list<string>');
 });
+
+it('--tenant injeta o filtro multi-empresa na Table', function (): void {
+    $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], tenant: true);
+    $tokens = $spec->tokens();
+
+    expect($tokens['__USE_MULTI_EMPRESA__'])->toContain('use App\Livewire\Concerns\FiltraPorMultiEmpresa;')
+        ->and($tokens['__TRAIT_MULTI_EMPRESA__'])->toBe('use FiltraPorMultiEmpresa;')
+        ->and($tokens['__PERMISSAO_LISTAGEM__'])->toContain("return 'exemplos.listar';")
+        ->and($tokens['__DS_OPEN__'])->toBe('$this->aplicarEscopoMultiEmpresa(')
+        ->and($tokens['__DS_CLOSE__'])->toBe(')')
+        ->and($tokens['__FIELDS_OPEN__'])->toBe('$this->camposMultiEmpresa(')
+        ->and($tokens['__COLUNAS_MULTI_EMPRESA__'])->toBe('...$this->colunasMultiEmpresa(),')
+        ->and($tokens['__FILTROS_MULTI_EMPRESA__'])->toBe('...$this->filtrosMultiEmpresa(),');
+});
+
+it('sem --tenant, os tokens multi-empresa ficam vazios', function (): void {
+    $tokens = specDeTokens(['nome:string'])->tokens();
+
+    expect($tokens['__USE_MULTI_EMPRESA__'])->toBe('')
+        ->and($tokens['__TRAIT_MULTI_EMPRESA__'])->toBe('')
+        ->and($tokens['__PERMISSAO_LISTAGEM__'])->toBe('')
+        ->and($tokens['__DS_OPEN__'])->toBe('')
+        ->and($tokens['__DS_CLOSE__'])->toBe('')
+        ->and($tokens['__COLUNAS_MULTI_EMPRESA__'])->toBe('');
+});

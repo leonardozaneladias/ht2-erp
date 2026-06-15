@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\__MODULO_STUDLY_PLURAL__;
 use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Enums\__STATUS_ENUM__;
 use App\Livewire\Concerns\ExportaPdf;
+__USE_MULTI_EMPRESA__
 use App\Models\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,9 +24,12 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 final class __MODULO_STUDLY__Table extends PowerGridComponent
 {
     use ExportaPdf;
+    __TRAIT_MULTI_EMPRESA__
     use WithExport;
 
     public string $tableName = '__MODULO_ROTA_NOME__-table';
+
+    __PERMISSAO_LISTAGEM__
 
     /**
      * @return array<int, mixed>
@@ -51,13 +55,13 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return __MODULO_STUDLY__::query();
+        return __DS_OPEN____MODULO_STUDLY__::query()__DS_CLOSE__;
     }
 
     public function fields(): PowerGridFields
     {
-        return PowerGrid::fields()
-__PG_FIELDS__;
+        return __FIELDS_OPEN__PowerGrid::fields()
+__PG_FIELDS____FIELDS_CLOSE__;
     }
 
     /**
@@ -66,6 +70,7 @@ __PG_FIELDS__;
     public function columns(): array
     {
         return [
+            __COLUNAS_MULTI_EMPRESA__
 __PG_COLUMNS__
         ];
     }
@@ -76,6 +81,7 @@ __PG_COLUMNS__
     public function filters(): array
     {
         return [
+            __FILTROS_MULTI_EMPRESA__
 __PG_FILTERS__
         ];
     }

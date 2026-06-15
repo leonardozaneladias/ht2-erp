@@ -127,7 +127,10 @@ php artisan migrate && php artisan access:sync
 ## Flags
 
 - `--tenant` — vincula à empresa ativa (trait `BelongsToEmpresa`: global scope por
-  empresa + auto-preenche `empresa_id`). Use em quase todo módulo de negócio.
+  empresa + auto-preenche `empresa_id`). Use em quase todo módulo de negócio. Também
+  injeta na Table o trait `FiltraPorMultiEmpresa` (filtro multi-empresa nas listagens —
+  veja `docs/multi-empresa.md`); o recurso só aparece para quem tem a permissão
+  `listagens.multi_empresa` e acesso a 2+ empresas.
 - `--menu="Rótulo"` — rótulo do item de menu (default: nome no plural, ex.: "Produtos").
 - `--menu-icon="tabler--..."` — ícone do item de menu (default `tabler--folder`).
 - `--skip-menu` — não injeta o item no menu lateral.

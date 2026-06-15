@@ -85,6 +85,58 @@ não são atribuíveis no escopo por empresa.
 Conceder a um usuário **acesso** a uma empresa (independente de papéis) é feito na aba
 **Empresas** do formulário de usuário (`SyncAcessoEmpresaAction`, permissão `empresas.acessos`).
 
+### Filtro multi-empresa nas listagens (trait `FiltraPorMultiEmpresa`)
+
+Por padrão, cada listagem (PowerGrid) mostra **só a empresa ativa** (global scope `empresa`).
+O trait `App\Livewire\Concerns\FiltraPorMultiEmpresa` dá a usuários autorizados um
+**multiselect de empresa (e filial)** para ver registros de várias empresas/filiais de uma vez,
+com uma coluna **Empresa** (e **Filial**) identificando cada linha.
+
+O recurso aparece somente quando o usuário **tem a permissão global `listagens.multi_empresa`**
+**e** é elegível em **2+ empresas**. Caso contrário, a listagem se comporta exatamente como hoje
+(só a empresa ativa).
+
+**Segurança (invariantes):**
+
+1. **Elegibilidade = RBAC estrito por empresa.** No multiselect só aparecem empresas onde o
+   usuário tem a permissão `listar` do módulo _naquela_ empresa — via
+   `AccessResolver::permiteNaEmpresa($user, $ability, $empresaId)`, que monta o snapshot pleno
+   de papéis do tenant (global ∪ `admin_user_empresa_role`), **sem** a lente do perfil ativo
+   (que vale só para a empresa ativa). super-admin é elegível em tudo.
+2. **Escopo da query = `selecionadas ∩ elegíveis`** (e filiais `∩ acessíveis`). A intersecção é
+   aplicada no `datasource()` após `withoutGlobalScope('empresa')` — valores de `empresa_id`/
+   `filial_id` vindos do cliente **nunca** ampliam o escopo.
+3. O **filtro de filial** só existe em models com coluna `filial_id` + relação `filial()`, e a
+   filial só **estreita** dentro das empresas selecionadas (o escopo base continua por empresa,
+   como no sistema atual — filial não restringe linhas por si só).
+
+**Como aplicar numa tabela tenant** (o gerador `make:modulo --tenant` já injeta isto):
+
+```php
+use App\Livewire\Concerns\FiltraPorMultiEmpresa;
+
+final class ProdutoTable extends PowerGridComponent
+{
+    use ExportaPdf;
+    use FiltraPorMultiEmpresa;
+    use WithExport;
+
+    protected function permissaoListagem(): string { return 'produtos.listar'; }
+
+    // Opcional: habilita a dimensão filial (model com filial_id + relação filial()).
+    // protected function modeloMultiEmpresa(): string { return Produto::class; }
+
+    public function datasource(): Builder { return $this->aplicarEscopoMultiEmpresa(Produto::query()); }
+    public function fields(): PowerGridFields { return $this->camposMultiEmpresa(PowerGrid::fields()->add('id')/* ... */); }
+    public function columns(): array { return [...$this->colunasMultiEmpresa(), /* ... */]; }
+    public function filters(): array { return [...$this->filtrosMultiEmpresa(), /* ... */]; }
+}
+```
+
+Como o escopo é aplicado no `datasource()`, a paginação/busca e a **exportação** (PDF/Excel)
+herdam o mesmo filtro automaticamente. A permissão `listagens.multi_empresa` é única e global
+(libera o recurso em todas as listagens) — concedida ao `gestor` no seeder; super-admin já bypassa.
+
 ---
 
 ## 4. Branding por empresa ativa

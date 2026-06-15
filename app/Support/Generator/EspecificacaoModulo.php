@@ -163,6 +163,16 @@ final class EspecificacaoModulo
             '__STATUS_VALUE_DEFAULT__' => $this->statusValueDefault(),
             '__MODEL_USE_TENANT__' => $this->tenant ? 'use App\Models\Concerns\BelongsToEmpresa;' : '',
             '__MODEL_TRAIT_TENANT__' => $this->tenant ? 'use BelongsToEmpresa;' : '',
+            // Filtro multi-empresa nas listagens (só faz sentido em módulos tenant).
+            '__USE_MULTI_EMPRESA__' => $this->tenant ? 'use App\Livewire\Concerns\FiltraPorMultiEmpresa;' : '',
+            '__TRAIT_MULTI_EMPRESA__' => $this->tenant ? 'use FiltraPorMultiEmpresa;' : '',
+            '__PERMISSAO_LISTAGEM__' => $this->tenant ? $this->metodoPermissaoListagem() : '',
+            '__DS_OPEN__' => $this->tenant ? '$this->aplicarEscopoMultiEmpresa(' : '',
+            '__DS_CLOSE__' => $this->tenant ? ')' : '',
+            '__FIELDS_OPEN__' => $this->tenant ? '$this->camposMultiEmpresa(' : '',
+            '__FIELDS_CLOSE__' => $this->tenant ? ')' : '',
+            '__COLUNAS_MULTI_EMPRESA__' => $this->tenant ? '...$this->colunasMultiEmpresa(),' : '',
+            '__FILTROS_MULTI_EMPRESA__' => $this->tenant ? '...$this->filtrosMultiEmpresa(),' : '',
         ];
     }
 
@@ -662,6 +672,22 @@ final class EspecificacaoModulo
         $linhas[] = "->set('status', '{$this->statusValueDefault()}')";
 
         return $this->bloco($linhas, $espacos);
+    }
+
+    /**
+     * Método permissaoListagem() exigido pelo trait FiltraPorMultiEmpresa. A
+     * indentação é normalizada pelo Pint após a geração.
+     */
+    private function metodoPermissaoListagem(): string
+    {
+        $permissao = $this->snakePlural() . '.listar';
+
+        return <<<PHP
+    protected function permissaoListagem(): string
+        {
+            return '{$permissao}';
+        }
+    PHP;
     }
 
     private function formBodyCardUnico(): string
