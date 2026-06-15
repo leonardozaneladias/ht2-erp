@@ -139,6 +139,7 @@ final class CampoModulo
             'datetime' => "\$table->timestamp('{$this->nome}')",
             'cnpj' => "\$table->string('{$this->nome}', 18)",
             'cpf' => "\$table->string('{$this->nome}', 14)",
+            'pis' => "\$table->string('{$this->nome}', 11)",
             'cep' => "\$table->string('{$this->nome}', 9)",
             'phone' => "\$table->string('{$this->nome}', 20)",
             'color' => "\$table->string('{$this->nome}', 9)",
@@ -254,8 +255,9 @@ final class CampoModulo
             'date', 'datetime' => [$this->nullable ? "'nullable'" : "'required'", "'date'"],
             'email' => [$this->nullable ? "'nullable'" : "'required'", "'email:rfc'", "'max:191'"],
             'url' => [$this->nullable ? "'nullable'" : "'required'", "'url'", "'max:255'"],
-            'cnpj' => [$obrig, "'string'", "'max:18'"],
-            'cpf' => [$obrig, "'string'", "'max:14'"],
+            'cnpj' => [$obrig, 'new \\App\\Rules\\Cnpj()'],
+            'cpf' => [$obrig, 'new \\App\\Rules\\Cpf()'],
+            'pis' => [$obrig, 'new \\App\\Rules\\Pis()'],
             'cep' => [$obrig, "'string'", "'max:9'"],
             'phone' => [$obrig, "'string'", "'max:20'"],
             'color' => [$obrig, "'string'", "'max:9'"],
@@ -268,7 +270,8 @@ final class CampoModulo
     public function usaRuleNaValidacao(): bool
     {
         // Rule::unique / Rule::enum / Rule::in (enum não-status também usa Rule::in).
-        return $this->unique || $this->ehEnum();
+        // App\Rules\Cpf / Cnpj / Pis também são objetos, não strings.
+        return $this->unique || $this->ehEnum() || in_array($this->tipo, ['cpf', 'cnpj', 'pis'], true);
     }
 
     // ---- Factory ----------------------------------------------------------
@@ -286,6 +289,7 @@ final class CampoModulo
             'url' => 'fake()->url()',
             'cnpj' => 'fake()->numerify(\'##.###.###/####-##\')',
             'cpf' => 'fake()->numerify(\'###.###.###-##\')',
+            'pis' => 'fake()->numerify(\'###.#####.##-#\')',
             'cep' => 'fake()->numerify(\'#####-###\')',
             'phone' => 'fake()->numerify(\'(##) #####-####\')',
             'color' => 'fake()->hexColor()',
@@ -312,7 +316,8 @@ final class CampoModulo
             'email' => "'contato@exemplo.com'",
             'url' => "'https://exemplo.com'",
             'cnpj' => "'11.222.333/0001-81'",
-            'cpf' => "'529.982.247-25'",
+            'cpf' => "'111.444.777-35'",
+            'pis' => "'12345678919'",
             'cep' => "'01001-000'",
             'phone' => "'(11) 99999-9999'",
             'color' => "'#3b82f6'",
@@ -336,7 +341,7 @@ final class CampoModulo
         return match ($this->tipo) {
             'boolean' => "Filter::boolean('{$this->nome}')",
             'enum' => null, // tratado a parte (multiSelect com cases do Enum)
-            'string', 'email', 'url', 'cnpj', 'cpf', 'cep', 'phone' => "Filter::inputText('{$this->nome}')->placeholder('Filtrar por {$this->label()}')",
+            'string', 'email', 'url', 'cnpj', 'cpf', 'pis', 'cep', 'phone' => "Filter::inputText('{$this->nome}')->placeholder('Filtrar por {$this->label()}')",
             default => null,
         };
     }
@@ -362,6 +367,7 @@ final class CampoModulo
             'date', 'datetime' => "<x-shared.date-picker name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
             'cnpj' => "<x-shared.cnpj-input name=\"{$nome}\" wire:model=\"{$nome}\"{$req} />",
             'cpf' => "<x-shared.cpf-input name=\"{$nome}\" wire:model=\"{$nome}\"{$req} />",
+            'pis' => "<x-shared.input name=\"{$nome}\" label=\"PIS/PASEP\" wire:model=\"{$nome}\" placeholder=\"000.00000.00-0\"{$req} />",
             'cep' => "<x-shared.cep-input name=\"{$nome}\" wire:model=\"{$nome}\"{$req} />",
             'phone' => "<x-shared.phone-input name=\"{$nome}\" wire:model=\"{$nome}\"{$req} />",
             'email' => "<x-shared.input type=\"email\" name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
