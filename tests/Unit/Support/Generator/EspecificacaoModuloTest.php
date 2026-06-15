@@ -103,7 +103,9 @@ it('--tenant injeta o filtro multi-empresa na Table', function (): void {
         ->and($tokens['__DS_CLOSE__'])->toBe(')')
         ->and($tokens['__FIELDS_OPEN__'])->toBe('$this->camposMultiEmpresa(')
         ->and($tokens['__COLUNAS_MULTI_EMPRESA__'])->toBe('...$this->colunasMultiEmpresa(),')
-        ->and($tokens['__FILTROS_MULTI_EMPRESA__'])->toBe('...$this->filtrosMultiEmpresa(),');
+        ->and($tokens['__FILTROS_MULTI_EMPRESA__'])->toBe('...$this->filtrosMultiEmpresa(),')
+        ->and($tokens['__PDF_LINHA_MULTI_EMPRESA__'])->toBe('...$this->linhaMultiEmpresa($registro),')
+        ->and($tokens['__PDF_CABECALHOS_MULTI_EMPRESA__'])->toBe('...$this->cabecalhosMultiEmpresa(), ');
 });
 
 it('sem --tenant, os tokens multi-empresa ficam vazios', function (): void {
@@ -114,5 +116,7 @@ it('sem --tenant, os tokens multi-empresa ficam vazios', function (): void {
         ->and($tokens['__PERMISSAO_LISTAGEM__'])->toBe('')
         ->and($tokens['__DS_OPEN__'])->toBe('')
         ->and($tokens['__DS_CLOSE__'])->toBe('')
-        ->and($tokens['__COLUNAS_MULTI_EMPRESA__'])->toBe('');
+        ->and($tokens['__COLUNAS_MULTI_EMPRESA__'])->toBe('')
+        ->and($tokens['__PDF_LINHA_MULTI_EMPRESA__'])->toBe('')
+        ->and($tokens['__PDF_CABECALHOS_MULTI_EMPRESA__'])->toBe('');
 });

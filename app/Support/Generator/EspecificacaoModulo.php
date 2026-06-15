@@ -173,6 +173,8 @@ final class EspecificacaoModulo
             '__FIELDS_CLOSE__' => $this->tenant ? ')' : '',
             '__COLUNAS_MULTI_EMPRESA__' => $this->tenant ? '...$this->colunasMultiEmpresa(),' : '',
             '__FILTROS_MULTI_EMPRESA__' => $this->tenant ? '...$this->filtrosMultiEmpresa(),' : '',
+            '__PDF_LINHA_MULTI_EMPRESA__' => $this->tenant ? '...$this->linhaMultiEmpresa($registro),' : '',
+            '__PDF_CABECALHOS_MULTI_EMPRESA__' => $this->tenant ? '...$this->cabecalhosMultiEmpresa(), ' : '',
         ];
     }
 

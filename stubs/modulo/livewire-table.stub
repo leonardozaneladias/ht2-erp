@@ -102,12 +102,13 @@ __PG_FILTERS__
     {
         $linhas = $this->datasource()->get()
             ->map(fn (__MODULO_STUDLY__ $registro): array => [
+                __PDF_LINHA_MULTI_EMPRESA__
 __PDF_MAP_ROW__
             ])
             ->values()
             ->all();
 
-        return new ExportavelDTO('__MODULO_LABEL_PLURAL__', [__PDF_COLUNAS__], $linhas);
+        return new ExportavelDTO('__MODULO_LABEL_PLURAL__', [__PDF_CABECALHOS_MULTI_EMPRESA____PDF_COLUNAS__], $linhas);
     }
 
     protected function renderStatus(__MODULO_STUDLY__ $registro): string
