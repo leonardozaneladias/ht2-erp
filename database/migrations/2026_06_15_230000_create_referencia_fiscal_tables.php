@@ -38,7 +38,7 @@ return new class extends Migration
         Schema::create('ncms', function (Blueprint $table): void {
             $table->id();
             $table->string('codigo', 8)->unique();
-            $table->string('descricao', 500);
+            $table->text('descricao'); // algumas descrições da TIPI passam de 1.000 chars
             $table->timestamps();
         });
     }

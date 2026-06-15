@@ -38,7 +38,9 @@ abstract class CsvReferenceSeeder extends Seeder
 
         $arquivo = new SplFileObject($caminho);
         $arquivo->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
-        $arquivo->setCsvControl($this->separador);
+        // 3º arg (escape) vazio: padrão RFC-4180 (aspas duplicadas) e silencia a
+        // deprecação do escape "\\" no PHP 8.4.
+        $arquivo->setCsvControl($this->separador, '"', '');
 
         $agora = now();
         $atualiza = [...$this->colunasUpdate(), 'updated_at'];

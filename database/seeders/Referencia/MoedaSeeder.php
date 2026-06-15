@@ -40,12 +40,14 @@ final class MoedaSeeder extends CsvReferenceSeeder
             return null;
         }
 
+        $casas = $linha[4] ?? '';
+
         return [
             'codigo_iso' => $iso,
             'numerico' => ($linha[1] ?? '') !== '' ? $linha[1] : null,
             'nome' => $linha[2] ?? '',
             'simbolo' => ($linha[3] ?? '') !== '' ? $linha[3] : null,
-            'casas_decimais' => (int) ($linha[4] ?? 2),
+            'casas_decimais' => is_numeric($casas) ? (int) $casas : 2,
             'ativo' => true,
         ];
     }

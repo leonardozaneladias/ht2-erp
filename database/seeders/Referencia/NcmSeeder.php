@@ -43,7 +43,7 @@ final class NcmSeeder extends CsvReferenceSeeder
 
         return [
             'codigo' => $codigo,
-            'descricao' => mb_substr($descricao, 0, 500),
+            'descricao' => $descricao,
         ];
     }
 }
