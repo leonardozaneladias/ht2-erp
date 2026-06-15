@@ -63,3 +63,24 @@ it('é idempotente: re-seed não duplica os catálogos', function () {
 
     expect([Moeda::count(), Banco::count(), Cnae::count(), Cfop::count(), Ncm::count()])->toBe($antes);
 });
+
+it('preserva a descrição completa do NCM (não trunca em 500 chars)', function () {
+    expect(Ncm::query()->whereRaw('length(descricao) > 500')->exists())->toBeTrue();
+});
+
+it('spot-check NCM/CNAE: código casa com a descrição (sem coluna deslocada)', function () {
+    // 84713012 tem vírgulas no meio (campo entre aspas): se as aspas não fossem
+    // respeitadas, a descrição quebraria na vírgula do decimal "3,5". Conter "tela"
+    // (depois dessa vírgula) prova que o campo inteiro caiu na coluna certa.
+    $ncmLongo = (string) Ncm::query()->where('codigo', '84713012')->value('descricao');
+
+    expect(Ncm::query()->where('codigo', '22030000')->value('descricao'))->toBe('Cervejas de malte.')
+        ->and($ncmLongo)->toContain('tela')
+        ->and(mb_strlen($ncmLongo))->toBeGreaterThan(50);
+
+    $cnae = Cnae::query()->where('codigo', '0111301')->firstOrFail();
+    expect($cnae->descricao)->toBe('Cultivo de arroz')
+        ->and($cnae->secao)->toBe('A')
+        ->and($cnae->divisao)->toBe('01')
+        ->and($cnae->classe)->toBe('01113');
+});

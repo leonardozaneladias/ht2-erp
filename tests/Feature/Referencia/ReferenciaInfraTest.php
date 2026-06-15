@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\Referencia\RegiaoBrasil;
 use App\Models\Referencia\Estado;
+use App\Models\Referencia\Municipio;
 use Database\Seeders\Referencia\EstadoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;
@@ -41,6 +42,19 @@ it('referencia:sync popula e registra a atividade', function () {
 
     expect(Estado::count())->toBe(27)
         ->and(Activity::query()->where('log_name', 'referencia')->exists())->toBeTrue();
+});
+
+it('referencia:sync com argumento de conjunto popula só o conjunto pedido', function () {
+    $this->artisan('referencia:sync', ['conjunto' => ['estados']])->assertSuccessful();
+
+    expect(Estado::count())->toBe(27)
+        ->and(Municipio::count())->toBe(0);
+});
+
+it('referencia:sync com conjunto inexistente falha (FAILURE)', function () {
+    $this->artisan('referencia:sync', ['conjunto' => ['inexistente']])
+        ->expectsOutputToContain('Nenhum conjunto reconhecido')
+        ->assertFailed();
 });
 
 arch('models de Referência não são tenant-scoped (sem BelongsToEmpresa)')

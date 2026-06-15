@@ -38,6 +38,17 @@ it('Filial: UF lista 27 estados e Município carrega por UF (server-side)', func
         ->and(count($municipios))->toBeGreaterThan(500);
 });
 
+it('Filial: cidade fora do catálogo permanece selecionável (paridade com cargo)', function () {
+    $empresa = Empresa::factory()->create();
+
+    $component = Livewire::actingAs($this->super, 'admin')
+        ->test(FormEmpresa::class, ['empresa' => $empresa->id])
+        ->set('filial_estado', 'SP')
+        ->set('filial_cidade', 'Cidade Inventada XYZ');
+
+    expect($component->instance()->municipiosDaFilial)->toHaveKey('Cidade Inventada XYZ');
+});
+
 it('Filial: trocar a UF limpa a cidade selecionada', function () {
     $empresa = Empresa::factory()->create();
 
