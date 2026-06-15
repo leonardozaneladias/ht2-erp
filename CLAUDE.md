@@ -330,6 +330,11 @@ Guia completo (tipos de campo, flags, customização dos stubs):
 `app/Livewire/Admin/Exemplos/`) é a referência viva — copie/apague à vontade. Os stubs ficam em
 `stubs/modulo/`.
 
+**Módulos reutilizáveis entre clientes** (produto HT2 ERP) viram pacotes Composer:
+`php artisan make:modulo-pacote Rh` cria a casca e `make:modulo --module=Rh` gera o CRUD
+dentro do pacote, sem editar o core. Ver [`ADR-0015`](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
+e o guia de [`distribuição e manutenção`](docs/distribuicao-manutencao.md).
+
 ---
 
 ## 17. Antes de Cada Tarefa

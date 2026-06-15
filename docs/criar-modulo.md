@@ -161,6 +161,25 @@ correspondentes) e mova as permissões do módulo para a chave dele em
    FormRequests).
 4. **Relacionamentos no Model** e eager-load no `datasource()` da Table (evita N+1).
 
+## Gerar dentro de um módulo-pacote (HT2 ERP)
+
+Por padrão o `make:modulo` gera em `app/` (monólito). Para criar um módulo de negócio
+**reutilizável entre clientes** como pacote Composer, gere dentro de um módulo-pacote:
+
+```bash
+php artisan make:modulo-pacote Rh                  # casca do pacote em packages/modulo-rh
+composer require "ht2erp/modulo-rh:@dev"           # instala (symlink) p/ dev local
+php artisan make:modulo Funcionario --module=Rh --fields="..."   # CRUD dentro do pacote
+```
+
+O CRUD nasce com namespaces do pacote (`HT2ERP\Rh\...`), views namespaced (`rh::`) e se
+integra ao core **sem editá-lo** (rotas via `ModuleRegistry`, permissões/menu via
+`config/rh.php` publicável, Livewire/Policy no provider do pacote). Sem `--module`, o
+comportamento é o atual (gera em `app/`).
+
+Guia completo de distribuição e manutenção:
+[`distribuicao-manutencao.md`](distribuicao-manutencao.md) · decisão: [`ADR-0015`](architecture/adrs/ADR-0015-modulos-pacotes-composer.md).
+
 ## Limitações conhecidas (v1)
 
 - Pluralização/derivação de nomes usa o inflector (inglês). Para nomes que ele
