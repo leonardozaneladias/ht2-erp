@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Admin\__MODULO_STUDLY_PLURAL__;
+namespace __NS_LIVEWIRE__;
 
-use App\Models\__MODULO_STUDLY__;
+use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -25,7 +25,7 @@ class Index__MODULO_STUDLY__ extends Component
 
     public function render(): View
     {
-        return view('livewire.admin.__MODULO_SNAKE_PLURAL__.index-__MODULO_SNAKE_PLURAL__', [
+        return view('__VIEW_PREFIX__.index-__MODULO_SNAKE_PLURAL__', [
             'podeCriar' => Auth::guard('admin')->user()?->can('create', __MODULO_STUDLY__::class) ?? false,
         ]);
     }

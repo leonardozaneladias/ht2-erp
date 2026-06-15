@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\__MODULO_STUDLY__ $row */
+    /** @var \__NS_MODELS__\__MODULO_STUDLY__ $row */
 @endphp
 
 <x-admin.row-actions>

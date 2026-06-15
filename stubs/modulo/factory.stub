@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace __NS_FACTORIES__;
 
-use App\Enums\__STATUS_ENUM__;
-use App\Models\__MODULO_STUDLY__;
+use __NS_ENUMS__\__STATUS_ENUM__;
+use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

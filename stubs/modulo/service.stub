@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Admin;
+namespace __NS_SERVICES__;
 
-use App\Models\__MODULO_STUDLY__;
+use __NS_MODELS__\__MODULO_STUDLY__;
 
 /**
  * Consultas reutilizáveis de __MODULO_LABEL__ (API-ready: não recebe Request,

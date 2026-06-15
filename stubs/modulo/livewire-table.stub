@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Admin\__MODULO_STUDLY_PLURAL__;
+namespace __NS_LIVEWIRE__;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
-use App\Enums\__STATUS_ENUM__;
+use __NS_ENUMS__\__STATUS_ENUM__;
 use App\Livewire\Concerns\ExportaPdf;
 __USE_MULTI_EMPRESA__
-use App\Models\__MODULO_STUDLY__;
+use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Blade;
@@ -40,7 +40,7 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.__MODULO_SNAKE_PLURAL__._export-pdf'),
+                ->includeViewOnTop('__VIEW_PREFIX__._export-pdf'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -92,7 +92,7 @@ __PG_FILTERS__
             return null;
         }
 
-        return view('livewire.admin.__MODULO_SNAKE_PLURAL__._acoes', ['row' => $row]);
+        return view('__VIEW_PREFIX__._acoes', ['row' => $row]);
     }
 
     /**

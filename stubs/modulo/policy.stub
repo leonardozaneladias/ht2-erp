@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Policies;
+namespace __NS_POLICIES__;
 
 use App\Models\AdminUser;
-use App\Models\__MODULO_STUDLY__;
+use __NS_MODELS__\__MODULO_STUDLY__;
 
 class __MODULO_STUDLY__Policy
 {

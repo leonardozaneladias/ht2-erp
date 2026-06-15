@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Actions\Admin;
+namespace __NS_ACTIONS__;
 
-use App\DTOs\Admin\__MODULO_STUDLY__DTO;
-use App\Models\__MODULO_STUDLY__;
+use __NS_DTOS__\__MODULO_STUDLY__DTO;
+use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Support\Facades\DB;
 
 class Update__MODULO_STUDLY__Action

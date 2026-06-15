@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\DTOs\Admin;
+namespace __NS_DTOS__;
 
-use App\Enums\__STATUS_ENUM__;
+use __NS_ENUMS__\__STATUS_ENUM__;
 
 final readonly class __MODULO_STUDLY__DTO
 {

@@ -9,5 +9,5 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    <livewire:admin.__MODULO_KEBAB_PLURAL__.__MODULO_KEBAB__-table />
+    <livewire:__LW_TAG__ />
 </div>

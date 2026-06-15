@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin;
+namespace __NS_REQUESTS__;
 
-use App\Enums\__STATUS_ENUM__;
+use __NS_ENUMS__\__STATUS_ENUM__;
 __RULE_IMPORT__
 
 /**

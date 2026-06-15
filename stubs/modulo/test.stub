@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\__MODULO_STUDLY_PLURAL__\Form__MODULO_STUDLY__;
-use App\Livewire\Admin\__MODULO_STUDLY_PLURAL__\Index__MODULO_STUDLY__;
+use __NS_LIVEWIRE__\Form__MODULO_STUDLY__;
+use __NS_LIVEWIRE__\Index__MODULO_STUDLY__;
 use App\Models\AdminUser;
-use App\Models\__MODULO_STUDLY__;
+use __NS_MODELS__\__MODULO_STUDLY__;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;

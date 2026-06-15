@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace __NS_MODELS__;
 
-use App\Enums\__STATUS_ENUM__;
+use __NS_ENUMS__\__STATUS_ENUM__;
 use App\Models\Concerns\Auditavel;
 __MODEL_USE_TENANT__
 use Illuminate\Database\Eloquent\Factories\HasFactory;

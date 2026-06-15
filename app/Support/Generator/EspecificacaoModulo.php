@@ -34,6 +34,7 @@ final class EspecificacaoModulo
         string $nome,
         array $todosCampos,
         public readonly bool $tenant = false,
+        public readonly ?ModuloPacote $pacote = null,
     ) {
         $this->studly = Str::studly(Str::singular($nome));
         $this->studlyPlural = Str::plural($this->studly);
@@ -98,6 +99,77 @@ final class EspecificacaoModulo
         return $this->status->enumValores[0] ?? 'ativo';
     }
 
+    public function nsModels(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\Models' : 'App\\Models';
+    }
+
+    public function nsEnums(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\Enums' : 'App\\Enums';
+    }
+
+    public function nsDtos(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\DTOs' : 'App\\DTOs\\Admin';
+    }
+
+    public function nsActions(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\Actions' : 'App\\Actions\\Admin';
+    }
+
+    public function nsServices(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\Services' : 'App\\Services\\Admin';
+    }
+
+    public function nsPolicies(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\Policies' : 'App\\Policies';
+    }
+
+    public function nsRequests(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\Http\\Requests' : 'App\\Http\\Requests\\Admin';
+    }
+
+    public function nsLivewire(): string
+    {
+        return $this->pacote !== null
+            ? $this->nsBase() . '\\Livewire\\' . $this->studlyPlural
+            : 'App\\Livewire\\Admin\\' . $this->studlyPlural;
+    }
+
+    public function nsFactories(): string
+    {
+        return $this->pacote !== null ? $this->nsBase() . '\\Database\\Factories' : 'Database\\Factories';
+    }
+
+    public function viewPrefix(): string
+    {
+        return $this->pacote !== null
+            ? $this->pacote->viewNamespace . '::livewire.' . $this->snakePlural()
+            : 'livewire.admin.' . $this->snakePlural();
+    }
+
+    public function lwTag(): string
+    {
+        $tabela = $this->kebabPlural() . '.' . Str::kebab($this->studly) . '-table';
+
+        return $this->pacote !== null ? $this->pacote->viewNamespace . '.' . $tabela : 'admin.' . $tabela;
+    }
+
+    public function rotaNome(): string
+    {
+        return $this->pacote !== null ? $this->pacote->slug . '.' . $this->snakePlural() : $this->snakePlural();
+    }
+
+    public function permissaoBase(): string
+    {
+        return $this->pacote !== null ? $this->pacote->slug . '.' . $this->snakePlural() : $this->snakePlural();
+    }
+
     public function temToggleStatus(): bool
     {
         $valores = array_map('strtolower', $this->status->enumValores);
@@ -113,7 +185,7 @@ final class EspecificacaoModulo
      */
     public function permissoes(): array
     {
-        $base = $this->snakePlural();
+        $base = $this->permissaoBase();
         $singular = mb_strtolower($this->studly);
         $plural = mb_strtolower($this->studlyPlural);
 
@@ -156,11 +228,22 @@ final class EspecificacaoModulo
             '__MODULO_LABEL_PLURAL__' => $this->studlyPlural,
             '__MODULO_TABELA__' => $this->tabela(),
             '__MODULO_ROTA_PREFIXO__' => $this->kebabPlural(),
-            '__MODULO_ROTA_NOME__' => $this->snakePlural(),
+            '__MODULO_ROTA_NOME__' => $this->rotaNome(),
             '__MODULO_PARAM__' => $this->snake(),
             '__STATUS_ENUM__' => $this->statusEnumShort(),
             '__STATUS_CASE_DEFAULT__' => $this->statusCaseDefault(),
             '__STATUS_VALUE_DEFAULT__' => $this->statusValueDefault(),
+            '__NS_MODELS__' => $this->nsModels(),
+            '__NS_ENUMS__' => $this->nsEnums(),
+            '__NS_DTOS__' => $this->nsDtos(),
+            '__NS_ACTIONS__' => $this->nsActions(),
+            '__NS_SERVICES__' => $this->nsServices(),
+            '__NS_POLICIES__' => $this->nsPolicies(),
+            '__NS_REQUESTS__' => $this->nsRequests(),
+            '__NS_LIVEWIRE__' => $this->nsLivewire(),
+            '__NS_FACTORIES__' => $this->nsFactories(),
+            '__VIEW_PREFIX__' => $this->viewPrefix(),
+            '__LW_TAG__' => $this->lwTag(),
             '__MODEL_USE_TENANT__' => $this->tenant ? 'use App\Models\Concerns\BelongsToEmpresa;' : '',
             '__MODEL_TRAIT_TENANT__' => $this->tenant ? 'use BelongsToEmpresa;' : '',
             // Filtro multi-empresa nas listagens (só faz sentido em módulos tenant).
@@ -674,6 +757,15 @@ final class EspecificacaoModulo
         $linhas[] = "->set('status', '{$this->statusValueDefault()}')";
 
         return $this->bloco($linhas, $espacos);
+    }
+
+    // ---- Destino: namespaces, views e rotas (app vs pacote) ---------------
+    // Quando $pacote é null o módulo nasce em app/ (App\...); quando é um
+    // ModuloPacote, nasce no pacote (HT2ERP\{Modulo}\...). Ver ADR-0015.
+
+    private function nsBase(): string
+    {
+        return $this->pacote !== null ? $this->pacote->namespaceBase : 'App';
     }
 
     /**
