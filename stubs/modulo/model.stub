@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace __NS_MODELS__;
 
 use __NS_ENUMS__\__STATUS_ENUM__;
-use App\Models\Concerns\Auditavel;
+use App\Models\Concerns\Auditavel;__MODEL_USE_SOFT_DELETE__
 __MODEL_USE_TENANT__
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class __MODULO_STUDLY__ extends Model
 {
-    use Auditavel;
+    use Auditavel;__MODEL_TRAIT_SOFT_DELETE__
     __MODEL_TRAIT_TENANT__
 
     /** @use HasFactory<\Database\Factories\__MODULO_STUDLY__Factory> */

@@ -35,6 +35,7 @@ final class EspecificacaoModulo
         array $todosCampos,
         public readonly bool $tenant = false,
         public readonly ?ModuloPacote $pacote = null,
+        public readonly bool $softDelete = false,
     ) {
         $this->studly = Str::studly(Str::singular($nome));
         $this->studlyPlural = Str::plural($this->studly);
@@ -244,6 +245,10 @@ final class EspecificacaoModulo
             '__NS_FACTORIES__' => $this->nsFactories(),
             '__VIEW_PREFIX__' => $this->viewPrefix(),
             '__LW_TAG__' => $this->lwTag(),
+            // Soft-delete: tokens com quebra embutida (nada quando ausente, p/ não deixar linha vazia).
+            '__MIGRATION_SOFT_DELETE__' => $this->softDelete ? "\n            \$table->softDeletes();" : '',
+            '__MODEL_USE_SOFT_DELETE__' => $this->softDelete ? "\nuse Illuminate\\Database\\Eloquent\\SoftDeletes;" : '',
+            '__MODEL_TRAIT_SOFT_DELETE__' => $this->softDelete ? "\n    use SoftDeletes;" : '',
             '__MODEL_USE_TENANT__' => $this->tenant ? 'use App\Models\Concerns\BelongsToEmpresa;' : '',
             '__MODEL_TRAIT_TENANT__' => $this->tenant ? 'use BelongsToEmpresa;' : '',
             // Filtro multi-empresa nas listagens (só faz sentido em módulos tenant).

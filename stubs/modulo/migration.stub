@@ -15,7 +15,7 @@ return new class extends Migration
 
 __MIGRATION_COLUNAS__
 
-            $table->timestamps();
+            $table->timestamps();__MIGRATION_SOFT_DELETE__
 
 __MIGRATION_INDICES__
         });

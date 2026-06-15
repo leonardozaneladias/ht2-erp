@@ -34,7 +34,7 @@ final class MakeModuloCommand extends Command
         {--menu= : Rótulo do item de menu (default: nome no plural)}
         {--menu-icon=tabler--folder : Ícone do item de menu (Tabler)}
         {--skip-menu : Não injeta o item no menu lateral (config/admin-menu.php)}
-        {--soft-delete : Reservado para evolução futura}
+        {--sem-soft-delete : Desativa o soft-delete (por padrão registros são recuperáveis via deleted_at)}
         {--force : Sobrescreve arquivos existentes}';
 
     protected $description = 'Gera um módulo CRUD completo no padrão do projeto (model, DTO, actions, Livewire, PowerGrid, views, teste, rotas, permissões e item de menu).';
@@ -69,7 +69,7 @@ final class MakeModuloCommand extends Command
             }
         }
 
-        $spec = new EspecificacaoModulo($nome, $campos, tenant: (bool) $this->option('tenant'), pacote: $pacote);
+        $spec = new EspecificacaoModulo($nome, $campos, tenant: (bool) $this->option('tenant'), pacote: $pacote, softDelete: ! (bool) $this->option('sem-soft-delete'));
 
         $stubDir = base_path('stubs/modulo');
         if (! File::isDirectory($stubDir)) {
