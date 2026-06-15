@@ -8,7 +8,6 @@ use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Anexo;
 use App\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -80,7 +79,8 @@ class GerenciadorAnexos extends Component
     public function removerAnexo(int $id): void
     {
         $anexo = Anexo::findOrFail($id);
-        Storage::disk($anexo->disco)->delete($anexo->caminho);
+        // Soft-delete técnico (D4): mantém o arquivo físico para retenção/auditoria;
+        // o binário só é removido no force-delete (evento forceDeleted) ou no GC.
         $anexo->delete();
         $this->carregarAnexos();
         $this->notificarSucesso('Anexo removido.');

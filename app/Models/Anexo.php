@@ -6,14 +6,20 @@ namespace App\Models;
 
 use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
+use App\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
-class Anexo extends Model
+/**
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ */
+class Anexo extends Model implements UsaSoftDeletes
 {
     use Auditavel;
     use BelongsToEmpresa;
+    use SoftDeletes;
 
     protected $fillable = [
         'empresa_id',
@@ -55,5 +61,16 @@ class Anexo extends Model
         return [
             'tamanho' => 'integer',
         ];
+    }
+
+    /**
+     * O arquivo físico só é removido na exclusão definitiva (force-delete) ou no
+     * GC — o soft-delete mantém o binário para retenção/auditoria (D4).
+     */
+    protected static function booted(): void
+    {
+        static::forceDeleted(function (self $anexo): void {
+            Storage::disk($anexo->disco)->delete($anexo->caminho);
+        });
     }
 }
