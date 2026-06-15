@@ -1,0 +1,194 @@
+codigo_iso2,codigo_iso3,codigo_numerico,nome
+AD,AND,020,Andorra
+AE,ARE,784,"Emirados Árabes Unidos"
+AF,AFG,004,Afeganistão
+AG,ATG,028,"Antígua e Barbuda"
+AL,ALB,008,Albânia
+AM,ARM,051,Armênia
+AO,AGO,024,Angola
+AR,ARG,032,Argentina
+AT,AUT,040,Áustria
+AU,AUS,036,Austrália
+AZ,AZE,031,Azerbaijão
+BA,BIH,070,"Bósnia e Herzegovina"
+BB,BRB,052,Barbados
+BD,BGD,050,Bangladesh
+BE,BEL,056,Bélgica
+BF,BFA,854,"Burkina Faso"
+BG,BGR,100,Bulgária
+BH,BHR,048,Barein
+BI,BDI,108,Burundi
+BJ,BEN,204,Benin
+BN,BRN,096,Brunei
+BO,BOL,068,Bolívia
+BR,BRA,076,Brasil
+BS,BHS,044,Bahamas
+BT,BTN,064,Butão
+BW,BWA,072,Botsuana
+BY,BLR,112,Belarus
+BZ,BLZ,084,Belize
+CA,CAN,124,Canadá
+CD,COD,180,"República Democrática do Congo"
+CF,CAF,140,"República Centro-Africana"
+CG,COG,178,"República do Congo"
+CH,CHE,756,Suíça
+CI,CIV,384,"Costa do Marfim"
+CL,CHL,152,Chile
+CM,CMR,120,Camarões
+CN,CHN,156,China
+CO,COL,170,Colômbia
+CR,CRI,188,"Costa Rica"
+CU,CUB,192,Cuba
+CV,CPV,132,"Cabo Verde"
+CY,CYP,196,Chipre
+CZ,CZE,203,"República Tcheca"
+DE,DEU,276,Alemanha
+DJ,DJI,262,Djibouti
+DK,DNK,208,Dinamarca
+DM,DMA,212,Dominica
+DO,DOM,214,"República Dominicana"
+DZ,DZA,012,Argélia
+EC,ECU,218,Equador
+EE,EST,233,Estônia
+EG,EGY,818,Egito
+ER,ERI,232,Eritreia
+ES,ESP,724,Espanha
+ET,ETH,231,Etiópia
+FI,FIN,246,Finlândia
+FJ,FJI,242,Fiji
+FM,FSM,583,Micronésia
+FR,FRA,250,França
+GA,GAB,266,Gabão
+GB,GBR,826,"Reino Unido"
+GD,GRD,308,Granada
+GE,GEO,268,Geórgia
+GH,GHA,288,Gana
+GM,GMB,270,Gâmbia
+GN,GIN,324,Guiné
+GQ,GNQ,226,"Guiné Equatorial"
+GR,GRC,300,Grécia
+GT,GTM,320,Guatemala
+GW,GNB,624,Guiné-Bissau
+GY,GUY,328,Guiana
+HN,HND,340,Honduras
+HR,HRV,191,Croácia
+HT,HTI,332,Haiti
+HU,HUN,348,Hungria
+ID,IDN,360,Indonésia
+IE,IRL,372,Irlanda
+IL,ISR,376,Israel
+IN,IND,356,Índia
+IQ,IRQ,368,Iraque
+IR,IRN,364,Irã
+IS,ISL,352,Islândia
+IT,ITA,380,Itália
+JM,JAM,388,Jamaica
+JO,JOR,400,Jordânia
+JP,JPN,392,Japão
+KE,KEN,404,Quênia
+KG,KGZ,417,Quirguistão
+KH,KHM,116,Camboja
+KI,KIR,296,Kiribati
+KM,COM,174,Comores
+KN,KNA,659,"São Cristóvão e Nevis"
+KP,PRK,408,"República Popular Democrática da Coreia"
+KR,KOR,410,"República da Coreia"
+KW,KWT,414,Kuwait
+KZ,KAZ,398,Cazaquistão
+LA,LAO,418,Laos
+LB,LBN,422,Líbano
+LC,LCA,662,"Santa Lúcia"
+LI,LIE,438,Liechtenstein
+LK,LKA,144,"Sri Lanka"
+LR,LBR,430,Libéria
+LS,LSO,426,Lesoto
+LT,LTU,440,Lituânia
+LU,LUX,442,Luxemburgo
+LV,LVA,428,Letônia
+LY,LBY,434,Líbia
+MA,MAR,504,Marrocos
+MC,MCO,492,Mônaco
+MD,MDA,498,Moldávia
+ME,MNE,499,Montenegro
+MG,MDG,450,Madagascar
+MH,MHL,584,"Ilhas Marshall"
+MK,MKD,807,"Macedônia do Norte"
+ML,MLI,466,Mali
+MM,MMR,104,Mianmar
+MN,MNG,496,Mongólia
+MR,MRT,478,Mauritânia
+MT,MLT,470,Malta
+MU,MUS,480,Maurício
+MV,MDV,462,Maldivas
+MW,MWI,454,Malauí
+MX,MEX,484,México
+MY,MYS,458,Malásia
+MZ,MOZ,508,Moçambique
+NA,NAM,516,Namíbia
+NE,NER,562,Niger
+NG,NGA,566,Nigéria
+NI,NIC,558,Nicarágua
+NL,NLD,528,"Países Baixos"
+NO,NOR,578,Noruega
+NP,NPL,524,Nepal
+NR,NRU,520,Nauru
+NZ,NZL,554,"Nova Zelândia"
+OM,OMN,512,Omã
+PA,PAN,591,Panamá
+PE,PER,604,Peru
+PG,PNG,598,"Papua Nova Guiné"
+PH,PHL,608,Filipinas
+PK,PAK,586,Paquistão
+PL,POL,616,Polônia
+PT,PRT,620,Portugal
+PW,PLW,585,Palau
+PY,PRY,600,Paraguai
+QA,QAT,634,Catar
+RO,ROU,642,Romênia
+RS,SRB,688,Sérvia
+RU,RUS,643,"Rússia (Federação Russa)"
+RW,RWA,646,Ruanda
+SA,SAU,682,"Arábia Saudita"
+SB,SLB,090,"Ilhas Salomão"
+SC,SYC,690,Seichelles
+SD,SDN,729,Sudão
+SE,SWE,752,Suécia
+SG,SGP,702,Singapura
+SI,SVN,705,Eslovênia
+SK,SVK,703,Eslováquia
+SL,SLE,694,"Serra Leoa"
+SM,SMR,674,"San Marino"
+SN,SEN,686,Senegal
+SO,SOM,706,Somália
+SR,SUR,740,Suriname
+SS,SSD,728,"Sudão do Sul"
+ST,STP,678,"São Tomé e Príncipe"
+SV,SLV,222,"El Salvador"
+SY,SYR,760,Síria
+SZ,SWZ,748,Eswatini
+TD,TCD,148,Chade
+TG,TGO,768,Togo
+TH,THA,764,Tailândia
+TJ,TJK,762,Tadjiquistão
+TL,TLS,626,Timor-Leste
+TM,TKM,795,Turcomenistão
+TN,TUN,788,Tunísia
+TO,TON,776,Tonga
+TR,TUR,792,Turquia
+TT,TTO,780,"Trinidad e Tobago"
+TV,TUV,798,Tuvalu
+TZ,TZA,834,Tanzânia
+UA,UKR,804,Ucrânia
+UG,UGA,800,Uganda
+US,USA,840,"Estados Unidos da América"
+UY,URY,858,Uruguai
+UZ,UZB,860,Uzbequistão
+VC,VCT,670,"São Vicente e Granadinas"
+VE,VEN,862,Venezuela
+VN,VNM,704,Vietnã
+VU,VUT,548,Vanuatu
+WS,WSM,882,Samoa
+YE,YEM,887,Iêmen
+ZA,ZAF,710,"África do Sul"
+ZM,ZMB,894,Zâmbia
+ZW,ZWE,716,Zimbábue

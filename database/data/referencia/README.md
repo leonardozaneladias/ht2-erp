@@ -26,8 +26,8 @@ chama o agregador antes dos seeders de demo).
 | Arquivo          | Fonte                     | Encoding | Contagem-âncora |
 | ---------------- | ------------------------- | -------- | --------------- |
 | `estados.csv`    | IBGE (fixo, 27 UF)        | UTF-8    | 27              |
-| `paises.csv`     | ISO 3166-1                | UTF-8    | ~249            |
-| `municipios.csv` | IBGE (API de localidades) | UTF-8    | ~5.570          |
+| `paises.csv`     | IBGE (ISO 3166-1, ONU)    | UTF-8    | 193             |
+| `municipios.csv` | IBGE (API de localidades) | UTF-8    | 5.571           |
 
 > Demais conjuntos (moedas, bancos, cargos/CBO, tipos de logradouro, CNAE, CFOP,
 > NCM) entram conforme as fases B2–B4. Cada adição: novo CSV aqui + seeder +

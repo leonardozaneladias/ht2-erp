@@ -19,7 +19,9 @@ final class DadosReferenciaSeeder extends Seeder
      * @var array<string, class-string<Seeder>>
      */
     public const CONJUNTOS = [
+        'paises' => PaisSeeder::class,
         'estados' => EstadoSeeder::class,
+        'municipios' => MunicipioSeeder::class,
     ];
 
     public function run(): void
