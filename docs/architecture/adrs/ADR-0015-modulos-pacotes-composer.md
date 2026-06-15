@@ -7,7 +7,9 @@ status: accepted
 
 # ADR-0015: Módulos de negócio como pacotes Composer distribuíveis
 
-**Status:** Accepted | **Data:** 2026-06-15 | **Decisores:** GDF Sistemas | **Tags:** arquitetura, modularidade, distribuição, packaging
+**Status:** Accepted | **Data:** 2026-06-15 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** arquitetura, modularidade, distribuição, packaging
+
+> Nomenclatura: **HT2 ERP** é o produto/base distribuível; **Grupo GDF** é o primeiro cliente (uma instância). Os módulos pertencem ao produto — vendor Composer `ht2erp`, namespace `HT2ERP\`, org GitHub `ht2-erp`.
 
 ## Contexto e problema
 
@@ -40,11 +42,11 @@ A decisão em aberto: qual formato de módulo permite **reuso entre clientes** e
 ### Alt 3: Pacote Composer puro + `spatie/laravel-package-tools` (escolhida)
 
 - Prós: distribuição nativa (`composer require` + semver + `composer update` propaga correções); **zero dependência nova** (package-tools já é dep transitiva); auto-discovery nativo do Laravel (`extra.laravel.providers`); é "só um package Laravel" (baixa curva).
-- Contras: componentes Livewire e Policies de pacote exigem registro explícito (não há auto-discovery fora de `App\`); acoplamento implícito pacote→core até extrair um `gdf/erp-contracts` (futuro).
+- Contras: componentes Livewire e Policies de pacote exigem registro explícito (não há auto-discovery fora de `App\`); acoplamento implícito pacote→core até extrair um `ht2erp/erp-contracts` (futuro).
 
 ## Decisão
 
-Módulos de negócio reutilizáveis serão **pacotes Composer puros** (`gdf/erp-module-{slug}`, namespace `Gdf\{Modulo}\`), distribuídos via **VCS repository** em GitHub privado com **semver por git tag**. A base/core é distribuída como **template repo + `upstream` remote** (git merge propaga melhorias). Extração do core como pacote (`gdf/erp-core`) + Satis/Private Packagist fica como **evolução futura**, quando a escala justificar.
+Módulos de negócio reutilizáveis serão **pacotes Composer puros** (`ht2erp/modulo-{slug}`, namespace `HT2ERP\{Modulo}\`), distribuídos via **VCS repository** em GitHub privado com **semver por git tag**. A base/core é distribuída como **template repo + `upstream` remote** (git merge propaga melhorias). Extração do core como pacote (`ht2erp/erp-core`) + Satis/Private Packagist fica como **evolução futura**, quando a escala justificar.
 
 **Pontos de extensão no core** (o core já é config-driven):
 
@@ -61,7 +63,7 @@ O `make:modulo` ganha modo pacote (`--module=`) com namespaces/paths dinâmicos;
 
 **Positivas:** reuso e propagação de correção reais (`composer update`); base atualizável via `git merge upstream`; separação forte core/negócio; sem dependência nova; gerador retrocompatível.
 
-**Negativas / a gerenciar:** registro explícito de Livewire/Policies de pacote (gerado pelos stubs); cache de menu/permissão deve ser limpo pós-instalação; acoplamento implícito pacote→core até extrair `gdf/erp-contracts`; prefixo de módulo obrigatório nas permissões (`rh.*`) para evitar colisão.
+**Negativas / a gerenciar:** registro explícito de Livewire/Policies de pacote (gerado pelos stubs); cache de menu/permissão deve ser limpo pós-instalação; acoplamento implícito pacote→core até extrair `ht2erp/erp-contracts`; prefixo de módulo obrigatório nas permissões (`rh.*`) para evitar colisão.
 
 ## Referências
 
