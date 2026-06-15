@@ -123,14 +123,22 @@
                             wire:model="filial_inscricao_estadual"
                         />
                         <x-shared.phone-input name="filial_telefone" wire:model="filial_telefone" />
-                        <x-shared.input name="filial_cidade" label="Cidade" wire:model="filial_cidade" />
-                        <x-shared.input
+                        <x-shared.select-search
                             name="filial_estado"
                             label="UF"
-                            placeholder="SP"
-                            maxlength="2"
-                            wire:model="filial_estado"
+                            placeholder="Selecione a UF..."
+                            :options="$this->ufsDisponiveis"
+                            wire:model.live="filial_estado"
                         />
+                        <div wire:key="filial-cidade-{{ $filial_estado }}">
+                            <x-shared.select-search
+                                name="filial_cidade"
+                                label="Cidade"
+                                placeholder="Selecione a cidade..."
+                                :options="$this->municipiosDaFilial"
+                                wire:model="filial_cidade"
+                            />
+                        </div>
                         <x-shared.toggle
                             name="filial_ativo"
                             label="Filial ativa"

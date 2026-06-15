@@ -57,7 +57,13 @@
                 <x-shared.input name="nome" label="Nome completo" wire:model="nome" required />
                 <x-shared.input type="email" name="email" label="E-mail" wire:model="email" required />
                 <x-shared.phone-input name="telefone" label="Telefone" wire:model="telefone" />
-                <x-shared.input name="cargo" label="Cargo" placeholder="Ex.: Gerente financeiro" wire:model="cargo" />
+                <x-shared.select-search
+                    name="cargo"
+                    label="Cargo"
+                    placeholder="Selecione o cargo..."
+                    :options="$this->cargosDisponiveis"
+                    wire:model="cargo"
+                />
 
                 @if ($modo === 'criar')
                     <div class="md:col-span-2">

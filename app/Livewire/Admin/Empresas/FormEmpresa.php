@@ -14,6 +14,8 @@ use App\Exceptions\FilialException;
 use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Empresa;
 use App\Models\Filial;
+use App\Models\Referencia\Estado;
+use App\Models\Referencia\Municipio;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
@@ -148,6 +150,54 @@ class FormEmpresa extends Component
             ->orderByDesc('e_matriz')
             ->orderBy('nome')
             ->get();
+    }
+
+    /**
+     * UFs para o select da filial (sigla => nome).
+     *
+     * @return array<string, string>
+     */
+    #[Computed]
+    public function ufsDisponiveis(): array
+    {
+        return Estado::query()->orderBy('nome')->pluck('nome', 'sigla')->all();
+    }
+
+    /**
+     * Municípios da UF selecionada na filial (nome => nome) + a cidade atual, se
+     * fora do catálogo. Carregado por UF para não despejar todos no DOM.
+     *
+     * @return array<string, string>
+     */
+    #[Computed]
+    public function municipiosDaFilial(): array
+    {
+        if ($this->filial_estado === '') {
+            return [];
+        }
+
+        $nomes = Municipio::query()
+            ->whereHas('estado', function ($q) {
+                $q->where('sigla', $this->filial_estado);
+            })
+            ->orderBy('nome')
+            ->pluck('nome')
+            ->all();
+
+        $mapa = array_combine($nomes, $nomes);
+
+        if ($this->filial_cidade !== '' && ! array_key_exists($this->filial_cidade, $mapa)) {
+            $mapa = [$this->filial_cidade => $this->filial_cidade] + $mapa;
+        }
+
+        return $mapa;
+    }
+
+    /** Ao trocar a UF, limpa a cidade (ficaria de outra UF) e o cache de municípios. */
+    public function updatedFilialEstado(): void
+    {
+        $this->filial_cidade = '';
+        unset($this->municipiosDaFilial);
     }
 
     public function abrirFormFilial(?int $filialId = null): void

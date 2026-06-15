@@ -18,6 +18,7 @@ use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Models\Empresa;
 use App\Models\PermissionGrant;
+use App\Models\Referencia\Cargo;
 use App\Services\Admin\HierarchyResolver;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -233,6 +234,23 @@ class FormUsuario extends Component
     public function podeVerHistorico(): bool
     {
         return Auth::guard('admin')->user()?->can('auditoria.visualizar') ?? false;
+    }
+
+    /**
+     * Cargos do catálogo (descrição => descrição) + o valor atual se fora do catálogo.
+     *
+     * @return array<string, string>
+     */
+    #[Computed]
+    public function cargosDisponiveis(): array
+    {
+        $cargos = Cargo::query()->where('ativo', true)->orderBy('descricao')->pluck('descricao')->all();
+
+        if ($this->cargo !== '' && ! in_array($this->cargo, $cargos, true)) {
+            array_unshift($cargos, $this->cargo);
+        }
+
+        return array_combine($cargos, $cargos);
     }
 
     public function abrirFormAcesso(): void
