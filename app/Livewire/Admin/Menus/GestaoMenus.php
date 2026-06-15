@@ -15,6 +15,7 @@ use App\Actions\Admin\Menu\SalvarPersonalizacaoMenuAction;
 use App\DTOs\Admin\MenuPersonalizacaoDTO;
 use App\Enums\TipoPersonalizacaoMenu;
 use App\Exceptions\AccessException;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Models\MenuPersonalizacao;
 use App\Policies\RolePolicy;
@@ -42,6 +43,8 @@ use Spatie\Permission\Models\Role;
 #[Title('Gestão de menus')]
 class GestaoMenus extends Component
 {
+    use EmiteNotificacoes;
+
     public ?string $editandoTipo = null;
 
     public ?string $editandoKey = null;
@@ -83,13 +86,13 @@ class GestaoMenus extends Component
         try {
             $action->execute($itemKey, $containerKey, $ordens);
         } catch (InvalidArgumentException) {
-            $this->dispatch('toast', variant: 'danger', message: 'Não foi possível reordenar o menu.');
+            $this->notificarErro('Não foi possível reordenar o menu.');
 
             return;
         }
 
         $this->recarregarEstrutura();
-        $this->dispatch('toast', variant: 'success', message: 'Ordem do menu atualizada.');
+        $this->notificarSucesso('Ordem do menu atualizada.');
     }
 
     /**
@@ -102,13 +105,13 @@ class GestaoMenus extends Component
         try {
             $action->execute($secaoKeys);
         } catch (InvalidArgumentException) {
-            $this->dispatch('toast', variant: 'danger', message: 'Não foi possível reordenar as seções.');
+            $this->notificarErro('Não foi possível reordenar as seções.');
 
             return;
         }
 
         $this->recarregarEstrutura();
-        $this->dispatch('toast', variant: 'success', message: 'Ordem das seções atualizada.');
+        $this->notificarSucesso('Ordem das seções atualizada.');
     }
 
     public function criarSecao(CriarSecaoMenuAction $action): void
@@ -123,7 +126,7 @@ class GestaoMenus extends Component
         $this->reset('novaSecaoLabel');
         $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-modais');
-        $this->dispatch('toast', variant: 'success', message: 'Seção criada.');
+        $this->notificarSucesso('Seção criada.');
     }
 
     public function criarGrupo(string $secaoKey, CriarGrupoMenuAction $action): void
@@ -139,7 +142,7 @@ class GestaoMenus extends Component
         try {
             $action->execute($this->novoGrupoLabel, $this->novoGrupoIcone, $secaoKey);
         } catch (InvalidArgumentException $e) {
-            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
@@ -148,7 +151,7 @@ class GestaoMenus extends Component
         $this->novoGrupoIcone = 'tabler--folder';
         $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-modais');
-        $this->dispatch('toast', variant: 'success', message: 'Grupo criado. Arraste itens para dentro dele.');
+        $this->notificarSucesso('Grupo criado. Arraste itens para dentro dele.');
     }
 
     /**
@@ -159,7 +162,7 @@ class GestaoMenus extends Component
         $detalhe = $this->detalheDe($tipo, $key);
 
         if ($detalhe === null) {
-            $this->dispatch('toast', variant: 'danger', message: 'Registro de menu não encontrado.');
+            $this->notificarErro('Registro de menu não encontrado.');
 
             return;
         }
@@ -192,14 +195,14 @@ class GestaoMenus extends Component
                 'ativo' => $this->ativo,
             ]));
         } catch (InvalidArgumentException) {
-            $this->dispatch('toast', variant: 'danger', message: 'Não foi possível salvar a personalização.');
+            $this->notificarErro('Não foi possível salvar a personalização.');
 
             return;
         }
 
         $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-editor');
-        $this->dispatch('toast', variant: 'success', message: 'Menu atualizado.');
+        $this->notificarSucesso('Menu atualizado.');
     }
 
     /**
@@ -228,7 +231,7 @@ class GestaoMenus extends Component
         }
 
         $this->recarregarEstrutura();
-        $this->dispatch('toast', variant: 'success', message: $item['ativo']
+        $this->notificarSucesso($item['ativo']
             ? 'Item desativado: não aparece mais no menu.'
             : 'Item reativado no menu.');
     }
@@ -257,7 +260,7 @@ class GestaoMenus extends Component
         }
 
         $this->recarregarEstrutura();
-        $this->dispatch('toast', variant: 'success', message: $grupo->ativo
+        $this->notificarSucesso($grupo->ativo
             ? 'Grupo reativado no menu.'
             : 'Grupo desativado: ele e seus itens não aparecem mais no menu.');
     }
@@ -285,7 +288,7 @@ class GestaoMenus extends Component
         $user = auth('admin')->user();
 
         if (! $user instanceof AdminUser || ! app(RolePolicy::class)->update($user, $role)) {
-            $this->dispatch('toast', variant: 'danger', message: 'Você não tem permissão para gerir este perfil.');
+            $this->notificarErro('Você não tem permissão para gerir este perfil.');
 
             return;
         }
@@ -295,13 +298,13 @@ class GestaoMenus extends Component
         try {
             $action->execute($roleId, $permissao, $conceder);
         } catch (AccessException $e) {
-            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
 
         unset($this->perfis);
-        $this->dispatch('toast', variant: 'success', message: $conceder
+        $this->notificarSucesso($conceder
             ? "Permissão concedida ao perfil {$role->name}."
             : "Permissão revogada do perfil {$role->name}.");
     }
@@ -334,14 +337,14 @@ class GestaoMenus extends Component
         try {
             $action->execute($enumTipo, $key);
         } catch (InvalidArgumentException $e) {
-            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
 
         $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-editor');
-        $this->dispatch('toast', variant: 'success', message: 'Registro excluído do menu.');
+        $this->notificarSucesso('Registro excluído do menu.');
     }
 
     public function solicitarRestaurar(string $tipo, string $key): void
@@ -369,7 +372,7 @@ class GestaoMenus extends Component
 
         $this->recarregarEstrutura();
         $this->dispatch('menus-fechar-editor');
-        $this->dispatch('toast', variant: 'success', message: 'Registro restaurado ao padrão.');
+        $this->notificarSucesso('Registro restaurado ao padrão.');
     }
 
     public function solicitarRestaurarTudo(): void
@@ -390,7 +393,7 @@ class GestaoMenus extends Component
         $removidas = $action->execute();
 
         $this->recarregarEstrutura();
-        $this->dispatch('toast', variant: 'success', message: $removidas > 0
+        $this->notificarSucesso($removidas > 0
             ? 'Menu restaurado para o padrão.'
             : 'O menu já está no padrão.');
     }
@@ -413,7 +416,7 @@ class GestaoMenus extends Component
         $removidas = $action->removerOrfas();
 
         $this->recarregarEstrutura();
-        $this->dispatch('toast', variant: 'success', message: $removidas > 0
+        $this->notificarSucesso($removidas > 0
             ? 'Personalizações órfãs removidas.'
             : 'Nenhuma personalização órfã encontrada.');
     }

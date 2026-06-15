@@ -14,6 +14,7 @@ use App\DTOs\Admin\ConcessaoAcessoDTO;
 use App\Enums\ModuloAcesso;
 use App\Enums\TipoConcessao;
 use App\Exceptions\AccessException;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Models\Empresa;
 use App\Models\PermissionGrant;
@@ -31,6 +32,7 @@ use Spatie\Permission\Models\Permission;
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 class FormUsuario extends Component
 {
+    use EmiteNotificacoes;
     use \Livewire\WithFileUploads;
 
     #[Locked]
@@ -113,13 +115,13 @@ class FormUsuario extends Component
 
             if ($porConvite) {
                 $convidar->execute($usuario, $ator);
-                session()->flash('toast.success', 'Usuário criado. Convite enviado por e-mail.');
+                $this->notificarAposRedirect('success', 'Usuário criado. Convite enviado por e-mail.');
             } else {
-                session()->flash('toast.success', 'Usuário admin criado.');
+                $this->notificarAposRedirect('success', 'Usuário admin criado.');
             }
         } else {
             $usuario = $atualizar->execute($alvo, $dto);
-            session()->flash('toast.success', 'Usuário admin atualizado.');
+            $this->notificarAposRedirect('success', 'Usuário admin atualizado.');
         }
 
         if ($this->avatar !== null) {
@@ -142,7 +144,7 @@ class FormUsuario extends Component
 
         $this->reset('avatar');
         unset($this->avatarAtualUrl);
-        $this->dispatch('toast', variant: 'success', message: 'Foto removida.');
+        $this->notificarSucesso('Foto removida.');
     }
 
     #[Computed]
@@ -181,7 +183,7 @@ class FormUsuario extends Component
         $this->authorize('update', $alvo);
         $convidar->execute($alvo, Auth::guard('admin')->user());
 
-        session()->flash('toast.success', 'Convite reenviado por e-mail.');
+        $this->notificarSucesso('Convite reenviado por e-mail.');
     }
 
     #[Computed]
@@ -207,7 +209,7 @@ class FormUsuario extends Component
             array_map('intval', $this->empresasAcesso),
         );
 
-        session()->flash('toast.success', 'Acesso a empresas atualizado.');
+        $this->notificarSucesso('Acesso a empresas atualizado.');
     }
 
     /**
@@ -277,14 +279,14 @@ class FormUsuario extends Component
                 'expiraEm' => $dados['novaValidade'] !== '' ? $dados['novaValidade'] : null,
             ]), Auth::guard('admin')->user());
         } catch (AccessException $e) {
-            session()->flash('toast.error', $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
 
         unset($this->acessosExtras);
         $this->cancelarFormAcesso();
-        session()->flash('toast.success', 'Acesso registrado.');
+        $this->notificarSucesso('Acesso registrado.');
     }
 
     public function solicitarRevogarAcessoExtra(int $grantId): void
@@ -313,7 +315,7 @@ class FormUsuario extends Component
         $action->execute($grant, 'Revogado pela tela de edição do usuário.', Auth::guard('admin')->user());
 
         unset($this->acessosExtras);
-        session()->flash('toast.success', 'Acesso revogado.');
+        $this->notificarSucesso('Acesso revogado.');
     }
 
     /**

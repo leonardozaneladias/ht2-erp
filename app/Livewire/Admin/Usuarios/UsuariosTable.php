@@ -9,6 +9,7 @@ use App\Actions\Admin\BulkUserStatusAction;
 use App\Actions\Admin\ToggleAdminUserStatusAction;
 use App\DTOs\Admin\AtribuicaoPerfilMassaDTO;
 use App\Exceptions\AccessException;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Services\Admin\HierarchyResolver;
 use App\Services\Admin\Security\ControleLockout;
@@ -33,6 +34,7 @@ use Spatie\Permission\Models\Role;
 
 final class UsuariosTable extends PowerGridComponent
 {
+    use EmiteNotificacoes;
     use WithExport;
 
     public string $tableName = 'usuarios-table';
@@ -212,9 +214,9 @@ final class UsuariosTable extends PowerGridComponent
 
         try {
             $action->execute($usuario);
-            session()->flash('toast.success', 'Status do usuário atualizado.');
+            $this->notificarSucesso('Status do usuário atualizado.');
         } catch (RuntimeException $e) {
-            session()->flash('toast.error', $e->getMessage());
+            $this->notificarErro($e->getMessage());
         }
     }
 
@@ -225,13 +227,13 @@ final class UsuariosTable extends PowerGridComponent
         $this->authorize('update', $usuario);
 
         $lockout->liberar($usuario);
-        session()->flash('toast.success', 'Conta desbloqueada.');
+        $this->notificarSucesso('Conta desbloqueada.');
     }
 
     public function solicitarAtribuirPerfilEmMassa(): void
     {
         if ($this->checkboxValues === [] || $this->perfilEmMassa === '') {
-            session()->flash('toast.error', 'Selecione usuários e um perfil.');
+            $this->notificarErro('Selecione usuários e um perfil.');
 
             return;
         }
@@ -251,7 +253,7 @@ final class UsuariosTable extends PowerGridComponent
         $this->authorize('create', AdminUser::class);
 
         if ($this->checkboxValues === [] || $this->perfilEmMassa === '') {
-            session()->flash('toast.error', 'Selecione usuários e um perfil.');
+            $this->notificarErro('Selecione usuários e um perfil.');
 
             return;
         }
@@ -262,13 +264,13 @@ final class UsuariosTable extends PowerGridComponent
                 'roles' => [$this->perfilEmMassa],
             ]), Auth::guard('admin')->user());
         } catch (AccessException $e) {
-            session()->flash('toast.error', $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
 
         $this->limparSelecao();
-        session()->flash('toast.success', "Perfil atribuído a {$total} usuário(s).");
+        $this->notificarSucesso("Perfil atribuído a {$total} usuário(s).");
     }
 
     public function solicitarAlternarStatusEmMassa(bool $ativo): void
@@ -303,13 +305,13 @@ final class UsuariosTable extends PowerGridComponent
         try {
             $total = $action->execute(array_map('intval', $this->checkboxValues), $ativo, Auth::guard('admin')->user());
         } catch (AccessException $e) {
-            session()->flash('toast.error', $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
 
         $this->limparSelecao();
-        session()->flash('toast.success', ($ativo ? 'Reativados' : 'Desativados') . " {$total} usuário(s).");
+        $this->notificarSucesso(($ativo ? 'Reativados' : 'Desativados') . " {$total} usuário(s).");
     }
 
     public function limparSelecao(): void

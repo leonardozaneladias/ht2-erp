@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveEmailSettingsAction;
 use App\DTOs\Admin\Settings\EmailSettingsDTO;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Services\Admin\Settings\SmtpTester;
 use App\Settings\EmailSettings;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,8 @@ use Throwable;
  */
 class AbaEmail extends Component
 {
+    use EmiteNotificacoes;
+
     public string $smtp_host = '';
 
     public int $smtp_port = 587;
@@ -56,7 +59,7 @@ class AbaEmail extends Component
 
         $action->execute($this->paraDTO($settings));
 
-        $this->dispatch('toast', variant: 'success', message: 'Configurações de e-mail salvas.');
+        $this->notificarSucesso('Configurações de e-mail salvas.');
     }
 
     public function enviarTeste(SmtpTester $tester, EmailSettings $settings): void
@@ -66,12 +69,12 @@ class AbaEmail extends Component
         try {
             $tester->enviar($this->paraDTO($settings), $this->emailTeste);
         } catch (Throwable $e) {
-            $this->dispatch('toast', variant: 'danger', message: 'Falha ao enviar: ' . $e->getMessage());
+            $this->notificarErro('Falha ao enviar: ' . $e->getMessage());
 
             return;
         }
 
-        $this->dispatch('toast', variant: 'success', message: "E-mail de teste enviado para {$this->emailTeste}.");
+        $this->notificarSucesso("E-mail de teste enviado para {$this->emailTeste}.");
     }
 
     public function render(): View

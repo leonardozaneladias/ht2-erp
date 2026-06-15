@@ -81,6 +81,9 @@
                 @case ('seguranca')
                     <livewire:admin.configuracao.aba-seguranca wire:key="aba-seguranca" />
                     @break
+                @case ('notificacoes')
+                    <livewire:admin.configuracao.aba-notificacoes wire:key="aba-notificacoes" />
+                    @break
                 @case ('danger')
                     <livewire:admin.configuracao.aba-danger-zone wire:key="aba-danger-zone" />
                     @break

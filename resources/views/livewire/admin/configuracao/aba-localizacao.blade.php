@@ -2,7 +2,7 @@
     <form wire:submit="salvar" class="grid gap-6">
         <x-shared.card title="Idioma e fuso" subtitle="Aplicados a toda a aplicação.">
             <div class="grid gap-x-4 md:grid-cols-2">
-                <x-shared.select
+                <x-shared.select-search
                     name="idioma"
                     label="Idioma"
                     wire:model="idioma"
@@ -10,7 +10,7 @@
                     :placeholder="null"
                     :options="$idiomas"
                 />
-                <x-shared.select
+                <x-shared.select-search
                     name="timezone"
                     label="Fuso horário"
                     wire:model="timezone"
@@ -23,7 +23,7 @@
 
         <x-shared.card title="Formatos" subtitle="Como datas e valores monetários são exibidos.">
             <div class="grid gap-x-4 md:grid-cols-3">
-                <x-shared.select
+                <x-shared.select-search
                     name="formato_data"
                     label="Formato de data"
                     wire:model="formato_data"
@@ -37,7 +37,7 @@
                     wire:model="moeda_simbolo"
                     placeholder="R$"
                 />
-                <x-shared.select
+                <x-shared.select-search
                     name="casas_decimais"
                     label="Casas decimais"
                     wire:model="casas_decimais"

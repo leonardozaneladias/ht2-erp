@@ -9,6 +9,7 @@ use App\Actions\Admin\Security\DisableTwoFactorAction;
 use App\Actions\Admin\Security\EnableTwoFactorAction;
 use App\Actions\Admin\Security\RegenerateRecoveryCodesAction;
 use App\Livewire\Concerns\ConfirmsPassword;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Services\Admin\Security\TwoFactorService;
 use App\Support\Impersonation\ImpersonationContext;
@@ -24,6 +25,7 @@ use Livewire\Component;
 class SegurancaConta extends Component
 {
     use ConfirmsPassword;
+    use EmiteNotificacoes;
 
     public bool $configurando = false;
 
@@ -67,7 +69,7 @@ class SegurancaConta extends Component
         $this->configurando = false;
         $this->reset('codigoConfirmacao', 'svgQr');
 
-        $this->dispatch('toast', variant: 'success', message: 'Verificação em duas etapas ativada.');
+        $this->notificarSucesso('Verificação em duas etapas ativada.');
     }
 
     public function regenerar(): void
@@ -77,7 +79,7 @@ class SegurancaConta extends Component
 
         $this->recoveryCodes = app(RegenerateRecoveryCodesAction::class)->execute($this->usuario());
 
-        $this->dispatch('toast', variant: 'success', message: 'Novos códigos de recuperação gerados.');
+        $this->notificarSucesso('Novos códigos de recuperação gerados.');
     }
 
     public function desativar(): void
@@ -89,7 +91,7 @@ class SegurancaConta extends Component
 
         $this->reset('recoveryCodes', 'svgQr', 'configurando', 'codigoConfirmacao');
 
-        $this->dispatch('toast', variant: 'success', message: 'Verificação em duas etapas desativada.');
+        $this->notificarSucesso('Verificação em duas etapas desativada.');
     }
 
     /**
@@ -112,7 +114,7 @@ class SegurancaConta extends Component
         app(\App\Services\Admin\AuditoriaSeguranca::class)->outrosDispositivosDesconectados($this->usuario());
 
         $this->reset('senhaDesconectar');
-        $this->dispatch('toast', variant: 'success', message: 'Sessões em outros dispositivos foram encerradas.');
+        $this->notificarSucesso('Sessões em outros dispositivos foram encerradas.');
     }
 
     public function render(): View

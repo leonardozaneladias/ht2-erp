@@ -15,7 +15,7 @@
 
         <div class="ms-auto flex flex-wrap items-center gap-2">
             <div class="w-48">
-                <x-shared.select
+                <x-shared.select-search
                     name="perfilEmMassa"
                     :options="array_merge([['value' => '', 'label' => 'Atribuir perfil...']], $this->perfisAtribuiveis)"
                     :placeholder="null"

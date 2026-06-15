@@ -4,7 +4,7 @@
     subtitle="Idioma e fuso horário aplicados à sua experiência."
 >
     <form wire:submit="salvar" class="grid max-w-md gap-4">
-        <x-shared.select
+        <x-shared.select-search
             name="locale"
             label="Idioma"
             wire:model="locale"
@@ -13,7 +13,7 @@
             placeholder="Padrão da instância"
         />
 
-        <x-shared.select
+        <x-shared.select-search
             name="timezone"
             label="Fuso horário"
             wire:model="timezone"

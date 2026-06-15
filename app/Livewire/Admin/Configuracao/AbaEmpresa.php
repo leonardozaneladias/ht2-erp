@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveGeneralSettingsAction;
 use App\DTOs\Admin\Settings\GeneralSettingsDTO;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Settings\GeneralSettings;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -15,6 +16,8 @@ use Livewire\Component;
  */
 class AbaEmpresa extends Component
 {
+    use EmiteNotificacoes;
+
     public string $nome_cliente = '';
 
     public string $razao_social = '';
@@ -69,7 +72,7 @@ class AbaEmpresa extends Component
 
         $action->execute(GeneralSettingsDTO::fromArray($dados));
 
-        $this->dispatch('toast', variant: 'success', message: 'Dados da empresa salvos.');
+        $this->notificarSucesso('Dados da empresa salvos.');
     }
 
     public function render(): View

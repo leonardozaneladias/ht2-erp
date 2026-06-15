@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveLoginSettingsAction;
 use App\DTOs\Admin\Settings\LoginSettingsDTO;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Services\Admin\Settings\SettingsFileUploadService;
 use App\Settings\LoginSettings;
 use Illuminate\Contracts\View\View;
@@ -19,6 +20,7 @@ use Livewire\WithFileUploads;
  */
 class AbaLogin extends Component
 {
+    use EmiteNotificacoes;
     use WithFileUploads;
 
     public string $titulo = '';
@@ -61,7 +63,7 @@ class AbaLogin extends Component
 
         $this->reset('fundo');
 
-        $this->dispatch('toast', variant: 'success', message: 'Tela de login atualizada.');
+        $this->notificarSucesso('Tela de login atualizada.');
     }
 
     public function render(LoginSettings $settings): View

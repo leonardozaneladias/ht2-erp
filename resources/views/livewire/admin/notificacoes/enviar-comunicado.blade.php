@@ -5,7 +5,7 @@
         <div class="lg:col-span-2">
             <x-shared.card title="Conteúdo do comunicado">
                 <form wire:submit="enviar" class="space-y-1">
-                    <x-shared.select
+                    <x-shared.select-search
                         name="tipo"
                         label="Tipo"
                         wire:model="tipo"
@@ -31,7 +31,7 @@
                         required
                     />
 
-                    <x-shared.select
+                    <x-shared.select-search
                         name="publico"
                         label="Destinatários"
                         wire:model.live="publico"
@@ -41,7 +41,7 @@
                     />
 
                     @if ($publico === \App\Enums\PublicoComunicado::Papel->value)
-                        <x-shared.select
+                        <x-shared.select-search
                             name="papel"
                             label="Papel"
                             wire:model="papel"

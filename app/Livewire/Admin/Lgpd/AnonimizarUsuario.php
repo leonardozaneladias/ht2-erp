@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Lgpd;
 use App\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
 use App\Exceptions\AccessException;
 use App\Livewire\Concerns\ConfirmsPassword;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ use Livewire\Component;
 class AnonimizarUsuario extends Component
 {
     use ConfirmsPassword;
+    use EmiteNotificacoes;
 
     public bool $aberto = false;
 
@@ -69,7 +71,7 @@ class AnonimizarUsuario extends Component
 
         $this->aberto = false;
         $this->reset('alvoId', 'alvoNome', 'confirmacao');
-        session()->flash('toast.success', 'Usuário anonimizado.');
+        $this->notificarSucesso('Usuário anonimizado.');
         $this->dispatch('lgpd::anonimizado');
     }
 

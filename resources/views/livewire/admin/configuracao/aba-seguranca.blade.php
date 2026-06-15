@@ -5,7 +5,7 @@
             subtitle="Exigências aplicadas ao cadastrar ou alterar senhas de usuários."
         >
             <div class="md:max-w-xs">
-                <x-shared.select
+                <x-shared.select-search
                     name="senha_min_caracteres"
                     label="Tamanho mínimo"
                     wire:model="senha_min_caracteres"
@@ -31,7 +31,7 @@
 
         <x-shared.card title="Sessão e acesso" subtitle="Controle de tempo de sessão e autenticação.">
             <div class="md:max-w-xs">
-                <x-shared.select
+                <x-shared.select-search
                     name="sessao_timeout_minutos"
                     label="Expirar sessão após"
                     wire:model="sessao_timeout_minutos"
@@ -53,7 +53,7 @@
 
         <x-shared.card title="Auditoria" subtitle="Retenção dos registros de atividade.">
             <div class="md:max-w-xs">
-                <x-shared.select
+                <x-shared.select-search
                     name="dias_retencao_logs"
                     label="Manter logs por"
                     wire:model="dias_retencao_logs"

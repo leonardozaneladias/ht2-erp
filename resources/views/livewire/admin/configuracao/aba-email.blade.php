@@ -9,7 +9,7 @@
                     placeholder="smtp.exemplo.com"
                 />
                 <x-shared.input name="smtp_port" label="Porta" type="number" wire:model="smtp_port" placeholder="587" />
-                <x-shared.select
+                <x-shared.select-search
                     name="criptografia"
                     label="Criptografia"
                     wire:model="criptografia"

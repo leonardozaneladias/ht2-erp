@@ -37,6 +37,7 @@
     @endisset
 
     <x-admin.partials.theme-bootstrap />
+    <x-admin.partials.notification-config />
 
     @vite (['resources/css/admin.css', 'resources/js/admin.js'])
 
@@ -77,31 +78,48 @@
 
     <x-shared.toast-container />
 
-    @foreach ([
-            'success' => 'success',
-            'error' => 'danger',
-            'warning' => 'warning',
-            'info' => 'info',
-        ] as $flashKey => $flashVariant)
-        @if (session()->has($flashKey))
-            <script>
-                window.addEventListener(
-                    'DOMContentLoaded',
-                    () => {
-                        window.dispatchEvent(
-                            new CustomEvent('toast', {
-                                detail: {
-                                    variant: @json ($flashVariant),
-                                    message: @json (session($flashKey)),
-                                },
-                            }),
-                        );
-                    },
-                    { once: true },
-                );
-            </script>
-        @endif
-    @endforeach
+    {{--
+        Notificações que sobrevivem a um redirect (sessão flash). Fonte canônica:
+        a chave `notify` (App\Livewire\Concerns\EmiteNotificacoes::notificarAposRedirect).
+        As chaves soltas success/error/warning/info/status cobrem fluxos legados/externos
+        (auth, middleware) e não levam título. Componentes que permanecem na página
+        devem usar $this->notificarSucesso()/notificarErro() (evento `toast`).
+    --}}
+    @php
+        $notificacoesFlash = [];
+
+        $flashNotify = session('notify');
+        if (is_array($flashNotify) && filled($flashNotify['message'] ?? null)) {
+            $notificacoesFlash[] = [
+                'variant' => $flashNotify['variant'] ?? 'info',
+                'message' => $flashNotify['message'],
+                'title' => $flashNotify['title'] ?? null,
+            ];
+        }
+
+        foreach (
+            ['success' => 'success', 'error' => 'danger', 'warning' => 'warning', 'info' => 'info', 'status' => 'info']
+            as $chave => $variante
+        ) {
+            if (session()->has($chave)) {
+                $notificacoesFlash[] = ['variant' => $variante, 'message' => session($chave), 'title' => null];
+            }
+        }
+    @endphp
+
+    @if (! empty($notificacoesFlash))
+        <script>
+            window.addEventListener(
+                'DOMContentLoaded',
+                () => {
+                    @foreach ($notificacoesFlash as $notificacao)
+                    window.dispatchEvent(new CustomEvent('toast', { detail: @json ($notificacao) }));
+                    @endforeach
+                },
+                { once: true },
+            );
+        </script>
+    @endif
 
     @livewireScripts
 

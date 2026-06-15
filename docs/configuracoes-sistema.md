@@ -26,7 +26,8 @@ cacheadas.
 
 Grupos disponíveis: **Empresa** (`general`), **Aparência** (`appearance` +
 `branding`), **Tela de login** (`login`), **E-mail** (`email`), **Localização**
-(`localizacao`), **Segurança** (`seguranca`). A navegação é uma **sidebar
+(`localizacao`), **Segurança** (`seguranca`), **Notificações** (`notificacoes`).
+A navegação é uma **sidebar
 vertical com busca** (`SettingsGroup::correspondeBusca()`, sem acento) e renderiza
 apenas a aba ativa (troca server-side via `?aba=`). Há ainda a **Zona de perigo**
 (`AbaDangerZone`) com ações destrutivas e reconfirmação por digitação.
@@ -66,6 +67,20 @@ migração condicional `database/settings/*_rebrand_ht2_defaults.php` (que só t
 paleta Inspinia antiga, preservando customizações do cliente). A **Zona de perigo**
 restaura tudo ao padrão (`ResetarAparenciaAction`) ou expurga logs antigos
 (`ExpurgarLogsAction`).
+
+---
+
+## Notificações
+
+A aba **Notificações** (`AbaNotificacoes`) define a aparência/comportamento do feedback
+visual da instância: **posição, duração, estilo (pílula/card) e quantidade máxima** dos
+toasts, e a **posição das confirmações** (SweetAlert2). Persistido em `NotificacaoSettings`
+e aplicado no frontend por `NotificacaoService::paraJsConfig()` (injetado pelo partial
+`x-admin.partials.notification-config` em `window.__notificacaoConfig`), lido por
+`resources/js/admin/toast.js` e `confirm.js`. A aba tem **preview ao vivo** (botões
+"Testar"). O disparo de toasts no backend é centralizado no trait
+`App\Livewire\Concerns\EmiteNotificacoes` (`notificarSucesso/Erro/Aviso/Info` e
+`notificarAposRedirect` para fluxos com redirect).
 
 ---
 

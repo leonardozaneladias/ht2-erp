@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Auditoria;
 
 use App\Actions\Admin\Lgpd\ExpurgarLogsAction;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Activity;
 use App\Models\AdminUser;
 use App\Support\Audit\FormatadorDiff;
@@ -27,6 +28,8 @@ use Livewire\Component;
 #[Title('Logs de auditoria')]
 class IndexAuditoria extends Component
 {
+    use EmiteNotificacoes;
+
     // Atividade aberta no drawer de detalhes (null = drawer sem conteúdo).
     #[Locked]
     public ?int $detalheId = null;
@@ -64,7 +67,7 @@ class IndexAuditoria extends Component
         }
 
         $action->execute();
-        session()->flash('toast.success', 'Logs antigos expurgados.');
+        $this->notificarSucesso('Logs antigos expurgados.');
     }
 
     /**
@@ -83,7 +86,7 @@ class IndexAuditoria extends Component
         $existe = Activity::query()->visiveisPara($user)->whereKey($id)->exists();
 
         if (! $existe) {
-            $this->dispatch('toast', variant: 'error', message: 'Registro de auditoria não encontrado.');
+            $this->notificarErro('Registro de auditoria não encontrado.');
 
             return;
         }

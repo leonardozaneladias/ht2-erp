@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveSegurancaSettingsAction;
 use App\DTOs\Admin\Settings\SegurancaSettingsDTO;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Settings\SegurancaSettings;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -19,6 +20,8 @@ use Livewire\Component;
  */
 class AbaSeguranca extends Component
 {
+    use EmiteNotificacoes;
+
     public int $senha_min_caracteres = 8;
 
     public bool $senha_exige_maiuscula = true;
@@ -82,7 +85,7 @@ class AbaSeguranca extends Component
             alerta_login_super_admin: $this->alerta_login_super_admin,
         ));
 
-        $this->dispatch('toast', variant: 'success', message: 'Configurações de segurança salvas.');
+        $this->notificarSucesso('Configurações de segurança salvas.');
     }
 
     public function render(): View

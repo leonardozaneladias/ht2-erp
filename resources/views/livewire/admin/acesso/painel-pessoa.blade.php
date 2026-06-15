@@ -132,7 +132,7 @@
                     @if ($mostrarFormAcesso)
                         <div class="border-default-200 bg-default-50 mb-5 rounded-lg border p-4">
                             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <x-shared.select
+                                <x-shared.select-search
                                     name="novoTipo"
                                     label="Tipo"
                                     :options="[
@@ -141,7 +141,7 @@
                                     ]"
                                     wire:model="novoTipo"
                                 />
-                                <x-shared.select
+                                <x-shared.select-search
                                     name="novaPermissao"
                                     label="Permissão"
                                     placeholder="Selecione a permissão"

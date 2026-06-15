@@ -1,3 +1,5 @@
+import { notify } from './toast';
+
 function collectElements(root, selector) {
   const elements = [];
 
@@ -19,14 +21,6 @@ function parseJsonDataset(element, key) {
     console.warn(`Configuracao invalida em ${key}`, error);
     return {};
   }
-}
-
-function dispatchToast(variant, message) {
-  window.dispatchEvent(
-    new CustomEvent('toast', {
-      detail: { variant, message },
-    }),
-  );
 }
 
 function updateButtonState(button, copied, config) {
@@ -58,7 +52,7 @@ function initCopyButtons(root = document) {
         updateButtonState(button, true, config);
 
         if (config.successMessage) {
-          dispatchToast('success', config.successMessage);
+          notify('success', config.successMessage);
         }
 
         window.setTimeout(() => {
@@ -66,7 +60,7 @@ function initCopyButtons(root = document) {
         }, 1500);
       } catch (error) {
         console.error('Erro ao copiar', error);
-        dispatchToast('danger', config.errorMessage || 'Erro ao copiar.');
+        notify('danger', config.errorMessage || 'Erro ao copiar.');
       }
     });
   });

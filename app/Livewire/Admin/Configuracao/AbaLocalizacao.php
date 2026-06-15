@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveLocalizacaoSettingsAction;
 use App\DTOs\Admin\Settings\LocalizacaoSettingsDTO;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Settings\LocalizacaoSettings;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -16,6 +17,8 @@ use Livewire\Component;
  */
 class AbaLocalizacao extends Component
 {
+    use EmiteNotificacoes;
+
     public string $idioma = 'pt_BR';
 
     public string $timezone = 'America/Sao_Paulo';
@@ -47,7 +50,7 @@ class AbaLocalizacao extends Component
             casas_decimais: $this->casas_decimais,
         ));
 
-        $this->dispatch('toast', variant: 'success', message: 'Configurações de localização salvas.');
+        $this->notificarSucesso('Configurações de localização salvas.');
     }
 
     public function render(): View

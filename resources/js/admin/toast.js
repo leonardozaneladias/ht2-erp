@@ -1,33 +1,68 @@
-const DEFAULT_DURATION = 4000;
+// =============================================================================
+// Sistema de notificações (toasts) — MOTOR ÚNICO DE COMPORTAMENTO
+//
+// As preferências (posição, duração, estilo, máximo) vêm das Configurações do
+// sistema, injetadas em window.__notificacaoConfig pelo partial
+// x-admin.partials.notification-config (origem: App\Settings\NotificacaoSettings).
+//
+//   • APARÊNCIA (markup/classes) ........ resources/views/components/shared/toast-container.blade.php
+//   • OPÇÕES p/ o admin ................. /admin/configuracoes?aba=notificacoes
+//   • DISPARO no backend ............... App\Livewire\Concerns\EmiteNotificacoes
+//
+// Disparo no frontend:  notify('success', 'Mensagem')  — ou  window.notify(...)
+// Preview ao vivo (aba Configurações):  window.notifyConfigure({ position, durationKey, style, max })
+// =============================================================================
 
-const variantMap = {
-  default: {
-    wrapper:
-      'border-default-300 bg-card/95 text-default-700 dark:border-default-700 dark:bg-default-950/95 dark:text-default-100',
-    iconColor: 'text-info',
-    icon: 'tabler--info-circle',
-  },
-  success: {
-    wrapper: 'border-success/30 bg-success/10 text-success dark:border-success/40 dark:bg-success/15',
-    iconColor: 'text-success',
-    icon: 'tabler--circle-check',
-  },
-  danger: {
-    wrapper: 'border-danger/30 bg-danger/10 text-danger dark:border-danger/40 dark:bg-danger/15',
-    iconColor: 'text-danger',
-    icon: 'tabler--alert-octagon',
-  },
-  warning: {
-    wrapper: 'border-warning/30 bg-warning/10 text-warning dark:border-warning/40 dark:bg-warning/15',
-    iconColor: 'text-warning',
-    icon: 'tabler--alert-triangle',
-  },
-  info: {
-    wrapper: 'border-info/30 bg-info/10 text-info dark:border-info/40 dark:bg-info/15',
-    iconColor: 'text-info',
-    icon: 'tabler--info-circle',
-  },
+// Defaults usados quando não há config injetada (páginas de erro/instalação).
+const DEFAULTS = {
+  position: 'top-center',
+  duration: 4500,
+  style: 'pilula',
+  max: 3,
 };
+
+// Acréscimo (ms) na duração de erros, para dar mais tempo de leitura.
+const DANGER_EXTRA = 1500;
+const ENTER_DURATION = 300;
+const LEAVE_DURATION = 200;
+
+// Espelha App\Enums\Admin\Notificacao\ToastDuracao::ms() — usado só no preview,
+// onde o JS recebe a chave (curta|media|longa) e não os milissegundos.
+const DURATION_MS = { curta: 3000, media: 4500, longa: 7000 };
+
+const VARIANTS = {
+  default: { icon: 'tabler--info-circle', color: 'text-info' },
+  success: { icon: 'tabler--circle-check', color: 'text-success' },
+  danger: { icon: 'tabler--alert-octagon', color: 'text-danger' },
+  warning: { icon: 'tabler--alert-triangle', color: 'text-warning' },
+  info: { icon: 'tabler--info-circle', color: 'text-info' },
+};
+
+// Posições aplicadas via inline-style (classes dinâmicas não são escaneadas pelo
+// Tailwind). `edge` define a direção da animação de entrada/saída.
+const POSITIONS = {
+  'top-center': { top: '1rem', bottom: 'auto', left: '0px', right: '0px', alignItems: 'center', edge: 'top' },
+  'top-right': { top: '1rem', bottom: 'auto', left: 'auto', right: '1rem', alignItems: 'flex-end', edge: 'top' },
+  'top-left': { top: '1rem', bottom: 'auto', left: '1rem', right: 'auto', alignItems: 'flex-start', edge: 'top' },
+  'bottom-center': { top: 'auto', bottom: '1rem', left: '0px', right: '0px', alignItems: 'center', edge: 'bottom' },
+  'bottom-right': { top: 'auto', bottom: '1rem', left: 'auto', right: '1rem', alignItems: 'flex-end', edge: 'bottom' },
+  'bottom-left': { top: 'auto', bottom: '1rem', left: '1rem', right: 'auto', alignItems: 'flex-start', edge: 'bottom' },
+};
+
+const config = { ...DEFAULTS };
+
+function prefersReducedMotion() {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+}
+
+// 'error' é um alias histórico de 'danger'.
+function resolveVariantName(name) {
+  if (name === 'error') {
+    return 'danger';
+  }
+
+  return VARIANTS[name] ? name : 'default';
+}
 
 function normalizePayload(payload) {
   if (Array.isArray(payload)) {
@@ -49,119 +84,161 @@ function getContainer() {
   return document.querySelector('[data-toast-container]');
 }
 
+function positionFor(key) {
+  return POSITIONS[key] ?? POSITIONS[DEFAULTS.position];
+}
+
+function enterTransform() {
+  return positionFor(config.position).edge === 'bottom' ? 'translateY(8px)' : 'translateY(-8px)';
+}
+
+function applyContainerPosition() {
+  const container = getContainer();
+
+  if (!container) {
+    return;
+  }
+
+  const pos = positionFor(config.position);
+  container.style.top = pos.top;
+  container.style.bottom = pos.bottom;
+  container.style.left = pos.left;
+  container.style.right = pos.right;
+  container.style.alignItems = pos.alignItems;
+}
+
+function loadConfig() {
+  const injected = window.__notificacaoConfig?.toast;
+
+  if (!injected || typeof injected !== 'object') {
+    return;
+  }
+
+  if (injected.position) {
+    config.position = injected.position;
+  }
+  if (injected.duration) {
+    config.duration = Number(injected.duration) || config.duration;
+  }
+  if (injected.style) {
+    config.style = injected.style;
+  }
+  if (injected.max) {
+    config.max = Number(injected.max) || config.max;
+  }
+}
+
+function templateFor(style) {
+  const container = getContainer();
+
+  return (
+    container?.querySelector(`[data-toast-template="${style}"]`) ??
+    container?.querySelector('[data-toast-template="pilula"]') ??
+    container?.querySelector('[data-toast-template]')
+  );
+}
+
 function removeToast(toast) {
   if (!toast || !toast.isConnected) {
     return;
   }
 
-  toast.classList.add('translate-x-4', 'opacity-0');
-  toast.classList.remove('translate-x-0', 'opacity-100');
+  toast.style.transitionDuration = `${LEAVE_DURATION}ms`;
+  toast.style.opacity = '0';
+  toast.style.transform = enterTransform();
 
-  window.setTimeout(() => {
-    toast.remove();
-  }, 250);
+  window.setTimeout(() => toast.remove(), LEAVE_DURATION);
 }
 
-function createIcon(icon, className) {
-  const element = document.createElement('i');
-  element.className = `iconify ${icon} ${className}`.trim();
+// Mantém no máximo config.max toasts: remove os mais antigos antes de inserir um novo.
+function enforceMax(container) {
+  const items = [...container.querySelectorAll('[data-toast-item]')];
+  const excess = items.length - config.max + 1;
 
-  return element;
+  for (let i = 0; i < excess; i += 1) {
+    removeToast(items[i]);
+  }
 }
 
-function buildToast(payload) {
-  const data = normalizePayload(payload);
-  const variant = variantMap[data.variant] ?? variantMap.default;
-  const toast = document.createElement('div');
-
-  toast.className = [
-    'pointer-events-auto',
-    'w-full',
-    'max-w-sm',
-    'overflow-hidden',
-    'rounded-xl',
-    'border',
-    'shadow-lg',
-    'backdrop-blur',
-    'transition',
-    'duration-300',
-    'ease-out',
-    'translate-x-4',
-    'opacity-0',
-    variant.wrapper,
-  ].join(' ');
-
-  toast.setAttribute('role', 'status');
-  toast.setAttribute('aria-live', 'polite');
-  toast.dataset.toastItem = 'true';
-
-  const body = document.createElement('div');
-  body.className = 'flex items-start gap-3 p-4';
-
-  const iconCircle = document.createElement('span');
-  iconCircle.className =
-    'mt-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white/70 dark:bg-default-900/70';
-  iconCircle.appendChild(createIcon(data.icon ?? variant.icon, `${variant.iconColor} text-xl`));
-
-  const content = document.createElement('div');
-  content.className = 'min-w-0 flex-1';
-
-  if (data.title) {
-    const title = document.createElement('p');
-    title.className = 'font-semibold text-body-color dark:text-default-100';
-    title.textContent = data.title;
-    content.appendChild(title);
+function durationFor(variantName, data) {
+  if (data.duration === false) {
+    return false;
   }
 
-  if (data.message) {
-    const message = document.createElement('div');
-    message.className = data.title
-      ? 'mt-1 text-sm leading-6 text-default-500 dark:text-default-400'
-      : 'text-sm leading-6 text-default-500 dark:text-default-400';
-    message.textContent = data.message;
-    content.appendChild(message);
+  if (data.duration != null) {
+    return Number(data.duration);
   }
 
-  const closeButton = document.createElement('button');
-  closeButton.type = 'button';
-  closeButton.className =
-    'inline-flex size-8 shrink-0 items-center justify-center rounded-full text-default-400 transition hover:bg-black/5 hover:text-body-color dark:text-default-500 dark:hover:bg-white/5 dark:hover:text-default-100';
-  closeButton.setAttribute('aria-label', 'Fechar toast');
-  closeButton.appendChild(createIcon('tabler--x', 'text-lg'));
-  closeButton.addEventListener('click', () => removeToast(toast));
+  return variantName === 'danger' ? config.duration + DANGER_EXTRA : config.duration;
+}
 
-  body.appendChild(iconCircle);
-  body.appendChild(content);
+function startAutoDismiss(toast, data, variantName) {
+  const duration = durationFor(variantName, data);
 
-  if (data.dismissible !== false) {
-    body.appendChild(closeButton);
+  if (!duration) {
+    return;
   }
 
-  toast.appendChild(body);
-
-  const duration = data.duration === false ? false : Number(data.duration || DEFAULT_DURATION);
   let timeoutId = null;
 
-  const startTimer = () => {
-    if (duration === false) {
-      return;
-    }
-
+  const start = () => {
     timeoutId = window.setTimeout(() => removeToast(toast), duration);
   };
 
-  const stopTimer = () => {
+  const stop = () => {
     if (timeoutId) {
       window.clearTimeout(timeoutId);
       timeoutId = null;
     }
   };
 
-  toast.addEventListener('mouseenter', stopTimer);
-  toast.addEventListener('mouseleave', startTimer);
-  startTimer();
+  toast.addEventListener('mouseenter', stop);
+  toast.addEventListener('mouseleave', start);
+  start();
+}
 
-  return toast;
+function buildToast(payload) {
+  const template = templateFor(config.style);
+
+  if (!template?.content?.firstElementChild) {
+    return null;
+  }
+
+  const data = normalizePayload(payload);
+  const variantName = resolveVariantName(data.variant);
+  const variant = VARIANTS[variantName];
+
+  const toast = template.content.firstElementChild.cloneNode(true);
+
+  const iconEl = toast.querySelector('[data-toast-icon]');
+  if (iconEl) {
+    const iconClasses = (data.icon || variant.icon).split(' ').filter(Boolean);
+    iconEl.classList.add(...iconClasses, variant.color);
+  }
+
+  const titleEl = toast.querySelector('[data-toast-title]');
+  if (titleEl && data.title) {
+    titleEl.textContent = data.title;
+    titleEl.classList.remove('hidden');
+  }
+
+  const messageEl = toast.querySelector('[data-toast-message]');
+  if (messageEl) {
+    messageEl.textContent = data.message ?? '';
+  }
+
+  const closeEl = toast.querySelector('[data-toast-close]');
+  if (data.dismissible === false) {
+    closeEl?.remove();
+  } else {
+    closeEl?.addEventListener('click', () => removeToast(toast));
+  }
+
+  // Estado inicial (transparente e deslocado) para a animação de entrada.
+  toast.style.opacity = '0';
+  toast.style.transform = enterTransform();
+
+  return { toast, data, variantName };
 }
 
 function showToast(payload) {
@@ -171,37 +248,90 @@ function showToast(payload) {
     return null;
   }
 
-  const toast = buildToast(payload);
+  const built = buildToast(payload);
+
+  if (!built) {
+    return null;
+  }
+
+  const { toast, data, variantName } = built;
+
+  enforceMax(container);
   container.appendChild(toast);
 
-  window.requestAnimationFrame(() => {
-    toast.classList.remove('translate-x-4', 'opacity-0');
-    toast.classList.add('translate-x-0', 'opacity-100');
-  });
+  const reveal = () => {
+    toast.style.transitionDuration = `${ENTER_DURATION}ms`;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+  };
+
+  if (prefersReducedMotion()) {
+    toast.style.opacity = '1';
+    toast.style.transform = 'none';
+  } else {
+    window.requestAnimationFrame(reveal);
+  }
+
+  startAutoDismiss(toast, data, variantName);
 
   return toast;
 }
 
 function registerToastEventBridge() {
+  // O Livewire entrega `$this->dispatch('toast', ...)` como um CustomEvent no
+  // window (detail = { variant, message, title }). Portanto UM único listener
+  // cobre os três caminhos: backend (dispatch via trait), frontend (notify) e o
+  // flash do layout. Registrar TAMBÉM via Livewire.on('toast') faria o mesmo
+  // dispatch ser processado duas vezes — dois toasts idênticos.
   window.addEventListener('toast', (event) => {
     showToast(event.detail);
   });
+}
 
-  document.addEventListener('livewire:init', () => {
-    if (!window.Livewire?.on) {
-      return;
-    }
+// API única de disparo no frontend (substitui os antigos `dispatchToast` locais).
+function notify(variant, message, options = {}) {
+  window.dispatchEvent(
+    new CustomEvent('toast', {
+      detail: { variant, message, ...options },
+    }),
+  );
+}
 
-    window.Livewire.on('toast', (...payload) => {
-      showToast(payload.length === 1 ? payload[0] : payload);
-    });
-  });
+// Aplica preferências em runtime (preview ao vivo na aba Configurações).
+function notifyConfigure(partial = {}) {
+  if (partial.position) {
+    config.position = partial.position;
+  }
+  if (partial.durationKey && DURATION_MS[partial.durationKey]) {
+    config.duration = DURATION_MS[partial.durationKey];
+  }
+  if (partial.duration != null) {
+    config.duration = Number(partial.duration) || config.duration;
+  }
+  if (partial.style) {
+    config.style = partial.style;
+  }
+  if (partial.max != null) {
+    config.max = Number(partial.max) || config.max;
+  }
+
+  applyContainerPosition();
+}
+
+function init() {
+  loadConfig();
+  applyContainerPosition();
 }
 
 registerToastEventBridge();
+init();
 
-window.showToast = (detail) => {
-  window.dispatchEvent(new CustomEvent('toast', { detail }));
-};
+// O container é recriado a cada navegação SPA (wire:navigate) — reaplica a posição.
+document.addEventListener('livewire:navigated', applyContainerPosition);
 
-export { removeToast, showToast };
+window.notify = notify;
+window.notifyConfigure = notifyConfigure;
+// Alias histórico — dispara o evento `toast` a partir de um payload completo.
+window.showToast = (detail) => window.dispatchEvent(new CustomEvent('toast', { detail }));
+
+export { notify, notifyConfigure, removeToast, showToast };

@@ -170,7 +170,7 @@
                 </div>
 
                 {{-- Skin --}}
-                <x-shared.select
+                <x-shared.select-search
                     name="skin"
                     label="Skin"
                     wire:model.live="skin"
@@ -219,7 +219,7 @@
 
                 {{-- Largura e menu --}}
                 <div class="grid gap-x-4 sm:grid-cols-2">
-                    <x-shared.select
+                    <x-shared.select-search
                         name="layout_width"
                         label="Largura do layout"
                         wire:model.live="layout_width"
@@ -227,7 +227,7 @@
                         :options="$layoutWidths"
                         :value="$layout_width"
                     />
-                    <x-shared.select
+                    <x-shared.select-search
                         name="sidenav_size_padrao"
                         label="Menu lateral (padrão)"
                         wire:model.live="sidenav_size_padrao"

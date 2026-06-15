@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Acesso;
 use App\Actions\Admin\SalvarPerfilAction;
 use App\DTOs\Admin\PerfilDTO;
 use App\Exceptions\AccessException;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Policies\RolePolicy;
 use Illuminate\Contracts\View\View;
@@ -25,6 +26,8 @@ use Spatie\Permission\Models\Role;
  */
 class PainelPerfil extends Component
 {
+    use EmiteNotificacoes;
+
     #[Locked]
     public ?int $perfilId = null;
 
@@ -117,7 +120,7 @@ class PainelPerfil extends Component
                 'permissoes' => array_values($this->permissions),
             ]), Auth::guard('admin')->user());
         } catch (AccessException $e) {
-            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
@@ -127,7 +130,7 @@ class PainelPerfil extends Component
         $this->original = $this->estadoAtual();
         unset($this->alteracoes);
 
-        $this->dispatch('toast', variant: 'success', message: 'Perfil salvo.');
+        $this->notificarSucesso('Perfil salvo.');
         $this->dispatch('perfil-salvo', id: $role->id);
     }
 

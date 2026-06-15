@@ -1,6 +1,6 @@
 @extends ('admin.dev.components.shell', [
-    'title' => 'Preview • família x-shared.toast',
-    'description' => 'Toasts efêmeros com container fixo e helper JS leve para browser events e Livewire.',
+    'title' => 'Preview • Notificações (toasts)',
+    'description' => 'Disparados pelo trait EmiteNotificacoes (backend) ou window.notify (frontend). Aparência e comportamento configuráveis em Configurações → Notificações.',
 ])
 
 @php
@@ -39,13 +39,6 @@
                             >
                                 Disparar {{ $example['label'] }}
                             </x-shared.button>
-
-                            <x-shared.toast
-                                :variant="$example['variant']"
-                                :title="$example['title']"
-                                :message="$example['message']"
-                                class="max-w-none"
-                            />
                         </div>
                     </div>
                 @endforeach
@@ -79,8 +72,10 @@
                 </div>
 
                 <x-shared.alert variant="info" title="Observação">
-                    O container fica global no layout admin e escuta
-                    <code>window.dispatchEvent(new CustomEvent('toast', ...))</code>.
+                    No backend, dispare via trait <code>EmiteNotificacoes</code>
+                    (<code>$this->notificarSucesso(...)</code>). No frontend, use
+                    <code>window.notify('success', 'Mensagem')</code>. Comportamento e aparência ficam centralizados em
+                    <code>toast.js</code> e <code>toast-container.blade.php</code>.
                 </x-shared.alert>
             </div>
         </x-shared.card>

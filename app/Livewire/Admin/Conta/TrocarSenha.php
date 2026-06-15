@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Support\Settings\PasswordPolicy;
 use Illuminate\Contracts\View\View;
@@ -16,6 +17,8 @@ use Livewire\Component;
  */
 class TrocarSenha extends Component
 {
+    use EmiteNotificacoes;
+
     public string $senhaAtual = '';
 
     public string $novaSenha = '';
@@ -47,7 +50,7 @@ class TrocarSenha extends Component
             ->log('Senha alterada pelo próprio usuário');
 
         $this->reset('senhaAtual', 'novaSenha', 'novaSenha_confirmation');
-        $this->dispatch('toast', variant: 'success', message: 'Senha alterada.');
+        $this->notificarSucesso('Senha alterada.');
     }
 
     public function render(): View

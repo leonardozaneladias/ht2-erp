@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,8 @@ use Livewire\Component;
  */
 class PreferenciasConta extends Component
 {
+    use EmiteNotificacoes;
+
     public ?string $locale = null;
 
     public ?string $timezone = null;
@@ -40,7 +43,7 @@ class PreferenciasConta extends Component
             'timezone' => $this->timezone ?: null,
         ])->save();
 
-        $this->dispatch('toast', variant: 'success', message: 'Preferências salvas.');
+        $this->notificarSucesso('Preferências salvas.');
     }
 
     public function render(): View

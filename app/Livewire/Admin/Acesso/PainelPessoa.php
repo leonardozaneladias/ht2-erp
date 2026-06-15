@@ -13,6 +13,7 @@ use App\DTOs\Admin\SyncRolesEmpresaDTO;
 use App\Enums\ModuloAcesso;
 use App\Enums\TipoConcessao;
 use App\Exceptions\AccessException;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Models\Empresa;
 use App\Models\PermissionGrant;
@@ -36,6 +37,8 @@ use Spatie\Permission\Models\Role;
  */
 class PainelPessoa extends Component
 {
+    use EmiteNotificacoes;
+
     #[Locked]
     public ?int $usuarioId = null;
 
@@ -136,7 +139,7 @@ class PainelPessoa extends Component
                 'roles' => array_values($this->roles),
             ]), Auth::guard('admin')->user());
         } catch (AccessException $e) {
-            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
@@ -144,7 +147,7 @@ class PainelPessoa extends Component
         $this->rolesOriginais = $this->rolesOrdenadas();
         unset($this->perfisAlterados);
 
-        $this->dispatch('toast', variant: 'success', message: 'Perfis atualizados.');
+        $this->notificarSucesso('Perfis atualizados.');
     }
 
     public function descartarPerfis(): void
@@ -234,14 +237,14 @@ class PainelPessoa extends Component
                 'expiraEm' => $dados['novaValidade'] !== '' ? $dados['novaValidade'] : null,
             ]), Auth::guard('admin')->user());
         } catch (AccessException $e) {
-            $this->dispatch('toast', variant: 'danger', message: $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }
 
         unset($this->acessosDiretos);
         $this->cancelarFormAcesso();
-        $this->dispatch('toast', variant: 'success', message: 'Acesso registrado.');
+        $this->notificarSucesso('Acesso registrado.');
     }
 
     public function solicitarRevogarAcesso(int $grantId): void
@@ -270,7 +273,7 @@ class PainelPessoa extends Component
         $action->execute($grant, 'Revogado pelo hub de controle de acesso.', Auth::guard('admin')->user());
 
         unset($this->acessosDiretos);
-        $this->dispatch('toast', variant: 'success', message: 'Acesso revogado.');
+        $this->notificarSucesso('Acesso revogado.');
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Actions\Admin\UpdateEmpresaAction;
 use App\DTOs\Admin\EmpresaDTO;
 use App\DTOs\Admin\FilialDTO;
 use App\Exceptions\FilialException;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Empresa;
 use App\Models\Filial;
 use Illuminate\Contracts\View\View;
@@ -24,6 +25,8 @@ use Livewire\Component;
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 class FormEmpresa extends Component
 {
+    use EmiteNotificacoes;
+
     #[Locked]
     public ?int $empresaId = null;
 
@@ -109,10 +112,10 @@ class FormEmpresa extends Component
 
         if ($this->empresaId === null) {
             $criar->execute($dto);
-            session()->flash('toast.success', 'Empresa criada.');
+            $this->notificarAposRedirect('success', 'Empresa criada.');
         } else {
             $atualizar->execute(Empresa::findOrFail($this->empresaId), $dto);
-            session()->flash('toast.success', 'Empresa atualizada.');
+            $this->notificarAposRedirect('success', 'Empresa atualizada.');
         }
 
         $this->redirect(route('admin.empresas.index'), navigate: true);
@@ -198,13 +201,13 @@ class FormEmpresa extends Component
         try {
             if ($this->filialEditandoId === null) {
                 $criar->execute($empresa, $dto);
-                session()->flash('toast.success', 'Filial criada.');
+                $this->notificarSucesso('Filial criada.');
             } else {
                 $atualizar->execute($this->localizarFilial($this->filialEditandoId), $dto);
-                session()->flash('toast.success', 'Filial atualizada.');
+                $this->notificarSucesso('Filial atualizada.');
             }
         } catch (FilialException $e) {
-            session()->flash('toast.error', $e->getMessage());
+            $this->notificarErro($e->getMessage());
 
             return;
         }

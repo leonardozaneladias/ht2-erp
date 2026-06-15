@@ -26,14 +26,12 @@
  * os botões −/+ movem o mesmo slider — sincronização bidirecional.
  */
 
+import { notify } from './toast';
+
 const TIPOS_ACEITOS = ['image/jpeg', 'image/png', 'image/webp'];
 
 let sessao = null; // { wrapper, modal, input, slider, cropper, objectUrl, minRatio, maxRatio, zoomViaSlider }
 let aberturaAtual = 0; // token de corrida: só a abertura mais recente instancia o Cropper
-
-function toast(variant, message) {
-  window.dispatchEvent(new CustomEvent('toast', { detail: { variant, message } }));
-}
 
 function configDe(wrapper) {
   try {
@@ -155,12 +153,12 @@ async function abrirCropper(wrapper, file) {
   const maxSizeMb = Number(config.maxSize || 2);
 
   if (!TIPOS_ACEITOS.includes(file.type)) {
-    toast('error', 'Formato inválido. Use PNG, JPG ou WebP.');
+    notify('error', 'Formato inválido. Use PNG, JPG ou WebP.');
     return;
   }
 
   if (file.size > maxSizeMb * 1024 * 1024) {
-    toast('error', `A imagem deve ter no máximo ${maxSizeMb} MB.`);
+    notify('error', `A imagem deve ter no máximo ${maxSizeMb} MB.`);
     return;
   }
 
@@ -251,7 +249,7 @@ function aplicarCrop() {
     (blob) => {
       if (!blob) {
         alternarLoadingAplicar(botao, false);
-        toast('error', 'Não foi possível processar a imagem.');
+        notify('error', 'Não foi possível processar a imagem.');
         return;
       }
 
@@ -267,7 +265,7 @@ function aplicarCrop() {
         },
         () => {
           alternarLoadingAplicar(botao, false);
-          toast('error', 'Falha ao enviar a imagem. Tente novamente.');
+          notify('error', 'Falha ao enviar a imagem. Tente novamente.');
         },
       );
     },

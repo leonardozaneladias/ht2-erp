@@ -8,7 +8,7 @@
     <div class="space-y-4 p-5">
         {{-- Filtros --}}
         <div class="grid grid-cols-1 gap-3 md:grid-cols-4">
-            <x-shared.select
+            <x-shared.select-search
                 name="event"
                 label="Tipo de evento"
                 :options="array_merge(

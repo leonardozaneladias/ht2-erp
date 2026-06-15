@@ -8,6 +8,7 @@ use App\Actions\Admin\Create__MODULO_STUDLY__Action;
 use App\Actions\Admin\Update__MODULO_STUDLY__Action;
 use App\DTOs\Admin\__MODULO_STUDLY__DTO;
 use App\Http\Requests\Admin\__MODULO_STUDLY__Rules;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -17,6 +18,8 @@ use Livewire\Component;
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 class Form__MODULO_STUDLY__ extends Component
 {
+    use EmiteNotificacoes;
+
     #[Locked]
     public ?int $__MODULO_CAMEL__Id = null;
 
@@ -48,10 +51,10 @@ __FORM_MOUNT_LOAD__
 
         if ($this->__MODULO_CAMEL__Id === null) {
             $criar->execute($dto);
-            session()->flash('toast.success', '__MODULO_LABEL__ criado(a) com sucesso.');
+            $this->notificarAposRedirect('success', '__MODULO_LABEL__ criado(a) com sucesso.');
         } else {
             $atualizar->execute(__MODULO_STUDLY__::findOrFail($this->__MODULO_CAMEL__Id), $dto);
-            session()->flash('toast.success', '__MODULO_LABEL__ atualizado(a) com sucesso.');
+            $this->notificarAposRedirect('success', '__MODULO_LABEL__ atualizado(a) com sucesso.');
         }
 
         $this->redirect(route('admin.__MODULO_ROTA_NOME__.index'), navigate: true);

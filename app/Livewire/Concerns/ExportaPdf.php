@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Dá a um componente (ex.: tabela PowerGrid) export para PDF. O componente só
  * implementa dadosParaExportacao(); o trait cuida do download síncrono e do
  * enfileiramento assíncrono (fila `exports`) para volumes grandes.
+ *
+ * @mixin \Livewire\Component
  */
 trait ExportaPdf
 {
@@ -34,7 +36,7 @@ trait ExportaPdf
     {
         GerarExportacaoPdfJob::dispatch($this->dadosParaExportacao(), (int) (auth('admin')->id() ?? 0));
 
-        session()->flash('toast.success', 'Exportação enfileirada. Avisaremos quando estiver pronta.');
+        $this->dispatch('toast', variant: 'success', message: 'Exportação enfileirada. Avisaremos quando estiver pronta.');
     }
 
     abstract protected function dadosParaExportacao(): ExportavelDTO;

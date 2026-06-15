@@ -10,10 +10,16 @@ function resolvePopupClass() {
     : 'bg-card text-body-color border border-default-300';
 }
 
+// Posição do diálogo definida nas Configurações → Notificações (NotificacaoSettings).
+function resolveConfirmPosition() {
+  return window.__notificacaoConfig?.confirm?.position === 'top' ? 'top' : 'center';
+}
+
 function getBaseOptions() {
   return {
     buttonsStyling: false,
     reverseButtons: true,
+    position: resolveConfirmPosition(),
     customClass: {
       popup: resolvePopupClass(),
       title: 'text-lg font-semibold text-body-color dark:text-default-100',
@@ -47,6 +53,8 @@ async function runConfirm(payload = {}) {
     // baseOptions PRIMEIRO: o customClass (com o botão destrutivo) precisa vir
     // DEPOIS, senão o spread sobrescreveria o vermelho da ação destrutiva.
     ...baseOptions,
+    // data.position permite o preview ao vivo (aba Configurações) sobrepor o padrão.
+    position: data.position ?? baseOptions.position,
     title: data.title ?? 'Confirmar ação',
     text: data.html ? undefined : data.text,
     html: data.html,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Conta;
 
 use App\Actions\Admin\Conta\AtualizarPerfilAction;
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ use Livewire\WithFileUploads;
  */
 class PerfilConta extends Component
 {
+    use EmiteNotificacoes;
     use WithFileUploads;
 
     public string $nome = '';
@@ -54,7 +56,7 @@ class PerfilConta extends Component
 
         // Redirect com navigate re-renderiza o layout — a nova foto aparece
         // imediatamente na topbar e na sidebar, sem F5.
-        session()->flash('toast.success', 'Perfil atualizado.');
+        $this->notificarAposRedirect('success', 'Perfil atualizado.');
         $this->redirect(route('admin.conta'), navigate: true);
     }
 
@@ -62,7 +64,7 @@ class PerfilConta extends Component
     {
         $action->removerAvatar($this->usuario());
 
-        session()->flash('toast.success', 'Foto removida.');
+        $this->notificarAposRedirect('success', 'Foto removida.');
         $this->redirect(route('admin.conta'), navigate: true);
     }
 

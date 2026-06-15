@@ -5,6 +5,7 @@ import Inputmask from 'inputmask';
 import Quill from 'quill';
 import { Portuguese } from 'flatpickr/dist/l10n/pt.js';
 import 'quill/dist/quill.snow.css';
+import { notify } from './toast';
 
 const passwordMeterStates = [
   {
@@ -57,14 +58,6 @@ function parseJsonDataset(element, key) {
     console.warn(`Configuracao invalida em ${key}`, error);
     return {};
   }
-}
-
-function dispatchToast(variant, message) {
-  window.dispatchEvent(
-    new CustomEvent('toast', {
-      detail: { variant, message },
-    }),
-  );
 }
 
 function calculatePasswordScore(password) {
@@ -322,7 +315,7 @@ function initCepFields(root = document) {
         const data = await response.json();
 
         if (data.erro) {
-          dispatchToast('warning', 'CEP não encontrado.');
+          notify('warning', 'CEP não encontrado.');
           return;
         }
 
@@ -351,7 +344,7 @@ function initCepFields(root = document) {
         }
       } catch (error) {
         console.error('Erro ao buscar CEP', error);
-        dispatchToast('danger', 'Erro ao buscar CEP.');
+        notify('danger', 'Erro ao buscar CEP.');
       } finally {
         if (loader) {
           loader.classList.add('hidden');
@@ -407,7 +400,7 @@ function validateSelectedFiles(files, config) {
     return true;
   }
 
-  dispatchToast('danger', `O arquivo ${invalidFile.name} excede ${config.maxSize}MB.`);
+  notify('danger', `O arquivo ${invalidFile.name} excede ${config.maxSize}MB.`);
   return false;
 }
 
@@ -563,7 +556,7 @@ function initDropzones(root = document) {
     instance.on('removedfile', syncInputFromDropzone);
     instance.on('error', (file, message) => {
       const feedback = typeof message === 'string' ? message : `Falha ao enviar ${file.name}.`;
-      dispatchToast('danger', feedback);
+      notify('danger', feedback);
     });
 
     field.dataset.afFormsDropzoneBound = 'true';

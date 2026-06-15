@@ -24,6 +24,7 @@ enum SettingsGroup: string
             self::EMAIL => 'E-mail',
             self::LOCALIZACAO => 'Localização',
             self::SEGURANCA => 'Segurança',
+            self::NOTIFICACOES => 'Notificações',
         };
     }
 
@@ -37,6 +38,7 @@ enum SettingsGroup: string
             self::EMAIL => 'tabler--mail',
             self::LOCALIZACAO => 'tabler--world',
             self::SEGURANCA => 'tabler--shield-lock',
+            self::NOTIFICACOES => 'tabler--bell',
         };
     }
 
@@ -50,6 +52,7 @@ enum SettingsGroup: string
             self::EMAIL => 'Servidor SMTP usado para enviar e-mails.',
             self::LOCALIZACAO => 'Idioma, fuso horário, moeda e formatos.',
             self::SEGURANCA => 'Política de senha, sessão e retenção de logs.',
+            self::NOTIFICACOES => 'Posição, duração e estilo das notificações e confirmações.',
         };
     }
 
@@ -68,6 +71,7 @@ enum SettingsGroup: string
             self::EMAIL => ['e-mail', 'email', 'smtp', 'servidor', 'remetente', 'porta', 'senha smtp'],
             self::LOCALIZACAO => ['idioma', 'fuso', 'fuso horario', 'timezone', 'moeda', 'formato', 'data', 'decimais'],
             self::SEGURANCA => ['senha', 'sessao', 'timeout', '2fa', 'auditoria', 'retencao', 'logs', 'lockout', 'tentativas', 'bloqueio'],
+            self::NOTIFICACOES => ['notificacao', 'notificacoes', 'toast', 'alerta', 'aviso', 'mensagem', 'posicao', 'duracao', 'confirmacao', 'feedback', 'popup'],
         };
     }
 
@@ -93,6 +97,7 @@ enum SettingsGroup: string
             self::EMAIL,
             self::LOCALIZACAO,
             self::SEGURANCA,
+            self::NOTIFICACOES,
         ];
     }
     case GERAL = 'general';
@@ -102,4 +107,5 @@ enum SettingsGroup: string
     case EMAIL = 'email';
     case LOCALIZACAO = 'localizacao';
     case SEGURANCA = 'seguranca';
+    case NOTIFICACOES = 'notificacoes';
 }

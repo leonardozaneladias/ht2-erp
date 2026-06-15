@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Shared;
 
+use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Anexo;
 use App\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
@@ -13,6 +14,7 @@ use Livewire\WithFileUploads;
 
 class GerenciadorAnexos extends Component
 {
+    use EmiteNotificacoes;
     use WithFileUploads;
 
     public int $modelId;
@@ -39,7 +41,7 @@ class GerenciadorAnexos extends Component
         $caminho = $this->arquivo->store('anexos', 'public');
 
         if ($caminho === false) {
-            $this->dispatch('toast', variant: 'danger', message: 'Erro ao armazenar o arquivo.');
+            $this->notificarErro('Erro ao armazenar o arquivo.');
 
             return;
         }
@@ -59,7 +61,7 @@ class GerenciadorAnexos extends Component
 
         $this->arquivo = null;
         $this->carregarAnexos();
-        $this->dispatch('toast', variant: 'success', message: 'Anexo adicionado.');
+        $this->notificarSucesso('Anexo adicionado.');
     }
 
     public function solicitarRemoverAnexo(int $id): void
@@ -81,7 +83,7 @@ class GerenciadorAnexos extends Component
         Storage::disk($anexo->disco)->delete($anexo->caminho);
         $anexo->delete();
         $this->carregarAnexos();
-        $this->dispatch('toast', variant: 'success', message: 'Anexo removido.');
+        $this->notificarSucesso('Anexo removido.');
     }
 
     public function render(): View
