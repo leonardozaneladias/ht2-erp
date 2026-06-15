@@ -13,3 +13,9 @@ Artisan::command('inspire', function () {
 // Expurga diariamente os logs de auditoria além do teto de retenção
 // (config activitylog.clean_after_days). Requer `php artisan schedule:run` no cron.
 Schedule::command('activitylog:clean')->daily();
+
+// Manutenção recorrente da plataforma (cada instalação cliente).
+Schedule::command('access:expirar')->hourly();                        // revoga concessões diretas vencidas
+Schedule::command('auth:clear-resets')->daily();                      // tokens de reset de senha expirados
+Schedule::command('queue:prune-failed', ['--hours' => 168])->daily(); // failed jobs com mais de 7 dias
+Schedule::command('horizon:snapshot')->everyFiveMinutes();            // snapshot de métricas do Horizon
