@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia\Support;
 
+use App\Exceptions\Referencia\ImportacaoReferenciaException;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use SplFileObject;
@@ -15,9 +16,24 @@ use SplFileObject;
  * mapearLinha() e grava em chunks com `upsert` (ON CONFLICT DO UPDATE nativo do
  * PostgreSQL) — idempotente: re-seed atualiza in-place, não duplica. `created_at`
  * é preservado no conflito; só `updated_at` (e as colunas de dado) é atualizado.
+ *
+ * Falha alto contra CSV corrompido: conta lidas/inseridas/puladas e aborta com
+ * ImportacaoReferenciaException quando o cabeçalho declarado em cabecalhoEsperado()
+ * diverge, quando um arquivo com dados não rende nenhuma linha, ou quando o total
+ * fica abaixo de minimoEsperado(). Ambos os hooks são opcionais (defaults mantêm
+ * o comportamento permissivo de antes).
  */
 abstract class CsvReferenceSeeder extends Seeder
 {
+    /** Linhas de dados consideradas no último run (exclui cabeçalho e brancas). */
+    public int $lidas = 0;
+
+    /** Linhas válidas enviadas ao upsert no último run. */
+    public int $inseridos = 0;
+
+    /** Linhas de dados descartadas por mapearLinha() no último run (inválidas). */
+    public int $pulados = 0;
+
     protected int $chunkSize = 1000;
 
     protected string $separador = ',';
@@ -28,10 +44,14 @@ abstract class CsvReferenceSeeder extends Seeder
     {
         DB::connection()->disableQueryLog();
 
-        $caminho = database_path('data/referencia/' . $this->arquivo());
+        $this->lidas = 0;
+        $this->inseridos = 0;
+        $this->pulados = 0;
+
+        $caminho = $this->caminhoArquivo();
 
         if (! is_file($caminho)) {
-            $this->command->warn("CSV ausente: {$this->arquivo()} — pulando {$this->tabela()}.");
+            $this->aviso("CSV ausente: {$this->arquivo()} — pulando {$this->tabela()}.");
 
             return;
         }
@@ -45,7 +65,6 @@ abstract class CsvReferenceSeeder extends Seeder
         $agora = now();
         $atualiza = [...$this->colunasUpdate(), 'updated_at'];
         $buffer = [];
-        $total = 0;
         $linhaNum = 0;
 
         foreach ($arquivo as $linha) {
@@ -55,39 +74,74 @@ abstract class CsvReferenceSeeder extends Seeder
 
             $linhaNum++;
 
+            $campos = array_map(static fn (mixed $v): string => is_string($v) ? trim($v) : '', $linha);
+
             if ($this->temCabecalho && $linhaNum === 1) {
+                $this->validarCabecalho($campos);
+
                 continue;
             }
 
-            $campos = array_map(static fn (mixed $v): string => is_string($v) ? trim($v) : '', $linha);
-
             if (implode('', $campos) === '') {
-                continue; // linha em branco
+                continue; // linha em branco — não conta como lida
             }
+
+            $this->lidas++;
 
             $mapeado = $this->mapearLinha($campos);
 
             if ($mapeado === null) {
+                $this->pulados++;
+
                 continue;
             }
 
             $mapeado['created_at'] = $agora;
             $mapeado['updated_at'] = $agora;
             $buffer[] = $mapeado;
+            $this->inseridos++;
 
             if (count($buffer) >= $this->chunkSize) {
                 DB::table($this->tabela())->upsert($buffer, $this->chaveNatural(), $atualiza);
-                $total += count($buffer);
                 $buffer = [];
             }
         }
 
         if ($buffer !== []) {
             DB::table($this->tabela())->upsert($buffer, $this->chaveNatural(), $atualiza);
-            $total += count($buffer);
         }
 
-        $this->command->info(sprintf('  %s: %d registros.', $this->tabela(), $total));
+        $this->logBalanco();
+        $this->verificarPiso();
+    }
+
+    /**
+     * Cabeçalho esperado (1ª linha do CSV, na ordem das colunas). Default null =
+     * não valida (pula a 1ª linha cega, como antes). Quando declarado, divergência
+     * aborta — defende contra colunas reordenadas/renomeadas que gravariam dado
+     * na coluna errada sem erro de banco.
+     *
+     * @return list<string>|null
+     */
+    protected function cabecalhoEsperado(): ?array
+    {
+        return null;
+    }
+
+    /**
+     * Piso mínimo de linhas inseridas. Default 0 = sem piso. Declarado nos
+     * catálogos de cardinalidade estável; abaixo do piso aborta (defende contra
+     * CSV truncado).
+     */
+    protected function minimoEsperado(): int
+    {
+        return 0;
+    }
+
+    /** Caminho absoluto do CSV. Seam para testes apontarem a um fixture. */
+    protected function caminhoArquivo(): string
+    {
+        return database_path('data/referencia/' . $this->arquivo());
     }
 
     /** Nome do arquivo CSV em database/data/referencia/. */
@@ -119,4 +173,89 @@ abstract class CsvReferenceSeeder extends Seeder
      * @return array<string, mixed>|null
      */
     abstract protected function mapearLinha(array $linha): ?array;
+
+    /**
+     * Confere a 1ª linha contra cabecalhoEsperado() (se declarado) e aborta na
+     * divergência. Comparação tolerante a caixa/espaços e a um BOM UTF-8 inicial.
+     *
+     * @param  list<string>  $campos
+     */
+    private function validarCabecalho(array $campos): void
+    {
+        $esperado = $this->cabecalhoEsperado();
+
+        if ($esperado === null) {
+            return;
+        }
+
+        if (isset($campos[0])) {
+            $campos[0] = preg_replace('/^\x{FEFF}/u', '', $campos[0]) ?? $campos[0];
+        }
+
+        $normalizar = static fn (array $cols): array => array_map(
+            static fn (string $c): string => mb_strtolower(trim($c)),
+            array_values($cols),
+        );
+
+        if ($normalizar($campos) !== $normalizar($esperado)) {
+            throw ImportacaoReferenciaException::cabecalhoDivergente(
+                $this->tabela(),
+                $this->arquivo(),
+                $esperado,
+                $campos,
+            );
+        }
+    }
+
+    /** Aborta se um arquivo com dados não rendeu nada, ou ficou abaixo do piso. */
+    private function verificarPiso(): void
+    {
+        if ($this->lidas > 0 && $this->inseridos === 0) {
+            throw ImportacaoReferenciaException::nenhumaLinhaImportada(
+                $this->tabela(),
+                $this->arquivo(),
+                $this->lidas,
+            );
+        }
+
+        $minimo = $this->minimoEsperado();
+
+        if ($minimo > 0 && $this->inseridos < $minimo) {
+            throw ImportacaoReferenciaException::abaixoDoMinimo(
+                $this->tabela(),
+                $this->arquivo(),
+                $this->inseridos,
+                $minimo,
+            );
+        }
+    }
+
+    /** Loga o balanço do run (info; warn quando houve linhas puladas). */
+    private function logBalanco(): void
+    {
+        $msg = sprintf(
+            '  %s: lidas %d / inseridas %d / puladas %d.',
+            $this->tabela(),
+            $this->lidas,
+            $this->inseridos,
+            $this->pulados,
+        );
+
+        $this->pulados > 0 ? $this->aviso($msg) : $this->info($msg);
+    }
+
+    /** Escreve em stdout do comando, se houver um anexado (null-safe p/ testes). */
+    private function info(string $msg): void
+    {
+        if (isset($this->command)) {
+            $this->command->info($msg);
+        }
+    }
+
+    private function aviso(string $msg): void
+    {
+        if (isset($this->command)) {
+            $this->command->warn($msg);
+        }
+    }
 }

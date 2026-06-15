@@ -33,6 +33,16 @@ final class CfopSeeder extends CsvReferenceSeeder
         return ['descricao', 'tipo', 'aplicacao'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo', 'descricao', 'aplicacao'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 25;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $codigo = $linha[0] ?? '';

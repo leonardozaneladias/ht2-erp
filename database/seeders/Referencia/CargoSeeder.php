@@ -32,6 +32,11 @@ final class CargoSeeder extends CsvReferenceSeeder
         return ['descricao'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo_cbo', 'descricao'];
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $codigo = $linha[0] ?? '';

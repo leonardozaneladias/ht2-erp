@@ -42,16 +42,25 @@ final class ReferenciaSyncCommand extends Command
             DB::beginTransaction();
         }
 
-        foreach ($conjuntos as $classe) {
-            $seeder = app($classe);
-            $seeder->setContainer($this->getLaravel())->setCommand($this);
-            $seeder->run();
+        try {
+            foreach ($conjuntos as $classe) {
+                $seeder = app($classe);
+                $seeder->setContainer($this->getLaravel())->setCommand($this);
+
+                // Run real: cada conjunto entra tudo-ou-nada — um abort do seeder
+                // (CSV corrompido) reverte limpo, sem deixar catálogo parcial gravado.
+                // Dry-run: roda dentro da transação externa, desfeita no finally.
+                $dryRun ? $seeder->run() : DB::transaction(fn () => $seeder->run());
+            }
+        } finally {
+            // Garante o rollback do dry-run mesmo que um seeder lance no meio do caminho.
+            if ($dryRun) {
+                DB::rollBack();
+                $this->info('DRY-RUN concluído — rollback aplicado.');
+            }
         }
 
         if ($dryRun) {
-            DB::rollBack();
-            $this->info('DRY-RUN concluído — rollback aplicado.');
-
             return self::SUCCESS;
         }
 

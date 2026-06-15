@@ -32,6 +32,16 @@ final class NcmSeeder extends CsvReferenceSeeder
         return ['descricao'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo', 'descricao'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 10000;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $codigo = $linha[0] ?? '';

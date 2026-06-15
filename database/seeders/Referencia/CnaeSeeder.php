@@ -32,6 +32,16 @@ final class CnaeSeeder extends CsvReferenceSeeder
         return ['descricao', 'secao', 'divisao', 'grupo', 'classe'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo', 'descricao', 'secao', 'divisao', 'grupo', 'classe'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 1300;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $codigo = $linha[0] ?? '';

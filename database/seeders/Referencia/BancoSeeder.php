@@ -32,6 +32,16 @@ final class BancoSeeder extends CsvReferenceSeeder
         return ['codigo_compe', 'nome', 'nome_completo'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['ispb', 'codigo_compe', 'nome', 'nome_completo'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 400;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $ispb = $linha[0] ?? '';

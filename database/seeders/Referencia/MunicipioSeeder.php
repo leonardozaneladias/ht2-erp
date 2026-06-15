@@ -37,6 +37,16 @@ final class MunicipioSeeder extends CsvReferenceSeeder
         return ['nome', 'estado_id'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo_ibge', 'nome'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 5560;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $codigo = $linha[0] ?? '';

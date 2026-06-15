@@ -31,6 +31,16 @@ final class TipoLogradouroSeeder extends CsvReferenceSeeder
         return ['codigo', 'abrev'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['nome', 'codigo', 'abrev'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 25;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $nome = $linha[0] ?? '';

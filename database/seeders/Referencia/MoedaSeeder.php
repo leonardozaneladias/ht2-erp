@@ -32,6 +32,16 @@ final class MoedaSeeder extends CsvReferenceSeeder
         return ['numerico', 'nome', 'simbolo', 'casas_decimais'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo_iso', 'numerico', 'nome', 'simbolo', 'casas_decimais'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 30;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $iso = mb_strtoupper($linha[0] ?? '');

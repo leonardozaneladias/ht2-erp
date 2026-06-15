@@ -32,6 +32,16 @@ final class PaisSeeder extends CsvReferenceSeeder
         return ['codigo_iso3', 'codigo_numerico', 'nome'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo_iso2', 'codigo_iso3', 'codigo_numerico', 'nome'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 190;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $iso2 = mb_strtoupper($linha[0] ?? '');

@@ -33,6 +33,16 @@ final class EstadoSeeder extends CsvReferenceSeeder
         return ['sigla', 'nome', 'regiao'];
     }
 
+    protected function cabecalhoEsperado(): ?array
+    {
+        return ['codigo_ibge', 'sigla', 'nome'];
+    }
+
+    protected function minimoEsperado(): int
+    {
+        return 27;
+    }
+
     protected function mapearLinha(array $linha): ?array
     {
         $codigoIbge = $linha[0] ?? '';
