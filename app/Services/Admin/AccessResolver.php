@@ -58,6 +58,40 @@ final class AccessResolver
     }
 
     /**
+     * Decide se o usuário tem a habilidade numa empresa arbitrária (RBAC estrito
+     * por empresa), considerando o conjunto pleno de papéis daquele tenant —
+     * global ∪ papéis por empresa — SEM a lente do perfil ativo (que vale apenas
+     * para a empresa ativa). Precedência: super-admin > deny > grant > role.
+     *
+     * Usado pelas listagens multi-empresa para decidir quais empresas o usuário
+     * pode incluir no filtro. Nunca vaza acesso: empresa sem o papel certo retorna false.
+     */
+    public function permiteNaEmpresa(AdminUser $user, string $ability, int $empresaId): bool
+    {
+        if ($this->ehSuperAdmin($user)) {
+            return true;
+        }
+
+        $snapshot = $this->cache->snapshotEmpresa($user, $empresaId);
+
+        if (in_array($ability, $snapshot['denies'], true)) {
+            return false;
+        }
+
+        if (in_array($ability, $snapshot['grants'], true)) {
+            return true;
+        }
+
+        foreach ($snapshot['roles'] as $role) {
+            if (in_array($ability, $snapshot['perms_por_role'][$role] ?? [], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Permissões líquidas efetivas (já com perfil ativo e denies aplicados).
      *
      * @return Collection<int, string>

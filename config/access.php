@@ -105,6 +105,10 @@ return [
                 'label' => 'Gerenciar acesso a empresas',
                 'descricao' => 'Definir quais empresas e filiais cada usuário acessa.',
             ],
+            'listagens.multi_empresa' => [
+                'label' => 'Filtro multi-empresa nas listagens',
+                'descricao' => 'Incluir registros de outras empresas/filiais acessíveis nas listagens (além da empresa ativa).',
+            ],
         ],
 
         ModuloAcesso::Usuarios->value => [

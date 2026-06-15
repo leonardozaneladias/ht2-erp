@@ -37,6 +37,24 @@ final class AccessCache
     }
 
     /**
+     * Snapshot bruto de acesso para uma empresa arbitrária (não necessariamente
+     * a ativa). Usado para decidir elegibilidade em listagens multi-empresa, onde
+     * conta o conjunto pleno de papéis do usuário naquele tenant (sem a lente do
+     * perfil ativo, que só vale para a empresa ativa).
+     *
+     * @return array{roles: list<string>, perms_por_role: array<string, list<string>>, grants: list<string>, denies: list<string>}
+     */
+    public function snapshotEmpresa(AdminUser $user, int $empresaId): array
+    {
+        $chave = $this->chave($user, $empresaId);
+
+        /** @var array{roles: list<string>, perms_por_role: array<string, list<string>>, grants: list<string>, denies: list<string>} $dados */
+        $dados = $this->store()->remember($chave, $this->ttl(), fn (): array => $this->montar($user, $empresaId));
+
+        return $dados;
+    }
+
+    /**
      * Invalida o snapshot do usuário em todas as empresas (bump da versão por usuário).
      */
     public function esquecer(AdminUser $user): void
