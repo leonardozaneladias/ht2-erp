@@ -23,3 +23,23 @@ it('semeia a empresa demonstração com matriz e vincula os admins', function ()
     expect($admin->temAcessoAEmpresa($empresa->id))->toBeTrue()
         ->and($admin->empresa_ativa_id)->toBe($empresa->id);
 });
+
+it('semeia 2+ empresas e habilita o filtro multi-empresa para o gestor', function () {
+    $this->seed(DatabaseSeeder::class);
+
+    expect(Empresa::query()->count())->toBeGreaterThanOrEqual(2);
+
+    $gestor = AdminUser::query()->where('email', 'gestor@example.com')->firstOrFail();
+
+    // O gestor acessa 2+ empresas e tem produtos.listar em todas elas (papel
+    // global) → o filtro multi-empresa fica de fato disponível na demo.
+    expect($gestor->empresasAcessiveis()->count())->toBeGreaterThanOrEqual(2);
+
+    $resolver = app(App\Services\Admin\AccessResolver::class);
+
+    $elegiveis = Empresa::query()
+        ->pluck('id')
+        ->filter(fn (int $id): bool => $resolver->permiteNaEmpresa($gestor, 'produtos.listar', $id));
+
+    expect($elegiveis->count())->toBeGreaterThanOrEqual(2);
+});

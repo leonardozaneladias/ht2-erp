@@ -41,6 +41,12 @@ class RolePermissionSeeder extends Seeder
         DB::table('roles')
             ->where('id', $gestor->getKey())
             ->update(['nivel' => $niveis['gestor'] ?? 50]);
-        $gestor->syncPermissions(['dashboard.view', 'usuarios.listar', 'listagens.multi_empresa']);
+        $gestor->syncPermissions([
+            'dashboard.view',
+            'usuarios.listar',
+            'produtos.listar',
+            'exemplos.listar',
+            'listagens.multi_empresa',
+        ]);
     }
 }

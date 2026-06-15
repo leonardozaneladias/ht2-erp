@@ -11,7 +11,7 @@ class EmpresaSeeder extends Seeder
 {
     public function run(): void
     {
-        $empresa = Empresa::firstOrCreate(
+        $demonstracao = Empresa::firstOrCreate(
             ['nome' => 'Empresa Demonstração'],
             [
                 'razao_social' => 'Empresa Demonstração LTDA',
@@ -19,7 +19,28 @@ class EmpresaSeeder extends Seeder
             ],
         );
 
-        $empresa->filiais()->firstOrCreate(
+        $demonstracao->filiais()->firstOrCreate(
+            ['nome' => 'Matriz'],
+            ['e_matriz' => true, 'ativo' => true],
+        );
+
+        // Segunda filial: demonstra a dimensão filial do filtro multi-empresa.
+        $demonstracao->filiais()->firstOrCreate(
+            ['nome' => 'Filial Centro'],
+            ['e_matriz' => false, 'ativo' => true],
+        );
+
+        // Segunda empresa: habilita o filtro multi-empresa nas listagens (exige
+        // 2+ empresas elegíveis) para usuários com a capacidade.
+        $comercio = Empresa::firstOrCreate(
+            ['nome' => 'Comércio Demonstração'],
+            [
+                'razao_social' => 'Comércio Demonstração LTDA',
+                'ativo' => true,
+            ],
+        );
+
+        $comercio->filiais()->firstOrCreate(
             ['nome' => 'Matriz'],
             ['e_matriz' => true, 'ativo' => true],
         );
