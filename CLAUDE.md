@@ -216,7 +216,8 @@ resources/views/livewire/admin/  ← Views dos componentes
 - **PostgreSQL 16**
 - Valores monetários: colunas `INTEGER` (centavos)
 - Índices em FKs, campos de filtro, status, datas
-- Soft-delete via campo `ativo` em entidades principais
+- Status operacional via campo `ativo` (liga/desliga; o registro segue visível)
+- **Lixeira** via `deleted_at` (`SoftDeletes`), independente de `ativo`: excluir manda para a lixeira (some da listagem, restaurável). Trait genérico `App\Livewire\Concerns\ComLixeira`; 3 níveis de permissão por módulo (`deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete). Models implementam `App\Models\Contracts\UsaSoftDeletes`. Ver [`docs/lixeira.md`](docs/lixeira.md).
 - `activity_log`: append-only (spatie/laravel-activitylog)
 
 ### Migrations de infra disponíveis (não alterar)

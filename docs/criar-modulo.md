@@ -36,8 +36,17 @@ Para `make:modulo Cliente` o gerador cria (tudo com `declare(strict_types=1)`):
 | Views                 | `resources/views/livewire/admin/clientes/{index-clientes,form-cliente,_acoes}.blade.php`                         |
 | Teste Feature         | `tests/Feature/Admin/Clientes/ClienteCrudTest.php`                                                               |
 | Rotas                 | injetadas em `routes/admin.php` (`admin.clientes.{index,create,edit}`)                                           |
-| Permissões            | injetadas em `config/access.php` (`clientes.{listar,criar,editar,deletar}`)                                      |
+| Permissões            | injetadas em `config/access.php` (`clientes.{listar,criar,editar,deletar,restaurar,excluir_permanente}`)         |
 | Menu lateral          | item injetado em `config/admin-menu.php` (seção **Negócio**), visível só p/ super-admin até atribuir a permissão |
+
+## Lixeira (soft-delete)
+
+Por padrão, todo módulo nasce com **lixeira**: o model usa `SoftDeletes` (coluna
+`deleted_at`) e implementa `UsaSoftDeletes`, a Table ganha o toggle "Ver lixeira"
+e as ações excluir → restaurar → excluir definitivamente (trait `ComLixeira`), e
+as permissões `restaurar` + `excluir_permanente` entram no catálogo. Use
+`--sem-soft-delete` para a saída antiga (sem lixeira). Detalhes em
+[`lixeira.md`](lixeira.md).
 
 ## Gramática de `--fields`
 

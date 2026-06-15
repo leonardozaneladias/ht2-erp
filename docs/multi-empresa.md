@@ -88,9 +88,14 @@ Conceder a um usuário **acesso** a uma empresa (independente de papéis) é fei
 ### Filtro multi-empresa nas listagens (trait `FiltraPorMultiEmpresa`)
 
 Por padrão, cada listagem (PowerGrid) mostra **só a empresa ativa** (global scope `empresa`).
-O trait `App\Livewire\Concerns\FiltraPorMultiEmpresa` dá a usuários autorizados um
-**multiselect de empresa (e filial)** para ver registros de várias empresas/filiais de uma vez,
-com uma coluna **Empresa** (e **Filial**) identificando cada linha.
+
+A **lixeira** (trait `ComLixeira`) compõe **por fora** deste escopo:
+`aplicarLixeira($this->aplicarEscopoMultiEmpresa(Model::query()))` — os global scopes
+`empresa` e `SoftDeletingScope` são independentes. Ver [`lixeira.md`](lixeira.md).
+
+> O trait `App\Livewire\Concerns\FiltraPorMultiEmpresa` dá a usuários autorizados um
+> **multiselect de empresa (e filial)** para ver registros de várias empresas/filiais de uma vez,
+> com uma coluna **Empresa** (e **Filial**) identificando cada linha.
 
 O recurso aparece somente quando o usuário **tem a permissão global `listagens.multi_empresa`**
 **e** é elegível em **2+ empresas**. Caso contrário, a listagem se comporta exatamente como hoje
