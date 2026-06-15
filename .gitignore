@@ -63,3 +63,4 @@ __pycache__/
 
 # Testes de browser (Pest + Playwright)
 /tests/Browser/Screenshots
+.workflows/.cache/

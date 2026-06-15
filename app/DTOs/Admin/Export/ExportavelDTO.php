@@ -19,5 +19,6 @@ final readonly class ExportavelDTO
         public string $titulo,
         public array $colunas,
         public array $linhas,
+        public ?string $logoUrl = null,
     ) {}
 }

@@ -67,6 +67,13 @@
 </head>
 <body>
     <div class="cabecalho">
+        @if ($dados->logoUrl)
+            <img
+                src="{{ $dados->logoUrl }}"
+                alt="Logo"
+                style="max-height: 40px; max-width: 160px; margin-bottom: 6px"
+            />
+        @endif
         <h1 class="titulo">{{ $dados->titulo }}</h1>
         <p class="meta">Gerado em {{ $geradoEm }} · {{ count($dados->linhas) }} registro(s)</p>
     </div>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Export;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
+use App\Services\Admin\Settings\BrandingService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\DomPDF\PDF as DomPdf;
 
@@ -15,9 +16,18 @@ use Barryvdh\DomPDF\PDF as DomPdf;
  */
 final class ExportarTabelaPdfAction
 {
+    public function __construct(private readonly BrandingService $branding) {}
+
     public function execute(ExportavelDTO $dados): DomPdf
     {
-        return Pdf::loadView('exports.tabela-pdf', ['dados' => $dados])
+        $dadosComLogo = new ExportavelDTO(
+            titulo: $dados->titulo,
+            colunas: $dados->colunas,
+            linhas: $dados->linhas,
+            logoUrl: $this->branding->logoUrl('light'),
+        );
+
+        return Pdf::loadView('exports.tabela-pdf', ['dados' => $dadosComLogo])
             ->setPaper('a4', 'landscape');
     }
 }
