@@ -166,5 +166,12 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         Route::get('/{exemplo}/editar', App\Livewire\Admin\Exemplos\FormExemplo::class)->name('edit');
     });
 
+    // Rotas contribuídas por módulos-pacote (ADR-0015). Cada pacote registra seu
+    // callback em App\Support\Modules\ModuleRegistry no register() do provider;
+    // aqui elas entram no grupo autenticado, herdando todo o middleware admin.
+    foreach (App\Support\Modules\ModuleRegistry::routeCallbacks() as $registrarRotasDoModulo) {
+        $registrarRotasDoModulo();
+    }
+
     // Adicione aqui as rotas do seu módulo de negócio
 });
