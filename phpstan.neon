@@ -5,4 +5,10 @@ parameters:
     level: 6
     paths:
         - app/
+        - packages/modulo-rh/src/
+    # Larastan infere as colunas dos models a partir das migrations. Inclui as
+    # dos módulos-pacote (HT2 ERP) para que os models do pacote sejam conhecidos.
+    databaseMigrationsPath:
+        - database/migrations
+        - packages/modulo-rh/database/migrations
     treatPhpDocTypesAsCertain: false

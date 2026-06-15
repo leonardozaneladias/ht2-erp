@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "75cf0d9ce8ddd328b4cc855583ca1c11",
+    "content-hash": "8b5500fab7be93ca849f323fdbb8994e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1709,6 +1709,45 @@
                 }
             ],
             "time": "2025-08-22T14:27:06+00:00"
+        },
+        {
+            "name": "ht2erp/modulo-rh",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/modulo-rh",
+                "reference": "704194505ae85c6898c30cd32a42bfca2975da5b"
+            },
+            "require": {
+                "php": "^8.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HT2ERP\\Rh\\RhServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HT2ERP\\Rh\\": "src/",
+                    "HT2ERP\\Rh\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "HT2ERP\\Rh\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Módulo Rh do HT2 ERP.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "laravel/framework",
@@ -14216,7 +14255,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "ht2erp/modulo-rh": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
