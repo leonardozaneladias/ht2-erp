@@ -25,7 +25,7 @@ final class MoneyCast implements CastsAttributes
             return null;
         }
 
-        return Money::deCentavos((int) $value);
+        return Money::fromCentavos((int) $value);
     }
 
     /**
@@ -34,7 +34,7 @@ final class MoneyCast implements CastsAttributes
     public function set(Model $model, string $key, mixed $value, array $attributes): int
     {
         if ($value instanceof Money) {
-            return $value->centavos;
+            return $value->centavos();
         }
 
         if (is_int($value)) {

@@ -6,7 +6,6 @@ namespace App\Support\Money;
 
 use InvalidArgumentException;
 use NumberFormatter;
-use Stringable;
 
 /**
  * Value Object imutável para valores monetários em centavos.
@@ -17,19 +16,23 @@ use Stringable;
  * - Operações aritméticas retornam nova instância.
  * - Formatação localizada via Intl (pt-BR por padrão).
  */
-final class Money implements Stringable
+final readonly class Money
 {
-    public function __construct(
-        public readonly int $centavos,
-    ) {
+    private function __construct(private int $centavos)
+    {
         if ($centavos < 0) {
             throw new InvalidArgumentException("Valor monetário não pode ser negativo: {$centavos}");
         }
     }
 
-    public static function deCentavos(int $centavos): self
+    public static function fromCentavos(int $centavos): self
     {
         return new self($centavos);
+    }
+
+    public static function fromReais(float|string $reais): self
+    {
+        return new self((int) round((float) $reais * 100));
     }
 
     public static function zero(): self
@@ -37,14 +40,26 @@ final class Money implements Stringable
         return new self(0);
     }
 
+    // ---- Accessors -----------------------------------------------------------
+
+    public function centavos(): int
+    {
+        return $this->centavos;
+    }
+
+    public function toInt(): int
+    {
+        return $this->centavos;
+    }
+
     // ---- Aritmética (retorna nova instância) ----------------------------------
 
-    public function somar(self $outro): self
+    public function mais(self $outro): self
     {
         return new self($this->centavos + $outro->centavos);
     }
 
-    public function subtrair(self $outro): self
+    public function menos(self $outro): self
     {
         return new self($this->centavos - $outro->centavos);
     }
@@ -71,7 +86,7 @@ final class Money implements Stringable
         return $this->centavos < $outro->centavos;
     }
 
-    public function ehZero(): bool
+    public function eZero(): bool
     {
         return $this->centavos === 0;
     }
@@ -85,7 +100,7 @@ final class Money implements Stringable
     }
 
     /** Formata como BRL: R$ 1.234,56 */
-    public function formatarBRL(): string
+    public function formatado(): string
     {
         $formatter = new NumberFormatter('pt_BR', NumberFormatter::CURRENCY);
 
@@ -94,6 +109,6 @@ final class Money implements Stringable
 
     public function __toString(): string
     {
-        return $this->formatarBRL();
+        return $this->formatado();
     }
 }

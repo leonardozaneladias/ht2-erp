@@ -15,7 +15,7 @@ it('converte int do banco para Money VO', function (): void {
     $result = $cast->get($model, 'preco', 1990, []);
 
     expect($result)->toBeInstanceOf(Money::class);
-    expect($result->centavos)->toBe(1990);
+    expect($result->centavos())->toBe(1990);
 });
 
 it('retorna null quando valor do banco é null', function (): void {
@@ -31,7 +31,7 @@ it('converte Money VO para int', function (): void {
     $cast = new MoneyCast;
     $model = Mockery::mock(Model::class);
 
-    $result = $cast->set($model, 'preco', Money::deCentavos(5000), []);
+    $result = $cast->set($model, 'preco', Money::fromCentavos(5000), []);
 
     expect($result)->toBe(5000);
 });
