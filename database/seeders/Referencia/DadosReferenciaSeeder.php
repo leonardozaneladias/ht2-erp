@@ -22,6 +22,13 @@ final class DadosReferenciaSeeder extends Seeder
         'paises' => PaisSeeder::class,
         'estados' => EstadoSeeder::class,
         'municipios' => MunicipioSeeder::class,
+        'moedas' => MoedaSeeder::class,
+        'bancos' => BancoSeeder::class,
+        'cargos' => CargoSeeder::class,
+        'tipos_logradouro' => TipoLogradouroSeeder::class,
+        'cnaes' => CnaeSeeder::class,
+        'cfops' => CfopSeeder::class,
+        'ncms' => NcmSeeder::class,
     ];
 
     public function run(): void

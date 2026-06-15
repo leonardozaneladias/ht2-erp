@@ -23,12 +23,22 @@ chama o agregador antes dos seeders de demo).
 
 ## Conjuntos
 
-| Arquivo          | Fonte                     | Encoding | Contagem-âncora |
-| ---------------- | ------------------------- | -------- | --------------- |
-| `estados.csv`    | IBGE (fixo, 27 UF)        | UTF-8    | 27              |
-| `paises.csv`     | IBGE (ISO 3166-1, ONU)    | UTF-8    | 193             |
-| `municipios.csv` | IBGE (API de localidades) | UTF-8    | 5.571           |
+| Arquivo                | Fonte                                 | Contagem-âncora |
+| ---------------------- | ------------------------------------- | --------------- |
+| `paises.csv`           | IBGE (ISO 3166-1, ONU)                | 193             |
+| `estados.csv`          | IBGE (fixo, 27 UF)                    | 27              |
+| `municipios.csv`       | IBGE (API de localidades)             | 5.571           |
+| `moedas.csv`           | ISO 4217 (curado)                     | 35              |
+| `bancos.csv`           | BrasilAPI/BACEN (SPB)                 | 478             |
+| `cargos.csv`           | MTE-CBO (starter, editável)           | 22              |
+| `tipos_logradouro.csv` | lista pública (curado)                | 28              |
+| `cnaes.csv`            | IBGE/Concla (subclasses)              | 1.332           |
+| `cfops.csv`            | CONFAZ (comuns, curado)               | 30              |
+| `ncms.csv`             | Siscomex via BrasilAPI (8 díg ativos) | 10.435          |
 
-> Demais conjuntos (moedas, bancos, cargos/CBO, tipos de logradouro, CNAE, CFOP,
-> NCM) entram conforme as fases B2–B4. Cada adição: novo CSV aqui + seeder +
-> entrada no mapa `DadosReferenciaSeeder::CONJUNTOS` + contagem-âncora no teste.
+Todos UTF-8. `cargos`, `cfops` e `tipos_logradouro` são conjuntos curados/starter
+(a expandir); os demais são listas autoritativas completas. Para adicionar/atualizar
+um conjunto: novo CSV aqui + seeder + entrada em `DadosReferenciaSeeder::CONJUNTOS`
+
+- contagem-âncora no teste. Para regerar a partir das fontes, refetch (IBGE/BrasilAPI)
+  e normalize para UTF-8.

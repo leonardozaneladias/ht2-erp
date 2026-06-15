@@ -1,0 +1,36 @@
+codigo_iso,numerico,nome,simbolo,casas_decimais
+AED,784,Dirham dos Emirados Árabes,د.إ,2
+ARS,032,Peso argentino,$,2
+AUD,036,Dólar australiano,A$,2
+BOB,068,Boliviano,Bs,2
+BRL,986,Real,R$,2
+CAD,124,Dólar canadense,C$,2
+CHF,756,Franco suíço,CHF,2
+CLP,152,Peso chileno,$,0
+CNY,156,Yuan chinês,¥,2
+COP,170,Peso colombiano,$,2
+CZK,203,Coroa tcheca,Kč,2
+DKK,208,Coroa dinamarquesa,kr,2
+EUR,978,Euro,€,2
+GBP,826,Libra esterlina,£,2
+HKD,344,Dólar de Hong Kong,HK$,2
+ILS,376,Novo shekel israelense,₪,2
+INR,356,Rupia indiana,₹,2
+JPY,392,Iene japonês,¥,0
+KRW,410,Won sul-coreano,₩,0
+MXN,484,Peso mexicano,$,2
+NOK,578,Coroa norueguesa,kr,2
+NZD,554,Dólar neozelandês,NZ$,2
+PEN,604,Sol peruano,S/,2
+PLN,985,Złoty polonês,zł,2
+PYG,600,Guarani,₲,0
+RUB,643,Rublo russo,₽,2
+SAR,682,Rial saudita,﷼,2
+SEK,752,Coroa sueca,kr,2
+SGD,702,Dólar de Singapura,S$,2
+THB,764,Baht tailandês,฿,2
+TRY,949,Lira turca,₺,2
+USD,840,Dólar americano,US$,2
+UYU,858,Peso uruguaio,$U,2
+VES,928,Bolívar venezuelano,Bs,2
+ZAR,710,Rand sul-africano,R,2

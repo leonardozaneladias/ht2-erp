@@ -1,0 +1,31 @@
+codigo,descricao,aplicacao
+1101,Compra para industrialização ou produção rural,Operação interna
+1102,Compra para comercialização,Operação interna
+1201,Devolução de venda de produção do estabelecimento,Operação interna
+1202,Devolução de venda de mercadoria adquirida ou recebida de terceiros,Operação interna
+1403,Compra de mercadoria para comercialização sujeita a ST,Operação interna
+1551,Compra de bem para o ativo imobilizado,Operação interna
+1556,Compra de material para uso ou consumo,Operação interna
+1949,Outra entrada de mercadoria ou prestação de serviço não especificada,Operação interna
+2101,Compra para industrialização ou produção rural,Operação interestadual
+2102,Compra para comercialização,Operação interestadual
+2403,Compra de mercadoria para comercialização sujeita a ST,Operação interestadual
+2551,Compra de bem para o ativo imobilizado,Operação interestadual
+2556,Compra de material para uso ou consumo,Operação interestadual
+3101,Compra para industrialização ou produção rural,Importação
+3102,Compra para comercialização,Importação
+5101,Venda de produção do estabelecimento,Operação interna
+5102,Venda de mercadoria adquirida ou recebida de terceiros,Operação interna
+5201,Devolução de compra para industrialização ou produção rural,Operação interna
+5202,Devolução de compra para comercialização,Operação interna
+5403,Venda de mercadoria sujeita a ST na condição de substituto tributário,Operação interna
+5405,Venda de mercadoria sujeita a ST na condição de substituído,Operação interna
+5551,Venda de bem do ativo imobilizado,Operação interna
+5910,"Remessa em bonificação, doação ou brinde",Operação interna
+5949,Outra saída de mercadoria ou prestação de serviço não especificada,Operação interna
+6101,Venda de produção do estabelecimento,Operação interestadual
+6102,Venda de mercadoria adquirida ou recebida de terceiros,Operação interestadual
+6108,Venda de mercadoria adquirida de terceiros destinada a não contribuinte,Operação interestadual
+6404,Venda de mercadoria sujeita a ST cujo imposto já tenha sido retido,Operação interestadual
+7101,Venda de produção do estabelecimento,Exportação
+7102,Venda de mercadoria adquirida ou recebida de terceiros,Exportação
