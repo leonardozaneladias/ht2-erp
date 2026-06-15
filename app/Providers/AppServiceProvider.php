@@ -13,6 +13,7 @@ use App\Policies\PermissionGrantPolicy;
 use App\Policies\RolePolicy;
 use App\Services\Admin\AccessResolver;
 use App\Services\Admin\Settings\SettingsRuntimeApplier;
+use App\Support\Documents\GeradorNumeroDocumento;
 use App\Support\Impersonation\ImpersonationContext;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AccessResolver::class);
         $this->app->singleton(\App\Support\Tenancy\TenantContext::class);
         $this->app->singleton(ImpersonationContext::class);
+        $this->app->singleton(GeradorNumeroDocumento::class);
     }
 
     public function boot(): void
