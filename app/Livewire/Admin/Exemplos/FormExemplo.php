@@ -20,7 +20,7 @@ class FormExemplo extends Component
     #[Locked]
     public ?int $exemploId = null;
 
-    public ?int $filial_id = null;
+    public ?string $filial_id = null;
 
     public string $nome = '';
 
@@ -68,7 +68,7 @@ class FormExemplo extends Component
             $this->authorize('update', $registro);
 
             $this->exemploId = $registro->id;
-            $this->filial_id = $registro->filial_id === null ? null : (int) $registro->filial_id;
+            $this->filial_id = $registro->filial_id === null ? null : (string) $registro->filial_id;
             $this->nome = (string) $registro->nome;
             $this->slug = (string) $registro->slug;
             $this->site = $registro->site;
