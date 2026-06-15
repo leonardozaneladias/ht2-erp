@@ -70,6 +70,7 @@ trait Auditavel
             'updated' => 'Registro atualizado',
             'deleted' => 'Registro excluído',
             'restored' => 'Registro restaurado',
+            'forceDeleted' => 'Registro excluído permanentemente',
             default => $evento,
         };
     }
