@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Support\Generator\CampoModulo;
 use App\Support\Generator\EspecificacaoModulo;
+use App\Support\Generator\ModuloPacote;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -29,6 +30,7 @@ final class MakeModuloCommand extends Command
         {nome : Nome do módulo no singular, PascalCase (ex.: Produto)}
         {--fields= : Lista "nome:tipo:modificador" separada por vírgula}
         {--tenant : Vincula o módulo à empresa ativa (trait BelongsToEmpresa)}
+        {--module= : Gera dentro de um módulo-pacote existente (ex.: Rh)}
         {--menu= : Rótulo do item de menu (default: nome no plural)}
         {--menu-icon=tabler--folder : Ícone do item de menu (Tabler)}
         {--skip-menu : Não injeta o item no menu lateral (config/admin-menu.php)}
@@ -54,7 +56,20 @@ final class MakeModuloCommand extends Command
         }
 
         $campos = $this->parseFields((string) $this->option('fields'));
-        $spec = new EspecificacaoModulo($nome, $campos, tenant: (bool) $this->option('tenant'));
+
+        $pacote = null;
+        $module = (string) $this->option('module');
+        if ($module !== '') {
+            $pacote = ModuloPacote::paraNome($module);
+            if (! File::isDirectory(base_path($pacote->dir))) {
+                $this->error("Módulo-pacote {$pacote->pacote} não encontrado em {$pacote->dir}.");
+                $this->line("Crie a casca primeiro:  php artisan make:modulo-pacote {$pacote->studly}");
+
+                return self::FAILURE;
+            }
+        }
+
+        $spec = new EspecificacaoModulo($nome, $campos, tenant: (bool) $this->option('tenant'), pacote: $pacote);
 
         $stubDir = base_path('stubs/modulo');
         if (! File::isDirectory($stubDir)) {
@@ -71,9 +86,13 @@ final class MakeModuloCommand extends Command
             $this->gerarArquivo($stubDir, $stub, $destino, $repl);
         }
 
-        $this->injetarRotas($spec);
-        $this->injetarPermissoes($spec);
-        $this->injetarMenu($spec);
+        if ($spec->pacote !== null) {
+            $this->integrarNoPacote($spec);
+        } else {
+            $this->injetarRotas($spec);
+            $this->injetarPermissoes($spec);
+            $this->injetarMenu($spec);
+        }
 
         $this->resumo($spec);
 
@@ -145,6 +164,10 @@ final class MakeModuloCommand extends Command
      */
     private function mapaArquivos(EspecificacaoModulo $spec): array
     {
+        if ($spec->pacote !== null) {
+            return $this->mapaArquivosPacote($spec);
+        }
+
         $studly = $spec->studly;
         $studlyPlural = $spec->studlyPlural;
         $snake = $spec->snake();
@@ -366,6 +389,172 @@ PHP;
         $icon = (string) $this->option('menu-icon');
 
         return "    ['key' => '{$base}', 'label' => '{$label}', 'icon' => '{$icon}', 'route' => 'admin.{$base}.index', 'permission' => '{$base}.listar', 'active' => ['admin.{$base}.*']],";
+    }
+
+    /**
+     * Mapa stub => caminho dentro do pacote (src/, database/, resources/, tests/).
+     *
+     * @return array<string, string>
+     */
+    private function mapaArquivosPacote(EspecificacaoModulo $spec): array
+    {
+        $pkg = $spec->pacote;
+        if ($pkg === null) {
+            return [];
+        }
+
+        $dir = $pkg->dir;
+        $studly = $spec->studly;
+        $studlyPlural = $spec->studlyPlural;
+        $snake = $spec->snake();
+        $snakePlural = $spec->snakePlural();
+        $migracao = now()->format('Y_m_d_His');
+
+        return [
+            'migration.stub' => "{$dir}/database/migrations/{$migracao}_create_{$spec->tabela()}_table.php",
+            'factory.stub' => "{$dir}/database/factories/{$studly}Factory.php",
+            'model.stub' => "{$dir}/src/Models/{$studly}.php",
+            'enum.stub' => "{$dir}/src/Enums/{$spec->statusEnumShort()}.php",
+            'dto.stub' => "{$dir}/src/DTOs/{$studly}DTO.php",
+            'rules.stub' => "{$dir}/src/Http/Requests/{$studly}Rules.php",
+            'store-request.stub' => "{$dir}/src/Http/Requests/Store{$studly}Request.php",
+            'update-request.stub' => "{$dir}/src/Http/Requests/Update{$studly}Request.php",
+            'create-action.stub' => "{$dir}/src/Actions/Create{$studly}Action.php",
+            'update-action.stub' => "{$dir}/src/Actions/Update{$studly}Action.php",
+            'service.stub' => "{$dir}/src/Services/{$studly}Service.php",
+            'policy.stub' => "{$dir}/src/Policies/{$studly}Policy.php",
+            'livewire-index.stub' => "{$dir}/src/Livewire/{$studlyPlural}/Index{$studly}.php",
+            'livewire-form.stub' => "{$dir}/src/Livewire/{$studlyPlural}/Form{$studly}.php",
+            'livewire-table.stub' => "{$dir}/src/Livewire/{$studlyPlural}/{$studly}Table.php",
+            'view-index.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/index-{$snakePlural}.blade.php",
+            'view-form.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/form-{$snake}.blade.php",
+            'view-acoes.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/_acoes.blade.php",
+            'view-export-pdf.stub' => "{$dir}/resources/views/livewire/{$snakePlural}/_export-pdf.blade.php",
+            'test.stub' => "{$dir}/tests/Feature/{$studlyPlural}/{$studly}CrudTest.php",
+        ];
+    }
+
+    /**
+     * Integra o CRUD ao pacote sem editar o core: rotas no routes/admin.php do
+     * pacote, permissões/menu no config/{slug}.php, componentes/policy no provider.
+     */
+    private function integrarNoPacote(EspecificacaoModulo $spec): void
+    {
+        $this->injetarRotasPacote($spec);
+        $this->injetarConfigPacote($spec);
+        $this->registrarNoProviderPacote($spec);
+    }
+
+    private function injetarRotasPacote(EspecificacaoModulo $spec): void
+    {
+        $pkg = $spec->pacote;
+        if ($pkg === null) {
+            return;
+        }
+
+        $arquivo = base_path("{$pkg->dir}/routes/admin.php");
+        $conteudo = (string) File::get($arquivo);
+        $nome = $spec->rotaNome();
+
+        if (str_contains($conteudo, "->name('{$nome}.')")) {
+            $this->pulados[] = "{$pkg->dir}/routes/admin.php (rotas já existem)";
+
+            return;
+        }
+
+        $prefixoUrl = $pkg->slug . '/' . $spec->kebabPlural();
+        $param = $spec->snake();
+        $index = '\\' . $spec->nsLivewire() . '\\Index' . $spec->studly;
+        $form = '\\' . $spec->nsLivewire() . '\\Form' . $spec->studly;
+        $marcador = '// make:modulo insere as rotas do módulo abaixo desta linha';
+
+        $bloco = implode("\n", [
+            $marcador,
+            "\\Illuminate\\Support\\Facades\\Route::prefix('{$prefixoUrl}')->name('{$nome}.')->group(function (): void {",
+            "    \\Illuminate\\Support\\Facades\\Route::get('/', {$index}::class)->name('index');",
+            "    \\Illuminate\\Support\\Facades\\Route::get('/criar', {$form}::class)->name('create');",
+            "    \\Illuminate\\Support\\Facades\\Route::get('/{{$param}}/editar', {$form}::class)->name('edit');",
+            '});',
+        ]);
+
+        File::put($arquivo, str_replace($marcador, $bloco, $conteudo));
+        $this->criados[] = "{$pkg->dir}/routes/admin.php (rotas)";
+    }
+
+    private function injetarConfigPacote(EspecificacaoModulo $spec): void
+    {
+        $pkg = $spec->pacote;
+        if ($pkg === null) {
+            return;
+        }
+
+        $arquivo = base_path("{$pkg->dir}/config/{$pkg->slug}.php");
+        $conteudo = (string) File::get($arquivo);
+        $base = $spec->permissaoBase();
+
+        $marcadorPerm = '        // make:modulo insere as permissões do módulo acima desta linha';
+        if (! str_contains($conteudo, "'{$base}.listar'") && str_contains($conteudo, $marcadorPerm)) {
+            $linhas = [];
+            foreach ($spec->permissoes() as $perm => $meta) {
+                $linhas[] = "        '{$perm}' => ['label' => '{$meta['label']}', 'descricao' => '{$meta['descricao']}'],";
+            }
+            $conteudo = str_replace($marcadorPerm, implode("\n", $linhas) . "\n" . $marcadorPerm, $conteudo);
+        }
+
+        $key = $pkg->slug . '-' . $spec->snakePlural();
+        $marcadorMenu = '        // make:modulo insere os itens de menu do módulo acima desta linha';
+        if (! str_contains($conteudo, "'key' => '{$key}'") && str_contains($conteudo, $marcadorMenu)) {
+            $label = (string) ($this->option('menu') ?: $spec->studlyPlural);
+            $icon = (string) $this->option('menu-icon');
+            $bloco = implode("\n", [
+                '        [',
+                "            'key' => '{$key}',",
+                "            'label' => '{$label}',",
+                "            'icon' => '{$icon}',",
+                "            'route' => 'admin.{$base}.index',",
+                "            'permission' => '{$base}.listar',",
+                "            'active' => ['admin.{$base}.*'],",
+                '        ],',
+                $marcadorMenu,
+            ]);
+            $conteudo = str_replace($marcadorMenu, $bloco, $conteudo);
+        }
+
+        File::put($arquivo, $conteudo);
+        $this->criados[] = "{$pkg->dir}/config/{$pkg->slug}.php (permissões + menu)";
+    }
+
+    private function registrarNoProviderPacote(EspecificacaoModulo $spec): void
+    {
+        $pkg = $spec->pacote;
+        if ($pkg === null) {
+            return;
+        }
+
+        $arquivo = base_path("{$pkg->dir}/src/{$pkg->providerClass}.php");
+        $conteudo = (string) File::get($arquivo);
+        $nsLw = '\\' . $spec->nsLivewire();
+        $table = $nsLw . '\\' . $spec->studly . 'Table';
+
+        $marcador = '        // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha';
+        if (str_contains($conteudo, "{$table}::class") || ! str_contains($conteudo, $marcador)) {
+            return;
+        }
+
+        $model = '\\' . $spec->nsModels() . '\\' . $spec->studly;
+        $policy = '\\' . $spec->nsPolicies() . '\\' . $spec->studly . 'Policy';
+        $nome = $spec->rotaNome();
+
+        $linhas = [
+            "        \\Livewire\\Livewire::component('{$nome}.index', {$nsLw}\\Index{$spec->studly}::class);",
+            "        \\Livewire\\Livewire::component('{$nome}.form', {$nsLw}\\Form{$spec->studly}::class);",
+            "        \\Livewire\\Livewire::component('{$spec->lwTag()}', {$table}::class);",
+            "        \\Illuminate\\Support\\Facades\\Gate::policy({$model}::class, {$policy}::class);",
+            $marcador,
+        ];
+
+        File::put($arquivo, str_replace($marcador, implode("\n", $linhas), $conteudo));
+        $this->criados[] = "{$pkg->dir}/src/{$pkg->providerClass}.php (componentes + policy)";
     }
 
     private function resumo(EspecificacaoModulo $spec): void

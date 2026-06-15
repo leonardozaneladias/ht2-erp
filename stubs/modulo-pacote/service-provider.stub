@@ -45,7 +45,7 @@ final class __PROVIDER_CLASS__ extends ServiceProvider
         $this->contribuirPermissoes();
         $this->contribuirMenu();
 
-        // make:modulo registra aqui os componentes Livewire e as Policies do módulo.
+        // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha
     }
 
     /**
