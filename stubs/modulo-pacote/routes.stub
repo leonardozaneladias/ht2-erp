@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+|--------------------------------------------------------------------------
+| Rotas do módulo __MODULO_STUDLY__
+|--------------------------------------------------------------------------
+|
+| Este arquivo é incluído (require) DENTRO do grupo autenticado /admin do core
+| (ver App\Support\Modules\ModuleRegistry e routes/admin.php), portanto as rotas
+| abaixo já herdam o prefixo /admin, o name "admin." e todo o middleware admin.
+| Use prefixos e names RELATIVOS (ex.: Route::prefix('__MODULO_SLUG__')...).
+|
+*/
+
+// make:modulo insere as rotas do módulo abaixo desta linha

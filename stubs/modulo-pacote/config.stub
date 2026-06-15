@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+|--------------------------------------------------------------------------
+| Configuração do módulo __MODULO_STUDLY__ (HT2 ERP)
+|--------------------------------------------------------------------------
+|
+| Publicável: php artisan vendor:publish --tag=__MODULO_SLUG__-config
+| É aqui que mora a customização por cliente (config-driven, ADR-0015): o
+| catálogo de permissões e os itens de menu do módulo. O make:modulo preenche
+| estas listas ao gerar cada recurso CRUD.
+|
+*/
+
+return [
+    // Permissões do módulo, no formato do catálogo do core (config/access.php).
+    'permissoes' => [
+        // '__MODULO_SLUG__.exemplo.listar' => ['label' => 'Listar exemplos', 'descricao' => 'Ver a listagem.'],
+    ],
+
+    // Itens de menu (seção "Negócio" da sidebar).
+    'menu' => [
+        // [
+        //     'key' => '__MODULO_SLUG__-exemplo',
+        //     'label' => 'Exemplos',
+        //     'icon' => 'tabler--folder',
+        //     'route' => 'admin.__MODULO_SLUG__.exemplo.index',
+        //     'permission' => '__MODULO_SLUG__.exemplo.listar',
+        //     'active' => ['admin.__MODULO_SLUG__.exemplo.*'],
+        // ],
+    ],
+];

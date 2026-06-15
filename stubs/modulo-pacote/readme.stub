@@ -1,0 +1,36 @@
+# __PKG_NAME__
+
+Módulo **__MODULO_STUDLY__** do HT2 ERP.
+
+Pacote Composer instalável que adiciona o módulo __MODULO_STUDLY__ a qualquer
+instalação do HT2 ERP, sem editar o core (ver ADR-0015).
+
+## Instalar em um cliente
+
+```bash
+composer require __PKG_NAME__
+php artisan migrate --force
+php artisan access:sync
+php artisan cache:clear
+```
+
+Depois, atribua as permissões do módulo aos perfis em `/admin/acesso`.
+
+## Customização por cliente
+
+Publique a config e ajuste permissões/menu sem tocar no pacote:
+
+```bash
+php artisan vendor:publish --tag=__MODULO_SLUG__-config
+```
+
+## Desenvolvimento
+
+Durante o desenvolvimento o pacote vive em `packages/__MODULO_SLUG__` do
+boilerplate (path repository, symlink). Para gerar recursos CRUD dentro dele:
+
+```bash
+php artisan make:modulo Recurso --module=__MODULO_STUDLY__ --fields="..."
+```
+
+Ao estabilizar, promova a um repositório Git próprio e versione por tag (semver).
