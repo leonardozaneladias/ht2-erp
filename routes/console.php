@@ -19,3 +19,7 @@ Schedule::command('access:expirar')->hourly();                        // revoga 
 Schedule::command('auth:clear-resets')->daily();                      // tokens de reset de senha expirados
 Schedule::command('queue:prune-failed', ['--hours' => 168])->daily(); // failed jobs com mais de 7 dias
 Schedule::command('horizon:snapshot')->everyFiveMinutes();            // snapshot de métricas do Horizon
+
+// Backup diário (spatie/laravel-backup). Ajuste destino/retenção em config/backup.php.
+Schedule::command('backup:clean')->daily()->at('01:00');              // remove backups além da retenção
+Schedule::command('backup:run')->daily()->at('01:30');                // backup de banco + arquivos
