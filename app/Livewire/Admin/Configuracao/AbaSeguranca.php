@@ -37,6 +37,8 @@ class AbaSeguranca extends Component
 
     public bool $exigir_2fa_admin = false;
 
+    public bool $permitir_2fa_email = false;
+
     public int $dias_retencao_logs = 365;
 
     public int $login_max_tentativas = 5;
@@ -59,6 +61,7 @@ class AbaSeguranca extends Component
         $this->senha_exige_especial = $settings->senha_exige_especial;
         $this->sessao_timeout_minutos = $settings->sessao_timeout_minutos;
         $this->exigir_2fa_admin = $settings->exigir_2fa_admin;
+        $this->permitir_2fa_email = $settings->permitir_2fa_email;
         $this->dias_retencao_logs = $settings->dias_retencao_logs;
         $this->login_max_tentativas = $settings->login_max_tentativas;
         $this->login_janela_minutos = $settings->login_janela_minutos;
@@ -90,6 +93,7 @@ class AbaSeguranca extends Component
             senha_exige_especial: $this->senha_exige_especial,
             sessao_timeout_minutos: $this->sessao_timeout_minutos,
             exigir_2fa_admin: $this->exigir_2fa_admin,
+            permitir_2fa_email: $this->permitir_2fa_email,
             dias_retencao_logs: $this->dias_retencao_logs,
             login_max_tentativas: $this->login_max_tentativas,
             login_janela_minutos: $this->login_janela_minutos,
@@ -136,6 +140,7 @@ class AbaSeguranca extends Component
             'senha_exige_especial' => ['boolean'],
             'sessao_timeout_minutos' => ['required', 'integer', 'min:5', 'max:1440'],
             'exigir_2fa_admin' => ['boolean'],
+            'permitir_2fa_email' => ['boolean'],
             'dias_retencao_logs' => ['required', 'integer', 'min:1', 'max:3650'],
             'login_max_tentativas' => ['required', 'integer', 'min:1', 'max:100'],
             'login_janela_minutos' => ['required', 'integer', 'min:1', 'max:60'],

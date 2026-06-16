@@ -49,6 +49,14 @@
                 />
                 <p class="text-default-500 mt-1 text-sm">Quando ativada, administradores sem 2FA são direcionados a configurá-lo antes de acessar o sistema. Desligada por padrão.</p>
             </div>
+            <div class="mt-4">
+                <x-shared.toggle
+                    name="permitir_2fa_email"
+                    label="Permitir 2FA por e-mail"
+                    wire:model="permitir_2fa_email"
+                />
+                <p class="text-default-500 mt-1 text-sm">Habilita o envio de código de verificação por e-mail como segundo fator. É pré-requisito para que cada usuário (ou um administrador) ative o método. Desligar desabilita o recurso para todos.</p>
+            </div>
         </x-shared.card>
 
         <x-shared.card title="Auditoria" subtitle="Retenção dos registros de atividade.">

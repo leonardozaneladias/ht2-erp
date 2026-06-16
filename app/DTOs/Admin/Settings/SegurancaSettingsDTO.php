@@ -13,6 +13,7 @@ final readonly class SegurancaSettingsDTO
         public bool $senha_exige_especial,
         public int $sessao_timeout_minutos,
         public bool $exigir_2fa_admin,
+        public bool $permitir_2fa_email,
         public int $dias_retencao_logs,
         public int $login_max_tentativas,
         public int $login_janela_minutos,

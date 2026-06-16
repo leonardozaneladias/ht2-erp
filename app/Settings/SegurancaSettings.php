@@ -8,11 +8,12 @@ use App\Enums\Admin\SettingsGroup;
 use Spatie\LaravelSettings\Settings;
 
 /**
- * Políticas de segurança da instalação.
+ * Políticas de segurança da instalação: senha, sessão, lockout, alertas e 2FA.
  *
- * A implementação efetiva do 2FA pertence ao Épico 2; aqui mantemos apenas a
- * flag `exigir_2fa_admin`. `sessao_timeout_minutos` é aplicado a
- * config('session.lifetime') pelo SettingsRuntimeApplier.
+ * `sessao_timeout_minutos` é aplicado a config('session.lifetime') pelo
+ * SettingsRuntimeApplier. `exigir_2fa_admin` é imposto pelo middleware
+ * EnsureTwoFactorEnabled. `permitir_2fa_email` é o switch global do segundo
+ * fator por e-mail — pré-requisito para a preferência individual de cada usuário.
  */
 final class SegurancaSettings extends Settings
 {
@@ -27,6 +28,8 @@ final class SegurancaSettings extends Settings
     public int $sessao_timeout_minutos;
 
     public bool $exigir_2fa_admin;
+
+    public bool $permitir_2fa_email;
 
     public int $dias_retencao_logs;
 

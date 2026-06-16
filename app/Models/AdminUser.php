@@ -185,6 +185,26 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
     }
 
     /**
+     * O 2FA por e-mail está disponível para este usuário: a preferência está
+     * ligada E o recurso está habilitado globalmente. Checar o switch global em
+     * runtime faz com que desligá-lo neutralize todos os usuários sem alterar as
+     * preferências individuais (e religá-lo reative quem já tinha optado).
+     */
+    public function emailDoisFatoresDisponivel(): bool
+    {
+        return $this->two_factor_email_enabled
+            && app(SegurancaSettings::class)->permitir_2fa_email;
+    }
+
+    /**
+     * O login exige um segundo fator: por TOTP confirmado OU por e-mail habilitado.
+     */
+    public function precisaSegundoFator(): bool
+    {
+        return $this->hasTwoFactorEnabled() || $this->emailDoisFatoresDisponivel();
+    }
+
+    /**
      * A conta está temporariamente bloqueada por excesso de falhas de login.
      */
     public function estaBloqueada(): bool
@@ -263,6 +283,8 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
             'perfil_ativo_role_id',
             'two_factor_confirmed_at',
             'two_factor_last_timestamp',
+            'two_factor_email_enabled',
+            'two_factor_email_enabled_at',
         ];
     }
 
@@ -279,6 +301,8 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
             'two_factor_recovery_codes' => 'array',
             'two_factor_confirmed_at' => 'datetime',
             'two_factor_last_timestamp' => 'integer',
+            'two_factor_email_enabled' => 'boolean',
+            'two_factor_email_enabled_at' => 'datetime',
         ];
     }
 }

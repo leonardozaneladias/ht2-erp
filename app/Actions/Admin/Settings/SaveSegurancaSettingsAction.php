@@ -22,6 +22,7 @@ final class SaveSegurancaSettingsAction
             $settings->senha_exige_especial = $dto->senha_exige_especial;
             $settings->sessao_timeout_minutos = $dto->sessao_timeout_minutos;
             $settings->exigir_2fa_admin = $dto->exigir_2fa_admin;
+            $settings->permitir_2fa_email = $dto->permitir_2fa_email;
             $settings->dias_retencao_logs = $dto->dias_retencao_logs;
             $settings->login_max_tentativas = $dto->login_max_tentativas;
             $settings->login_janela_minutos = $dto->login_janela_minutos;

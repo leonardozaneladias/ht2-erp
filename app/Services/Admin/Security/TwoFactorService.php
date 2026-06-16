@@ -22,7 +22,15 @@ use PragmaRX\Google2FA\Google2FA;
  */
 final class TwoFactorService
 {
+    /** Validade do código enviado por e-mail, em segundos (10 min). */
+    public const EMAIL_CODE_TTL = 600;
+
+    /** Intervalo mínimo entre envios de código por e-mail, em segundos. */
+    public const EMAIL_RESEND_COOLDOWN = 60;
+
     private const RECOVERY_CODES = 8;
+
+    private const EMAIL_CODE_CACHE_PREFIX = '2fa-email-code:';
 
     public function __construct(private readonly Google2FA $google2fa) {}
 
@@ -98,5 +106,41 @@ final class TwoFactorService
         }
 
         return null;
+    }
+
+    /**
+     * Gera um código numérico de 6 dígitos, guarda o hash em cache (single-use,
+     * com TTL) e o envia por e-mail. O código em claro nunca é persistido — só
+     * trafega no e-mail; no servidor fica apenas o hash.
+     */
+    public function dispararCodigoEmail(AdminUser $usuario): void
+    {
+        $codigo = (string) random_int(100000, 999999);
+
+        Cache::put(
+            self::EMAIL_CODE_CACHE_PREFIX . $usuario->id,
+            Hash::make($codigo),
+            self::EMAIL_CODE_TTL,
+        );
+
+        $usuario->notify(new CodigoVerificacaoEmailNotification($codigo, intdiv(self::EMAIL_CODE_TTL, 60)));
+    }
+
+    /**
+     * Verifica o código de e-mail informado. Single-use: em caso de sucesso o
+     * código é descartado do cache para impedir reuso (anti-replay).
+     */
+    public function verificarCodigoEmail(AdminUser $usuario, string $codigo): bool
+    {
+        $chave = self::EMAIL_CODE_CACHE_PREFIX . $usuario->id;
+        $hash = Cache::get($chave);
+
+        if (! is_string($hash) || ! Hash::check($codigo, $hash)) {
+            return false;
+        }
+
+        Cache::forget($chave);
+
+        return true;
     }
 }
