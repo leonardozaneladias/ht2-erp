@@ -76,8 +76,9 @@ class AplicarMenuPadraoAction
                 'ref-cfops' => ['grupo_key' => 'grupo-tab-cadastros', 'ordem' => 9],
                 'ref-ncms' => ['grupo_key' => 'grupo-tab-cadastros', 'ordem' => 10],
 
-                // Tabelas Auxiliares → RH (item do pacote modulo-rh, movido da seção Negócio).
+                // Tabelas Auxiliares → RH (itens do pacote modulo-rh, movidos da seção Negócio).
                 'rh-departamentos' => ['grupo_key' => 'grupo-tab-rh', 'ordem' => 1],
+                'rh-funcionarios' => ['grupo_key' => 'grupo-tab-rh', 'ordem' => 2],
             ];
 
             foreach ($itens as $key => $dados) {
