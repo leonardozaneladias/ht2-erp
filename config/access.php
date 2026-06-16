@@ -236,30 +236,33 @@ return [
         | mova suas permissões para a chave correspondente.
         */
         ModuloAcesso::Negocio->value => [
-            'exemplos.listar' => [
-                'label' => 'Listar exemplos',
-                'descricao' => 'Ver a listagem de exemplos.',
-            ],
-            'exemplos.criar' => [
-                'label' => 'Criar exemplos',
-                'descricao' => 'Cadastrar novos registros de exemplo.',
-            ],
-            'exemplos.editar' => [
-                'label' => 'Editar exemplos',
-                'descricao' => 'Alterar dados e status de exemplos.',
-            ],
-            'exemplos.deletar' => [
-                'label' => 'Excluir exemplos',
-                'descricao' => 'Mover exemplos para a lixeira.',
-            ],
-            'exemplos.restaurar' => [
-                'label' => 'Restaurar exemplos',
-                'descricao' => 'Restaurar exemplos da lixeira.',
-            ],
-            'exemplos.excluir_permanente' => [
-                'label' => 'Excluir exemplos permanentemente',
-                'descricao' => 'Remover exemplos definitivamente do banco (irreversível).',
-            ],
+            // Permissões do Exemplo (demo) — opcionais (ver EXEMPLO_DEMO em config/modulos.php).
+            ...(env('EXEMPLO_DEMO', true) ? [
+                'exemplos.listar' => [
+                    'label' => 'Listar exemplos',
+                    'descricao' => 'Ver a listagem de exemplos.',
+                ],
+                'exemplos.criar' => [
+                    'label' => 'Criar exemplos',
+                    'descricao' => 'Cadastrar novos registros de exemplo.',
+                ],
+                'exemplos.editar' => [
+                    'label' => 'Editar exemplos',
+                    'descricao' => 'Alterar dados e status de exemplos.',
+                ],
+                'exemplos.deletar' => [
+                    'label' => 'Excluir exemplos',
+                    'descricao' => 'Mover exemplos para a lixeira.',
+                ],
+                'exemplos.restaurar' => [
+                    'label' => 'Restaurar exemplos',
+                    'descricao' => 'Restaurar exemplos da lixeira.',
+                ],
+                'exemplos.excluir_permanente' => [
+                    'label' => 'Excluir exemplos permanentemente',
+                    'descricao' => 'Remover exemplos definitivamente do banco (irreversível).',
+                ],
+            ] : []),
             // make:modulo insere permissões de negócio acima desta linha
         ],
 
@@ -272,6 +275,102 @@ return [
                 'label' => 'Acessar Pulse',
                 'descricao' => 'Ver o monitoramento de performance (Laravel Pulse).',
             ],
+        ],
+
+        /*
+        | Tabelas Auxiliares — catálogos de dados de referência (localização,
+        | financeiro, fiscal, pessoas). Majoritariamente oficiais (IBGE/BrasilAPI),
+        | mantidos via `referencia:sync`; o CRUD permite ajustes pontuais.
+        */
+        ModuloAcesso::TabelasAuxiliares->value => [
+            'estados.listar' => [
+                'label' => 'Listar estados',
+                'descricao' => 'Ver o catálogo de estados (UF).',
+            ],
+            'estados.criar' => [
+                'label' => 'Criar estados',
+                'descricao' => 'Cadastrar novos estados (UF).',
+            ],
+            'estados.editar' => [
+                'label' => 'Editar estados',
+                'descricao' => 'Alterar dados de estados (UF).',
+            ],
+            'estados.deletar' => [
+                'label' => 'Excluir estados',
+                'descricao' => 'Mover estados para a lixeira.',
+            ],
+            'estados.restaurar' => [
+                'label' => 'Restaurar estados',
+                'descricao' => 'Restaurar estados da lixeira.',
+            ],
+            'estados.excluir_permanente' => [
+                'label' => 'Excluir estados permanentemente',
+                'descricao' => 'Remover estados definitivamente do banco (irreversível).',
+            ],
+
+            'paises.listar' => ['label' => 'Listar países', 'descricao' => 'Ver o catálogo de países.'],
+            'paises.criar' => ['label' => 'Criar países', 'descricao' => 'Cadastrar novos países.'],
+            'paises.editar' => ['label' => 'Editar países', 'descricao' => 'Alterar dados de países.'],
+            'paises.deletar' => ['label' => 'Excluir países', 'descricao' => 'Mover países para a lixeira.'],
+            'paises.restaurar' => ['label' => 'Restaurar países', 'descricao' => 'Restaurar países da lixeira.'],
+            'paises.excluir_permanente' => ['label' => 'Excluir países permanentemente', 'descricao' => 'Remover países definitivamente (irreversível).'],
+
+            'municipios.listar' => ['label' => 'Listar municípios', 'descricao' => 'Ver o catálogo de municípios.'],
+            'municipios.criar' => ['label' => 'Criar municípios', 'descricao' => 'Cadastrar novos municípios.'],
+            'municipios.editar' => ['label' => 'Editar municípios', 'descricao' => 'Alterar dados de municípios.'],
+            'municipios.deletar' => ['label' => 'Excluir municípios', 'descricao' => 'Mover municípios para a lixeira.'],
+            'municipios.restaurar' => ['label' => 'Restaurar municípios', 'descricao' => 'Restaurar municípios da lixeira.'],
+            'municipios.excluir_permanente' => ['label' => 'Excluir municípios permanentemente', 'descricao' => 'Remover municípios definitivamente (irreversível).'],
+
+            'moedas.listar' => ['label' => 'Listar moedas', 'descricao' => 'Ver o catálogo de moedas.'],
+            'moedas.criar' => ['label' => 'Criar moedas', 'descricao' => 'Cadastrar novas moedas.'],
+            'moedas.editar' => ['label' => 'Editar moedas', 'descricao' => 'Alterar dados de moedas.'],
+            'moedas.deletar' => ['label' => 'Excluir moedas', 'descricao' => 'Mover moedas para a lixeira.'],
+            'moedas.restaurar' => ['label' => 'Restaurar moedas', 'descricao' => 'Restaurar moedas da lixeira.'],
+            'moedas.excluir_permanente' => ['label' => 'Excluir moedas permanentemente', 'descricao' => 'Remover moedas definitivamente (irreversível).'],
+
+            'bancos.listar' => ['label' => 'Listar bancos', 'descricao' => 'Ver o catálogo de bancos.'],
+            'bancos.criar' => ['label' => 'Criar bancos', 'descricao' => 'Cadastrar novos bancos.'],
+            'bancos.editar' => ['label' => 'Editar bancos', 'descricao' => 'Alterar dados de bancos.'],
+            'bancos.deletar' => ['label' => 'Excluir bancos', 'descricao' => 'Mover bancos para a lixeira.'],
+            'bancos.restaurar' => ['label' => 'Restaurar bancos', 'descricao' => 'Restaurar bancos da lixeira.'],
+            'bancos.excluir_permanente' => ['label' => 'Excluir bancos permanentemente', 'descricao' => 'Remover bancos definitivamente (irreversível).'],
+
+            'cargos.listar' => ['label' => 'Listar cargos', 'descricao' => 'Ver o catálogo de cargos (CBO).'],
+            'cargos.criar' => ['label' => 'Criar cargos', 'descricao' => 'Cadastrar novos cargos.'],
+            'cargos.editar' => ['label' => 'Editar cargos', 'descricao' => 'Alterar dados de cargos.'],
+            'cargos.deletar' => ['label' => 'Excluir cargos', 'descricao' => 'Mover cargos para a lixeira.'],
+            'cargos.restaurar' => ['label' => 'Restaurar cargos', 'descricao' => 'Restaurar cargos da lixeira.'],
+            'cargos.excluir_permanente' => ['label' => 'Excluir cargos permanentemente', 'descricao' => 'Remover cargos definitivamente (irreversível).'],
+
+            'tipos_logradouro.listar' => ['label' => 'Listar tipos de logradouro', 'descricao' => 'Ver o catálogo de tipos de logradouro.'],
+            'tipos_logradouro.criar' => ['label' => 'Criar tipos de logradouro', 'descricao' => 'Cadastrar novos tipos de logradouro.'],
+            'tipos_logradouro.editar' => ['label' => 'Editar tipos de logradouro', 'descricao' => 'Alterar dados de tipos de logradouro.'],
+            'tipos_logradouro.deletar' => ['label' => 'Excluir tipos de logradouro', 'descricao' => 'Mover tipos de logradouro para a lixeira.'],
+            'tipos_logradouro.restaurar' => ['label' => 'Restaurar tipos de logradouro', 'descricao' => 'Restaurar tipos de logradouro da lixeira.'],
+            'tipos_logradouro.excluir_permanente' => ['label' => 'Excluir tipos de logradouro permanentemente', 'descricao' => 'Remover tipos de logradouro definitivamente (irreversível).'],
+
+            'cnaes.listar' => ['label' => 'Listar CNAEs', 'descricao' => 'Ver o catálogo de CNAEs.'],
+            'cnaes.criar' => ['label' => 'Criar CNAEs', 'descricao' => 'Cadastrar novos CNAEs.'],
+            'cnaes.editar' => ['label' => 'Editar CNAEs', 'descricao' => 'Alterar dados de CNAEs.'],
+            'cnaes.deletar' => ['label' => 'Excluir CNAEs', 'descricao' => 'Mover CNAEs para a lixeira.'],
+            'cnaes.restaurar' => ['label' => 'Restaurar CNAEs', 'descricao' => 'Restaurar CNAEs da lixeira.'],
+            'cnaes.excluir_permanente' => ['label' => 'Excluir CNAEs permanentemente', 'descricao' => 'Remover CNAEs definitivamente (irreversível).'],
+
+            'cfops.listar' => ['label' => 'Listar CFOPs', 'descricao' => 'Ver o catálogo de CFOPs.'],
+            'cfops.criar' => ['label' => 'Criar CFOPs', 'descricao' => 'Cadastrar novos CFOPs.'],
+            'cfops.editar' => ['label' => 'Editar CFOPs', 'descricao' => 'Alterar dados de CFOPs.'],
+            'cfops.deletar' => ['label' => 'Excluir CFOPs', 'descricao' => 'Mover CFOPs para a lixeira.'],
+            'cfops.restaurar' => ['label' => 'Restaurar CFOPs', 'descricao' => 'Restaurar CFOPs da lixeira.'],
+            'cfops.excluir_permanente' => ['label' => 'Excluir CFOPs permanentemente', 'descricao' => 'Remover CFOPs definitivamente (irreversível).'],
+
+            'ncms.listar' => ['label' => 'Listar NCMs', 'descricao' => 'Ver o catálogo de NCMs.'],
+            'ncms.criar' => ['label' => 'Criar NCMs', 'descricao' => 'Cadastrar novos NCMs.'],
+            'ncms.editar' => ['label' => 'Editar NCMs', 'descricao' => 'Alterar dados de NCMs.'],
+            'ncms.deletar' => ['label' => 'Excluir NCMs', 'descricao' => 'Mover NCMs para a lixeira.'],
+            'ncms.restaurar' => ['label' => 'Restaurar NCMs', 'descricao' => 'Restaurar NCMs da lixeira.'],
+            'ncms.excluir_permanente' => ['label' => 'Excluir NCMs permanentemente', 'descricao' => 'Remover NCMs definitivamente (irreversível).'],
+            // catálogos de referência adicionais entram acima desta linha
         ],
 
     ],

@@ -166,6 +166,69 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
         Route::get('/{exemplo}/editar', App\Livewire\Admin\Exemplos\FormExemplo::class)->name('edit');
     });
 
+    // Tabelas Auxiliares (dados de referência) — CRUD por catálogo.
+    Route::prefix('referencia')->name('referencia.')->group(function (): void {
+        Route::prefix('estados')->name('estados.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexEstado::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormEstado::class)->name('create');
+            Route::get('/{estado}/editar', App\Livewire\Admin\Referencia\FormEstado::class)->name('edit');
+        });
+
+        Route::prefix('paises')->name('paises.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexPais::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormPais::class)->name('create');
+            Route::get('/{pais}/editar', App\Livewire\Admin\Referencia\FormPais::class)->name('edit');
+        });
+
+        Route::prefix('municipios')->name('municipios.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexMunicipio::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormMunicipio::class)->name('create');
+            Route::get('/{municipio}/editar', App\Livewire\Admin\Referencia\FormMunicipio::class)->name('edit');
+        });
+
+        Route::prefix('moedas')->name('moedas.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexMoeda::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormMoeda::class)->name('create');
+            Route::get('/{moeda}/editar', App\Livewire\Admin\Referencia\FormMoeda::class)->name('edit');
+        });
+
+        Route::prefix('bancos')->name('bancos.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexBanco::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormBanco::class)->name('create');
+            Route::get('/{banco}/editar', App\Livewire\Admin\Referencia\FormBanco::class)->name('edit');
+        });
+
+        Route::prefix('cargos')->name('cargos.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexCargo::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormCargo::class)->name('create');
+            Route::get('/{cargo}/editar', App\Livewire\Admin\Referencia\FormCargo::class)->name('edit');
+        });
+
+        Route::prefix('tipos-logradouro')->name('tipos_logradouro.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexTipoLogradouro::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormTipoLogradouro::class)->name('create');
+            Route::get('/{tipo_logradouro}/editar', App\Livewire\Admin\Referencia\FormTipoLogradouro::class)->name('edit');
+        });
+
+        Route::prefix('cnaes')->name('cnaes.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexCnae::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormCnae::class)->name('create');
+            Route::get('/{cnae}/editar', App\Livewire\Admin\Referencia\FormCnae::class)->name('edit');
+        });
+
+        Route::prefix('cfops')->name('cfops.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexCfop::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormCfop::class)->name('create');
+            Route::get('/{cfop}/editar', App\Livewire\Admin\Referencia\FormCfop::class)->name('edit');
+        });
+
+        Route::prefix('ncms')->name('ncms.')->group(function (): void {
+            Route::get('/', App\Livewire\Admin\Referencia\IndexNcm::class)->name('index');
+            Route::get('/criar', App\Livewire\Admin\Referencia\FormNcm::class)->name('create');
+            Route::get('/{ncm}/editar', App\Livewire\Admin\Referencia\FormNcm::class)->name('edit');
+        });
+    });
+
     // Rotas contribuídas por módulos-pacote (ADR-0015). Cada pacote registra seu
     // callback em App\Support\Modules\ModuleRegistry no register() do provider;
     // aqui elas entram no grupo autenticado, herdando todo o middleware admin.

@@ -32,4 +32,13 @@ return [
 
     // Prefixo do nome do pacote Composer: {vendor}/{prefixo}{slug}.
     'prefixo_pacote' => 'modulo-',
+
+    /*
+    | Módulo "Exemplo (demo)" — referência viva do gerador make:modulo. Mantenha
+    | true no boilerplate; num projeto-cliente, defina EXEMPLO_DEMO=false para
+    | ocultar o item de menu e suas permissões (a tela segue em /admin/exemplos
+    | como referência de código). Gateado direto por env() nos config/ de menu e
+    | acesso para não depender da ordem de carregamento dos arquivos de config.
+    */
+    'exemplo_demo' => env('EXEMPLO_DEMO', true),
 ];

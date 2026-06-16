@@ -19,6 +19,7 @@ enum ModuloAcesso: string
             self::Notificacoes => 'Notificações',
             self::Negocio => 'Negócio',
             self::Sistema => 'Sistema',
+            self::TabelasAuxiliares => 'Tabelas Auxiliares',
         };
     }
 
@@ -35,6 +36,7 @@ enum ModuloAcesso: string
             self::Notificacoes => 'Envio de comunicados in-app aos usuários.',
             self::Negocio => 'Módulos de negócio do cliente.',
             self::Sistema => 'Ferramentas operacionais (filas, monitoramento).',
+            self::TabelasAuxiliares => 'Catálogos de dados de referência (localização, financeiro, fiscal, pessoas).',
         };
     }
 
@@ -49,6 +51,7 @@ enum ModuloAcesso: string
             self::Auditoria, self::Configuracoes, self::Sistema => 'neutral',
             self::Notificacoes => 'info',
             self::Negocio => 'primary',
+            self::TabelasAuxiliares => 'secondary',
         };
     }
 
@@ -65,6 +68,7 @@ enum ModuloAcesso: string
             self::Notificacoes => 'tabler--bell',
             self::Negocio => 'tabler--box',
             self::Sistema => 'tabler--server-cog',
+            self::TabelasAuxiliares => 'tabler--table',
         };
     }
 
@@ -89,4 +93,5 @@ enum ModuloAcesso: string
     case Notificacoes = 'notificacoes';
     case Negocio = 'negocio';
     case Sistema = 'sistema';
+    case TabelasAuxiliares = 'tabelas_auxiliares';
 }
