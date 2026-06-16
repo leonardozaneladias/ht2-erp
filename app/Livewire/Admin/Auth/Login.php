@@ -93,7 +93,7 @@ final class Login extends Component
             app(ControleLockout::class)->liberar($usuario);
         }
 
-        if ($usuario !== null && $usuario->hasTwoFactorEnabled()) {
+        if ($usuario !== null && $usuario->precisaSegundoFator()) {
             session()->put('2fa.pending', [
                 'id' => $usuario->id,
                 'remember' => $this->remember,

@@ -10,6 +10,8 @@ use App\Services\Admin\Security\AlertaSeguranca;
 use App\Services\Admin\Security\LimiteTentativas;
 use App\Services\Admin\Security\TwoFactorService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
@@ -17,9 +19,9 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * Segunda etapa do login: valida o código TOTP (ou um código de recuperação)
- * para o usuário cujas credenciais já foram aprovadas (sessão "2fa.pending").
- * Só aqui o usuário é de fato autenticado.
+ * Segunda etapa do login: valida o segundo fator do usuário cujas credenciais já
+ * foram aprovadas (sessão "2fa.pending"). Aceita código TOTP, código de
+ * recuperação ou código enviado por e-mail. Só aqui o usuário é autenticado.
  */
 #[Layout('components.admin.auth-layout')]
 #[Title('Verificação em duas etapas')]
@@ -31,13 +33,26 @@ final class TwoFactorChallenge extends Component
 
     public string $recoveryCode = '';
 
-    /** @var 'totp'|'recovery' Método que satisfez o desafio (auditoria/alerta). */
+    public bool $usarEmail = false;
+
+    /** @var 'totp'|'recovery'|'email' Método que satisfez o desafio (auditoria/alerta). */
     private string $metodoVerificado = 'totp';
 
     public function mount(): void
     {
-        if (! session()->has('2fa.pending')) {
+        $usuario = $this->usuarioPendente();
+
+        if ($usuario === null) {
             $this->redirect(route('admin.login'), navigate: true);
+
+            return;
+        }
+
+        // Usuário só-e-mail (sem TOTP): já inicia no método e-mail e dispara o
+        // envio do código. Reenvios (inclusive ao recarregar) respeitam o cooldown.
+        if (! $usuario->hasTwoFactorEnabled() && $usuario->emailDoisFatoresDisponivel()) {
+            $this->usarEmail = true;
+            $this->enviarCodigoEmail($usuario, app(TwoFactorService::class));
         }
     }
 
@@ -65,7 +80,7 @@ final class TwoFactorChallenge extends Component
 
         $usuario = AdminUser::find($pendente['id']);
 
-        if (! $usuario instanceof AdminUser || ! $usuario->hasTwoFactorEnabled()) {
+        if (! $usuario instanceof AdminUser || ! $usuario->precisaSegundoFator()) {
             session()->forget('2fa.pending');
             $this->redirect(route('admin.login'), navigate: true);
 
@@ -112,13 +127,86 @@ final class TwoFactorChallenge extends Component
         );
     }
 
+    /**
+     * Alterna para o método e-mail e dispara o envio do código (a partir do TOTP).
+     */
+    public function usarMetodoEmail(TwoFactorService $service): void
+    {
+        $usuario = $this->usuarioPendente();
+
+        if ($usuario === null) {
+            $this->redirect(route('admin.login'), navigate: true);
+
+            return;
+        }
+
+        if (! $usuario->emailDoisFatoresDisponivel()) {
+            return;
+        }
+
+        $this->usarEmail = true;
+        $this->usarRecovery = false;
+        $this->reset('codigo', 'recoveryCode');
+        $this->resetErrorBag();
+
+        if (! $this->enviarCodigoEmail($usuario, $service)) {
+            $this->addError('codigo', 'Um código já foi enviado há instantes. Verifique seu e-mail.');
+        }
+    }
+
+    /**
+     * Reenvia o código por e-mail, respeitando o cooldown entre envios.
+     */
+    public function reenviarCodigoEmail(TwoFactorService $service): void
+    {
+        $usuario = $this->usuarioPendente();
+
+        if ($usuario === null) {
+            $this->redirect(route('admin.login'), navigate: true);
+
+            return;
+        }
+
+        if (! $usuario->emailDoisFatoresDisponivel()) {
+            return;
+        }
+
+        if (! $this->enviarCodigoEmail($usuario, $service)) {
+            $this->addError('codigo', 'Aguarde alguns segundos antes de pedir um novo código.');
+
+            return;
+        }
+
+        $this->reset('codigo');
+        $this->resetErrorBag('codigo');
+    }
+
     public function render(): View
     {
-        return view('livewire.admin.auth.two-factor-challenge');
+        $usuario = $this->usuarioPendente();
+
+        return view('livewire.admin.auth.two-factor-challenge', [
+            'temTotp' => $usuario?->hasTwoFactorEnabled() ?? false,
+            'emailDisponivel' => $usuario?->emailDoisFatoresDisponivel() ?? false,
+            'emailMascarado' => $usuario !== null ? $this->mascararEmail($usuario->email) : '',
+        ]);
     }
 
     private function codigoConfere(TwoFactorService $service, AdminUser $usuario): bool
     {
+        if ($this->usarEmail) {
+            if (! $usuario->emailDoisFatoresDisponivel()
+                || ! $service->verificarCodigoEmail($usuario, trim($this->codigo))) {
+                $this->addError('codigo', 'Código inválido ou expirado.');
+
+                return false;
+            }
+
+            $this->metodoVerificado = 'email';
+
+            return true;
+        }
+
         if ($this->usarRecovery) {
             $restantes = $service->consumirRecoveryCode(
                 $usuario->two_factor_recovery_codes ?? [],
@@ -160,5 +248,59 @@ final class TwoFactorChallenge extends Component
         $this->metodoVerificado = 'totp';
 
         return true;
+    }
+
+    /**
+     * Dispara o código por e-mail respeitando o cooldown de reenvio. Devolve
+     * false (sem enviar) quando ainda está no intervalo mínimo entre envios.
+     */
+    private function enviarCodigoEmail(AdminUser $usuario, TwoFactorService $service): bool
+    {
+        $chave = 'two-factor-email-send:' . $usuario->id;
+
+        if (RateLimiter::tooManyAttempts($chave, 1)) {
+            return false;
+        }
+
+        RateLimiter::hit($chave, TwoFactorService::EMAIL_RESEND_COOLDOWN);
+        $service->dispararCodigoEmail($usuario);
+
+        return true;
+    }
+
+    /**
+     * Usuário da sessão "2fa.pending", revalidando bloqueio/ativação (TOCTOU).
+     * Devolve null quando não há pendência válida — nesta etapa o usuário ainda
+     * não está autenticado, então tudo vem da sessão.
+     */
+    private function usuarioPendente(): ?AdminUser
+    {
+        $pendente = session('2fa.pending');
+
+        if (! is_array($pendente)) {
+            return null;
+        }
+
+        $usuario = AdminUser::find($pendente['id']);
+
+        if (! $usuario instanceof AdminUser || $usuario->estaBloqueada() || ! $usuario->ativo) {
+            return null;
+        }
+
+        return $usuario;
+    }
+
+    /**
+     * Mascara o e-mail para exibição (ex.: "j•••@dominio.com").
+     */
+    private function mascararEmail(string $email): string
+    {
+        $partes = explode('@', $email);
+
+        if (count($partes) !== 2) {
+            return $email;
+        }
+
+        return Str::mask($partes[0], '•', 1) . '@' . $partes[1];
     }
 }

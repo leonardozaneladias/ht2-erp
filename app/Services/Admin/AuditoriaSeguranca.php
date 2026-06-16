@@ -13,7 +13,7 @@ use App\Models\AdminUser;
 final class AuditoriaSeguranca
 {
     /**
-     * @param  'totp'|'recovery'|null  $metodo  Como o 2FA foi satisfeito (quando via2fa).
+     * @param  'totp'|'recovery'|'email'|null  $metodo  Como o 2FA foi satisfeito (quando via2fa).
      */
     public function loginBemSucedido(AdminUser $usuario, bool $via2fa, ?string $metodo = null): void
     {

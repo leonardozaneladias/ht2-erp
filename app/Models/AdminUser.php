@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Concerns\Auditavel;
 use App\Models\Contracts\UsaSoftDeletes;
+use App\Settings\SegurancaSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

@@ -25,7 +25,7 @@ final class EnsureTwoFactorEnabled
 
         if ($usuario instanceof AdminUser
             && ! app(ImpersonationContext::class)->ativo()
-            && ! $usuario->hasTwoFactorEnabled()
+            && ! $usuario->precisaSegundoFator()
             && app(SegurancaSettings::class)->exigir_2fa_admin
             && ! $request->routeIs('admin.conta')
             && ! $request->routeIs('admin.logout')) {
