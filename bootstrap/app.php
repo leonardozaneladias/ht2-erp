@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -28,4 +30,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle:api',
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {})->create();
+    ->withExceptions(function (Exceptions $exceptions): void {
+        // Requisições web sem autenticação válida (inclui o AuthenticateSession,
+        // que desloga quando o hash da senha em sessão diverge) vão para o login
+        // do admin — não para a rota 'login' padrão do framework (inexistente aqui).
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return null;
+            }
+
+            return redirect()->guest(route('admin.login'));
+        });
+    })->create();
