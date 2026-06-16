@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('aplica a disposição padrão com os grupos Cadastros e Segurança', function () {
+it('aplica a disposição padrão com os grupos Organização e Segurança', function () {
     expect(app(AplicarMenuPadraoAction::class)->execute())->toBeTrue();
 
     $secoes = app(MenuService::class)->estruturaParaSidebar(null, mostrarTudo: true);
@@ -22,7 +22,7 @@ it('aplica a disposição padrão com os grupos Cadastros e Segurança', functio
         ->toBe(['grupo-cadastros', 'grupo-seguranca', 'auditoria', 'comunicados'])
         ->and(array_column($porKey['grupo-cadastros']['children'], 'key'))->toBe(['empresas', 'usuarios'])
         ->and(array_column($porKey['grupo-seguranca']['children'], 'key'))->toBe(['acesso', 'menus', 'configuracoes'])
-        ->and($porKey['grupo-cadastros']['label'])->toBe('Cadastros')
+        ->and($porKey['grupo-cadastros']['label'])->toBe('Organização')
         ->and($porKey['grupo-seguranca']['icon'])->toBe('tabler--shield-lock');
 
     // Principal intocada.

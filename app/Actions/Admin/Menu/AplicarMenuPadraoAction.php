@@ -42,7 +42,7 @@ class AplicarMenuPadraoAction
 
         DB::transaction(function (): void {
             $grupos = [
-                'grupo-cadastros' => ['label' => 'Cadastros', 'icone' => 'tabler--folder', 'secao_key' => 'administracao', 'ordem' => 1],
+                'grupo-cadastros' => ['label' => 'Organização', 'icone' => 'tabler--folder', 'secao_key' => 'administracao', 'ordem' => 1],
                 'grupo-seguranca' => ['label' => 'Segurança', 'icone' => 'tabler--shield-lock', 'secao_key' => 'administracao', 'ordem' => 2],
                 'grupo-tab-cadastros' => ['label' => 'Cadastros', 'icone' => 'tabler--folder', 'secao_key' => 'tabelas-auxiliares', 'ordem' => 1],
                 'grupo-tab-rh' => ['label' => 'RH', 'icone' => 'tabler--users-group', 'secao_key' => 'tabelas-auxiliares', 'ordem' => 2],
