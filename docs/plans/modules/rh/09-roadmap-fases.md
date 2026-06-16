@@ -23,6 +23,22 @@ A sequência é **ascendente em complexidade legal**: cada fase consome a funda�
 
 > As fases podem ser fatiadas em incrementos `1.x`/`2.x`/etc. e algumas se sobrepõem no tempo (ex.: começar a Fase 5 enquanto a Fase 4 amadurece), desde que respeitadas as dependências da coluna direita.
 
+### 1.1 Os 7 temas do briefing complementar nas fases
+
+A revisão de produto trouxe 7 necessidades novas. Posicionamento (princípio: o que **endurece/estende o cadastro da pessoa** é incremento da **Fase 1**; o que tem **workflow/cálculo próprio** é **Fase 2+**):
+
+| #   | Tema do cliente                                | Fase                                                | Tratado em                                                                                                            |
+| --- | ---------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1   | Campos personalizados (o cliente cria campos)  | **1** (incremento de B2)                            | [10](10-campos-personalizados.md) · [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)                            |
+| 2   | Importação/exportação Excel de funcionários    | export **1**; import **pós-1**                      | [11](11-importacao-exportacao.md)                                                                                     |
+| 3   | Documentos em lote (multi-arquivo + ZIP + tag) | **1** (incremento de B2; ZIP/tag = 1.x)             | [03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)                                                                      |
+| 4   | Proteção/armazenamento de documentos           | **1** (endurece B2)                                 | [03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)        |
+| 5   | Acesso do funcionário (portal)                 | **1** (dados/documentos próprios); cresce nas fases | [05 §9](05-organograma-acl-hierarquica.md)                                                                            |
+| 6   | Controle/envio de atestados                    | **2** (workflow; tabela definida na Fase 1)         | [12](12-ausencias-faltas-atestados-afastamentos.md) · [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md) |
+| 7   | Faltas / atestados / afastamentos              | afastamento base **1** (B4); faltas/abono **2**     | [12](12-ausencias-faltas-atestados-afastamentos.md)                                                                   |
+
+> Os temas 1, 3, 4 e 5 são **incrementos da Fase 1** ([02 §7](02-fase-1-blueprint.md)) — não mexem no caminho crítico B1→B2→B3. Os temas 6 e 7 (workflow de atestado, faltas, abono, INSS) caem na **Fase 2** abaixo (§3), que já reunia férias/afastamentos avançados/banco de horas. O tema 2 entrega a **exportação** já na Fase 1 (PowerGrid) e a **importação multi-aba** depois.
+
 ---
 
 ## 2. Fase 1 — Cadastro, organograma e fundação (em andamento)
@@ -57,6 +73,7 @@ O valor entregue: empresa cadastrada e operando com pessoas, organograma, docume
 
 - **Férias** — apuração do **período aquisitivo** (12 meses a partir da admissão / da última concessão), do **período concessivo** (12 meses seguintes para gozo), saldo de dias e abono pecuniário; **programação** (agendamento de gozo, incl. fracionamento conforme reforma trabalhista); **workflow de aprovação** (solicitação do funcionário/gestor → aprovação → efetivação) gerando evento na linha do tempo. Modelado sobre `funcionarios` + `funcionario_eventos` (status `ferias` já existe em `StatusFuncionario`).
 - **Afastamentos avançados** — sobre `funcionario_afastamentos`/`tipos_afastamento` (já com flags eSocial e `cid` cifrado): workflow de solicitação/aprovação, controle de prazo previsto × efetivo, prorrogação, e regras derivadas das flags (`suspende_contrato`, `conta_como_falta`, `remunerado`).
+- **Atestados (workflow) e faltas/ocorrências** — atestado como **entidade com máquina de estados** (`atestados`, [01 §C3](01-modelo-de-dominio.md)): envio pelo colaborador (portal), análise/aprovação pelo RH, e abono de horas/dias ou geração de afastamento; e o lançamento/classificação de **faltas** (`ocorrencias`, [01 §C4](01-modelo-de-dominio.md)). É aqui que os **temas 6 e 7** (§1.1) se completam — detalhe, papéis e ACL em [12](12-ausencias-faltas-atestados-afastamentos.md) · [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md).
 - **Banco de horas** — saldo de horas por funcionário alimentado pela **compensação de HE aprovadas** (consome `horas_extras` com `status = aprovada`); lançamentos de crédito/débito, regras de expiração/acordo coletivo e extrato. É a alternativa "compenso" ao "pago em folha".
 - **Calendário de equipe / feriados** — feriados nacionais/estaduais/municipais e pontos facultativos por empresa, visão de calendário da equipe (quem está de férias/afastado), base para o cálculo de dias úteis usado por férias, banco de horas e (futuro) ponto.
 

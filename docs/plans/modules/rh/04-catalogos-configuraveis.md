@@ -146,6 +146,8 @@ As flags são lidas pelo formulário de `funcionario_documentos` (ver [03](03-ca
 
 **Como o cliente adapta:** cria tipos próprios e marca as exigências por toggle (ex.: um certificado interno que exige validade e arquivo). O formulário do documento passa a respeitar essas regras na hora.
 
+> **Tag de documento:** o `codigo` é também a **chave do mapeamento de tag** no envio em lote/ZIP — `config('rh.documentos.tags')` casa prefixos do nome do arquivo (`documento-cpf`, `comprovante-endereco`…) a este `codigo` para classificar automaticamente ([03 §8.6](03-cadastro-pessoa-documentos.md)).
+
 ---
 
 ## 5. `tipos_afastamento` — Tipos de afastamento (flags eSocial)
@@ -179,6 +181,8 @@ Essas flags alimentam o registro de `funcionario_afastamentos` e os cálculos de
 **Valores semente** (com flags marcadas): Férias · Atestado ≤15d _(`exige_atestado`)_ · Auxílio-doença INSS >15d _(`suspende_contrato`)_ · Acidente de trabalho · Licença-maternidade _(`remunerado`)_ · Licença-paternidade · Licença não remunerada _(`!remunerado`, `suspende_contrato`)_ · Falta justificada · Falta injustificada _(`conta_como_falta`)_ · Suspensão disciplinar · Serviço militar · Gala (núpcias) · Nojo (luto) · Doação de sangue.
 
 **Como o cliente adapta:** ajusta nomes/códigos eSocial conforme a convenção da empresa, cria motivos próprios e marca as flags — a linha do tempo e a folha passam a tratar o novo tipo corretamente.
+
+> **Faltas e atestados:** as flags (`conta_como_falta`, `remunerado`, `suspende_contrato`, `exige_atestado`) também classificam **faltas/ocorrências** e o **abono** por atestado, e decidem quando um atestado **vira afastamento** (>15 d → INSS, `suspende_contrato`) — ver [12](12-ausencias-faltas-atestados-afastamentos.md).
 
 ---
 

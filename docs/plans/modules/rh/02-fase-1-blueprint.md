@@ -161,6 +161,10 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 3. **Enums** novos ([01 §4](01-modelo-de-dominio.md)): `StatusFuncionario`, `Sexo`, `EstadoCivil`, `Escolaridade`, `RacaCor`, `TipoVinculo` (`geraFgts()`/`temCarteira()`/**`codCategEsocial(): ?int`** — [01 §4.1](01-modelo-de-dominio.md)), `RegimeTrabalho` (`baseCalculoHoraExtra()`), `TipoContaBancaria`, `Titularidade`, `TipoChavePix` (`validaFormato()`), `TipoContato`, `TipoTelefone`, `TipoEndereco`, `GrauParentesco`.
 4. **Documentos via `Anexo`** — `funcionario_documentos.anexo_id` aponta para `App\Models\Anexo` (`anexavel_type = Funcionario`); upload em disco **privado** + URL assinada (foto idem, `foto_caminho`). Detalhe em [03](03-cadastro-pessoa-documentos.md).
 5. **Form com abas** — formulário grande do funcionário dividido em abas (`aba(...)` no gerador): Dados pessoais · Contratação · Contatos · Endereços · Bancário · Dependentes · Documentos.
+6. **Incrementos desta revisão (aditivos a B2):**
+    - **Campos personalizados (fundação)** — `campos_personalizados` ([01 §A11](01-modelo-de-dominio.md)) + coluna `funcionarios.dados_personalizados` + enum `TipoCampoPersonalizado` + trait `TemCamposPersonalizados` + tela de definições + aba "Personalizados" no `FormFuncionario`. **Fundação reutilizável** (candidata a promoção ao core — [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)). Detalhe em [10](10-campos-personalizados.md).
+    - **Documentos em lote/ZIP + detecção por tag** — multi-upload, extração de `.zip` por job, classificação por padrão no nome, bandeja de não-classificados ([03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)). ZIP/tag podem ser fatiados em 1.x.
+    - **Storage endurecido** — disco `rh_privado`, layout não-adivinhável, download por Policy + URL assinada, retenção; ajuste **aditivo** no `GerenciadorAnexos` (parametrizar disco, default `public` preservado) — [03 §8.3](03-cadastro-pessoa-documentos.md) / [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md).
 
 **Tabelas/enums envolvidos** ([01](01-modelo-de-dominio.md)): `funcionarios`, `funcionario_contatos`, `funcionario_enderecos`, `funcionario_dados_bancarios`, `funcionario_dependentes`, `funcionario_documentos`; reaproveita `anexos`, `cargos`, `bancos`, `paises`, `municipios`, `estados`, `tipos_logradouro`. Enums listados acima.
 
@@ -181,6 +185,8 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 - [ ] Policy `FuncionarioPolicy` (`rh.funcionarios.*` + `ver_dados_sensiveis`); grupo PCD em `atributosNaoAuditados()` e oculto sem `ver_dados_sensiveis`; lixeira na Table.
 - [ ] Telas Index/Form (abas)/Table funcionais; sub-edição de filhas no form (sem `<select>` nativo).
 - [ ] Testes Pest: CRUD; tenant scope; unique por empresa; PII fora do diff de auditoria; upload/serve privado de documento.
+- [ ] **Campos personalizados (fundação):** `campos_personalizados` + `dados_personalizados` + trait + tela de definições + aba; validação dinâmica fundida no `FuncionarioRules` ([10](10-campos-personalizados.md)).
+- [ ] **Documentos em lote/ZIP + tag** (§8.5/§8.6) e **storage endurecido** (`rh_privado`, download por Policy — [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)).
 - [ ] Pint + Prettier + PHPStan + test verdes.
 
 ---
@@ -229,6 +235,7 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 2. **`funcionario_afastamentos`** ([01 §3 C2](01-modelo-de-dominio.md)) — FK `tipo_afastamento_id`→`tipos_afastamento` (B1) restrict; `cid` (**dado de saúde, LGPD art. 11** — `encrypted` + fora de auditoria + permissão dedicada); `dias` cache; CHECK `data_fim_efetiva >= data_inicio`; alvo de `Anexo` (atestado).
 3. **Enum** `TipoEventoFuncional` ([01 §4](01-modelo-de-dominio.md)) com `afetaSalario()`/`afetaLotacao()` (dirige quais colunas o evento atualiza).
 4. **Timeline** — visualização cronológica unificada (eventos + início/fim de afastamento) na ficha do funcionário.
+5. **Fundação de ausências (fronteira de fase).** As tabelas `atestados` ([01 §C3](01-modelo-de-dominio.md)) e `ocorrencias` ([01 §C4](01-modelo-de-dominio.md)) + enums `StatusAtestado`/`OrigemAtestado`/`TipoOcorrencia` estão **definidas em [01](01-modelo-de-dominio.md)** como fundação aditiva. A **entrega de ausências da Fase 1 é o afastamento + anexo + flags** (itens 1–2); o **atestado como workflow**, as **faltas/ocorrências** e o **abono** são **Fase 2** ([12](12-ausencias-faltas-atestados-afastamentos.md) / [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md)) — suas migrations+telas entram lá, sem reescrever B4.
 
 **Tabelas/enums envolvidos** ([01](01-modelo-de-dominio.md)): `funcionario_eventos`, `funcionario_afastamentos`; enum `TipoEventoFuncional`; reaproveita `tipos_afastamento` (B1), `cargos`/`departamentos`/`filiais`/`anexos`/`admin_users`.
 
@@ -370,3 +377,22 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 - **LGPD** — PII fora de auditoria (`atributosNaoAuditados()`), `cid`/financeiro `encrypted`, foto/documentos em disco **privado** + URL assinada, permissão dedicada `rh.afastamentos.ver_cid` ([01 §8](01-modelo-de-dominio.md)).
 - **Imutabilidade de snapshots** — `funcionario_eventos` e `horas_extras` aprovadas não se editam; correção é evento novo / mudança de status (ADR-0009).
 - **Desnormalização "atual" vs histórico** — colunas atuais em `funcionarios` (cargo/departamento/filial/salário/`cargo_nivel`) são **cache**; a verdade temporal está em `funcionario_eventos` (a Action de evento atualiza ambos na mesma transação).
+
+---
+
+## 7. Incrementos desta revisão e fronteira pós-Fase 1
+
+Os 7 temas trazidos pelo cliente nesta revisão se dividem entre **incremento da Fase 1** (endurecem/estendem o cadastro da pessoa, sobre B2/B3, **sem** mudar o caminho crítico B1→B2→B3) e **pós-Fase 1** (têm workflow/cálculo próprio):
+
+| Tema (revisão)                                             | Fase 1?                                                             | Onde                                                                                                                  |
+| ---------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Campos personalizados (no funcionário)                     | **Sim** — incremento de B2                                          | [10](10-campos-personalizados.md) · [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)                            |
+| Proteção/armazenamento de documentos                       | **Sim** — endurece B2                                               | [03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)        |
+| Documentos em lote/ZIP + tag                               | **Sim** — incremento de B2 (ZIP/tag = 1.x)                          | [03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)                                                                      |
+| Acesso do funcionário (portal — dados/documentos próprios) | **Sim** — B3 (self-service)                                         | [05 §9](05-organograma-acl-hierarquica.md)                                                                            |
+| Exportação de funcionários                                 | **Sim (parcial)** — export da listagem já em B2 (PowerGrid)         | [11 §6.1](11-importacao-exportacao.md)                                                                                |
+| Importação de funcionários (multi-aba)                     | **Não** — pós-Fase 1                                                | [11](11-importacao-exportacao.md)                                                                                     |
+| Atestado com workflow                                      | **Não** — Fase 2 (tabela definida em [01](01-modelo-de-dominio.md)) | [12](12-ausencias-faltas-atestados-afastamentos.md) · [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md) |
+| Faltas/ocorrências + atestados + afastamentos              | **Não** — Fase 2 (afastamento base é B4)                            | [12](12-ausencias-faltas-atestados-afastamentos.md) · [09 §3](09-roadmap-fases.md)                                    |
+
+> A regra: o que **endurece/estende o cadastro da pessoa** (campos personalizados, storage, docs em lote, self-service de dados/documentos) é **incremento da Fase 1** sobre B2/B3. O que tem **workflow/cálculo próprio** (importação em lote, atestado, faltas, abono, INSS) é **pós-Fase 1**, alinhado ao [09](09-roadmap-fases.md) (Fase 2 — "Gestão de ausências e tempo"). Como as tabelas novas já vivem em [01](01-modelo-de-dominio.md) (aditivas — [01 §6](01-modelo-de-dominio.md)), entrar nessas fases é **migration + telas**, sem reescrever a fundação nem o caminho crítico.

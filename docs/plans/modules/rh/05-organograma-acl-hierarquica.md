@@ -479,6 +479,29 @@ O self-service e a resolução "qual funcionário sou eu" (§2.3) só funcionam 
 
 > Segurança: conceder/revogar acesso é operação **do RH** (sob `rh.funcionarios.editar` + a capability de gestão de acesso do core), **nunca** self-service; os listeners de admissão/desligamento são **idempotentes** e toleram reprocessamento ([06 §4.1](06-linha-do-tempo.md)). A automação total (provisionar sempre na admissão) é evolução; a Fase 1 entrega a **ação manual** + a **revogação no desligamento**.
 
+### 9.2 O portal do colaborador como produto (recursos × fase)
+
+A auto-visibilidade (§8.6) + o vínculo + o modo `proprio` ([03 §11](03-cadastro-pessoa-documentos.md)) formam o **portal do colaborador** — um produto que **cresce com as fases** ([09](09-roadmap-fases.md)). Cada recurso aparece quando o módulo que o sustenta entra; tudo sobre o **próprio** registro (subárvore = `{ele}`):
+
+| Recurso (do colaborador, sobre si)                                           | Fase  | Onde                                                   |
+| ---------------------------------------------------------------------------- | ----- | ------------------------------------------------------ |
+| Ver/editar dados cadastrais próprios (contato, endereço, banco, dependentes) | **1** | [03 §11](03-cadastro-pessoa-documentos.md)             |
+| Ver/enviar documentos próprios (anexar RG/CPF/comprovantes)                  | **1** | [03 §8/§11](03-cadastro-pessoa-documentos.md)          |
+| Ver a própria linha do tempo (leitura)                                       | **1** | [06 §6.2](06-linha-do-tempo.md)                        |
+| Ver a própria escala e horas extras (leitura)                                | **1** | [07](07-jornada-horas-extras-folha.md)                 |
+| Enviar atestado e acompanhar o status                                        | **2** | [12 §7](12-ausencias-faltas-atestados-afastamentos.md) |
+| Consultar faltas/afastamentos (leitura)                                      | **2** | [12 §7](12-ausencias-faltas-atestados-afastamentos.md) |
+| Solicitar férias (workflow)                                                  | **2** | [09 §3](09-roadmap-fases.md)                           |
+| Holerite/demonstrativo (PDF)                                                 | **3** | [09 §4](09-roadmap-fases.md)                           |
+
+> O portal **não** é um guard/SPA novo (o projeto é um **único ambiente admin** — CLAUDE): é o **mesmo painel** com escopo `proprio` resolvido pela ACL. Cada recurso reusa a tela do módulo correspondente, restrita à subárvore `{ele}` (§8.6). A Fase 1 entrega o vínculo + self-service de dados/documentos; os recursos avançados seguem as fases dos respectivos módulos ([12](12-ausencias-faltas-atestados-afastamentos.md)/[07](07-jornada-horas-extras-folha.md)/[09](09-roadmap-fases.md)).
+
+### 9.3 Funcionário ↔ usuário ↔ permissões (e multi-empresa)
+
+- **Papel + capability.** O acesso do colaborador é um **papel "colaborador" por empresa** (RBAC de 2 níveis — §1) + a capability `rh.self.ver`. O papel concede os **verbos** de leitura/edição própria; a **ACL de subárvore** (§1) garante que recaiam **só** sobre o próprio registro. Sem `ver_todos` (jamais para colaborador).
+- **Multi-empresa (§6).** O mesmo `AdminUser` pode ser **pessoas distintas** em empresas diferentes; `FuncionarioAtual` resolve por `(user, empresa)` (§2.3) — o portal mostra o "eu" da **empresa ativa**, nunca mistura.
+- **Convite / primeiro acesso / 2FA.** Provisionar o acesso reusa o **fluxo de convite do core** ([03 §11.2](03-cadastro-pessoa-documentos.md)); o colaborador, como qualquer `AdminUser`, passa pelo **2FA por e-mail** e pela política de **inatividade** do core — **sem** mecanismo de auth novo. A revogação no desligamento (§9.1) desativa o login/papéis, e o fail-closed (§2.4) fecha o acesso de quem perdeu o vínculo.
+
 ---
 
 ## 10. Organograma de CARGOS vs organograma de PESSOAS

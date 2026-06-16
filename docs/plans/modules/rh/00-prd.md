@@ -169,6 +169,25 @@ Catálogo `rubricas` (proventos/descontos/informativa, com incidências INSS/FGT
 
 ---
 
+## 4.2 Revisão complementar (7 necessidades novas)
+
+Necessidades trazidas após o briefing original. Detalhe e posicionamento por fase em [09 §1.1](09-roadmap-fases.md), [README](README.md) e [02 §7](02-fase-1-blueprint.md); resumo de escopo:
+
+| #   | Necessidade                                    | Escopo                                               | Doc                                                                                                                   |
+| --- | ---------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1   | Campos personalizados pelo cliente             | **IN (Fase 1)** — incremento de B2                   | [10](10-campos-personalizados.md) · [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)                            |
+| 2   | Exportação de funcionários (Excel)             | **IN (Fase 1)** — listagem (PowerGrid)               | [11 §6.1](11-importacao-exportacao.md)                                                                                |
+| 2   | Importação multi-aba de funcionários           | **OUT (pós-Fase 1)**                                 | [11](11-importacao-exportacao.md)                                                                                     |
+| 3   | Documentos em lote (multi-arquivo + ZIP + tag) | **IN (Fase 1)** — incremento de B2                   | [03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)                                                                      |
+| 4   | Proteção/armazenamento de documentos           | **IN (Fase 1)** — endurece B2                        | [03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)        |
+| 5   | Acesso do funcionário (portal)                 | **IN (Fase 1)** — dados/documentos próprios          | [05 §9](05-organograma-acl-hierarquica.md)                                                                            |
+| 6   | Controle/envio de atestados (workflow)         | **OUT (Fase 2)** — tabela definida agora             | [12](12-ausencias-faltas-atestados-afastamentos.md) · [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md) |
+| 7   | Faltas / atestados / afastamentos              | afastamento **IN (Fase 1)**; faltas/abono **Fase 2** | [12](12-ausencias-faltas-atestados-afastamentos.md) · [06](06-linha-do-tempo.md)                                      |
+
+> Princípio: o que **endurece/estende o cadastro da pessoa** (1, 3, 4, 5) é incremento da **Fase 1**; o que tem **workflow/cálculo próprio** (importação em lote, atestado, faltas) é **pós-Fase 1**. As tabelas novas já vivem em [01](01-modelo-de-dominio.md) (aditivas), então entrar nas fases seguintes é migration + telas.
+
+---
+
 ## 5. Escopo OUT — Fase 1 (fronteiras explícitas)
 
 Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09](09-roadmap-fases.md):

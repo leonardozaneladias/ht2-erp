@@ -8,22 +8,25 @@ Documentação de produto e técnica do **super módulo de RH** do HT2 ERP. Cobr
 
 ## Índice da suíte
 
-| #   | Documento                                                                  | Para quê                                                                                        |
-| --- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| —   | **[README.md](README.md)**                                                 | Este índice, cobertura de requisitos, glossário, permissões (resumo; canônicas em 01 §10)       |
-| 00  | **[00-prd.md](00-prd.md)**                                                 | PRD: visão, personas, objetivos, escopo IN/OUT, matriz S-2200, requisitos não-funcionais        |
-| 01  | **[01-modelo-de-dominio.md](01-modelo-de-dominio.md)**                     | **Fonte de verdade** de schema: ≈21 tabelas, enums, seeds, LGPD, **permissões canônicas (§10)** |
-| 02  | **[02-fase-1-blueprint.md](02-fase-1-blueprint.md)**                       | Decomposição da Fase 1 em 7 blocos (B1–B7), dependências, DoD                                   |
-| 03  | **[03-cadastro-pessoa-documentos.md](03-cadastro-pessoa-documentos.md)**   | Spec do cadastro completo (abas, validações) + documentos seguros                               |
-| 04  | **[04-catalogos-configuraveis.md](04-catalogos-configuraveis.md)**         | Catálogos CRUD pelo cliente (departamento, função, tipos, escala, rubrica) + seeds              |
-| 05  | **[05-organograma-acl-hierarquica.md](05-organograma-acl-hierarquica.md)** | Organograma + ACL de visibilidade por hierarquia + self-service                                 |
-| 06  | **[06-linha-do-tempo.md](06-linha-do-tempo.md)**                           | Histórico funcional como eventos imutáveis + afastamentos                                       |
-| 07  | **[07-jornada-horas-extras-folha.md](07-jornada-horas-extras-folha.md)**   | Jornada/escalas, cálculo de HE, workflow, fundação de folha                                     |
-| 08  | **[08-arquitetura-tecnica.md](08-arquitetura-tecnica.md)**                 | Guia de implementação como pacote: comandos, camadas, testes                                    |
-| 09  | **[09-roadmap-fases.md](09-roadmap-fases.md)**                             | Roadmap até a marcação de ponto em dispositivo (fase final)                                     |
-| ADR | **[adrs/](adrs/)**                                                         | 7 decisões de arquitetura do módulo (ADR-RH-001..007)                                           |
+| #   | Documento                                                                                          | Para quê                                                                                                         |
+| --- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| —   | **[README.md](README.md)**                                                                         | Este índice, cobertura de requisitos, glossário, permissões (resumo; canônicas em 01 §10)                        |
+| 00  | **[00-prd.md](00-prd.md)**                                                                         | PRD: visão, personas, objetivos, escopo IN/OUT, matriz S-2200, requisitos não-funcionais                         |
+| 01  | **[01-modelo-de-dominio.md](01-modelo-de-dominio.md)**                                             | **Fonte de verdade** de schema: ≈21 tabelas, enums, seeds, LGPD, **permissões canônicas (§10)**                  |
+| 02  | **[02-fase-1-blueprint.md](02-fase-1-blueprint.md)**                                               | Decomposição da Fase 1 em 7 blocos (B1–B7), dependências, DoD                                                    |
+| 03  | **[03-cadastro-pessoa-documentos.md](03-cadastro-pessoa-documentos.md)**                           | Spec do cadastro completo (abas, validações) + documentos seguros                                                |
+| 04  | **[04-catalogos-configuraveis.md](04-catalogos-configuraveis.md)**                                 | Catálogos CRUD pelo cliente (departamento, função, tipos, escala, rubrica) + seeds                               |
+| 05  | **[05-organograma-acl-hierarquica.md](05-organograma-acl-hierarquica.md)**                         | Organograma + ACL de visibilidade por hierarquia + self-service                                                  |
+| 06  | **[06-linha-do-tempo.md](06-linha-do-tempo.md)**                                                   | Histórico funcional como eventos imutáveis + afastamentos                                                        |
+| 07  | **[07-jornada-horas-extras-folha.md](07-jornada-horas-extras-folha.md)**                           | Jornada/escalas, cálculo de HE, workflow, fundação de folha                                                      |
+| 08  | **[08-arquitetura-tecnica.md](08-arquitetura-tecnica.md)**                                         | Guia de implementação como pacote: comandos, camadas, testes                                                     |
+| 09  | **[09-roadmap-fases.md](09-roadmap-fases.md)**                                                     | Roadmap até a marcação de ponto em dispositivo (fase final)                                                      |
+| 10  | **[10-campos-personalizados.md](10-campos-personalizados.md)**                                     | Campos definidos pelo cliente (JSONB-híbrido): definições + valores + trait reutilizável                         |
+| 11  | **[11-importacao-exportacao.md](11-importacao-exportacao.md)**                                     | Importação/exportação Excel do funcionário (multi-aba, round-trip, assíncrono)                                   |
+| 12  | **[12-ausencias-faltas-atestados-afastamentos.md](12-ausencias-faltas-atestados-afastamentos.md)** | Ausências: atestado com workflow + faltas/ocorrências + fronteira com o afastamento ([06](06-linha-do-tempo.md)) |
+| ADR | **[adrs/](adrs/)**                                                                                 | 10 decisões de arquitetura do módulo (ADR-RH-001..010)                                                           |
 
-**Por onde começar:** Produto/PO → 00 → 09. Dev → 01 → 02 → 08 → specs (03–07). QA → 02 (DoD) + specs. Arquitetura → ADRs + 05 + 07.
+**Por onde começar:** Produto/PO → 00 → 09. Dev → 01 → 02 → 08 → specs (03–12). QA → 02 (DoD) + specs. Arquitetura → ADRs + 05 + 07. Revisão complementar (campos personalizados, import/export, ausências) → 10 · 11 · 12 + ADR-RH-008..010.
 
 ---
 
@@ -51,6 +54,20 @@ Cada pedido do briefing original mapeado ao documento que o cobre:
 | Modelo eSocial-ready _(decisão de escopo)_                         | [01](01-modelo-de-dominio.md) + [03](03-cadastro-pessoa-documentos.md) · matriz S-2200 em [00 §4.1](00-prd.md) · [ADR-RH-006](adrs/ADR-RH-006-cobertura-esocial-dados-sensiveis-saude.md) |
 | Fundação de folha _(decisão de escopo)_                            | [07](07-jornada-horas-extras-folha.md)                                                                                                                                                    |
 | Fases seguintes até marcação de ponto em dispositivo               | [09](09-roadmap-fases.md)                                                                                                                                                                 |
+
+### Requisitos do briefing complementar (revisão)
+
+As 7 necessidades novas trazidas pelo cliente nesta revisão e onde cada uma é tratada (posicionamento por fase em [09 §1.1](09-roadmap-fases.md); incrementos da Fase 1 × pós-Fase 1 em [02 §7](02-fase-1-blueprint.md)):
+
+| #   | Necessidade                                    | Onde                                                                                                                                                      |
+| --- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Campos personalizados pelo cliente             | [10](10-campos-personalizados.md) · [01 §A11](01-modelo-de-dominio.md) · [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)                           |
+| 2   | Importação/exportação Excel de funcionários    | [11](11-importacao-exportacao.md) · [01 §F](01-modelo-de-dominio.md)                                                                                      |
+| 3   | Documentos em lote (multi-arquivo + ZIP + tag) | [03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)                                                                                                          |
+| 4   | Proteção/armazenamento de documentos           | [03 §8.3](03-cadastro-pessoa-documentos.md) · [01 §8](01-modelo-de-dominio.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)         |
+| 5   | Acesso do funcionário (portal)                 | [05 §9](05-organograma-acl-hierarquica.md) · [03 §11](03-cadastro-pessoa-documentos.md)                                                                   |
+| 6   | Controle/envio de atestados                    | [12](12-ausencias-faltas-atestados-afastamentos.md) · [01 §C3](01-modelo-de-dominio.md) · [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md) |
+| 7   | Faltas / atestados / afastamentos              | [12](12-ausencias-faltas-atestados-afastamentos.md) · [06 §5](06-linha-do-tempo.md) · [01 §C4](01-modelo-de-dominio.md)                                   |
 
 ### Decisões de escopo confirmadas com o cliente (Fase 1)
 
@@ -99,6 +116,8 @@ O `make:modulo` gera o CRUD padrão `listar/criar/editar/deletar/restaurar/exclu
 
 Prefixo `rh.` obrigatório (anti-colisão, ADR-0015). Convivem com o RBAC de dois níveis (papéis globais + por empresa) e a ACL hierárquica ([05](05-organograma-acl-hierarquica.md)). `rh.funcionarios.ver` (abrir um cadastro) é subsumido por `listar` no conjunto gerado (ver nota em 01 §10).
 
+**Permissões da revisão (canônicas em [01 §10](01-modelo-de-dominio.md)):** `rh.campos_personalizados.{listar,criar,editar,deletar,restaurar,excluir_permanente}` (gestão das **definições**; editar os valores segue `rh.funcionarios.editar` — [10](10-campos-personalizados.md)) · `rh.atestados.{listar,criar,editar,analisar,aprovar,rejeitar,deletar,restaurar,excluir_permanente}` **+ `ver_cid`** (dado de saúde — [12](12-ausencias-faltas-atestados-afastamentos.md)) · `rh.ocorrencias.{listar,criar,editar,deletar,restaurar,excluir_permanente}` _(+ `abonar` opcional)_ · `rh.funcionarios.{importar,exportar}` (planilha — [11](11-importacao-exportacao.md)).
+
 ---
 
 ## Glossário
@@ -122,7 +141,7 @@ Pontos onde a documentação encontra o código existente — decididos aqui par
 - **Departamento vs Setor** — adotado `Departamento` (`HT2ERP\Rh\Models\Departamento`, tabela `departamentos`), alinhado ao teste `tests/Feature/Rh/RhLixeiraTest.php` e ao item de menu `rh-departamentos`. "Setor" é sinônimo de UI.
 - **Menu** — os itens do RH ficam no grupo **RH** da seção **Tabelas Auxiliares** (ver `AplicarMenuPadraoAction`), não na seção "Negócio" do stub padrão.
 - **Cargo** — reaproveita a referência global `cargos` (CBO), satisfazendo `tests/Feature/Rh/FuncionarioCargoTest.php` (`cargosDisponiveis`); cargos próprios por empresa ficam como evolução ([ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md)).
-- **Upload seguro** — o `GerenciadorAnexos` do core hoje grava no disco `public`; para documentos de RH (PII) deve-se parametrizar o disco para **privado** + URL assinada ([03](03-cadastro-pessoa-documentos.md)).
+- **Upload seguro** — o `GerenciadorAnexos` do core hoje grava no disco `public`; para documentos de RH (PII) deve-se parametrizar o disco para **privado** (`rh_privado`) + URL assinada + download por Policy ([03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)). O multi-upload/ZIP e a detecção por tag reusam o mesmo `Anexo`/Dropzone ([03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)).
 - **Linha do tempo (UI)** — `x-admin.timeline-table` existe mas é especializado em "programações" (períodos); a decisão registrada é **criar `x-admin.event-timeline`** (eventos pontuais), não generalizar o existente ([06 §6.1](06-linha-do-tempo.md)).
 - **Organograma (CTE)** — a subárvore usa `WITH RECURSIVE` (Postgres); os testes do organograma rodam em **Postgres**, não SQLite ([05](05-organograma-acl-hierarquica.md) · [08](08-arquitetura-tecnica.md)).
 - **ULID** — não há `HasUlid` no core; o módulo usa `id` interno (ADR-0004 fica como evolução).

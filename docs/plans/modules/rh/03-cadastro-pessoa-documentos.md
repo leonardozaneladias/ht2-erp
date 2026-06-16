@@ -14,15 +14,18 @@ O cadastro de funcionário é um **formulário único em abas** (não um wizard 
 
 As abas espelham os blocos do modelo (01 §3, Bloco B):
 
-| #   | Aba                     | Tabela(s) de origem                             | Cardinalidade           |
-| --- | ----------------------- | ----------------------------------------------- | ----------------------- |
-| 1   | **Identificação**       | `funcionarios` (dados pessoais)                 | 1:1                     |
-| 2   | **Documentos pessoais** | `funcionarios` (RG/CPF/PIS)                     | 1:1                     |
-| 3   | **Contato e Endereço**  | `funcionario_contatos`, `funcionario_enderecos` | 1:N (linhas repetíveis) |
-| 4   | **Bancário**            | `funcionario_dados_bancarios`                   | 1:N (com `principal`)   |
-| 5   | **Dependentes**         | `funcionario_dependentes`                       | 1:N                     |
-| 6   | **Contratação**         | `funcionarios` (vínculo/lotação/salário)        | 1:1                     |
-| 7   | **Documentos / Anexos** | `funcionario_documentos` (+ `anexos`)           | 1:N                     |
+| #   | Aba                     | Tabela(s) de origem                             | Cardinalidade                 |
+| --- | ----------------------- | ----------------------------------------------- | ----------------------------- |
+| 1   | **Identificação**       | `funcionarios` (dados pessoais)                 | 1:1                           |
+| 2   | **Documentos pessoais** | `funcionarios` (RG/CPF/PIS)                     | 1:1                           |
+| 3   | **Contato e Endereço**  | `funcionario_contatos`, `funcionario_enderecos` | 1:N (linhas repetíveis)       |
+| 4   | **Bancário**            | `funcionario_dados_bancarios`                   | 1:N (com `principal`)         |
+| 5   | **Dependentes**         | `funcionario_dependentes`                       | 1:N                           |
+| 6   | **Contratação**         | `funcionarios` (vínculo/lotação/salário)        | 1:1                           |
+| 7   | **Documentos / Anexos** | `funcionario_documentos` (+ `anexos`)           | 1:N                           |
+| 8   | **Personalizados**      | `funcionarios.dados_personalizados` (JSONB)     | campos definidos pelo cliente |
+
+> A aba **Personalizados** (8) só aparece quando a empresa tem campos definidos em `campos_personalizados` ([01 §A11](01-modelo-de-dominio.md)); embute o componente genérico que renderiza os campos a partir das definições, agrupados por `grupo`/`ordem`. Mecânica, trait `TemCamposPersonalizados`, validação dinâmica e LGPD por campo em [10](10-campos-personalizados.md).
 
 ### Componentes de aba (obrigatórios — nunca `<select>` HTML)
 
@@ -253,8 +256,10 @@ As flags do `tipos_documento` (01 §3 A4: `exige_numero`, `exige_validade`, `exi
 ### 8.3 Upload seguro (disco **privado**) reaproveitando o core
 
 - O binário entra como `App\Models\Anexo` com `anexavel_type = HT2ERP\Rh\Models\Funcionario` (morph map) e `anexavel_id = funcionario.id`; `funcionario_documentos.anexo_id` aponta para ele (FK `nullOnDelete`).
-- O `GerenciadorAnexos` do core hoje grava no **disco `public`** (`store('anexos','public')`). Documentos de RH são **sensíveis** → devem usar **disco privado**. Caminho: parametrizar o disco do `GerenciadorAnexos` (prop `disco` com default `public`) e instanciá-lo com `disco="rh_privado"` no RH; o `Anexo` já guarda o disco por linha e serve via `url()` no disco gravado. **Acesso sempre por URL assinada** (controller de download autorizado por policy), nunca link público. Esta parametrização é um ajuste mínimo no componente do core (aditivo, default preservado) — registrar no plano de implementação.
+- O `GerenciadorAnexos` do core hoje grava no **disco `public`** com caminho fixo (`store('anexos','public')`) e monta a lista chamando `Anexo::url()`. Documentos de RH são **sensíveis** → disco **privado**. Como o driver `local`/privado **não** serve `url()` pública, a abordagem fiel ao [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) é um **componente próprio do pacote** (`GerenciadorAnexosRh`) que **reusa o _model_ `Anexo`** com `disco='rh_privado'` e caminho `rh/{empresa_id}/...` (§8.3 endurecimento), **sem editar** o componente do core. **Acesso sempre por rota de download assinada autorizada por Policy** (`Storage::disk('rh_privado')->download(...)`), **nunca** `Anexo::url()` nem link público. _Alternativa:_ tornar o `GerenciadorAnexos` do core parametrizável (disco + caminho + geração de URL) como mudança **aditiva aprovada** — mais invasiva ([ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)).
 - Ciclo de vida do arquivo segue o core: soft-delete do `Anexo` mantém o binário (retenção/auditoria); o arquivo físico só some no force-delete (evento `forceDeleted`). Combina com a guarda legal trabalhista (01 §8).
+
+> **Endurecimento (estratégia — [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)).** O disco dedicado é o **`rh_privado`** (`storage/app/private/rh`, fora do webroot), com layout `rh/{empresa_id}/funcionarios/{funcionario_id}/{tipo_documento_codigo}/{ulid_ou_hash}.{ext}` — nome físico **não-adivinhável**, nome original em `Anexo.nome_original`. O **download é sempre por controller autorizado por Policy** (ACL hierárquica [05](05-organograma-acl-hierarquica.md): quem vê o funcionário vê os documentos; sensíveis exigem permissão dedicada) **+ URL assinada temporária** — nunca link público nem disco `public`. Operações (upload/substituição/exclusão) são auditadas via `Auditavel`; o **acesso a documento sensível** também é logado. **Substituição = versionamento** (novo `Anexo` + soft-delete do anterior); **retenção trabalhista longa** (não expurgar). Cifra de binário/checksum são evolução. O RH usa um **componente próprio** (`GerenciadorAnexosRh`) que reusa o _model_ `Anexo` (disco + caminho + download assinado) — **sem editar** o componente do core; parametrizar o `GerenciadorAnexos` do core (disco + caminho + URL) é alternativa aditiva. Ver [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md).
 
 ### 8.4 Relatório/alerta de "documentos a vencer" (mini-spec)
 
@@ -265,6 +270,24 @@ As flags do `tipos_documento` (01 §3 A4: `exige_numero`, `exige_validade`, `exi
 - **KPI no dashboard de RH** — card `x-admin.kpi-card` com a contagem de documentos a vencer/vencidos da empresa ativa (atalho para a listagem filtrada).
 - **Filtro na tabela** — `FuncionarioTable`/uma tabela de documentos ganha um filtro "Vencimento" (a vencer / vencidos / em dia) via `x-shared.select-search`.
 - **Badges** — na linha do documento (no form e na listagem): `x-shared.badge` **âmbar** = a vencer (dentro da janela), **vermelho** = vencido. Sem CSS custom (só Tailwind, CLAUDE §9).
+
+### 8.5 Envio de documentos em lote (multi-upload + ZIP)
+
+Além do upload individual (§8.1), a aba Documentos aceita **vários arquivos de uma vez** e um **`.zip`** — reaproveitando o `Anexo`/`GerenciadorAnexos` no disco `rh_privado` (§8.3):
+
+- **Multi-upload** — o Dropzone do core recebe N arquivos numa seleção; cada arquivo vira um `Anexo` + uma linha `funcionario_documentos` (tipo resolvido por §8.6 ou pendente de classificação).
+- **ZIP** — o upload de um `.zip` é **extraído no servidor por um job** (fila), que processa cada arquivo interno como no multi-upload. Cobre a "pasta de documentos" que o cliente já tem do colaborador, sem N requisições.
+- **Incluir vs substituir** — se já existe documento do mesmo tipo, política configurável: **substituir** (nova versão — novo `Anexo` + soft-delete do anterior, §8.3) ou **adicionar** (mantém ambos). Default: adicionar.
+- **Resultado ao usuário** — relatório do lote: **classificados automaticamente** (tipo detectado §8.6), **pendentes** (bandeja de não-classificados §8.6) e **erros** (arquivo corrompido/não suportado). O lote **não falha** por um arquivo fora do padrão.
+
+### 8.6 Detecção de tipo por padrão no nome (tag)
+
+Para classificar automaticamente os arquivos de um lote/ZIP, o nome do arquivo carrega uma **tag/prefixo** mapeada a um `tipos_documento` (por `codigo` — [04 §4](04-catalogos-configuraveis.md)):
+
+- **Convenção configurável** — `config('rh.documentos.tags')` (ou aliases por tipo) mapeia prefixos a códigos: `documento-cpf` → `cpf`, `documento-rg` → `rg`, `comprovante-endereco` → `comprovante_residencia`, … O cliente ajusta sem código.
+- **Normalização** — o nome é normalizado antes do match: minúsculas, sem acento, separadores (`-`/`_`/espaço) unificados. `RG_João.pdf` e `documento-rg.png` caem no mesmo tipo `rg`.
+- **Fora do padrão → bandeja de não-classificados** — arquivos sem tag reconhecível **não falham** o lote: vão para uma **bandeja** onde o RH associa o tipo manualmente (linha `funcionario_documentos` com `tipo_documento_id` pendente).
+- **Complementar à importação** — a planilha de [11](11-importacao-exportacao.md) traz **metadados** de documento; o envio em lote/ZIP traz **binários**. A planilha não carrega arquivo; o lote/ZIP não cria o cadastro da pessoa.
 
 ---
 
@@ -294,18 +317,23 @@ Reforça 01 §8 e a regra do core "dados sensíveis nunca em logs":
 
 O vínculo `funcionarios.admin_user_id` (01 §3 Bloco E) liga o funcionário ao seu `AdminUser`. O **Colaborador** acessa o próprio cadastro (escopo "eu"); o **RH** acessa todos da empresa. A matriz de permissões/escopo é definida em [05](05-organograma-acl-hierarquica.md); abaixo, o recorte por campo desta tela:
 
-| Bloco / campo                                                     | Colaborador (próprio cadastro) | Só RH/Gestor                              |
-| ----------------------------------------------------------------- | ------------------------------ | ----------------------------------------- |
-| Foto, nome social                                                 | **Vê e edita**                 | —                                         |
-| Contatos (telefone/e-mail)                                        | **Vê e edita**                 | —                                         |
-| Endereços                                                         | **Vê e edita**                 | —                                         |
-| Dados bancários + PIX                                             | **Vê e edita** (próprios)      | RH pode editar                            |
-| Dependentes                                                       | **Vê e edita**                 | RH valida flags IR/sal-família            |
-| Documentos pessoais (anexar RG/CPF/CNH/comprovantes)              | **Vê e anexa**                 | RH valida/aprova                          |
-| Nome civil, CPF, PIS/PASEP, `matricula`                           | **Só leitura**                 | **Só RH edita**                           |
-| Cargo, departamento, gestor, filial (lotação)                     | **Só leitura**                 | **Só RH** (via evento — 06)               |
-| Contratação (vínculo, regime, salário, admissão/demissão, status) | **Só leitura**                 | **Só RH** (salário/cargo via evento — 06) |
-| `cid` / afastamentos                                              | Não vê detalhe sensível        | RH com permissão dedicada                 |
+| Bloco / campo                                                     | Colaborador (próprio cadastro)                                              | Só RH/Gestor                                                          |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Foto, nome social                                                 | **Vê e edita**                                                              | —                                                                     |
+| Contatos (telefone/e-mail)                                        | **Vê e edita**                                                              | —                                                                     |
+| Endereços                                                         | **Vê e edita**                                                              | —                                                                     |
+| Dados bancários + PIX                                             | **Vê e edita** (próprios)                                                   | RH pode editar                                                        |
+| Dependentes                                                       | **Vê e edita**                                                              | RH valida flags IR/sal-família                                        |
+| Documentos pessoais (anexar RG/CPF/CNH/comprovantes)              | **Vê e anexa**                                                              | RH valida/aprova                                                      |
+| Nome civil, CPF, PIS/PASEP, `matricula`                           | **Só leitura**                                                              | **Só RH edita**                                                       |
+| Cargo, departamento, gestor, filial (lotação)                     | **Só leitura**                                                              | **Só RH** (via evento — 06)                                           |
+| Contratação (vínculo, regime, salário, admissão/demissão, status) | **Só leitura**                                                              | **Só RH** (salário/cargo via evento — 06)                             |
+| `cid` / afastamentos                                              | Não vê detalhe sensível                                                     | RH com permissão dedicada                                             |
+| Atestados (enviar pelo portal / acompanhar)                       | **Envia e acompanha** ([12](12-ausencias-faltas-atestados-afastamentos.md)) | RH analisa/aprova                                                     |
+| Faltas / afastamentos (consulta)                                  | **Só leitura** (próprios)                                                   | RH/gestor lança ([12](12-ausencias-faltas-atestados-afastamentos.md)) |
+| Campos personalizados                                             | Conforme definição (RH edita)                                               | **RH** ([10](10-campos-personalizados.md))                            |
+
+> **Atestado e portal:** o **envio de atestado** pelo colaborador e a **consulta** de faltas/afastamentos são recursos do portal — máquina de estados, abono e ACL em [12](12-ausencias-faltas-atestados-afastamentos.md); a tabela recursos × fase do portal está em [05 §9](05-organograma-acl-hierarquica.md). Atestado **não** é campo do `FormFuncionario` (é entidade própria, [01 §C3](01-modelo-de-dominio.md)).
 
 > Implementação: o `FormFuncionario` recebe um **modo** (`proprio` vs `rh`) derivado da policy/escopo (05); no modo `proprio`, abas/campos fora do recorte do colaborador renderizam **somente leitura** (`readonly`/desabilitado) e a validação/Action ignoram qualquer tentativa de alterar campos vedados (defesa no servidor, não só na UI). As mudanças sujeitas a evento (salário/cargo/departamento/demissão) **nunca** são editáveis pelo colaborador.
 
@@ -373,7 +401,7 @@ Ou seja: **cargo é catálogo** (`cargosDisponiveis` populado pelo `CargoSeeder`
 
 ## 13. Checklist de implementação (resumo)
 
-- [ ] `FormFuncionario` com 7 abas `x-shared.tab-*` server-driven (`abaAtiva` + `abaTemErro()`), `cargosDisponiveis` no `mount()`.
+- [ ] `FormFuncionario` com 7 abas fixas `x-shared.tab-*` server-driven (`abaAtiva` + `abaTemErro()`) + aba **Personalizados** condicional (§1), `cargosDisponiveis` no `mount()`.
 - [ ] `IndexFuncionario` + `FuncionarioTable` (PowerGrid): filtros por `status`/departamento/cargo, PII mascarada, ação de lixeira (`ComLixeira`).
 - [ ] `FuncionarioRules` + `Store/UpdateFuncionarioRequest`; `Rule` nova `PisPasep`; validação PIX por tipo; unique por empresa (cpf, matricula); matrícula auto-sugerida (§3.1, helper `SugerirMatricula` + config de zero-pad/prefixo).
 - [ ] Seção **PCD** (§2.1): toggles + `observacao_pcd`, em `atributosNaoAuditados()`, ocultos sem `rh.funcionarios.ver_dados_sensiveis`, ignorados pela Action sem a permissão.
@@ -382,4 +410,6 @@ Ou seja: **cargo é catálogo** (`cargosDisponiveis` populado pelo `CargoSeeder`
 - [ ] Modo `proprio` vs `rh` (self-service) com campos vedados em só-leitura e **defesa no servidor** (Rules + allowlist da Action, §11.1; alinhado a 05).
 - [ ] **Provisionamento de acesso** (§11.2): ação "Conceder acesso" (vincular existente / criar+convidar) + revogação no desligamento (listeners idempotentes — [06](06-linha-do-tempo.md)).
 - [ ] Relatório/alerta "documentos a vencer" (§8.4): janela configurável, KPI, filtro na tabela, badges âmbar/vermelho, sobre `(empresa_id, data_validade)`.
+- [ ] Aba **Personalizados** (§1): embute o componente genérico de [10](10-campos-personalizados.md); `FuncionarioRules` funde `regrasPersonalizadas()`; persistência em `dados_personalizados` (allowlist por modo §11.1).
+- [ ] Documentos em lote/ZIP (§8.5) + detecção por tag (§8.6, `config('rh.documentos.tags')`); bandeja de não-classificados; storage endurecido (§8.3 / [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)).
 - [ ] Pós-tarefa: `pint`, `prettier` nas views `rh::`, `phpstan`, `php artisan test` (inclui `FuncionarioCargoTest`).

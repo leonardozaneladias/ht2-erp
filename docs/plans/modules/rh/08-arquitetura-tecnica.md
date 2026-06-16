@@ -343,6 +343,14 @@ php artisan access:sync      # publica as rh.* (config('access.modules') já as 
 php artisan cache:clear      # invalida cache de menu e de resolução de acesso
 ```
 
+### 6.4 Notas de infra desta revisão
+
+Pontos de instalação/arquitetura que os incrementos da revisão acrescentam (aditivos — [02 §7](02-fase-1-blueprint.md)):
+
+- **Disco `rh_privado`** — registrar um disk `local` apontando para `storage/app/private/rh` (fora do webroot) em `config/filesystems.php` (merge do pacote ou nota de instalação). O `GerenciadorAnexos` do core ganha a prop `disco` (default `public` preservado) e é instanciado com `disco="rh_privado"` no RH; download por controller assinado + Policy. Layout, retenção e auditoria em [03 §8.3](03-cadastro-pessoa-documentos.md) / [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md).
+- **Jobs na fila `exports`** — extração de `.zip` de documentos ([03 §8.5](03-cadastro-pessoa-documentos.md)) e importação multi-aba de funcionários ([11](11-importacao-exportacao.md)) rodam assíncronos; o log opcional `importacoes` ([01 §F](01-modelo-de-dominio.md)) guarda status/resumo.
+- **Campos personalizados** — trait `TemCamposPersonalizados` em `src/Models/Concerns/`, enum `TipoCampoPersonalizado` em `src/Enums/`, e o componente Livewire genérico de renderização em `src/Livewire/` ([10](10-campos-personalizados.md)); a coluna `funcionarios.dados_personalizados` (JSONB) tem cast `array`.
+
 ---
 
 ## 7. Testes (Pest)

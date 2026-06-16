@@ -57,24 +57,31 @@ Catálogos com **flags de comportamento** (ex.: `tipos_afastamento.remunerado`, 
 
 ### Decisão item a item (requisitos do cliente)
 
-| Conceito                                                     | Decisão                                                | Por quê                              |
-| ------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------ |
-| Status do funcionário                                        | ENUM `StatusFuncionario`                               | conjunto fixo com lógica/badge       |
-| Sexo, Estado civil, Escolaridade, Raça/cor                   | ENUM                                                   | domínios fixos do eSocial            |
-| Tipo de vínculo (CLT/PJ/estágio/…)                           | ENUM `TipoVinculo`                                     | dirige cálculo (FGTS, regras)        |
-| Regime (mensalista/horista/…)                                | ENUM `RegimeTrabalho`                                  | dirige base de cálculo da HE         |
-| Tipo de conta / chave PIX / telefone / endereço / parentesco | ENUM                                                   | fixos (alguns com validação)         |
-| **Departamento**                                             | CATÁLOGO `departamentos`                               | cliente cria, com hierarquia         |
-| **Cargo**                                                    | REFERÊNCIA `cargos` (CBO) + nível                      | catálogo oficial reaproveitado       |
-| **Funções/Extras (líder, preposto…)**                        | CATÁLOGO `funcoes` (N:N)                               | vocabulário por empresa              |
-| **Tipos de documento**                                       | CATÁLOGO `tipos_documento`                             | cliente adiciona, com flags          |
-| **Tipos de afastamento**                                     | CATÁLOGO `tipos_afastamento`                           | cliente customiza + flags eSocial    |
-| **Escalas/Jornadas**                                         | CATÁLOGO `escalas` + `escala_dias`                     | reutilizáveis, criadas pelo cliente  |
-| **Rubricas (proventos/descontos)**                           | CATÁLOGO `rubricas`                                    | cliente define, com incidências      |
-| Tipo de evento de histórico                                  | ENUM `TipoEventoFuncional`                             | dirige snapshot/colunas              |
-| Tipo de hora extra (50/100/noturno/DSR)                      | ENUM `TipoHoraExtra` (+ override de fator por empresa) | percentual com lógica                |
-| Status de aprovação da HE                                    | ENUM `StatusHoraExtra`                                 | máquina de estados                   |
-| Tabelas legais (INSS/IRRF/salário-família)                   | REFERÊNCIA por vigência `tabelas_legais`               | parâmetros nacionais por competência |
+| Conceito                                                     | Decisão                                                | Por quê                                                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Status do funcionário                                        | ENUM `StatusFuncionario`                               | conjunto fixo com lógica/badge                                                              |
+| Sexo, Estado civil, Escolaridade, Raça/cor                   | ENUM                                                   | domínios fixos do eSocial                                                                   |
+| Tipo de vínculo (CLT/PJ/estágio/…)                           | ENUM `TipoVinculo`                                     | dirige cálculo (FGTS, regras)                                                               |
+| Regime (mensalista/horista/…)                                | ENUM `RegimeTrabalho`                                  | dirige base de cálculo da HE                                                                |
+| Tipo de conta / chave PIX / telefone / endereço / parentesco | ENUM                                                   | fixos (alguns com validação)                                                                |
+| **Departamento**                                             | CATÁLOGO `departamentos`                               | cliente cria, com hierarquia                                                                |
+| **Cargo**                                                    | REFERÊNCIA `cargos` (CBO) + nível                      | catálogo oficial reaproveitado                                                              |
+| **Funções/Extras (líder, preposto…)**                        | CATÁLOGO `funcoes` (N:N)                               | vocabulário por empresa                                                                     |
+| **Tipos de documento**                                       | CATÁLOGO `tipos_documento`                             | cliente adiciona, com flags                                                                 |
+| **Tipos de afastamento**                                     | CATÁLOGO `tipos_afastamento`                           | cliente customiza + flags eSocial                                                           |
+| **Escalas/Jornadas**                                         | CATÁLOGO `escalas` + `escala_dias`                     | reutilizáveis, criadas pelo cliente                                                         |
+| **Rubricas (proventos/descontos)**                           | CATÁLOGO `rubricas`                                    | cliente define, com incidências                                                             |
+| Tipo de evento de histórico                                  | ENUM `TipoEventoFuncional`                             | dirige snapshot/colunas                                                                     |
+| Tipo de hora extra (50/100/noturno/DSR)                      | ENUM `TipoHoraExtra` (+ override de fator por empresa) | percentual com lógica                                                                       |
+| Status de aprovação da HE                                    | ENUM `StatusHoraExtra`                                 | máquina de estados                                                                          |
+| Tabelas legais (INSS/IRRF/salário-família)                   | REFERÊNCIA por vigência `tabelas_legais`               | parâmetros nacionais por competência                                                        |
+| **Campos personalizados (definições)**                       | CATÁLOGO **meta** `campos_personalizados`              | o cliente cria campos por entidade, sem código ([10](10-campos-personalizados.md))          |
+| Tipo de campo personalizado                                  | ENUM `TipoCampoPersonalizado`                          | dirige componente de UI + regra de validação                                                |
+| Status do atestado                                           | ENUM `StatusAtestado`                                  | máquina de estados (`pendente`→`em_analise`→`aprovado`/`rejeitado`; `aprovado`→`estornado`) |
+| Origem do atestado                                           | ENUM `OrigemAtestado`                                  | dirige fluxo/permissão de quem lançou                                                       |
+| Tipo de ocorrência (falta/atraso)                            | ENUM `TipoOcorrencia`                                  | domínio fixo (falta, atraso, saída antecipada)                                              |
+
+> Os conceitos novos (atestado, ocorrência, campos personalizados) entram nesta revisão como **fundação aditiva** (§6); o detalhe vive em [10](10-campos-personalizados.md), [11](11-importacao-exportacao.md) e [12](12-ausencias-faltas-atestados-afastamentos.md).
 
 ---
 
@@ -83,6 +90,8 @@ Catálogos com **flags de comportamento** (ex.: `tipos_afastamento.remunerado`, 
 ```
 empresas (core) 1 ─< funcionarios >─ 0..1 admin_users (core)   [vínculo 1:1 opcional → ACL hierárquica]
 empresas 1 ─< departamentos, funcoes, tipos_documento, tipos_afastamento, escalas, rubricas   [catálogos tenant]
+empresas 1 ─< campos_personalizados             [definições de campos por entidade — doc 10; valores em funcionarios.dados_personalizados JSONB]
+empresas 1 ─< importacoes                        [log de importação de planilha — apoio, doc 11]
 
 funcionarios ─< funcionarios            (self: gestor_id)      [organograma de pessoas → ACL]
 departamentos ─< departamentos                      (self: departamento_pai_id)   [sub-departamentos]
@@ -95,6 +104,8 @@ funcionarios 1 ─< funcionario_dependentes
 funcionarios 1 ─< funcionario_documentos        (>─ 0..1 anexos [core polimórfico] + tipos_documento)
 funcionarios 1 ─< funcionario_eventos           [append-only, snapshot JSONB]
 funcionarios 1 ─< funcionario_afastamentos      (>─ tipos_afastamento)
+funcionarios 1 ─< atestados                     (>─ 0..1 anexos; >─ 0..1 funcionario_afastamentos)   [workflow de ausência — doc 12]
+funcionarios 1 ─< ocorrencias                   (>─ 0..1 atestados; >─ 0..1 tipos_afastamento)        [faltas/atrasos — doc 12]
 funcionarios 1 ─< horas_extras                  (>─ admin_users: lançou/aprovou; >─ rubricas)
 
 funcionarios M ─< funcionario_funcao >─ M funcoes      [pivot c/ vigência início/fim]
@@ -282,62 +293,90 @@ Catálogo tenant **opcional e fino**: sobrepõe, por empresa, o fator-padrão do
 
 Unique: `(empresa_id, tipo)` parcial `WHERE deleted_at IS NULL` (no máx. um override ativo por tipo/empresa). Índice: `(empresa_id, ativo)`. CHECK `fator_bps >= 0`. **Vigência opcional (evolução):** se o cliente exigir histórico de fatores por período, adicionar `vigencia_inicio`/`vigencia_fim` (DATE) de forma aditiva, com unique parcial de vigência aberta análogo a `escala_funcionario` (§A8); na Fase 1 vale o override corrente (sem vigência). O **CRUD/tela** deste catálogo entra como incremento em **B6/B7** ([02](02-fase-1-blueprint.md)); permissões `rh.fator_horas_extras.*` em §10.
 
+#### A11. `campos_personalizados` — [E][S][A] (meta-catálogo: definições de campos do cliente)
+
+Catálogo tenant **meta**: o cliente define, **sem código**, campos extras por **entidade** (`funcionario` na Fase 1). Os **valores** moram numa coluna JSONB na entidade hospedeira (`funcionarios.dados_personalizados`, §B1) — modelo **JSONB-híbrido**, não EAV nem schemaless ([ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)). Trait reutilizável `TemCamposPersonalizados`, enum `TipoCampoPersonalizado` (§4) e mecânica completa em [10](10-campos-personalizados.md). É **fundação reutilizável** (candidata a promoção ao core — analogia ao [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md)).
+
+| Coluna                           | Tipo         | Null | Notas                                                                          |
+| -------------------------------- | ------------ | ---- | ------------------------------------------------------------------------------ |
+| id                               | BIGSERIAL PK | N    |                                                                                |
+| empresa_id                       | BIGINT       | N    | FK→empresas cascade                                                            |
+| entidade                         | VARCHAR(40)  | N    | entidade hospedeira (ex.: `funcionario`); na Fase 1 só `funcionario`           |
+| chave                            | VARCHAR(40)  | N    | slug `snake_case` — chave no JSONB `dados_personalizados`                      |
+| rotulo                           | VARCHAR(120) | N    | label exibido na UI                                                            |
+| tipo                             | VARCHAR(20)  | N    | ENUM `TipoCampoPersonalizado` + CHECK                                          |
+| opcoes                           | JSONB        | S    | lista de opções (apenas `select`/`multi_select`)                               |
+| obrigatorio                      | BOOLEAN      | N    | default false                                                                  |
+| sensivel                         | BOOLEAN      | N    | default false · **LGPD**: liga mascaramento + exclusão de auditoria (dinâmico) |
+| grupo                            | VARCHAR(60)  | S    | agrupamento/aba na UI                                                          |
+| ordem                            | INTEGER      | S    | ordenação                                                                      |
+| ajuda                            | VARCHAR(255) | S    | texto de ajuda (tooltip)                                                       |
+| regras                           | JSONB        | S    | validação extra (min/max/regex) resolvida por tipo                             |
+| ativo                            | BOOLEAN      | N    | default true                                                                   |
+| created_at/updated_at/deleted_at |              |      |                                                                                |
+
+Unique: `(empresa_id, entidade, chave)` parcial `WHERE deleted_at IS NULL`. Índices: `(empresa_id, entidade, ativo)`. CHECK `tipo IN (...)` (lista do enum). **Sem seed** (catálogo nasce vazio — o cliente cria). Permissões `rh.campos_personalizados.*` em §10.
+
 ### Bloco B — Pessoa / Funcionário (agregado-raiz)
 
 #### B1. `funcionarios` — [E][S][A][Anx] (núcleo: dados pessoais + contratação, eSocial-ready)
 
-| Coluna                                             | Tipo         | Null | Notas                                                                                        |
-| -------------------------------------------------- | ------------ | ---- | -------------------------------------------------------------------------------------------- |
-| id                                                 | BIGSERIAL PK | N    | route binding por id                                                                         |
-| empresa_id                                         | BIGINT       | N    | FK→empresas cascade                                                                          |
-| filial_id                                          | BIGINT       | S    | FK→filiais nullOnDelete (lotação atual)                                                      |
-| admin_user_id                                      | BIGINT       | S    | FK→admin_users nullOnDelete (vínculo 1:1 — ver B-ACL)                                        |
-| gestor_id                                          | BIGINT       | S    | FK→funcionarios (self) nullOnDelete (organograma)                                            |
-| departamento_id                                    | BIGINT       | S    | FK→departamentos nullOnDelete (atual; histórico em C1)                                       |
-| cargo_id                                           | BIGINT       | S    | FK→cargos (referência CBO) nullOnDelete (atual; histórico em C1)                             |
-| cargo_nivel                                        | SMALLINT     | S    | nível hierárquico do cargo (cache p/ organograma)                                            |
-| _Dados pessoais_                                   |              |      |                                                                                              |
-| nome                                               | VARCHAR(150) | N    |                                                                                              |
-| nome_social                                        | VARCHAR(150) | S    |                                                                                              |
-| cpf                                                | VARCHAR(11)  | N    | só dígitos · PII                                                                             |
-| rg                                                 | VARCHAR(20)  | S    | PII                                                                                          |
-| rg_orgao_emissor                                   | VARCHAR(20)  | S    |                                                                                              |
-| rg_uf                                              | CHAR(2)      | S    |                                                                                              |
-| data_nascimento                                    | DATE         | S    |                                                                                              |
-| sexo                                               | VARCHAR(20)  | S    | ENUM `Sexo` + CHECK                                                                          |
-| estado_civil                                       | VARCHAR(20)  | S    | ENUM `EstadoCivil` + CHECK                                                                   |
-| escolaridade                                       | VARCHAR(30)  | S    | ENUM `Escolaridade` + CHECK                                                                  |
-| raca_cor                                           | VARCHAR(20)  | S    | ENUM `RacaCor` (eSocial) + CHECK                                                             |
-| nacionalidade_pais_id                              | BIGINT       | S    | FK→paises                                                                                    |
-| naturalidade_municipio_id                          | BIGINT       | S    | FK→municipios                                                                                |
-| nome_mae                                           | VARCHAR(150) | S    | PII                                                                                          |
-| nome_pai                                           | VARCHAR(150) | S    | PII                                                                                          |
-| foto_caminho                                       | VARCHAR(255) | S    | disco privado                                                                                |
-| _Contratação_                                      |              |      |                                                                                              |
-| matricula                                          | VARCHAR(30)  | N    | gerada/manual                                                                                |
-| pis_pasep                                          | VARCHAR(11)  | S    | PII eSocial · nullable (cadastro progressivo); **obrigatório na validação eSocial — Fase 4** |
-| data_admissao                                      | DATE         | N    |                                                                                              |
-| data_demissao                                      | DATE         | S    | null = ativo                                                                                 |
-| tipo_vinculo                                       | VARCHAR(20)  | N    | ENUM `TipoVinculo` + CHECK                                                                   |
-| regime_trabalho                                    | VARCHAR(20)  | N    | ENUM `RegimeTrabalho` + CHECK                                                                |
-| salario_base_centavos                              | INTEGER      | S    | atual; histórico em C1                                                                       |
-| salario_tipo                                       | VARCHAR(10)  | N    | ENUM (mensal/horista) + CHECK, default mensal                                                |
-| status                                             | VARCHAR(20)  | N    | ENUM `StatusFuncionario` + CHECK, default `ativo`                                            |
-| _PCD / Deficiência (dado de saúde — LGPD art. 11)_ |              |      | grupo eSocial `infoDeficiencia`; mesmo rigor do `cid` (§8) — ver [03 §2.1]                   |
-| def_fisica                                         | BOOLEAN      | S    | deficiência física · **dado sensível de saúde**                                              |
-| def_visual                                         | BOOLEAN      | S    | deficiência visual · sensível                                                                |
-| def_auditiva                                       | BOOLEAN      | S    | deficiência auditiva · sensível                                                              |
-| def_mental                                         | BOOLEAN      | S    | deficiência mental · sensível                                                                |
-| def_intelectual                                    | BOOLEAN      | S    | deficiência intelectual · sensível                                                           |
-| reabilitado_readaptado                             | BOOLEAN      | S    | reabilitado/readaptado pelo INSS                                                             |
-| beneficiario_cota                                  | BOOLEAN      | S    | preenche cota de PCD (Lei 8.213/91 art. 93)                                                  |
-| observacao_pcd                                     | TEXT         | S    | laudo/observações · **PII sensível**                                                         |
-| created_at/updated_at/deleted_at                   |              |      |                                                                                              |
+| Coluna                                             | Tipo         | Null | Notas                                                                                                                      |
+| -------------------------------------------------- | ------------ | ---- | -------------------------------------------------------------------------------------------------------------------------- |
+| id                                                 | BIGSERIAL PK | N    | route binding por id                                                                                                       |
+| empresa_id                                         | BIGINT       | N    | FK→empresas cascade                                                                                                        |
+| filial_id                                          | BIGINT       | S    | FK→filiais nullOnDelete (lotação atual)                                                                                    |
+| admin_user_id                                      | BIGINT       | S    | FK→admin_users nullOnDelete (vínculo 1:1 — ver B-ACL)                                                                      |
+| gestor_id                                          | BIGINT       | S    | FK→funcionarios (self) nullOnDelete (organograma)                                                                          |
+| departamento_id                                    | BIGINT       | S    | FK→departamentos nullOnDelete (atual; histórico em C1)                                                                     |
+| cargo_id                                           | BIGINT       | S    | FK→cargos (referência CBO) nullOnDelete (atual; histórico em C1)                                                           |
+| cargo_nivel                                        | SMALLINT     | S    | nível hierárquico do cargo (cache p/ organograma)                                                                          |
+| _Dados pessoais_                                   |              |      |                                                                                                                            |
+| nome                                               | VARCHAR(150) | N    |                                                                                                                            |
+| nome_social                                        | VARCHAR(150) | S    |                                                                                                                            |
+| cpf                                                | VARCHAR(11)  | N    | só dígitos · PII                                                                                                           |
+| rg                                                 | VARCHAR(20)  | S    | PII                                                                                                                        |
+| rg_orgao_emissor                                   | VARCHAR(20)  | S    |                                                                                                                            |
+| rg_uf                                              | CHAR(2)      | S    |                                                                                                                            |
+| data_nascimento                                    | DATE         | S    |                                                                                                                            |
+| sexo                                               | VARCHAR(20)  | S    | ENUM `Sexo` + CHECK                                                                                                        |
+| estado_civil                                       | VARCHAR(20)  | S    | ENUM `EstadoCivil` + CHECK                                                                                                 |
+| escolaridade                                       | VARCHAR(30)  | S    | ENUM `Escolaridade` + CHECK                                                                                                |
+| raca_cor                                           | VARCHAR(20)  | S    | ENUM `RacaCor` (eSocial) + CHECK                                                                                           |
+| nacionalidade_pais_id                              | BIGINT       | S    | FK→paises                                                                                                                  |
+| naturalidade_municipio_id                          | BIGINT       | S    | FK→municipios                                                                                                              |
+| nome_mae                                           | VARCHAR(150) | S    | PII                                                                                                                        |
+| nome_pai                                           | VARCHAR(150) | S    | PII                                                                                                                        |
+| foto_caminho                                       | VARCHAR(255) | S    | disco privado                                                                                                              |
+| _Contratação_                                      |              |      |                                                                                                                            |
+| matricula                                          | VARCHAR(30)  | N    | gerada/manual                                                                                                              |
+| pis_pasep                                          | VARCHAR(11)  | S    | PII eSocial · nullable (cadastro progressivo); **obrigatório na validação eSocial — Fase 4**                               |
+| data_admissao                                      | DATE         | N    |                                                                                                                            |
+| data_demissao                                      | DATE         | S    | null = ativo                                                                                                               |
+| tipo_vinculo                                       | VARCHAR(20)  | N    | ENUM `TipoVinculo` + CHECK                                                                                                 |
+| regime_trabalho                                    | VARCHAR(20)  | N    | ENUM `RegimeTrabalho` + CHECK                                                                                              |
+| salario_base_centavos                              | INTEGER      | S    | atual; histórico em C1                                                                                                     |
+| salario_tipo                                       | VARCHAR(10)  | N    | ENUM (mensal/horista) + CHECK, default mensal                                                                              |
+| status                                             | VARCHAR(20)  | N    | ENUM `StatusFuncionario` + CHECK, default `ativo`                                                                          |
+| _PCD / Deficiência (dado de saúde — LGPD art. 11)_ |              |      | grupo eSocial `infoDeficiencia`; mesmo rigor do `cid` (§8) — ver [03 §2.1]                                                 |
+| def_fisica                                         | BOOLEAN      | S    | deficiência física · **dado sensível de saúde**                                                                            |
+| def_visual                                         | BOOLEAN      | S    | deficiência visual · sensível                                                                                              |
+| def_auditiva                                       | BOOLEAN      | S    | deficiência auditiva · sensível                                                                                            |
+| def_mental                                         | BOOLEAN      | S    | deficiência mental · sensível                                                                                              |
+| def_intelectual                                    | BOOLEAN      | S    | deficiência intelectual · sensível                                                                                         |
+| reabilitado_readaptado                             | BOOLEAN      | S    | reabilitado/readaptado pelo INSS                                                                                           |
+| beneficiario_cota                                  | BOOLEAN      | S    | preenche cota de PCD (Lei 8.213/91 art. 93)                                                                                |
+| observacao_pcd                                     | TEXT         | S    | laudo/observações · **PII sensível**                                                                                       |
+| _Campos personalizados (doc 10)_                   |              |      |                                                                                                                            |
+| dados_personalizados                               | JSONB        | S    | valores dos campos definidos em `campos_personalizados` (§A11); mapa `chave→valor` — ver [10](10-campos-personalizados.md) |
+| created_at/updated_at/deleted_at                   |              |      |                                                                                                                            |
 
 Unique (todos parciais `WHERE deleted_at IS NULL`): `(empresa_id, cpf)`, `(empresa_id, matricula)`, `(empresa_id, admin_user_id)`.
 Índices: `(empresa_id, status)`, `(empresa_id, departamento_id)`, `(empresa_id, cargo_id)`, `(empresa_id, gestor_id)` (recursão do organograma), `filial_id`, `(empresa_id, nome)`, `(empresa_id, data_admissao)`.
 CHECK: `gestor_id <> id`; `data_demissao IS NULL OR data_demissao >= data_admissao`.
 `atributosNaoAuditados()`: `['cpf','rg','pis_pasep','nome_mae','nome_pai','def_fisica','def_visual','def_auditiva','def_mental','def_intelectual','reabilitado_readaptado','beneficiario_cota','observacao_pcd']`.
+
+> **Campos personalizados:** a coluna `dados_personalizados` (JSONB) guarda os valores dos campos definidos em `campos_personalizados` (§A11) para a entidade `funcionario`; chaves marcadas `sensivel=true` entram em mascaramento e ficam **fora de auditoria dinamicamente** (resolvido pelo trait `TemCamposPersonalizados`, não por lista estática) — ver [10](10-campos-personalizados.md).
 
 > **PCD = categoria especial de dado pessoal (LGPD art. 11)** — o grupo de deficiência recebe **o mesmo rigor do `cid`** (§8): fora do diff de auditoria (acima) **+** permissão dedicada `rh.funcionarios.ver_dados_sensiveis` (§10) para exibir/editar (sem ela, a UI oculta a seção PCD); a tela ([03 §2.1](03-cadastro-pessoa-documentos.md)) marca a seção com selo "eSocial" e visibilidade restrita. **Alternativa de isolamento físico:** extrair o grupo para uma tabela-filha 1:1 `funcionario_pcd` (mesmas colunas, FK `funcionario_id` única, `[E][S][A]`) — preferível se o cliente exigir segregação de armazenamento/coluna; na Fase 1 o grupo nasce **embutido** em `funcionarios` (colunas nullable, cadastro progressivo). Cobertura eSocial em [ADR-RH-006](adrs/ADR-RH-006-cobertura-esocial-dados-sensiveis-saude.md).
 
@@ -482,6 +521,56 @@ CHECK: `gestor_id <> id`; `data_demissao IS NULL OR data_demissao >= data_admiss
 
 Índices: `funcionario_id`, `(funcionario_id, data_fim_efetiva)`, `(empresa_id, tipo_afastamento_id)`, `(empresa_id, data_inicio)`. CHECK `data_fim_efetiva IS NULL OR data_fim_efetiva >= data_inicio`. `atributosNaoAuditados()`: `['cid']`.
 
+#### C3. `atestados` — [E][S][A][Anx] (atestado como entidade com workflow)
+
+Atestado deixa de ser "só um anexo de afastamento" e vira **entidade com máquina de estados** (`pendente → em_analise → aprovado | rejeitado`): recebido por vários canais (`origem`), analisado pelo RH, e capaz de **abonar** horas/dias (`ocorrencias`, §C4) ou **virar afastamento** (>15 d → INSS, gera `funcionario_afastamentos` §C2). Modelo, papéis, workflow e fronteira Fase 1 × Fase 2 em [12](12-ausencias-faltas-atestados-afastamentos.md) e [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md).
+
+| Coluna                           | Tipo         | Null | Notas                                                                                                  |
+| -------------------------------- | ------------ | ---- | ------------------------------------------------------------------------------------------------------ |
+| id                               | BIGSERIAL PK | N    |                                                                                                        |
+| empresa_id                       | BIGINT       | N    | FK→empresas cascade                                                                                    |
+| funcionario_id                   | BIGINT       | N    | FK→funcionarios cascade                                                                                |
+| tipo                             | VARCHAR(20)  | S    | natureza (médico/odontológico/acompanhante) — domínio leve, candidato a enum `TipoAtestado` (evolução) |
+| data_emissao                     | DATE         | N    | data do atestado                                                                                       |
+| data_inicio                      | DATE         | S    | início do período coberto (default = `data_emissao`)                                                   |
+| dias_abonados                    | INTEGER      | S    | dias inteiros abonados                                                                                 |
+| minutos_abonados                 | INTEGER      | S    | minutos abonados (parte do dia — convenção §0, nunca horas-float)                                      |
+| cid                              | VARCHAR(10)  | S    | **dado de saúde — LGPD art. 11** (`encrypted` + permissão `rh.atestados.ver_cid`)                      |
+| anexo_id                         | BIGINT       | S    | FK→anexos nullOnDelete (imagem/PDF do atestado)                                                        |
+| status                           | VARCHAR(16)  | N    | ENUM `StatusAtestado` + CHECK, default `pendente`                                                      |
+| origem                           | VARCHAR(24)  | N    | ENUM `OrigemAtestado` + CHECK (canal de entrada)                                                       |
+| afastamento_id                   | BIGINT       | S    | FK→funcionario_afastamentos nullOnDelete (quando o atestado gera afastamento)                          |
+| observacao                       | TEXT         | S    |                                                                                                        |
+| registrado_por_admin_user_id     | BIGINT       | S    | FK→admin_users nullOnDelete (quem lançou)                                                              |
+| analisado_por_admin_user_id      | BIGINT       | S    | FK→admin_users nullOnDelete (quem analisou)                                                            |
+| analisado_em                     | TIMESTAMP    | S    |                                                                                                        |
+| motivo_rejeicao                  | TEXT         | S    |                                                                                                        |
+| created_at/updated_at/deleted_at |              |      |                                                                                                        |
+
+Índices: `(empresa_id, funcionario_id, data_emissao)`, `(empresa_id, status)`, `afastamento_id`, `anexo_id`. CHECK `dias_abonados IS NULL OR dias_abonados >= 0`; `minutos_abonados IS NULL OR minutos_abonados >= 0`. `atributosNaoAuditados()`: `['cid']` (mesmo rigor do `cid` de afastamento — §8 / [06 §5.3](06-linha-do-tempo.md)). **Fundação na Fase 1** (entidade + anexo + estados); workflow/análise/abono completos são Fase 2 — [12](12-ausencias-faltas-atestados-afastamentos.md).
+
+#### C4. `ocorrencias` — [E][S][A] (faltas, atrasos e saídas antecipadas)
+
+Ausência **pontual** (um dia / algumas horas), distinta do afastamento (período, §C2) e do atestado (documento, §C3). Classificação **justificada / injustificada / abonada** (derivada das flags); **origem manual** por gestor/RH na Fase 1 (sem ponto eletrônico até a Fase 5 — [09](09-roadmap-fases.md)). Detalhe em [12](12-ausencias-faltas-atestados-afastamentos.md).
+
+| Coluna                           | Tipo         | Null | Notas                                                                     |
+| -------------------------------- | ------------ | ---- | ------------------------------------------------------------------------- |
+| id                               | BIGSERIAL PK | N    |                                                                           |
+| empresa_id                       | BIGINT       | N    | FK→empresas cascade                                                       |
+| funcionario_id                   | BIGINT       | N    | FK→funcionarios cascade                                                   |
+| data                             | DATE         | N    | dia da ocorrência                                                         |
+| tipo                             | VARCHAR(20)  | N    | ENUM `TipoOcorrencia` + CHECK (falta, atraso, saida_antecipada)           |
+| minutos                          | INTEGER      | S    | duração (atraso/saída; falta de dia inteiro pode ser null) — convenção §0 |
+| justificada                      | BOOLEAN      | N    | default false                                                             |
+| abonada                          | BOOLEAN      | N    | default false (abono por atestado aprovado ou decisão do RH)              |
+| atestado_id                      | BIGINT       | S    | FK→atestados nullOnDelete (quando abonada por atestado)                   |
+| tipo_afastamento_id              | BIGINT       | S    | FK→tipos_afastamento nullOnDelete (classificação trabalhista)             |
+| observacao                       | TEXT         | S    |                                                                           |
+| registrado_por_admin_user_id     | BIGINT       | S    | FK→admin_users nullOnDelete                                               |
+| created_at/updated_at/deleted_at |              |      |                                                                           |
+
+Índices: `(empresa_id, funcionario_id, data)`, `(empresa_id, tipo)`, `atestado_id`. CHECK `minutos IS NULL OR minutos >= 0`. **Injustificada** = `NOT justificada AND NOT abonada` (derivada, sem coluna). As flags conversam com `tipos_afastamento` (`conta_como_falta`, `remunerado`) e com a apuração de frequência/DSR (Fase 3 — [07](07-jornada-horas-extras-folha.md)). **Fundação na Fase 1**; abono automático via atestado aprovado é Fase 2.
+
 ### Bloco D — Horas extras
 
 #### D1. `horas_extras` — [E][A] (lançamento + cálculo + aprovação)
@@ -518,6 +607,29 @@ Resolvido por `funcionarios.admin_user_id` (FK nullable, `UNIQUE(empresa_id, adm
 #### `tabelas_legais` — REFERÊNCIA global por vigência (INSS/IRRF/salário-família)
 
 Parâmetros nacionais que mudam por competência (faixas/alíquotas). Modelados como referência versionada por `vigencia_inicio`/`vigencia_fim` + `tipo` (inss/irrf/salario_familia) + payload JSONB com as faixas. **Fundação** de folha: alimenta cálculos futuros; não há apuração na Fase 1. Pode nascer como seed do pacote e ser atualizada por competência. Ver fronteira em [07](07-jornada-horas-extras-folha.md).
+
+### Bloco F — Apoio à importação (opcional)
+
+#### `importacoes` — [E][A] (log de importação de planilha — apoio)
+
+Registro **opcional** de cada importação de planilha ([11](11-importacao-exportacao.md)): status, contadores e relatório de erros por linha, para a tela de resultado e a auditoria do que foi criado/atualizado. **Não** é pré-requisito da importação — é apoio operacional; pode entrar no incremento que entrega a importação (pós-Fase 1). Sem `deleted_at` (log).
+
+| Coluna                     | Tipo         | Null | Notas                                                                                             |
+| -------------------------- | ------------ | ---- | ------------------------------------------------------------------------------------------------- |
+| id                         | BIGSERIAL PK | N    |                                                                                                   |
+| empresa_id                 | BIGINT       | N    | FK→empresas cascade                                                                               |
+| entidade                   | VARCHAR(40)  | N    | alvo (ex.: `funcionarios`)                                                                        |
+| arquivo_nome               | VARCHAR(255) | S    | nome original do arquivo                                                                          |
+| status                     | VARCHAR(16)  | N    | domínio leve + CHECK: `pendente`/`processando`/`concluida`/`falhou` (sem enum dedicado na Fase 1) |
+| total_linhas               | INTEGER      | S    |                                                                                                   |
+| criados                    | INTEGER      | S    |                                                                                                   |
+| atualizados                | INTEGER      | S    |                                                                                                   |
+| com_erro                   | INTEGER      | S    |                                                                                                   |
+| relatorio_erros            | JSONB        | S    | erros por linha (linha → motivos)                                                                 |
+| iniciado_por_admin_user_id | BIGINT       | S    | FK→admin_users nullOnDelete                                                                       |
+| created_at/updated_at      |              |      | sem `deleted_at` (log)                                                                            |
+
+Índices: `(empresa_id, entidade)`, `(empresa_id, status)`. Fluxo completo (assíncrono, fila, relatório de erros, round-trip) em [11](11-importacao-exportacao.md).
 
 ---
 
@@ -564,6 +676,17 @@ A **categoria do trabalhador** do eSocial (campo `codCateg` do grupo `infoContra
 
 > Os códigos seguem a **Tabela 01 do eSocial** e devem ser **reconfirmados contra o leiaute vigente** (S-1.x) na implementação da Fase 4. `null` significa "não se aplica a um S-2200 deste empregador". Cobertura eSocial completa em [ADR-RH-006](adrs/ADR-RH-006-cobertura-esocial-dados-sensiveis-saude.md) e na matriz S-2200 do [00 §4.1](00-prd.md).
 
+### 4.2 Enums desta revisão (campos personalizados e ausências)
+
+Backed `string`, com `label()`/`options()` e **CHECK** na coluna, como os demais. Uso detalhado em [10](10-campos-personalizados.md) (campos personalizados) e [12](12-ausencias-faltas-atestados-afastamentos.md) (atestados/ocorrências).
+
+| Enum                     | Cases (valor)                                                             | Lógica                                                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TipoCampoPersonalizado` | texto, texto_longo, numero, decimal, data, booleano, select, multi_select | `componente(): string` (mapeia p/ `x-shared.*`), `regraValidacao(array $regras, ?array $opcoes): array`, `aceitaOpcoes(): bool`, `castValor(mixed): mixed`     |
+| `StatusAtestado`         | pendente, em_analise, aprovado, rejeitado, estornado                      | `isFinal()`, `podeTransicionarPara()`, `variant()` (`estornar` reverte um `aprovado` → `estornado` — [12 §2.4](12-ausencias-faltas-atestados-afastamentos.md)) |
+| `OrigemAtestado`         | portal_colaborador, gestor, rh, importacao                                | `label()` (canal de entrada — [12](12-ausencias-faltas-atestados-afastamentos.md))                                                                             |
+| `TipoOcorrencia`         | falta, atraso, saida_antecipada                                           | `label()`, `usaMinutos(): bool` (atraso/saída usam `minutos`; falta de dia inteiro não)                                                                        |
+
 ---
 
 ## 5. Seeds padrão (catálogos) — por empresa, idempotentes
@@ -590,6 +713,8 @@ Greenfield: a Fase 1 cria as tabelas já completas. O padrão para evoluções f
 4. Catálogos novos e tabelas-filhas são puramente aditivos.
 5. Empacotamento (ADR-0015): migrations em `packages/modulo-rh/database/migrations` (via `loadMigrationsFrom`); permissões/menu mesclados em runtime no `boot()`; **aditivo, nunca edita o core**.
 
+> **Itens desta revisão (todos aditivos).** As tabelas novas — `campos_personalizados` (§A11) + coluna `funcionarios.dados_personalizados`, `atestados` (§C3), `ocorrencias` (§C4) e `importacoes` (§F, opcional) — e os enums de §4.2 entram pelas regras acima (colunas/tabelas novas `NULL`/com default; FKs nullable; CHECK após backfill). **Faseamento:** campos personalizados é **fundação reutilizável** aplicada ao funcionário já na Fase 1 (candidata a promoção ao core — [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)); atestado/ocorrência entram como **fundação na Fase 1** (entidade + estados + anexo), com workflow/abono completos nas fases seguintes ([12](12-ausencias-faltas-atestados-afastamentos.md), [09](09-roadmap-fases.md)); a importação é **pós-Fase 1** ([11](11-importacao-exportacao.md)).
+
 ---
 
 ## 7. Performance e integridade
@@ -614,16 +739,17 @@ Greenfield: a Fase 1 cria as tabelas já completas. O padrão para evoluções f
 
 ---
 
-## 9. Resumo (≈21 tabelas novas + reaproveitadas)
+## 9. Resumo (≈24 tabelas novas + reaproveitadas)
 
-**Catálogos tenant (10):** `departamentos`, `funcoes`, `funcionario_funcao`, `tipos_documento`, `tipos_afastamento`, `escalas`, `escala_dias`, `escala_funcionario`, `rubricas`, `fator_horas_extras`.
-**Funcionário e filhas (7):** `funcionarios` (inclui o grupo **PCD** — colunas, não tabela — e o vínculo ACL `admin_user_id`), `funcionario_contatos`, `funcionario_enderecos`, `funcionario_dados_bancarios`, `funcionario_dependentes`, `funcionario_documentos`.
-**Histórico (2):** `funcionario_eventos`, `funcionario_afastamentos`.
+**Catálogos tenant (11):** `departamentos`, `funcoes`, `funcionario_funcao`, `tipos_documento`, `tipos_afastamento`, `escalas`, `escala_dias`, `escala_funcionario`, `rubricas`, `fator_horas_extras`, `campos_personalizados` (§A11, meta).
+**Funcionário e filhas (6):** `funcionarios` (inclui o grupo **PCD** — colunas, não tabela —, o vínculo ACL `admin_user_id` e a coluna `dados_personalizados` JSONB), `funcionario_contatos`, `funcionario_enderecos`, `funcionario_dados_bancarios`, `funcionario_dependentes`, `funcionario_documentos`.
+**Histórico e ausências (4):** `funcionario_eventos`, `funcionario_afastamentos`, `atestados` (§C3), `ocorrencias` (§C4).
 **Operacional (1):** `horas_extras`.
+**Apoio à importação (1, opcional):** `importacoes` (§F).
 **Referência de folha (1):** `tabelas_legais`.
 **Reaproveitadas do core (sem nova tabela):** `anexos`, `cargos`, `bancos`, `paises`, `estados`, `municipios`, `tipos_logradouro`, `empresas`, `filiais`, `admin_users`.
 
-> O grupo **PCD/Deficiência** e a derivação **`codCateg`** (§4.1) são **cadastrais e baratos** — colunas nullable em `funcionarios` + método no enum, **sem tabela nova** (a única tabela acrescentada nesta revisão é `fator_horas_extras`, §A10). As **permissões canônicas** estão em §10.
+> O grupo **PCD/Deficiência** e a derivação **`codCateg`** (§4.1) seguem **cadastrais e baratos** — colunas nullable em `funcionarios` + método no enum, **sem tabela nova**. Esta revisão acrescenta **4 tabelas** (`campos_personalizados`, `atestados`, `ocorrencias` e a opcional `importacoes`) + a coluna `dados_personalizados`, todas **aditivas** (§6) e detalhadas em [10](10-campos-personalizados.md)/[11](11-importacao-exportacao.md)/[12](12-ausencias-faltas-atestados-afastamentos.md). As **permissões canônicas** estão em §10.
 
 ---
 
@@ -638,25 +764,28 @@ Esta é a lista **canônica** das permissões do módulo. README, [02](02-fase-1
 - **Especiais** (escritas à mão em `config/rh.php`, fora das âncoras CRUD): coluna "Especiais" abaixo.
 - **Verbo semântico de UI** (`registrar`/`encerrar` em afastamentos; `ver` individual de funcionário) é **rótulo** mapeado a um slug CRUD registrado — o slug que `access:sync` publica é o desta tabela.
 
-| Recurso               | Tipo                             | Ações registradas (`rh.<recurso>.…`)                                                                                                                                              |
-| --------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `departamentos`       | catálogo tenant                  | `listar` · `criar` · `editar` · `deletar` · `restaurar` · `excluir_permanente`                                                                                                    |
-| `funcoes`             | catálogo tenant                  | CRUD + lixeira (idem)                                                                                                                                                             |
-| `tipos_documento`     | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                    |
-| `tipos_afastamento`   | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                    |
-| `escalas`             | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                    |
-| `rubricas`            | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                    |
-| `fator_horas_extras`  | catálogo tenant (fino, §A10)     | CRUD + lixeira                                                                                                                                                                    |
-| `funcionarios`        | agregado-raiz                    | CRUD + lixeira **+ `ver_todos`** (desliga o eixo organograma — [05](05-organograma-acl-hierarquica.md)) **+ `ver_dados_sensiveis`** (grupo PCD — dado de saúde, LGPD art. 11, §8) |
-| `funcoes_funcionario` | pivot (vigência)                 | `atribuir` · `encerrar`                                                                                                                                                           |
-| `escala_funcionario`  | pivot (vigência)                 | `atribuir` · `encerrar`                                                                                                                                                           |
-| `organograma`         | tela                             | `ver`                                                                                                                                                                             |
-| `self`                | portal do colaborador            | `ver`                                                                                                                                                                             |
-| `eventos`             | append-only (§C1)                | `listar` · `registrar` _(sem editar/excluir — append-only; correção = evento de estorno)_                                                                                         |
-| `afastamentos`        | soft-deletable                   | `listar` · `criar` · `editar` · `deletar` · `restaurar` · `excluir_permanente` **+ `ver_cid`** (dado de saúde) _(UI: `criar`="registrar", `editar`="encerrar")_                   |
-| `horas_extras`        | máquina de estados (sem lixeira) | `listar` · `lancar` · `aprovar` · `estornar` · `marcar_paga` · `ver_valores`                                                                                                      |
-| `tabelas_legais`      | referência (leitura)             | `listar` · `ver`                                                                                                                                                                  |
-| `documentos`          | opcional                         | `listar` · `criar` · `editar` · `deletar` _(default: gerido dentro do form do funcionário, sob `rh.funcionarios.*`)_                                                              |
+| Recurso                 | Tipo                             | Ações registradas (`rh.<recurso>.…`)                                                                                                                                                                                                                                        |
+| ----------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `departamentos`         | catálogo tenant                  | `listar` · `criar` · `editar` · `deletar` · `restaurar` · `excluir_permanente`                                                                                                                                                                                              |
+| `funcoes`               | catálogo tenant                  | CRUD + lixeira (idem)                                                                                                                                                                                                                                                       |
+| `tipos_documento`       | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                                                                                                              |
+| `tipos_afastamento`     | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                                                                                                              |
+| `escalas`               | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                                                                                                              |
+| `rubricas`              | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                                                                                                              |
+| `fator_horas_extras`    | catálogo tenant (fino, §A10)     | CRUD + lixeira                                                                                                                                                                                                                                                              |
+| `funcionarios`          | agregado-raiz                    | CRUD + lixeira **+ `ver_todos`** (desliga o eixo organograma — [05](05-organograma-acl-hierarquica.md)) **+ `ver_dados_sensiveis`** (grupo PCD — dado de saúde, LGPD art. 11, §8) **+ `importar`** · **`exportar`** (planilha — [11](11-importacao-exportacao.md))          |
+| `funcoes_funcionario`   | pivot (vigência)                 | `atribuir` · `encerrar`                                                                                                                                                                                                                                                     |
+| `escala_funcionario`    | pivot (vigência)                 | `atribuir` · `encerrar`                                                                                                                                                                                                                                                     |
+| `organograma`           | tela                             | `ver`                                                                                                                                                                                                                                                                       |
+| `self`                  | portal do colaborador            | `ver`                                                                                                                                                                                                                                                                       |
+| `eventos`               | append-only (§C1)                | `listar` · `registrar` _(sem editar/excluir — append-only; correção = evento de estorno)_                                                                                                                                                                                   |
+| `afastamentos`          | soft-deletable                   | `listar` · `criar` · `editar` · `deletar` · `restaurar` · `excluir_permanente` **+ `ver_cid`** (dado de saúde) _(UI: `criar`="registrar", `editar`="encerrar")_                                                                                                             |
+| `horas_extras`          | máquina de estados (sem lixeira) | `listar` · `lancar` · `aprovar` · `estornar` · `marcar_paga` · `ver_valores`                                                                                                                                                                                                |
+| `tabelas_legais`        | referência (leitura)             | `listar` · `ver`                                                                                                                                                                                                                                                            |
+| `documentos`            | opcional                         | `listar` · `criar` · `editar` · `deletar` _(default: gerido dentro do form do funcionário, sob `rh.funcionarios.*`)_                                                                                                                                                        |
+| `campos_personalizados` | meta-catálogo (§A11)             | `listar` · `criar` · `editar` · `deletar` · `restaurar` · `excluir_permanente` _(gestão das **definições**; editar os **valores** segue a permissão da entidade, ex. `rh.funcionarios.editar`)_                                                                             |
+| `atestados`             | workflow (soft-deletable, §C3)   | `listar` · `criar` · `editar` · `analisar` · `aprovar` · `rejeitar` · `estornar` · `deletar` · `restaurar` · `excluir_permanente` **+ `ver_cid`** (dado de saúde) _(UI: colaborador "enviar"/gestor "registrar" = `criar`; `estornar` reverte um `aprovado` → `estornado`)_ |
+| `ocorrencias`           | soft-deletable (§C4)             | `listar` · `criar` · `editar` · `deletar` · `restaurar` · `excluir_permanente` _(+ `abonar` opcional — abono separado do `editar`)_                                                                                                                                         |
 
 **Notas de reconciliação (resolvem divergências entre docs):**
 
@@ -666,3 +795,7 @@ Esta é a lista **canônica** das permissões do módulo. README, [02](02-fase-1
 - **`funcionarios.ver`** (abrir um cadastro) citado em [05 §11](05-organograma-acl-hierarquica.md) é **subsumido por `listar`** no conjunto gerado; um split `ver` é opcional (entra como especial, se adotado). O eixo RBAC é o mesmo: **o verbo é RBAC; quais linhas é tenant + organograma**.
 - Permissões sensíveis (`ver_cid`, `ver_dados_sensiveis`) são **separadas do CRUD** — ver o registro ≠ ver o dado de saúde (LGPD art. 11, §8). Convivem com o RBAC de dois níveis e a ACL hierárquica ([05](05-organograma-acl-hierarquica.md)); super-admin faz bypass.
 - **`rh.cargos.*` não é permissão da Fase 1.** Cargo é **referência global** (CBO), não catálogo do RH (§0/[ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md)). O slug `rh.cargos.*` aparece em [04](04-catalogos-configuraveis.md)/[ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md) **apenas** como **evolução futura** (promover a catálogo tenant `cargos_empresa`); se/quando adotado, entra aqui como CRUD + lixeira.
+- **`atestados` é workflow + lixeira:** além do CRUD + lixeira, tem os verbos de análise (`analisar`/`aprovar`/`rejeitar`/`estornar` — este reverte um `aprovado` → `estornado`) e o sensível **`ver_cid`** (dado de saúde, §8) — mesmo rigor do `cid` de afastamento ([06 §5.3](06-linha-do-tempo.md)). Os rótulos de UI "enviar" (colaborador, portal) e "registrar" (gestor/RH) mapeiam para `criar`, discriminados pela coluna `origem` (`OrigemAtestado`). Máquina de estados em [12](12-ausencias-faltas-atestados-afastamentos.md) / [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md).
+- **`ocorrencias`** (faltas/atrasos) tem CRUD + lixeira; o **abono** (marcar `abonada`/`justificada`, que afeta frequência/folha) pode ser o `editar` ou um verbo especial `rh.ocorrencias.abonar` se o cliente exigir separar quem lança de quem abona. O slug alternativo `rh.faltas.*` é equivalente — adota-se **`rh.ocorrencias.*`** (= nome da tabela).
+- **`campos_personalizados`** governa as **definições** (CRUD + lixeira). Editar os **valores** (`funcionarios.dados_personalizados`) **não** tem permissão própria — segue a permissão da entidade hospedeira (`rh.funcionarios.editar`); campos com `sensivel=true` herdam o mascaramento/ocultação do grupo PCD ([10](10-campos-personalizados.md)).
+- **`rh.funcionarios.{importar,exportar}`** são **especiais** (escritas à mão em `config/rh.php`, fora das âncoras CRUD) — [11](11-importacao-exportacao.md). A exportação carrega PII (auditar a operação + mascaramento); o log opcional `importacoes` (§F) é consultado dentro do fluxo de `importar` (sem permissão própria na Fase 1).
