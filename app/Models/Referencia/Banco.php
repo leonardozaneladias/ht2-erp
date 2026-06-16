@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
+use App\Models\Concerns\Auditavel;
+use App\Models\Contracts\UsaSoftDeletes;
+use Database\Factories\Referencia\BancoFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Banco (participante do SPB) — dado de referência global. Chave natural: ispb.
@@ -15,13 +20,26 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $nome
  * @property string|null $nome_completo
  * @property bool $ativo
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  */
-class Banco extends Model
+class Banco extends Model implements UsaSoftDeletes
 {
+    use Auditavel;
+
+    /** @use HasFactory<BancoFactory> */
+    use HasFactory;
+
+    use SoftDeletes;
+
     protected $table = 'bancos';
 
     /** @var list<string> */
     protected $fillable = ['ispb', 'codigo_compe', 'nome', 'nome_completo', 'ativo'];
+
+    protected static function newFactory(): BancoFactory
+    {
+        return BancoFactory::new();
+    }
 
     /** @return array<string, string> */
     protected function casts(): array
