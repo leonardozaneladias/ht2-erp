@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Usuarios;
 use App\Actions\Admin\ConcederAcessoDiretoAction;
 use App\Actions\Admin\CreateAdminUserAction;
 use App\Actions\Admin\RevogarAcessoDiretoAction;
+use App\Actions\Admin\Security\DefinirEmailDoisFatoresAction;
 use App\Actions\Admin\SyncAcessoEmpresaAction;
 use App\Actions\Admin\UpdateAdminUserAction;
 use App\DTOs\Admin\AdminUserDTO;
@@ -20,6 +21,7 @@ use App\Models\Empresa;
 use App\Models\PermissionGrant;
 use App\Models\Referencia\Cargo;
 use App\Services\Admin\HierarchyResolver;
+use App\Settings\SegurancaSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -63,6 +65,9 @@ class FormUsuario extends Component
     /** @var array<int, int> */
     public array $empresasAcesso = [];
 
+    // Preferência de 2FA por e-mail do usuário-alvo (gerida por um admin com ACL).
+    public bool $emailDoisFatoresAlvo = false;
+
     // Painel de concessão de acesso extra (grant/deny direto).
     public bool $mostrarFormAcesso = false;
 
@@ -87,6 +92,7 @@ class FormUsuario extends Component
             $this->ativo = (bool) $alvo->ativo;
             $this->roles = $alvo->getRoleNames()->all();
             $this->empresasAcesso = $alvo->empresasAcessiveis()->pluck('empresas.id')->all();
+            $this->emailDoisFatoresAlvo = (bool) $alvo->two_factor_email_enabled;
 
             return;
         }
@@ -228,6 +234,45 @@ class FormUsuario extends Component
     public function podeGerirEmpresas(): bool
     {
         return Auth::guard('admin')->user()?->can('empresas.acessos') ?? false;
+    }
+
+    #[Computed]
+    public function podeGerirDoisFatores(): bool
+    {
+        if ($this->usuarioId === null) {
+            return false;
+        }
+
+        $ator = Auth::guard('admin')->user();
+        $alvo = AdminUser::find($this->usuarioId);
+
+        return $ator instanceof AdminUser
+            && $alvo instanceof AdminUser
+            && $ator->can('usuarios.gerenciar-2fa')
+            && app(HierarchyResolver::class)->podeGerir($ator, $alvo);
+    }
+
+    #[Computed]
+    public function emailDoisFatoresGlobalAtivo(): bool
+    {
+        return app(SegurancaSettings::class)->permitir_2fa_email;
+    }
+
+    public function salvarDoisFatoresEmail(DefinirEmailDoisFatoresAction $action): void
+    {
+        if ($this->usuarioId === null) {
+            return;
+        }
+
+        $alvo = AdminUser::findOrFail($this->usuarioId);
+        $this->authorize('gerenciarDoisFatores', $alvo);
+
+        $ator = Auth::guard('admin')->user();
+        assert($ator instanceof AdminUser);
+
+        $action->execute($alvo, $this->emailDoisFatoresAlvo, $ator);
+
+        $this->notificarSucesso('Preferência de 2FA por e-mail atualizada.');
     }
 
     #[Computed]

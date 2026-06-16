@@ -34,6 +34,9 @@
         @if ($modo === 'editar')
             <x-shared.tab-trigger id="aba-empresas" icon="tabler--building-community">Empresas</x-shared.tab-trigger>
             <x-shared.tab-trigger id="aba-acessos" icon="tabler--key">Acessos extras</x-shared.tab-trigger>
+            @if ($this->podeGerirDoisFatores)
+                <x-shared.tab-trigger id="aba-seguranca" icon="tabler--lock">Segurança</x-shared.tab-trigger>
+            @endif
             @if ($this->podeVerHistorico)
                 <x-shared.tab-trigger id="aba-historico" icon="tabler--history">Histórico</x-shared.tab-trigger>
             @endif
@@ -326,6 +329,38 @@
                         </tbody>
                     </table>
                 </div>
+            </x-shared.tab-panel>
+        @endif
+
+        {{-- ABA SEGURANÇA --}}
+        @if ($modo === 'editar' && $this->podeGerirDoisFatores)
+            <x-shared.tab-panel id="aba-seguranca">
+                <p class="text-default-500 mb-5 text-sm">Controle o segundo fator por e-mail deste usuário.</p>
+
+                @if (! $this->emailDoisFatoresGlobalAtivo)
+                    <x-shared.alert variant="info" icon="tabler--lock">
+                        O 2FA por e-mail está desligado nas Configurações do sistema. Habilite-o em Configurações ›
+                        Segurança para poder usá-lo aqui.
+                    </x-shared.alert>
+                @else
+                    <x-shared.toggle
+                        name="emailDoisFatoresAlvo"
+                        label="Permitir código 2FA por e-mail"
+                        wire:model="emailDoisFatoresAlvo"
+                    />
+                    <p class="text-default-500 mt-1 text-sm">O usuário poderá receber um código de verificação por e-mail ao entrar, mesmo sem o aplicativo autenticador.</p>
+                    <div class="mt-4 flex justify-end">
+                        <x-shared.button
+                            variant="primary"
+                            size="sm"
+                            wire:click="salvarDoisFatoresEmail"
+                            wire:loading.attr="disabled"
+                        >
+                            <span wire:loading.remove wire:target="salvarDoisFatoresEmail">Salvar</span>
+                            <span wire:loading wire:target="salvarDoisFatoresEmail">Salvando...</span>
+                        </x-shared.button>
+                    </div>
+                @endif
             </x-shared.tab-panel>
         @endif
 

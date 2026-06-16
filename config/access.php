@@ -132,6 +132,10 @@ return [
                 'label' => 'Editar usuários',
                 'descricao' => 'Alterar dados e status de usuários.',
             ],
+            'usuarios.gerenciar-2fa' => [
+                'label' => 'Gerenciar 2FA de usuários',
+                'descricao' => 'Habilitar ou desabilitar o recebimento de código 2FA por e-mail de outros usuários.',
+            ],
             'usuarios.deletar' => [
                 'label' => 'Excluir usuários',
                 'descricao' => 'Mover usuários para a lixeira.',

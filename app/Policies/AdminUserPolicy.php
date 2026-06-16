@@ -43,6 +43,11 @@ class AdminUserPolicy
         return $auth->can('acessos.gerenciar') && $this->hierarchy->podeGerir($auth, $usuario);
     }
 
+    public function gerenciarDoisFatores(AdminUser $auth, AdminUser $usuario): bool
+    {
+        return $auth->can('usuarios.gerenciar-2fa') && $this->hierarchy->podeGerir($auth, $usuario);
+    }
+
     public function impersonate(AdminUser $auth, AdminUser $usuario): bool
     {
         return $auth->can('usuarios.impersonar') && $this->hierarchy->podeGerir($auth, $usuario);
