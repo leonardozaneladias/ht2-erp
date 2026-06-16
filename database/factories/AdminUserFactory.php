@@ -60,4 +60,15 @@ final class AdminUserFactory extends Factory
             'two_factor_confirmed_at' => now(),
         ]);
     }
+
+    /**
+     * 2FA por e-mail habilitado (preferência do usuário).
+     */
+    public function comEmailDoisFatores(): static
+    {
+        return $this->state([
+            'two_factor_email_enabled' => true,
+            'two_factor_email_enabled_at' => now(),
+        ]);
+    }
 }
