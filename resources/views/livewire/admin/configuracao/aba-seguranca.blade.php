@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit="salvar" class="grid gap-6">
+    <form wire:submit="solicitarSalvar" class="grid gap-6">
         <x-shared.card
             title="Política de senha"
             subtitle="Exigências aplicadas ao cadastrar ou alterar senhas de usuários."
@@ -41,13 +41,13 @@
                     hint="Tempo de inatividade até exigir novo login."
                 />
             </div>
-            <div class="flex items-center gap-2">
+            <div class="mt-2">
                 <x-shared.toggle
                     name="exigir_2fa_admin"
                     label="Exigir 2FA para administradores"
                     wire:model="exigir_2fa_admin"
                 />
-                <x-shared.badge variant="warning">em breve</x-shared.badge>
+                <p class="text-default-500 mt-1 text-sm">Quando ativada, administradores sem 2FA são direcionados a configurá-lo antes de acessar o sistema. Desligada por padrão.</p>
             </div>
         </x-shared.card>
 
@@ -125,9 +125,12 @@
         </x-shared.card>
 
         <div class="flex justify-end">
-            <x-shared.loading-button target="salvar" icon="tabler--device-floppy">
+            <x-shared.loading-button target="solicitarSalvar" icon="tabler--device-floppy">
                 Salvar segurança
             </x-shared.loading-button>
         </div>
     </form>
+
+    @include ('admin.partials.confirms-password')
+    @include ('admin.partials.confirms-two-factor')
 </div>

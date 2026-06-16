@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveSegurancaSettingsAction;
 use App\DTOs\Admin\Settings\SegurancaSettingsDTO;
+use App\Livewire\Concerns\ConfirmaSegundoFator;
 use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Settings\SegurancaSettings;
 use Illuminate\Contracts\View\View;
@@ -15,11 +16,13 @@ use Livewire\Component;
  * Aba "Segurança": política de senha, tempo de sessão e retenção de logs.
  *
  * A política de senha é consumida por App\Support\Settings\PasswordPolicy; o
- * timeout de sessão é aplicado pelo SettingsRuntimeApplier. A flag de 2FA é
- * apenas armazenada aqui — sua aplicação pertence ao épico de Segurança.
+ * timeout de sessão é aplicado pelo SettingsRuntimeApplier. A flag
+ * exigir_2fa_admin é imposta pelo middleware EnsureTwoFactorEnabled (opcional,
+ * desligada por padrão). Salvar esta aba exige step-up de segundo fator.
  */
 class AbaSeguranca extends Component
 {
+    use ConfirmaSegundoFator;
     use EmiteNotificacoes;
 
     public int $senha_min_caracteres = 8;
@@ -65,11 +68,22 @@ class AbaSeguranca extends Component
         $this->alerta_login_super_admin = $settings->alerta_login_super_admin;
     }
 
-    public function salvar(SaveSegurancaSettingsAction $action): void
+    /**
+     * Pedido de salvamento vindo do formulário: valida e dispara o step-up de
+     * segurança (2FA, ou senha quando o usuário não tem 2FA) antes de persistir.
+     */
+    public function solicitarSalvar(): void
     {
         $this->validate();
+        $this->iniciarConfirmacao2fa('salvar');
+    }
 
-        $action->execute(new SegurancaSettingsDTO(
+    public function salvar(): void
+    {
+        $this->ensureSegundoFatorConfirmado();
+        $this->validate();
+
+        app(SaveSegurancaSettingsAction::class)->execute(new SegurancaSettingsDTO(
             senha_min_caracteres: $this->senha_min_caracteres,
             senha_exige_maiuscula: $this->senha_exige_maiuscula,
             senha_exige_numero: $this->senha_exige_numero,

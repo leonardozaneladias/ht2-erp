@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Security;
 
 use App\Models\AdminUser;
+use App\Services\Admin\Security\AlertaSeguranca;
 use App\Services\Admin\Security\TwoFactorService;
 use Illuminate\Support\Facades\Auth;
 
 final class RegenerateRecoveryCodesAction
 {
-    public function __construct(private readonly TwoFactorService $service) {}
+    public function __construct(
+        private readonly TwoFactorService $service,
+        private readonly AlertaSeguranca $alerta,
+    ) {}
 
     /**
      * @return list<string> Novos códigos de recuperação (texto puro, exibidos uma vez).
@@ -28,6 +32,8 @@ final class RegenerateRecoveryCodesAction
             ->causedBy(Auth::guard('admin')->user())
             ->event('2fa-recovery-regenerated')
             ->log('Códigos de recuperação 2FA regenerados');
+
+        $this->alerta->codigosRecuperacaoRegenerados($usuario);
 
         return $codigos;
     }

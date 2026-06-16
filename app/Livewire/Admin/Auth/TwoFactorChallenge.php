@@ -31,6 +31,9 @@ final class TwoFactorChallenge extends Component
 
     public string $recoveryCode = '';
 
+    /** @var 'totp'|'recovery' Método que satisfez o desafio (auditoria/alerta). */
+    private string $metodoVerificado = 'totp';
+
     public function mount(): void
     {
         if (! session()->has('2fa.pending')) {
@@ -88,7 +91,13 @@ final class TwoFactorChallenge extends Component
         $limite->limpar($chave);
 
         Auth::guard('admin')->login($usuario, (bool) ($pendente['remember'] ?? false));
-        app(AuditoriaSeguranca::class)->loginBemSucedido($usuario, true);
+        app(AuditoriaSeguranca::class)->loginBemSucedido($usuario, true, $this->metodoVerificado);
+
+        // Uso de código de recuperação é evento de risco (perda do dispositivo):
+        // avisa o titular para detectar acesso indevido.
+        if ($this->metodoVerificado === 'recovery') {
+            app(AlertaSeguranca::class)->codigoRecuperacaoUtilizado($usuario);
+        }
 
         if ($usuario->hasRole((string) config('access.super_admin_role', 'super-admin'))) {
             app(AlertaSeguranca::class)->superAdminLogou($usuario);
@@ -123,16 +132,32 @@ final class TwoFactorChallenge extends Component
             }
 
             $usuario->forceFill(['two_factor_recovery_codes' => $restantes])->save();
+            $this->metodoVerificado = 'recovery';
 
             return true;
         }
 
-        if ($usuario->two_factor_secret === null
-            || ! $service->verificarCodigo($usuario->two_factor_secret, trim($this->codigo))) {
+        if ($usuario->two_factor_secret === null) {
             $this->addError('codigo', 'Código inválido ou expirado.');
 
             return false;
         }
+
+        $timestamp = $service->verificarCodigo(
+            $usuario->two_factor_secret,
+            trim($this->codigo),
+            $usuario->two_factor_last_timestamp,
+        );
+
+        if ($timestamp === false) {
+            $this->addError('codigo', 'Código inválido ou expirado.');
+
+            return false;
+        }
+
+        // Persiste a janela aceita: o mesmo código não vale uma segunda vez.
+        $usuario->forceFill(['two_factor_last_timestamp' => $timestamp])->save();
+        $this->metodoVerificado = 'totp';
 
         return true;
     }

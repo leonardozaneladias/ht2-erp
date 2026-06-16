@@ -128,4 +128,17 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Two Factor Confirmation Timeout
+    |--------------------------------------------------------------------------
+    |
+    | Janela (em segundos) em que uma confirmação de segundo fator (step-up)
+    | permanece válida para ações sensíveis antes de o código ser exigido de
+    | novo. Curta por desenho — o padrão é cinco minutos.
+    |
+    */
+
+    'two_factor_confirm_timeout' => env('AUTH_TWO_FACTOR_CONFIRM_TIMEOUT', 300),
+
 ];

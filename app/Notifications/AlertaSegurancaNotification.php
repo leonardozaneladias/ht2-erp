@@ -47,7 +47,9 @@ final class AlertaSegurancaNotification extends Notification implements ShouldQu
             $mail->line(ucfirst($rotulo) . ': ' . $valor);
         }
 
-        return $mail->line('Verifique a trilha de auditoria em /admin/auditoria.');
+        return $this->tipo->paraUsuario()
+            ? $mail->action('Revisar segurança da conta', $this->url())
+            : $mail->line('Verifique a trilha de auditoria em /admin/auditoria.');
     }
 
     /**
@@ -62,9 +64,20 @@ final class AlertaSegurancaNotification extends Notification implements ShouldQu
             'titulo' => $this->tipo->label(),
             'mensagem' => $this->tipo->descricao(),
             'icon' => $this->tipoNotificacao()->icon(),
-            'url' => route('admin.auditoria.index'),
+            'url' => $this->url(),
             'contexto' => $this->contexto,
         ];
+    }
+
+    /**
+     * Destino in-app do alerta: a própria segurança da conta (alertas do dono)
+     * ou a trilha de auditoria (alertas operacionais aos super-admins).
+     */
+    private function url(): string
+    {
+        return $this->tipo->paraUsuario()
+            ? route('admin.conta', ['aba' => 'seguranca'])
+            : route('admin.auditoria.index');
     }
 
     /**
@@ -73,7 +86,9 @@ final class AlertaSegurancaNotification extends Notification implements ShouldQu
     private function tipoNotificacao(): TipoNotificacao
     {
         return match ($this->tipo) {
-            TipoAlertaSeguranca::LoginSuperAdmin => TipoNotificacao::Info,
+            TipoAlertaSeguranca::LoginSuperAdmin,
+            TipoAlertaSeguranca::DoisFatoresAtivado,
+            TipoAlertaSeguranca::CodigosRecuperacaoRegenerados => TipoNotificacao::Info,
             default => TipoNotificacao::Aviso,
         };
     }

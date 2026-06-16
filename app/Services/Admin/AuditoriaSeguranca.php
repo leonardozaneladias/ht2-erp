@@ -12,12 +12,21 @@ use App\Models\AdminUser;
  */
 final class AuditoriaSeguranca
 {
-    public function loginBemSucedido(AdminUser $usuario, bool $via2fa): void
+    /**
+     * @param  'totp'|'recovery'|null  $metodo  Como o 2FA foi satisfeito (quando via2fa).
+     */
+    public function loginBemSucedido(AdminUser $usuario, bool $via2fa, ?string $metodo = null): void
     {
+        $propriedades = ['2fa' => $via2fa];
+
+        if ($metodo !== null) {
+            $propriedades['metodo'] = $metodo;
+        }
+
         activity('auth')
             ->causedBy($usuario)
             ->event('login')
-            ->withProperties(['2fa' => $via2fa])
+            ->withProperties($propriedades)
             ->log('Login realizado');
     }
 

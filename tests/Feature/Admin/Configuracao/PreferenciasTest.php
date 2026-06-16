@@ -89,6 +89,9 @@ it('rejeita fuso horário inválido', function () {
 });
 
 it('salva a política de segurança', function () {
+    // Salvar a aba exige step-up; sem 2FA, cai no fallback de senha (já confirmada).
+    session()->put('auth.password_confirmed_at', time());
+
     Livewire::actingAs($this->admin, 'admin')
         ->test(AbaSeguranca::class)
         ->set('senha_min_caracteres', 12)

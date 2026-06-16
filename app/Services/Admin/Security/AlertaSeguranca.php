@@ -44,6 +44,37 @@ final class AlertaSeguranca
         ]);
     }
 
+    public function doisFatoresAtivado(AdminUser $usuario): void
+    {
+        $this->enviarAoUsuario($usuario, TipoAlertaSeguranca::DoisFatoresAtivado);
+    }
+
+    public function doisFatoresDesativado(AdminUser $usuario): void
+    {
+        $this->enviarAoUsuario($usuario, TipoAlertaSeguranca::DoisFatoresDesativado);
+    }
+
+    public function codigosRecuperacaoRegenerados(AdminUser $usuario): void
+    {
+        $this->enviarAoUsuario($usuario, TipoAlertaSeguranca::CodigosRecuperacaoRegenerados);
+    }
+
+    public function codigoRecuperacaoUtilizado(AdminUser $usuario): void
+    {
+        $this->enviarAoUsuario($usuario, TipoAlertaSeguranca::CodigoRecuperacaoUtilizado);
+    }
+
+    /**
+     * Alerta direcionado ao próprio dono da conta sobre mudanças no seu 2FA.
+     * Sempre enviado (não depende de `alertas_seguranca_habilitados`, que rege
+     * apenas os alertas operacionais aos super-admins): avisar o titular sobre
+     * uma mudança de segurança é defesa contra tomada de conta.
+     */
+    private function enviarAoUsuario(AdminUser $usuario, TipoAlertaSeguranca $tipo): void
+    {
+        $usuario->notify(new AlertaSegurancaNotification($tipo, []));
+    }
+
     /**
      * @param  array<string, string>  $contexto
      */

@@ -8,7 +8,7 @@ use App\Actions\Admin\Security\ConfirmTwoFactorAction;
 use App\Actions\Admin\Security\DisableTwoFactorAction;
 use App\Actions\Admin\Security\EnableTwoFactorAction;
 use App\Actions\Admin\Security\RegenerateRecoveryCodesAction;
-use App\Livewire\Concerns\ConfirmsPassword;
+use App\Livewire\Concerns\ConfirmaSegundoFator;
 use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Services\Admin\Security\TwoFactorService;
@@ -24,7 +24,7 @@ use Livewire\Component;
  */
 class SegurancaConta extends Component
 {
-    use ConfirmsPassword;
+    use ConfirmaSegundoFator;
     use EmiteNotificacoes;
 
     public bool $configurando = false;
@@ -85,7 +85,8 @@ class SegurancaConta extends Component
     public function desativar(): void
     {
         app(ImpersonationContext::class)->garantirNaoPersonificando();
-        $this->ensurePasswordIsConfirmed();
+        // Step-up: para desligar o 2FA é preciso provar que ainda o controla.
+        $this->ensureSegundoFatorConfirmado();
 
         app(DisableTwoFactorAction::class)->execute($this->usuario());
 
@@ -119,8 +120,11 @@ class SegurancaConta extends Component
 
     public function render(): View
     {
+        $usuario = $this->usuario();
+
         return view('livewire.admin.conta.seguranca-conta', [
-            'ativo' => $this->usuario()->hasTwoFactorEnabled(),
+            'ativo' => $usuario->hasTwoFactorEnabled(),
+            'restantes' => count($usuario->two_factor_recovery_codes ?? []),
         ]);
     }
 

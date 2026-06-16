@@ -23,6 +23,7 @@ final class EnableTwoFactorAction
             'two_factor_secret' => $secret,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            'two_factor_last_timestamp' => null,
         ])->save();
 
         return $secret;

@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
+use App\Enums\TipoAlertaSeguranca;
 use App\Livewire\Admin\Auth\Login;
 use App\Livewire\Admin\Auth\TwoFactorChallenge;
+use App\Livewire\Admin\Configuracao\AbaSeguranca;
 use App\Livewire\Admin\Conta\SegurancaConta;
+use App\Notifications\AlertaSegurancaNotification;
 use App\Settings\SegurancaSettings;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -17,8 +21,10 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
     $this->google2fa = app(Google2FA::class);
-    // Ações sensíveis de 2FA exigem senha confirmada; aqui o foco é o 2FA.
+    // Ações sensíveis de 2FA exigem senha e/ou segundo fator confirmados; aqui o
+    // foco é o 2FA em si, então marcamos ambos como recém-confirmados.
     session()->put('auth.password_confirmed_at', time());
+    session()->put('auth.two_factor_confirmed_at', time());
 });
 
 /**
@@ -152,4 +158,154 @@ it('desativa o 2FA', function () {
         ->call('desativar');
 
     expect($admin->fresh()->hasTwoFactorEnabled())->toBeFalse();
+});
+
+it('rejeita o reuso do mesmo código TOTP no desafio (anti-replay)', function () {
+    $admin = criarAdminUser('2fa@teste.com');
+    $secret = $this->google2fa->generateSecretKey();
+    ativar2fa($admin, $secret);
+    $otp = $this->google2fa->getCurrentOtp($secret);
+
+    session()->put('2fa.pending', ['id' => $admin->id, 'remember' => false]);
+    Livewire::test(TwoFactorChallenge::class)
+        ->set('codigo', $otp)
+        ->call('verificar')
+        ->assertRedirect(route('admin.dashboard'));
+
+    auth('admin')->logout();
+
+    // O mesmo código não vale uma segunda vez.
+    session()->put('2fa.pending', ['id' => $admin->id, 'remember' => false]);
+    Livewire::test(TwoFactorChallenge::class)
+        ->set('codigo', $otp)
+        ->call('verificar')
+        ->assertHasErrors(['codigo']);
+
+    expect(auth('admin')->check())->toBeFalse();
+});
+
+it('exige confirmação de 2FA para desativar (abre o step-up)', function () {
+    $admin = criarAdminUser('2fa@teste.com');
+    $admin->assignRole('super-admin');
+    ativar2fa($admin, $this->google2fa->generateSecretKey());
+
+    session()->forget('auth.two_factor_confirmed_at');
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(SegurancaConta::class)
+        ->call('iniciarConfirmacao2fa', 'desativar')
+        ->assertSet('confirmando2fa', true);
+
+    expect($admin->fresh()->hasTwoFactorEnabled())->toBeTrue();
+});
+
+it('desativa o 2FA após confirmar o segundo fator (step-up)', function () {
+    $admin = criarAdminUser('2fa@teste.com');
+    $admin->assignRole('super-admin');
+    $secret = $this->google2fa->generateSecretKey();
+    ativar2fa($admin, $secret);
+
+    session()->forget('auth.two_factor_confirmed_at');
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(SegurancaConta::class)
+        ->call('iniciarConfirmacao2fa', 'desativar')
+        ->set('codigo2fa', $this->google2fa->getCurrentOtp($secret))
+        ->call('confirmar2fa')
+        ->assertHasNoErrors();
+
+    expect($admin->fresh()->hasTwoFactorEnabled())->toBeFalse();
+});
+
+it('exige step-up de 2FA para salvar a aba Segurança', function () {
+    $admin = criarAdminUser('2fa@teste.com');
+    $admin->assignRole('super-admin');
+    ativar2fa($admin, $this->google2fa->generateSecretKey());
+
+    session()->forget('auth.two_factor_confirmed_at');
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(AbaSeguranca::class)
+        ->set('lockout_max_falhas', 9)
+        ->call('solicitarSalvar')
+        ->assertSet('confirmando2fa', true);
+
+    expect(app(SegurancaSettings::class)->lockout_max_falhas)->not->toBe(9);
+});
+
+it('cai no fallback de senha ao salvar a aba Segurança sem 2FA', function () {
+    $admin = criarAdminUser('semtfa@config.test');
+    $admin->assignRole('super-admin');
+
+    session()->forget('auth.two_factor_confirmed_at');
+    session()->put('auth.password_confirmed_at', time());
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(AbaSeguranca::class)
+        ->set('lockout_max_falhas', 8)
+        ->call('solicitarSalvar')
+        ->assertHasNoErrors();
+
+    expect(app(SegurancaSettings::class)->lockout_max_falhas)->toBe(8);
+});
+
+it('notifica o próprio usuário ao ativar o 2FA', function () {
+    Notification::fake();
+
+    $admin = criarAdminUser('2fa@teste.com');
+
+    $componente = Livewire::actingAs($admin, 'admin')->test(SegurancaConta::class)->call('ativar');
+    $secret = $admin->fresh()->two_factor_secret;
+
+    $componente->set('codigoConfirmacao', $this->google2fa->getCurrentOtp($secret))
+        ->call('confirmar')
+        ->assertHasNoErrors();
+
+    Notification::assertSentTo(
+        $admin,
+        AlertaSegurancaNotification::class,
+        fn (AlertaSegurancaNotification $n): bool => $n->tipo === TipoAlertaSeguranca::DoisFatoresAtivado,
+    );
+});
+
+it('alerta o usuário quando um código de recuperação é usado', function () {
+    Notification::fake();
+
+    $admin = criarAdminUser('2fa@teste.com');
+    ativar2fa($admin, $this->google2fa->generateSecretKey(), [Hash::make('AAAAA-BBBBB')]);
+
+    session()->put('2fa.pending', ['id' => $admin->id, 'remember' => false]);
+    Livewire::test(TwoFactorChallenge::class)
+        ->set('usarRecovery', true)
+        ->set('recoveryCode', 'AAAAA-BBBBB')
+        ->call('verificar')
+        ->assertRedirect(route('admin.dashboard'));
+
+    Notification::assertSentTo(
+        $admin,
+        AlertaSegurancaNotification::class,
+        fn (AlertaSegurancaNotification $n): bool => $n->tipo === TipoAlertaSeguranca::CodigoRecuperacaoUtilizado,
+    );
+});
+
+it('mostra quantos códigos de recuperação restam', function () {
+    $admin = criarAdminUser('2fa@teste.com');
+    ativar2fa($admin, $this->google2fa->generateSecretKey(), [
+        Hash::make('AAAAA-BBBBB'),
+        Hash::make('CCCCC-DDDDD'),
+        Hash::make('EEEEE-FFFFF'),
+    ]);
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(SegurancaConta::class)
+        ->assertSee('3 códigos de recuperação restantes');
+});
+
+it('avisa quando os códigos de recuperação estão acabando', function () {
+    $admin = criarAdminUser('2fa@teste.com');
+    ativar2fa($admin, $this->google2fa->generateSecretKey(), [Hash::make('AAAAA-BBBBB')]);
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(SegurancaConta::class)
+        ->assertSee('estão acabando');
 });

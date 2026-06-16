@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Security;
 
 use App\Models\AdminUser;
+use App\Services\Admin\Security\AlertaSeguranca;
 use Illuminate\Support\Facades\Auth;
 
 final class DisableTwoFactorAction
 {
+    public function __construct(private readonly AlertaSeguranca $alerta) {}
+
     public function execute(AdminUser $usuario): void
     {
         $usuario->forceFill([
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            'two_factor_last_timestamp' => null,
         ])->save();
 
         activity('admin_users')
@@ -22,5 +26,7 @@ final class DisableTwoFactorAction
             ->causedBy(Auth::guard('admin')->user())
             ->event('2fa-disabled')
             ->log('Autenticação em dois fatores desativada');
+
+        $this->alerta->doisFatoresDesativado($usuario);
     }
 }

@@ -262,6 +262,7 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
             'filial_ativa_id',
             'perfil_ativo_role_id',
             'two_factor_confirmed_at',
+            'two_factor_last_timestamp',
         ];
     }
 
@@ -277,6 +278,7 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
             'two_factor_secret' => 'encrypted',
             'two_factor_recovery_codes' => 'array',
             'two_factor_confirmed_at' => 'datetime',
+            'two_factor_last_timestamp' => 'integer',
         ];
     }
 }

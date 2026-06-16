@@ -44,10 +44,19 @@ final class TwoFactorService
         return (new Writer($renderer))->writeString($uri);
     }
 
-    public function verificarCodigo(string $secret, string $codigo): bool
+    /**
+     * Verifica um código TOTP e devolve o contador de janela aceito (para
+     * persistir e impedir replay) ou false. Informe o último timestamp aceito
+     * para rejeitar a reutilização do mesmo código dentro da janela de validade.
+     */
+    public function verificarCodigo(string $secret, string $codigo, ?int $ultimoTimestamp = null): int|false
     {
         // Janela de ±1 passo (30s) para tolerar pequena defasagem de relógio.
-        return $this->google2fa->verifyKey($secret, $codigo, 1);
+        // oldTimestamp nunca nulo (?? 0): garante o retorno do timestamp inteiro
+        // — com null, o verifyKeyNewer devolveria apenas true.
+        $resultado = $this->google2fa->verifyKeyNewer($secret, $codigo, $ultimoTimestamp ?? 0, 1);
+
+        return is_int($resultado) ? $resultado : false;
     }
 
     /**
