@@ -97,7 +97,7 @@ it('reordena seções', function () {
 
     $secoes = app(MenuService::class)->estruturaParaSidebar($this->admin);
 
-    expect(array_column($secoes, 'key'))->toBe(['administracao', 'principal', 'negocio']);
+    expect(array_column($secoes, 'key'))->toBe(['administracao', 'principal', 'negocio', 'tabelas-auxiliares']);
 });
 
 it('rejeita payload com keys desconhecidas sem persistir nada', function () {

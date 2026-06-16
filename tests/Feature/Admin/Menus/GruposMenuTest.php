@@ -161,7 +161,7 @@ it('cria seção custom com key única e a reordena', function () {
         ->assertHasNoErrors();
 
     $secoes = app(MenuService::class)->estruturaParaGestao()['secoes'];
-    expect(array_column($secoes, 'key'))->toBe(['secao-operacoes', 'principal', 'administracao', 'secao-operacoes-2', 'negocio']);
+    expect(array_column($secoes, 'key'))->toBe(['secao-operacoes', 'principal', 'administracao', 'secao-operacoes-2', 'negocio', 'tabelas-auxiliares']);
 });
 
 it('cria grupo validando ícone, seção e colisão com keys de itens', function () {
