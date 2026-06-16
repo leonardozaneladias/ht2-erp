@@ -64,6 +64,8 @@ O escape consciente para relatórios globais legítimos é `Funcionario::without
 
 Na **Fase 1** a recursão é resolvida por CTE Postgres (sem closure table). Detecção de **ciclo** ao atribuir gestor (além do CHECK `gestor_id <> id` de nível 1) é validada na Action de atribuição. Mecânica completa, self-service e organograma navegável em [05 — Organograma e ACL hierárquica](../05-organograma-acl-hierarquica.md).
 
+**Mapa estrutural e escopo da tela.** As **dimensões** do organograma (empresa, filial, departamento auto-hierárquico — que absorve unidade/setor/área —, centro de custo, cargo, função/equipe, gestor) e a justificativa de **por que a base da ACL é a hierarquia de PESSOAS (`gestor_id`) e não de departamentos** estão em [05 §3.2](../05-organograma-acl-hierarquica.md). A **spec de UX** da tela (árvore incremental: expand/collapse, busca, filtros, drag-para-reposicionar via Action anti-ciclo, detecção de vagos/órfãos/sem-responsável; pan/zoom/tela cheia incrementais; canvas rico = evolução) está em [05 §10.1](../05-organograma-acl-hierarquica.md); as **regras e impactos** de mudança estrutural em [05 §13](../05-organograma-acl-hierarquica.md) e a **segurança/auditoria** em [05 §11.2](../05-organograma-acl-hierarquica.md).
+
 ## Consequências
 
 **Positivas:**

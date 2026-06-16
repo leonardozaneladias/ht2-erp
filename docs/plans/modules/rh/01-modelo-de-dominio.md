@@ -317,6 +317,23 @@ Catálogo tenant **meta**: o cliente define, **sem código**, campos extras por 
 
 Unique: `(empresa_id, entidade, chave)` parcial `WHERE deleted_at IS NULL`. Índices: `(empresa_id, entidade, ativo)`. CHECK `tipo IN (...)` (lista do enum). **Sem seed** (catálogo nasce vazio — o cliente cria). Permissões `rh.campos_personalizados.*` em §10.
 
+#### A12. `centros_custo` — [E][S][A] (centro de custo: catálogo tenant **opcional**)
+
+Catálogo tenant **opcional e aditivo** (decisão **D1** desta revisão): agrupamento **gerencial/financeiro** do funcionário (e, opcionalmente, do departamento), para relatórios e rateio. É **dimensão organizacional paralela**, não governa a ACL ([05 §3.2](05-organograma-acl-hierarquica.md)). **Não existe no core** (verificado: não há model/migração `centro_custo`), logo nasce aqui — sem recriar nada. É **CATÁLOGO** (não enum): o cliente cria linhas, sem lógica/cálculo no valor ([ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md) §casos de fronteira). Por ser **aditivo**, **não bloqueia o B1 mínimo** — entra como migration aditiva quando o cliente precisar. CRUD/seed em [04 §7.1](04-catalogos-configuraveis.md).
+
+| Coluna                           | Tipo         | Null | Notas                           |
+| -------------------------------- | ------------ | ---- | ------------------------------- |
+| id                               | BIGSERIAL PK | N    |                                 |
+| empresa_id                       | BIGINT       | N    | FK→empresas cascade             |
+| codigo                           | VARCHAR(30)  | S    | código contábil/gerencial       |
+| nome                             | VARCHAR(120) | N    | ex.: "Administrativo", "Obra X" |
+| descricao                        | TEXT         | S    |                                 |
+| ativo                            | BOOLEAN      | N    | default true                    |
+| ordem                            | INTEGER      | S    | ordenação UI                    |
+| created_at/updated_at/deleted_at |              |      |                                 |
+
+Unique: `(empresa_id, codigo)` parcial; `(empresa_id, nome)` parcial. Índice: `(empresa_id, ativo)`. Vínculo: **FK nullable `funcionarios.centro_custo_id`** (`nullOnDelete`, §B1) e — **evolução opcional** — `departamentos.centro_custo_id`. Permissões `rh.centros_custo.*` em §10.
+
 ### Bloco B — Pessoa / Funcionário (agregado-raiz)
 
 #### B1. `funcionarios` — [E][S][A][Anx] (núcleo: dados pessoais + contratação, eSocial-ready)
@@ -331,6 +348,7 @@ Unique: `(empresa_id, entidade, chave)` parcial `WHERE deleted_at IS NULL`. Índ
 | departamento_id                                    | BIGINT       | S    | FK→departamentos nullOnDelete (atual; histórico em C1)                                                                     |
 | cargo_id                                           | BIGINT       | S    | FK→cargos (referência CBO) nullOnDelete (atual; histórico em C1)                                                           |
 | cargo_nivel                                        | SMALLINT     | S    | nível hierárquico do cargo (cache p/ organograma)                                                                          |
+| centro_custo_id                                    | BIGINT       | S    | FK→centros_custo nullOnDelete (catálogo tenant **opcional** — §A12; **aditivo**, não bloqueia o B1 mínimo)                 |
 | _Dados pessoais_                                   |              |      |                                                                                                                            |
 | nome                                               | VARCHAR(150) | N    |                                                                                                                            |
 | nome_social                                        | VARCHAR(150) | S    |                                                                                                                            |
@@ -730,18 +748,37 @@ Greenfield: a Fase 1 cria as tabelas já completas. O padrão para evoluções f
 
 ## 8. LGPD (dados sensíveis)
 
-- **PII pessoal** (cpf, rg, pis, nome_mae/pai, cpf de dependente, número de documento): fora do diff de auditoria via `atributosNaoAuditados()`. Reforça a regra do core "dados sensíveis nunca em logs".
-- **Dado de saúde** (`funcionario_afastamentos.cid`): categoria especial (art. 11). `encrypted` cast (padrão `two_factor_secret` do `AdminUser`) + permissão dedicada `rh.afastamentos.ver_cid` + fora de auditoria.
-- **Financeiro** (`conta`, `pix_chave`): fora de auditoria; `encrypted` recomendado.
-- **Foto**: disco **privado** + URL assinada (nunca `public`).
-- **Retenção trabalhista**: guarda legal longa (eSocial/FGTS) — soft-delete + append-only de eventos atende; não expurgar `funcionario_eventos`.
-- **Anonimização**: alinhar ao fluxo LGPD do core (`anonimizado_em` no `AdminUser`; plano `docs/superpowers/plans/2026-06-05-lgpd.md`). Funcionário desligado pode ser anonimizado mascarando PII e mantendo o esqueleto para obrigações legais; chamar `disableLogging()` antes do save.
+### 8.1 Matriz de dados sensíveis (fonte única)
+
+Esta é a **lista canônica** de tudo que é sensível no módulo: o que é, onde mora, qual a categoria LGPD, qual permissão dedicada o protege e como é tratado. Os demais documentos **referenciam esta matriz** em vez de redefini-la: [03 §2.1/§8.3](03-cadastro-pessoa-documentos.md), [06 §5.3](06-linha-do-tempo.md), [10 §6](10-campos-personalizados.md) e [12 §2.6](12-ausencias-faltas-atestados-afastamentos.md). Categorias: **PII** (art. 5º — dado pessoal comum) · **Saúde** (art. 11 — categoria especial de dado pessoal).
+
+| Dado sensível                                                                                        | Entidade · coluna(s)                                                 | Categoria                          | Permissão dedicada                                                            | Tratamento                                                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CPF, RG, PIS/PASEP, nome do pai/mãe                                                                  | `funcionarios.{cpf,rg,pis_pasep,nome_mae,nome_pai}`                  | PII                                | — (visível sob `rh.funcionarios.*`)                                           | `atributosNaoAuditados()` (fora do diff de auditoria)                                                                                                                      |
+| CPF de dependente                                                                                    | `funcionario_dependentes.cpf`                                        | PII                                | —                                                                             | `atributosNaoAuditados()`                                                                                                                                                  |
+| Número de documento                                                                                  | `funcionario_documentos.numero`                                      | PII                                | —                                                                             | `atributosNaoAuditados()`                                                                                                                                                  |
+| Dados bancários (conta, agência, dígito, chave PIX)                                                  | `funcionario_dados_bancarios.{conta,conta_digito,agencia,pix_chave}` | PII financeira                     | —                                                                             | `atributosNaoAuditados()` + `encrypted` recomendado em `pix_chave`/`conta`                                                                                                 |
+| **Grupo PCD/Deficiência** (`def_*`, `reabilitado_readaptado`, `beneficiario_cota`, `observacao_pcd`) | `funcionarios` (colunas PCD — §B1)                                   | **Saúde (art. 11)**                | **`rh.funcionarios.ver_dados_sensiveis`**                                     | `atributosNaoAuditados()` + UI **oculta a seção** sem a permissão; selo "eSocial" — [03 §2.1](03-cadastro-pessoa-documentos.md)                                            |
+| **CID do afastamento**                                                                               | `funcionario_afastamentos.cid`                                       | **Saúde (art. 11)**                | **`rh.afastamentos.ver_cid`**                                                 | `encrypted` + `atributosNaoAuditados()` + **mascarado** sem a permissão — [06 §5.3](06-linha-do-tempo.md)                                                                  |
+| **CID do atestado**                                                                                  | `atestados.cid`                                                      | **Saúde (art. 11)**                | **`rh.atestados.ver_cid`**                                                    | `encrypted` + `atributosNaoAuditados()` + **mascarado** sem a permissão — [12 §2.6](12-ausencias-faltas-atestados-afastamentos.md)                                         |
+| Campos personalizados marcados `sensivel=true`                                                       | `funcionarios.dados_personalizados` (chaves marcadas — §A11)         | conforme o dado (pode ser saúde)   | herda da entidade (`rh.funcionarios.editar`); flag `sensivel` liga a proteção | máscara + fora de auditoria **dinâmico** (trait `TemCamposPersonalizados`, não lista estática) — [10 §6](10-campos-personalizados.md)                                      |
+| Foto                                                                                                 | `funcionarios.foto_caminho`                                          | PII (imagem)                       | —                                                                             | disco **privado** `rh_privado` + URL assinada (nunca `public`)                                                                                                             |
+| Arquivos de documento (binário)                                                                      | `funcionario_documentos.anexo_id` → `anexos`                         | PII (pode conter saúde — ex.: ASO) | download por Policy                                                           | disco **privado** + URL assinada + layout não-adivinhável — [03 §8.3](03-cadastro-pessoa-documentos.md) / [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md) |
+| Biometria (digital/facial)                                                                           | _(futuro — ponto, Fase 6)_                                           | **Saúde/biométrico (art. 11)**     | _(a definir)_                                                                 | mesmo rigor do `cid`; registrado em [09 §7](09-roadmap-fases.md) — fora da Fase 1                                                                                          |
+
+> **Regra única:** "ver o registro" ≠ "ver o dado de saúde". As permissões sensíveis (`ver_cid`, `ver_dados_sensiveis`) são **separadas do CRUD** e do escopo (tenant + organograma); super-admin faz bypass. Dado de saúde nunca em logs (reforça a regra do core).
+
+### 8.2 Princípios gerais
+
+- **PII fora de auditoria** — `atributosNaoAuditados()` por model (acima). Reforça a regra do core "dados sensíveis nunca em logs".
+- **Retenção trabalhista** — guarda legal longa (eSocial/FGTS): soft-delete + append-only de eventos atende; **não expurgar** `funcionario_eventos`.
+- **Anonimização** — alinhar ao fluxo LGPD do core (`anonimizado_em` no `AdminUser`; plano `docs/superpowers/plans/2026-06-05-lgpd.md`). Funcionário desligado pode ser anonimizado mascarando PII e mantendo o esqueleto para obrigações legais; chamar `disableLogging()` antes do save.
 
 ---
 
 ## 9. Resumo (≈24 tabelas novas + reaproveitadas)
 
-**Catálogos tenant (11):** `departamentos`, `funcoes`, `funcionario_funcao`, `tipos_documento`, `tipos_afastamento`, `escalas`, `escala_dias`, `escala_funcionario`, `rubricas`, `fator_horas_extras`, `campos_personalizados` (§A11, meta).
+**Catálogos tenant (12):** `departamentos`, `funcoes`, `funcionario_funcao`, `tipos_documento`, `tipos_afastamento`, `escalas`, `escala_dias`, `escala_funcionario`, `rubricas`, `fator_horas_extras`, `campos_personalizados` (§A11, meta), `centros_custo` (§A12, **opcional/aditivo**).
 **Funcionário e filhas (6):** `funcionarios` (inclui o grupo **PCD** — colunas, não tabela —, o vínculo ACL `admin_user_id` e a coluna `dados_personalizados` JSONB), `funcionario_contatos`, `funcionario_enderecos`, `funcionario_dados_bancarios`, `funcionario_dependentes`, `funcionario_documentos`.
 **Histórico e ausências (4):** `funcionario_eventos`, `funcionario_afastamentos`, `atestados` (§C3), `ocorrencias` (§C4).
 **Operacional (1):** `horas_extras`.
@@ -749,7 +786,7 @@ Greenfield: a Fase 1 cria as tabelas já completas. O padrão para evoluções f
 **Referência de folha (1):** `tabelas_legais`.
 **Reaproveitadas do core (sem nova tabela):** `anexos`, `cargos`, `bancos`, `paises`, `estados`, `municipios`, `tipos_logradouro`, `empresas`, `filiais`, `admin_users`.
 
-> O grupo **PCD/Deficiência** e a derivação **`codCateg`** (§4.1) seguem **cadastrais e baratos** — colunas nullable em `funcionarios` + método no enum, **sem tabela nova**. Esta revisão acrescenta **4 tabelas** (`campos_personalizados`, `atestados`, `ocorrencias` e a opcional `importacoes`) + a coluna `dados_personalizados`, todas **aditivas** (§6) e detalhadas em [10](10-campos-personalizados.md)/[11](11-importacao-exportacao.md)/[12](12-ausencias-faltas-atestados-afastamentos.md). As **permissões canônicas** estão em §10.
+> O grupo **PCD/Deficiência** e a derivação **`codCateg`** (§4.1) seguem **cadastrais e baratos** — colunas nullable em `funcionarios` + método no enum, **sem tabela nova**. Esta revisão acrescenta **4 tabelas** (`campos_personalizados`, `atestados`, `ocorrencias` e a opcional `importacoes`) + a coluna `dados_personalizados` + o catálogo **opcional** `centros_custo` (§A12, com a FK aditiva `funcionarios.centro_custo_id`), todas **aditivas** (§6) e detalhadas em [10](10-campos-personalizados.md)/[11](11-importacao-exportacao.md)/[12](12-ausencias-faltas-atestados-afastamentos.md) (centro de custo em [04 §7.1](04-catalogos-configuraveis.md)). As **permissões canônicas** estão em §10.
 
 ---
 
@@ -773,6 +810,7 @@ Esta é a lista **canônica** das permissões do módulo. README, [02](02-fase-1
 | `escalas`               | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                                                                                                              |
 | `rubricas`              | catálogo tenant                  | CRUD + lixeira                                                                                                                                                                                                                                                              |
 | `fator_horas_extras`    | catálogo tenant (fino, §A10)     | CRUD + lixeira                                                                                                                                                                                                                                                              |
+| `centros_custo`         | catálogo tenant (opcional, §A12) | CRUD + lixeira _(criado quando o cliente adotar centro de custo — D1, aditivo)_                                                                                                                                                                                             |
 | `funcionarios`          | agregado-raiz                    | CRUD + lixeira **+ `ver_todos`** (desliga o eixo organograma — [05](05-organograma-acl-hierarquica.md)) **+ `ver_dados_sensiveis`** (grupo PCD — dado de saúde, LGPD art. 11, §8) **+ `importar`** · **`exportar`** (planilha — [11](11-importacao-exportacao.md))          |
 | `funcoes_funcionario`   | pivot (vigência)                 | `atribuir` · `encerrar`                                                                                                                                                                                                                                                     |
 | `escala_funcionario`    | pivot (vigência)                 | `atribuir` · `encerrar`                                                                                                                                                                                                                                                     |

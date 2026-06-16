@@ -38,6 +38,27 @@ Aplicáveis a **todos** os blocos (herdadas do core e do [01 §0](01-modelo-de-d
 
 > _Esforço relativo:_ **P** = pequeno · **M** = médio · **G** = grande. B1 é grande pela infraestrutura (wiring + 6 catálogos + provisionamento idempotente + seeds). B7 é pequeno por ser **fundação** (modelagem + seed, sem apuração).
 
+### 1.1 Status de implementação (B1–B7)
+
+Estado **real** do pacote `packages/modulo-rh` nesta data — verificado no repositório próprio do pacote (3 commits: base do módulo, lixeira, select de cargo). Legenda: ✅ existe · 🟡 parcial · ❌ não iniciado. Serve para o dev saber o que **expandir** vs **criar do zero**; **não** substitui o DoD de cada bloco (que continua sendo o critério de pronto).
+
+| Bloco  | Item                                                                                           | Status | Observação                                                                                                                   |
+| ------ | ---------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| —      | Casca do pacote (bootstrap + wiring no `RhServiceProvider`)                                    | 🟡     | pacote existe, instalado por symlink, rotas/menu/permissões mescladas; **provisionamento de catálogos ainda não**            |
+| **B1** | `departamentos` (model `Departamento`, `StatusDepartamento`, lixeira)                          | ✅     | catálogo hierárquico no ar; conferir `responsavel_funcionario_id` + CHECK self-relation do [01 §A1](01-modelo-de-dominio.md) |
+| **B1** | `funcoes`, `tipos_documento`, `tipos_afastamento`, `escalas`, `rubricas`, `fator_horas_extras` | ❌     | 5 catálogos + 1 fino ainda não criados                                                                                       |
+| **B1** | `ProvisionarCatalogosRh` + gancho de criação de empresa + seed `tabelas_legais`                | ❌     | sem provisionamento por empresa ainda                                                                                        |
+| **B2** | `funcionarios` (tabela base, `StatusFuncionario`, lixeira, select de cargo)                    | 🟡     | núcleo mínimo existe; faltam grupo **PCD**, demais colunas eSocial-ready e `dados_personalizados`                            |
+| **B2** | 5 filhas (contatos, endereços, bancário, dependentes, documentos) + documentos via `Anexo`     | ❌     | nenhuma filha criada                                                                                                         |
+| **B2** | Campos personalizados (fundação) · storage endurecido (`rh_privado`) · docs em lote/ZIP+tag    | ❌     | incrementos da revisão ([10](10-campos-personalizados.md) · [03 §8](03-cadastro-pessoa-documentos.md))                       |
+| **B3** | Organograma (`gestor_id`/CTE), `funcionario_funcao`, vínculo `admin_user_id`, self-service     | ❌     | colunas `gestor_id`/`admin_user_id` ainda não estão na migration base de `funcionarios`                                      |
+| **B4** | `funcionario_eventos` (append-only) + `funcionario_afastamentos`                               | ❌     | —                                                                                                                            |
+| **B5** | `escala_dias`, `escala_funcionario`                                                            | ❌     | dependem do cabeçalho `escalas` (B1, ainda ❌)                                                                               |
+| **B6** | `horas_extras` + cálculo + máquina de estados                                                  | ❌     | —                                                                                                                            |
+| **B7** | `rubricas` (uso pleno) + `tabelas_legais` + ponte HE→rubrica                                   | ❌     | —                                                                                                                            |
+
+> **Leitura:** o caminho crítico `B1 → B2 → B3` está **apenas começado** — há a casca + 1 catálogo + a base do funcionário. O próximo passo natural é **completar B1** (5 catálogos restantes + provisionamento) e **expandir B2** (grupo PCD, filhas, eSocial-ready), mantendo verdes os testes de intenção (`FuncionarioCargoTest`, `RhLixeiraTest`). As pendências bloqueantes de cada bloco estão consolidadas em [13 §2](13-rastreabilidade-e-pendencias.md).
+
 ---
 
 ## 2. Diagrama de dependências entre blocos
@@ -163,7 +184,7 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 5. **Form com abas** — formulário grande do funcionário dividido em abas (`aba(...)` no gerador): Dados pessoais · Contratação · Contatos · Endereços · Bancário · Dependentes · Documentos.
 6. **Incrementos desta revisão (aditivos a B2):**
     - **Campos personalizados (fundação)** — `campos_personalizados` ([01 §A11](01-modelo-de-dominio.md)) + coluna `funcionarios.dados_personalizados` + enum `TipoCampoPersonalizado` + trait `TemCamposPersonalizados` + tela de definições + aba "Personalizados" no `FormFuncionario`. **Fundação reutilizável** (candidata a promoção ao core — [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)). Detalhe em [10](10-campos-personalizados.md).
-    - **Documentos em lote/ZIP + detecção por tag** — multi-upload, extração de `.zip` por job, classificação por padrão no nome, bandeja de não-classificados ([03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)). ZIP/tag podem ser fatiados em 1.x.
+    - **Documentos em lote/ZIP + detecção por tag** — multi-upload, extração de `.zip` por job, classificação por padrão no nome, bandeja de não-classificados ([03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)). **Faseamento (idêntico em [09 §1.1](09-roadmap-fases.md)):** o **multi-upload** entra na **Fase 1** (B2); o **ZIP** e a **detecção por tag** são fatiados como incremento **1.x**.
     - **Storage endurecido** — disco `rh_privado`, layout não-adivinhável, download por Policy + URL assinada, retenção; ajuste **aditivo** no `GerenciadorAnexos` (parametrizar disco, default `public` preservado) — [03 §8.3](03-cadastro-pessoa-documentos.md) / [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md).
 
 **Tabelas/enums envolvidos** ([01](01-modelo-de-dominio.md)): `funcionarios`, `funcionario_contatos`, `funcionario_enderecos`, `funcionario_dados_bancarios`, `funcionario_dependentes`, `funcionario_documentos`; reaproveita `anexos`, `cargos`, `bancos`, `paises`, `municipios`, `estados`, `tipos_logradouro`. Enums listados acima.
@@ -215,12 +236,14 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 **Critérios de pronto (DoD).**
 
 - [ ] Migration do pivot `funcionario_funcao` (unique `(funcionario_id, funcao_id, inicio)`, índices de vigência); FK `admin_user_id`/`gestor_id` confirmadas nullable + uniques/índices.
-- [ ] `EscopoOrganograma` (CTE recursiva) + trait `VisivelNaHierarquia`; Action de atribuição de gestor com detecção de ciclo.
-- [ ] `AdminUser::funcionario()` (HasOne) adicionado **via model do pacote**, sem tocar o core; vínculo 1:1 com unique parcial.
-- [ ] Listagens de funcionário respeitam a subárvore; `rh.funcionarios.ver_todos` libera visão global.
-- [ ] Portal do colaborador (self-service) read-only escopado ao `funcionario` do `AdminUser` logado.
-- [ ] Policy estende com `ver_todos`/`self`/organograma; testes de **escopo** (gestor A não vê subárvore de B; colaborador só vê a si).
-- [ ] Testes Pest **na suíte Postgres** ([08 §7](08-arquitetura-tecnica.md)): subárvore recursiva (CTE `WITH RECURSIVE`), rejeição de ciclo de gestor; vínculo único por empresa (índice parcial); self-service negado a terceiros. _(CTE não roda em SQLite — `@group postgres`.)_
+- [ ] `EscopoOrganograma` (CTE recursiva) + trait `VisivelNaHierarquia`; Action de atribuição de gestor com **detecção de ciclo em todas as profundidades** (nível 1 via CHECK `gestor_id <> id`; ciclo profundo via subárvore na Action — [05 §8.7](05-organograma-acl-hierarquica.md)).
+- [ ] `AdminUser::funcionario()` (HasOne) adicionado **via model do pacote**, sem tocar o core; vínculo 1:1 com **unique parcial por empresa** (`(empresa_id, admin_user_id) WHERE deleted_at IS NULL`).
+- [ ] Listagens de funcionário **escopadas pela subárvore** por padrão; `rh.funcionarios.ver_todos` libera visão global; **fail-closed** (sem vínculo e sem `ver_todos` → vê zero — [05 §2.4](05-organograma-acl-hierarquica.md)).
+- [ ] **Tela `OrganogramaView` navegável** ([05 §10.1](05-organograma-acl-hierarquica.md)): árvore **expand/collapse**; **drag-para-reposicionar** sempre via a Action anti-ciclo (nunca grava `gestor_id` direto); **busca** (funcionário/cargo/gestor/"setor") + **filtros** (empresa/filial/departamento/centro de custo/situação); **detecção** de vagos/funcionários sem vínculo/departamentos sem responsável (§10.1.4); item 🔴 a componentizar no catálogo Inspinia.
+- [ ] Portal do colaborador (self-service) read-only escopado ao `funcionario` do `AdminUser` logado (`rh.self.ver`).
+- [ ] Policy estende com `ver_todos`/`self`/organograma; testes dos **3 eixos** (tenant **AND** RBAC **AND** organograma): gestor A não vê subárvore de B; colaborador só vê a si; `ver_todos` vê a empresa.
+- [ ] **Segurança/auditoria** ([05 §11.2](05-organograma-acl-hierarquica.md)): mover/definir gestor exige `rh.funcionarios.editar` + alvo na subárvore; mudanças registradas em `activity_log` + evento de transferência na linha do tempo; estrutura passada reconstruível por data.
+- [ ] Testes Pest **na suíte Postgres** ([08 §7](08-arquitetura-tecnica.md)): subárvore recursiva (CTE `WITH RECURSIVE`), rejeição de ciclo de gestor (profundo); vínculo único por empresa (índice parcial); self-service negado a terceiros. _(CTE não roda em SQLite — `@group postgres`.)_
 - [ ] Pint + Prettier + PHPStan + test verdes.
 
 ---
@@ -384,15 +407,15 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 
 Os 7 temas trazidos pelo cliente nesta revisão se dividem entre **incremento da Fase 1** (endurecem/estendem o cadastro da pessoa, sobre B2/B3, **sem** mudar o caminho crítico B1→B2→B3) e **pós-Fase 1** (têm workflow/cálculo próprio):
 
-| Tema (revisão)                                             | Fase 1?                                                             | Onde                                                                                                                  |
-| ---------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Campos personalizados (no funcionário)                     | **Sim** — incremento de B2                                          | [10](10-campos-personalizados.md) · [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)                            |
-| Proteção/armazenamento de documentos                       | **Sim** — endurece B2                                               | [03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)        |
-| Documentos em lote/ZIP + tag                               | **Sim** — incremento de B2 (ZIP/tag = 1.x)                          | [03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)                                                                      |
-| Acesso do funcionário (portal — dados/documentos próprios) | **Sim** — B3 (self-service)                                         | [05 §9](05-organograma-acl-hierarquica.md)                                                                            |
-| Exportação de funcionários                                 | **Sim (parcial)** — export da listagem já em B2 (PowerGrid)         | [11 §6.1](11-importacao-exportacao.md)                                                                                |
-| Importação de funcionários (multi-aba)                     | **Não** — pós-Fase 1                                                | [11](11-importacao-exportacao.md)                                                                                     |
-| Atestado com workflow                                      | **Não** — Fase 2 (tabela definida em [01](01-modelo-de-dominio.md)) | [12](12-ausencias-faltas-atestados-afastamentos.md) · [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md) |
-| Faltas/ocorrências + atestados + afastamentos              | **Não** — Fase 2 (afastamento base é B4)                            | [12](12-ausencias-faltas-atestados-afastamentos.md) · [09 §3](09-roadmap-fases.md)                                    |
+| Tema (revisão)                                             | Fase 1?                                                                       | Onde                                                                                                                  |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Campos personalizados (no funcionário)                     | **Sim** — incremento de B2                                                    | [10](10-campos-personalizados.md) · [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)                            |
+| Proteção/armazenamento de documentos                       | **Sim** — endurece B2                                                         | [03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)        |
+| Documentos em lote/ZIP + tag                               | **Sim** — incremento de B2 (multi-upload na Fase 1; ZIP/tag = incremento 1.x) | [03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)                                                                      |
+| Acesso do funcionário (portal — dados/documentos próprios) | **Sim** — B3 (self-service)                                                   | [05 §9](05-organograma-acl-hierarquica.md)                                                                            |
+| Exportação de funcionários                                 | **Sim (parcial)** — export da listagem já em B2 (PowerGrid)                   | [11 §6.1](11-importacao-exportacao.md)                                                                                |
+| Importação de funcionários (multi-aba)                     | **Não** — pós-Fase 1                                                          | [11](11-importacao-exportacao.md)                                                                                     |
+| Atestado com workflow                                      | **Não** — Fase 2 (tabela definida em [01](01-modelo-de-dominio.md))           | [12](12-ausencias-faltas-atestados-afastamentos.md) · [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md) |
+| Faltas/ocorrências + atestados + afastamentos              | **Não** — Fase 2 (afastamento base é B4)                                      | [12](12-ausencias-faltas-atestados-afastamentos.md) · [09 §3](09-roadmap-fases.md)                                    |
 
 > A regra: o que **endurece/estende o cadastro da pessoa** (campos personalizados, storage, docs em lote, self-service de dados/documentos) é **incremento da Fase 1** sobre B2/B3. O que tem **workflow/cálculo próprio** (importação em lote, atestado, faltas, abono, INSS) é **pós-Fase 1**, alinhado ao [09](09-roadmap-fases.md) (Fase 2 — "Gestão de ausências e tempo"). Como as tabelas novas já vivem em [01](01-modelo-de-dominio.md) (aditivas — [01 §6](01-modelo-de-dominio.md)), entrar nessas fases é **migration + telas**, sem reescrever a fundação nem o caminho crítico.

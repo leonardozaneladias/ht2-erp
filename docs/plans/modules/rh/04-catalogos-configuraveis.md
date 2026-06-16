@@ -252,6 +252,36 @@ Essas flags alimentam o registro de `funcionario_afastamentos` e os cálculos de
 
 ---
 
+## 7.1 `centros_custo` — Centro de custo (catálogo tenant **opcional**)
+
+**Propósito.** Agrupamento **gerencial/financeiro** do funcionário (ex.: "Administrativo", "Obra X", "Filial Centro") para relatórios, headcount e rateio de custo. Decisão **D1** desta revisão: é um **catálogo tenant novo e opcional** — **não existe no core** (verificado: nenhum model/migração `centro_custo`), então nasce aqui sem recriar nada. É **dimensão organizacional paralela** — agrupa a pessoa, mas **não governa a ACL** ([05 §3.2](05-organograma-acl-hierarquica.md)). É **CATÁLOGO** (não enum): o cliente cria linhas, sem lógica/cálculo atrelado ao valor ([ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md)).
+
+> **Aditivo, não bloqueante.** Por ser opcional, a tabela `centros_custo` (§A12 do [01](01-modelo-de-dominio.md)) e a FK `funcionarios.centro_custo_id` entram por **migration aditiva** quando o cliente adotar centro de custo — **não fazem parte do B1 mínimo** ([02 §1.1](02-fase-1-blueprint.md)). Quem não usa, ignora.
+
+**Colunas-chave** (tabela `centros_custo`, [01 §A12](01-modelo-de-dominio.md)):
+
+| Coluna                | Papel                                                       |
+| --------------------- | ----------------------------------------------------------- |
+| `codigo` (VARCHAR 30) | código contábil/gerencial (opcional, único por empresa)     |
+| `nome` (VARCHAR 120)  | rótulo (ex.: "Administrativo", "Obra X"), único por empresa |
+| `descricao` (TEXT)    | detalhe opcional                                            |
+| `ativo` (bool)        | liga/desliga                                                |
+| `ordem` (int)         | ordenação na UI                                             |
+
+**Vínculo:** FK nullable `funcionarios.centro_custo_id` (`nullOnDelete`); selecionável no cadastro do funcionário ([03](03-cadastro-pessoa-documentos.md)) e usado como filtro no organograma ([05 §10.1.3](05-organograma-acl-hierarquica.md)). **Evolução opcional:** `departamentos.centro_custo_id` (herança de centro de custo por área).
+
+**Telas CRUD.** _Lista_ (PowerGrid): código, nome, status; filtro por status; busca. _Formulário_ (drawer): código, nome, descrição, `x-shared.toggle` para `ativo`, ordem.
+
+**Permissões:** `rh.centros_custo.{listar, criar, editar, deletar, restaurar, excluir_permanente}` ([01 §10](01-modelo-de-dominio.md)).
+
+**Lixeira:** `ComLixeira`. Centro de custo referenciado por funcionários é protegido (`restrictOnDelete`).
+
+**Seed padrão (opcional, idempotente).** Diferente dos seis catálogos sempre semeados, o centro de custo nasce **vazio** por padrão (é muito específico de cada empresa). Quando o cliente adota, o `ProvisionarCatalogosRh` (§10) pode semear um conjunto mínimo idempotente — ex.: **Administrativo**, **Operacional**, **Comercial** — via `firstOrCreate(['empresa_id','codigo'], …)`, ou o cliente cria os seus. Sem seed, sem prejuízo.
+
+**Como o cliente adapta:** cria os centros de custo da empresa, vincula no cadastro de cada funcionário e usa como filtro/agrupamento em listagens e no organograma.
+
+---
+
 ## 8. Cargo — reaproveitamento da referência global (CBO)
 
 Cargo é **REFERÊNCIA global**, não catálogo tenant. O RH reaproveita o catálogo oficial `cargos` (`App\Models\Referencia\Cargo`, semeado pelo `CargoSeeder` com a CBO), sem recriá-lo:
@@ -280,7 +310,7 @@ Toda empresa nova precisa nascer **já configurada** com o padrão — esse é o
 
 - **Action idempotente** `HT2ERP\Rh\Actions\ProvisionarCatalogosRh` (análoga ao `App\Actions\Admin\Menu\AplicarMenuPadraoAction` do core, que usa exatamente este padrão), semeia os catálogos tenant via `firstOrCreate` por chave estável: `(empresa_id, codigo)` para `tipos_documento`/`tipos_afastamento`/`rubricas`; `(empresa_id, nome)` para `departamentos`/`funcoes`/`escalas`. Rodar duas vezes é **no-op** — nunca duplica nem sobrescreve o que o cliente já editou.
 - **Gatilho:** chamada **na criação da empresa** (no fluxo de cadastro de empresa / listener do core), dentro de uma transação. Greenfield e reexecutável.
-- **O que NÃO entra aqui:** enums (vivem no código) e referências globais (`cargos`, `bancos`, `paises`… já semeados pelo core). A Action cuida só dos seis catálogos tenant (+ as filhas `escala_dias` e o conjunto de `funcionario_funcao`/`escala_funcionario` permanecem vazios — são preenchidos por atribuição).
+- **O que NÃO entra aqui:** enums (vivem no código) e referências globais (`cargos`, `bancos`, `paises`… já semeados pelo core). A Action cuida só dos seis catálogos tenant (+ as filhas `escala_dias` e o conjunto de `funcionario_funcao`/`escala_funcionario` permanecem vazios — são preenchidos por atribuição). O catálogo **opcional** `centros_custo` (§7.1) **não** faz parte dos seis: nasce **vazio** por padrão e só é semeado (mínimo idempotente) se o cliente adotar centro de custo.
 - **Empacotamento (ADR-0015):** a Action e seus dados-semente vivem no pacote `packages/modulo-rh`; o core não é editado. O item de menu do RH já é contribuído pelo pacote (visto em `AplicarMenuPadraoAction`: grupo `grupo-tab-rh`).
 
 Resultado: a empresa abre o módulo de RH e encontra departamentos, funções, tipos de documento, tipos de afastamento, escalas e rubricas **prontos** — e livres para editar.
@@ -297,6 +327,7 @@ Resultado: a empresa abre o módulo de RH e encontra departamentos, funções, t
 | Tipos de afastamento                 | `tipos_afastamento`                                 | `tipos_afastamento.*`                                                      | 14 tipos                               | `codigo_esocial`, `remunerado`, `conta_como_falta`, `suspende_contrato`, `exige_atestado`, `ativo`                         |
 | Escalas/Jornadas                     | `escalas` + `escala_dias` + `escala_funcionario`    | `escalas.*`                                                                | 6 escalas (com dias)                   | `tipo` (`TipoEscala`), `horas_mensais_divisor`, `ativo`; dias com `eh_folga`/turnos; atribuição com vigência               |
 | Rubricas                             | `rubricas`                                          | `rubricas.*`                                                               | 10 rubricas                            | `natureza` (`NaturezaRubrica`), `incide_inss`/`incide_fgts`/`incide_irrf`, `referencia_he_tipo`, `codigo_esocial`, `ativo` |
+| Centro de custo _(opcional, D1)_     | `centros_custo`                                     | `centros_custo.*`                                                          | — (opcional; nasce vazio)              | `codigo`, `nome`, `ativo`, `ordem`; FK `funcionarios.centro_custo_id` ([01 §A12](01-modelo-de-dominio.md))                 |
 | Cargo _(referência, não CRUD do RH)_ | `cargos` (global, CBO) + `funcionarios.cargo_nivel` | usa permissões de referência do core                                       | seed nacional (core)                   | — (evolução opcional: catálogo tenant `cargos_empresa`)                                                                    |
 
 **Provisionamento:** os seis catálogos tenant são semeados por empresa pela Action idempotente `ProvisionarCatalogosRh` (`firstOrCreate`), invocada na criação da empresa. Padrão pronto, 100% editável por CRUD, sem tocar em código.

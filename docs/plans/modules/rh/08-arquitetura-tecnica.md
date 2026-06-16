@@ -1,6 +1,6 @@
 # 08 — Arquitetura Técnica e Guia de Implementação
 
-Relacionados: [01](01-modelo-de-dominio.md) (fonte de verdade de schema) · [02](02-fase-1-blueprint.md) (blocos B1–B7) · [05](05-organograma-acl-hierarquica.md) (organograma/ACL) · [07](07-jornada-horas-extras-folha.md) (jornada/HE/folha) · [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
+Relacionados: [01](01-modelo-de-dominio.md) (fonte de verdade de schema) · [02](02-fase-1-blueprint.md) (blocos B1–B7) · [05](05-organograma-acl-hierarquica.md) (organograma/ACL) · [07](07-jornada-horas-extras-folha.md) (jornada/HE/folha) · [09](09-roadmap-fases.md) (roadmap de longo prazo / por que a fundação é imutável) · [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
 
 > **O que este documento é.** O **guia de implementação** transversal da Fase 1 do módulo de RH: como erguer o pacote, gerar cada CRUD com o gerador real do core, o que é **GERADO** vs. o que se **ESCREVE À MÃO**, as camadas por recurso, a ordem das migrations, seeds/provisionamento, testes (Pest), qualidade e a sequência mapeada aos blocos B1..B7 do [02](02-fase-1-blueprint.md).
 >
@@ -423,6 +423,8 @@ Commit em **Conventional Commits** PT-BR, escopo `rh`: `feat(rh): adicionar cat�
 ## 9. Sequência de implementação recomendada (mapeada aos blocos B1..B7)
 
 Caminho crítico `B1 → B2 → B3`; depois B4 (paralelo) e a trilha de folha `B5 → B6 → B7` (ver [02 §3](02-fase-1-blueprint.md)).
+
+> **Por que esta ordem importa além da Fase 1.** A Fase 1 não é um fim em si — é o **contrato imutável** que as fases 2–6 (ausências/tempo → folha → eSocial → ponto) consomem **sem retrabalho**: snapshots imutáveis (ADR-0009), cadastro eSocial-ready, `rubricas`/`tabelas_legais`, jornada/escalas. Essa visão de longo prazo e o "porquê" da fundação ser imutável estão em [09 — Roadmap](09-roadmap-fases.md) (em especial [09 §9 — "a fundação é o contrato"](09-roadmap-fases.md)). Decisões de modelagem tomadas aqui (ENUM × CATÁLOGO × REFERÊNCIA, vínculo `funcionario↔admin_user`, append-only) habilitam o futuro — ver os ADRs do módulo.
 
 ```bash
 # ── B1 · Fundação + catálogos ─────────────────────────────────────────────

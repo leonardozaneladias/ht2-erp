@@ -60,6 +60,13 @@ Criar **coluna + migration por pedido** não é opção: cada cliente teria um s
 
 É **fundação reutilizável**: adotar em outra entidade é adicionar a coluna JSONB + usar o trait + filtrar a tela de definições por `entidade` ([10 §7](../10-campos-personalizados.md)). Marcada como **candidata a promoção ao core** — mesma lógica do [ADR-RH-007](ADR-RH-007-rh-familia-modulos-pacote.md); a promoção em si fica para quando um segundo módulo precisar, sem reabrir esta decisão.
 
+**Faseamento de capacidades (D3) — visão completa, MVP enxuto.** A modelagem comporta um catálogo amplo, mas a Fase 1 entrega só o núcleo:
+
+- **Tipos** — **MVP = 8** (`texto`, `texto_longo`, `numero`, `decimal`, `data`, `booleano`, `select`, `multi_select`); o catálogo-alvo de ~30 ([10 §3](../10-campos-personalizados.md)) entra como **novos `case` do enum** (aditivo, sem migration de schema). **Exclusões conscientes:** `monetario` (dinheiro é centavos `INTEGER` — [ADR-0014](../../../../architecture/adrs/ADR-0014-money-integer-centavos.md); só entra serializando centavos, nunca float em JSONB) e `senha`/segredo (risco LGPD — não se guarda segredo livre em JSONB de cadastro). Tipos com alça extra (`arquivo`/`imagem`/`documento` → `Anexo`; `relacionado` → FK lógica; `calculado` → derivado) são evolução por exigirem mais que JSONB plano.
+- **Condicionais** — o **MVP é de campos PLANOS (sem condicionais)**; as regras condicionais (show-if, required-if, opções dependentes, limites por contexto, autofill, bloqueio por status, regras por perfil) são **[Evolução]** com o **desenho pronto** em [10 §2.4](../10-campos-personalizados.md), vivendo no JSONB `regras.condicoes` (zero migration quando entrarem).
+- **Propriedades e opções** — o MVP entrega as propriedades essenciais (§2.1) e opções `label/valor/ordem` (§2.3); configs ricas (descrição, valor padrão, máscara, visível, exibir em listagem, opção ativa/padrão) e UX (drag-drop, prévia, duplicar, "onde é usado", "já tem dados?") são evolução — a maioria cabe em `regras` (JSONB) ou colunas aditivas.
+- **Mudança de tipo / preservação** — proibida a troca silenciosa de `tipo`/`chave` de um campo com dados; valores preservados por `chave` no JSONB ([10 §2.5](../10-campos-personalizados.md)). Pendência consolidada em [13 PEND-11/PEND-12](../13-rastreabilidade-e-pendencias.md).
+
 ## Consequências
 
 **Positivas:**

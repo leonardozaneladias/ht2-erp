@@ -69,21 +69,44 @@ Um atestado chega por caminhos diferentes; a coluna `origem` registra qual ([01 
 
 ### 2.4 Máquina de estados (`StatusAtestado`)
 
+Cinco estados. A fonte da máquina é `StatusAtestado::podeTransicionarPara()` / `isFinal()` ([01 §4.2](01-modelo-de-dominio.md)); a matriz abaixo é a **definição canônica** das transições (espelhada no [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md) §Decisão). Diagrama:
+
 ```
-                    analisar                aprovar
-   [pendente] ───────────────► [em_analise] ─────────► [aprovado]   (final → dispara efeitos §5)
-       │                            │         rejeitar
-       │ aprovar/rejeitar diretos   └────────────────► [rejeitado]  (final, com motivo_rejeicao)
-       └────────────────────────────────────────────► (RH pode aprovar/rejeitar sem passar por em_analise)
+                analisar                 aprovar
+   [pendente] ───────────► [em_analise] ─────────► [aprovado] ──estornar──► [estornado]  ⊗ terminal
+       │  │                     │                 (dispara efeitos §5)
+       │  │ aprovar (direto)    │ rejeitar
+       │  └─────────────────────┴───────────────► [aprovado]
+       │ rejeitar (direto)
+       └────────────────────────────────────────► [rejeitado]  ⊗ terminal (exige motivo_rejeicao)
 ```
 
-- **`pendente`** — recém-criado, aguardando o RH. É o estado de um atestado enviado pelo colaborador ou registrado pelo gestor.
-- **`em_analise`** — o RH/gestor "pegou" para conferir (opcional; deixa claro que está em curso).
-- **`aprovado`** — ao entrar aqui, a Action aplica o **efeito** (§5): abona horas, abona dias, ou gera afastamento. **Estornável** (não é terminal absoluto): `estornar` reverte o efeito e leva a `estornado`.
-- **`rejeitado`** — **final**; exige `motivo_rejeicao`; não abona nada. `rejeitar` **só** transiciona de `pendente`/`em_analise` (nunca de `aprovado`).
-- **`estornado`** — **final**; resultado de `estornar` um `aprovado` (correção): reverte o abono (a ocorrência abonada volta a injustificada / o afastamento gerado é encerrado), preservando a trilha. Espelha `horas_extras.cancelada`.
-- **Transições** são guardadas por permissão (§2.6) e implementadas por Actions (`AnalisarAtestadoAction`, `AprovarAtestadoAction`, `RejeitarAtestadoAction`), seguindo o padrão de máquina de estados das horas extras ([07 §5](07-jornada-horas-extras-folha.md)). `StatusAtestado::isFinal()`/`podeTransicionarPara()` ([01 §4.2](01-modelo-de-dominio.md)) validam transições.
-- **Correção** de um atestado finalizado **não** é editar o passado: `rejeitado` por engano → novo atestado; `aprovado` por engano → **`estornar`** (`rh.atestados.estornar` → `estornado`), que desfaz o efeito (a ocorrência volta a injustificada / o afastamento gerado é encerrado), preservando a trilha — mesma disciplina append-only da linha do tempo ([06 §3](06-linha-do-tempo.md)).
+**Transições válidas** (verbo → permissão de [01 §10](01-modelo-de-dominio.md); tudo conferido no servidor por Action + Policy, §2.6):
+
+| De ↓ \ Para → | `em_analise`  | `aprovado`   | `rejeitado`   | `estornado`   |
+| ------------- | ------------- | ------------ | ------------- | ------------- |
+| `pendente`    | ✅ `analisar` | ✅ `aprovar` | ✅ `rejeitar` | ❌            |
+| `em_analise`  | —             | ✅ `aprovar` | ✅ `rejeitar` | ❌            |
+| `aprovado`    | ❌            | —            | ❌            | ✅ `estornar` |
+| `rejeitado`   | ❌            | ❌           | — (terminal)  | ❌            |
+| `estornado`   | ❌            | ❌           | ❌            | — (terminal)  |
+
+**Transições proibidas (explícitas) e o que fazer no lugar:**
+
+- **`aprovado → rejeitado`** — proibido. `rejeitar` só sai de `pendente`/`em_analise`. Aprovou por engano? Use **`estornar`** (`aprovado → estornado`), que reverte o efeito (§4).
+- **`aprovado → em_analise` / `aprovado → pendente`** — proibido. De `aprovado` só se sai por `estornar`; "reanalisar" = estornar e lançar **novo** atestado.
+- **`pendente|em_analise → estornado`** — proibido: não há efeito a estornar antes da aprovação (rejeitar/deletar é o caminho).
+- **`rejeitado → *` e `estornado → *`** — proibido: ambos são **terminais absolutos**. Correção = **novo atestado** (mesma disciplina append-only da linha do tempo — [06 §3](06-linha-do-tempo.md)).
+
+**Estados:**
+
+- **`pendente`** — recém-criado, aguardando o RH (enviado pelo colaborador ou registrado pelo gestor).
+- **`em_analise`** — o RH/gestor "pegou" para conferir (passo **opcional**; pode-se aprovar/rejeitar direto de `pendente`).
+- **`aprovado`** — ao entrar, a Action aplica o **efeito** (§5): abona horas, abona dias ou gera afastamento. **Não é terminal absoluto**: reversível **só** por `estornar` (→ `estornado`). É "final operacional" (`isFinal()` não admite aprovar/rejeitar de novo), com o estorno como única exceção controlada.
+- **`rejeitado`** — **terminal absoluto**; exige `motivo_rejeicao`; não abona nada.
+- **`estornado`** — **terminal absoluto**; resultado de `estornar` um `aprovado`: reverte o abono (a ocorrência abonada volta a injustificada / o afastamento gerado é encerrado), preservando a trilha. Espelha `horas_extras.cancelada`.
+
+Transições implementadas por Actions (`AnalisarAtestadoAction`, `AprovarAtestadoAction`, `RejeitarAtestadoAction`, `EstornarAtestadoAction`) e guardadas por permissão (§2.6), seguindo o padrão de máquina de estados das horas extras ([07 §5](07-jornada-horas-extras-folha.md)). Toda transição fora da matriz lança exceção de domínio (transição inválida) — testada em §11.
 
 ### 2.5 Papéis e responsabilidades (× ACL hierárquica)
 
@@ -101,7 +124,7 @@ A análise/aprovação é, por padrão, do **RH**; um cliente pode delegar a apr
 ### 2.6 Permissões e LGPD do atestado
 
 - Permissões ([01 §10](01-modelo-de-dominio.md)): `rh.atestados.{listar, criar, editar, analisar, aprovar, rejeitar, estornar, deletar, restaurar, excluir_permanente}` **+ `rh.atestados.ver_cid`**.
-- **`cid` é dado de saúde** (LGPD art. 11) — **mesmo rigor do `cid` de afastamento** ([06 §5.3](06-linha-do-tempo.md) / [01 §8](01-modelo-de-dominio.md)): `encrypted`, fora de auditoria, **mascarado** sem `rh.atestados.ver_cid`. O colaborador, ao enviar, **pode** informar o CID, mas **não** o vê de volta mascarado de outros; o gestor vê o atestado mas **não** o CID sem a permissão.
+- **`cid` é dado de saúde** (LGPD art. 11) — **mesmo rigor do `cid` de afastamento**, conforme a **matriz única de dados sensíveis** ([01 §8.1](01-modelo-de-dominio.md) · [06 §5.3](06-linha-do-tempo.md)): `encrypted`, fora de auditoria, **mascarado** sem `rh.atestados.ver_cid`. O colaborador, ao enviar, **pode** informar o CID, mas **não** o vê de volta mascarado de outros; o gestor vê o atestado mas **não** o CID sem a permissão.
 - Tudo conferido no **servidor** (Policy + escopo), nunca só na UI.
 
 ---

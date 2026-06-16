@@ -89,6 +89,8 @@ Colunas extras na aba **Funcionarios**, prefixadas (ex.: `cp_tamanho_camiseta`, 
 - A validação reusa `regrasPersonalizadas()` ([10 §4](10-campos-personalizados.md)) — tipo, obrigatoriedade e opções valem na importação como valem na tela.
 - Coluna `cp_<chave>` sem definição → **ignorada com aviso** no relatório (não falha o lote); campo obrigatório ausente → **erro de linha**.
 - O **template** (§6.2) já emite as colunas `cp_*` da empresa e documenta os valores válidos na aba "Instruções".
+- **Identificação na importação/atualização:** cada coluna `cp_<chave>` é casada à definição pela `chave` (estável); o **round-trip** (§6.2) reexporta os `cp_*` e reimporta atualizando pelos mesmos. Desativar/renomear uma definição muda as colunas emitidas — ver preservação de dados em [10 §2.5](10-campos-personalizados.md).
+- **Listagens dinâmicas, filtros (JSONB/GIN), relatórios, dashboards e API** sobre campos personalizados: a visão completa (e o faseamento MVP × evolução) está em [10 §8/§8.1](10-campos-personalizados.md) — esta seção cobre só o recorte de **planilha**.
 
 ---
 

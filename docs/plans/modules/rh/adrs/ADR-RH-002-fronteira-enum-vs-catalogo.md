@@ -69,6 +69,7 @@ Três categorias, com uma regra de fronteira explícita.
 
 - **Cargo** fica em REFERÊNCIA (`cargos`/CBO), satisfazendo o teste de intenção que espera `cargosDisponiveis`. O **nível hierárquico** que o organograma precisa mora em `funcionarios.cargo_nivel` (cache desnormalizado). Se o cliente exigir cargos próprios (não-CBO) com CRUD por empresa, a evolução é **aditiva**: promover para catálogo tenant `cargos_empresa` (`rh.cargos.*`), sem quebrar o que existe.
 - **`NaturezaRubrica`** (provento/desconto/informativa) é ENUM **embutido** numa linha de catálogo — exemplo de coexistência: a rubrica é catálogo do cliente, mas sua natureza dirige cálculo, logo é enum.
+- **Centro de custo** (`centros_custo`, [01 §A12](../01-modelo-de-dominio.md)) é **CATÁLOGO tenant opcional** (decisão D1 desta revisão): o cliente cria linhas, **sem** lógica/cálculo atrelado ao valor (só rótulo + agrupamento gerencial/financeiro) — aplica-se a regra mnemônica "o cliente adiciona linhas → CATÁLOGO". **Não é REFERÊNCIA** (não há lista oficial BR/ISO; não existe no core — verificado) **nem ENUM** (não dirige `if`/cálculo; é dimensão de agrupamento). Entra de forma **aditiva** (FK nullable `funcionarios.centro_custo_id`), sem bloquear o B1 mínimo — CRUD em [04 §7.1](../04-catalogos-configuraveis.md).
 
 ## Consequências
 

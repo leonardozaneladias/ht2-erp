@@ -157,7 +157,7 @@ O afastamento tem **duas Actions** (em `packages/modulo-rh/src/Actions/Afastamen
 
 ### 5.3 CID — dado de saúde protegido (LGPD art. 11)
 
-O `cid` (código da doença) é **categoria especial de dado pessoal** (LGPD art. 11). Tratamento obrigatório, alinhado ao core ([01 §8](01-modelo-de-dominio.md)):
+O `cid` (código da doença) é **categoria especial de dado pessoal** (LGPD art. 11). Tratamento obrigatório, conforme a **matriz única de dados sensíveis** ([01 §8.1](01-modelo-de-dominio.md)):
 
 - **`encrypted`** — cast de criptografia no model (mesmo padrão do `two_factor_secret` do `AdminUser`); nunca em claro no banco.
 - **Fora de auditoria** — `cid` em `atributosNaoAuditados()`: não vaza para o diff do activitylog (reforça "dados sensíveis nunca em logs" — CLAUDE §19).
@@ -201,7 +201,7 @@ O componente recebe os eventos já **projetados pela camada Livewire** (não mon
 
 ## 7. Permissões
 
-A linha do tempo expõe **operações** (lançar fatos), então as permissões são **orientadas à ação** — distintas do CRUD genérico de catálogo. Verbos canônicos (Policy via `@can`):
+A linha do tempo expõe **operações** (lançar fatos), então as permissões são **orientadas à ação** — distintas do CRUD genérico de catálogo. Os **slugs canônicos são os de [01 §10](01-modelo-de-dominio.md)** (fonte de verdade); esta seção descreve o **uso**, e os rótulos semânticos `registrar`/`encerrar` da UI **mapeiam** para os slugs CRUD registrados lá. Verbos (Policy via `@can`):
 
 - **Eventos** — `rh.eventos.listar` (ver a linha do tempo de um funcionário visível) e `rh.eventos.registrar` (lançar qualquer evento funcional). Opcionalmente, granularidade **por ação** (`rh.eventos.registrar_promocao`, `rh.eventos.alterar_salario`, `rh.eventos.transferir`, …) quando o cliente precisar separar quem promove de quem reajusta. O **blueprint** ([02 §B4](02-fase-1-blueprint.md)) cita o par CRUD-style `rh.eventos.{listar,criar}`; `criar` ≡ `registrar` (semântica de "lançar evento"). **Não há** `editar`/`deletar`/`restaurar`/`excluir_permanente` para eventos — a tabela é append-only (§3).
 - **Afastamentos** — `rh.afastamentos.listar`, `rh.afastamentos.registrar` (abrir afastamento), `rh.afastamentos.encerrar` (registrar retorno) e a permissão sensível **`rh.afastamentos.ver_cid`** (§5.3). Como a tabela é soft-deletável, valem também `rh.afastamentos.{deletar, restaurar, excluir_permanente}` do fluxo `ComLixeira` ([02 §B4](02-fase-1-blueprint.md) lista `{listar,criar,editar,deletar,restaurar,excluir_permanente}` + `ver_cid`); `criar`≡`registrar`, `editar` cobre o `encerrar`. Os verbos `registrar`/`encerrar` são os **nomes semânticos** preferidos na UI; mantêm-se mapeados aos da lixeira para reaproveitar o core.
