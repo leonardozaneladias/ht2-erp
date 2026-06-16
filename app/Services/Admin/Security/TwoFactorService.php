@@ -12,6 +12,7 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -33,6 +34,8 @@ final class TwoFactorService
     private const RECOVERY_CODES = 8;
 
     private const EMAIL_CODE_CACHE_PREFIX = '2fa-email-code:';
+
+    private const EMAIL_SEND_COOLDOWN_PREFIX = 'two-factor-email-send:';
 
     public function __construct(private readonly Google2FA $google2fa) {}
 
@@ -114,9 +117,20 @@ final class TwoFactorService
      * Gera um código numérico de 6 dígitos, guarda o hash em cache (single-use,
      * com TTL) e o envia por e-mail. O código em claro nunca é persistido — só
      * trafega no e-mail; no servidor fica apenas o hash.
+     *
+     * Respeita o cooldown de reenvio: devolve false (sem enviar) quando ainda
+     * está dentro do intervalo mínimo entre envios.
      */
-    public function dispararCodigoEmail(AdminUser $usuario): void
+    public function dispararCodigoEmail(AdminUser $usuario): bool
     {
+        $chaveCooldown = self::EMAIL_SEND_COOLDOWN_PREFIX . $usuario->id;
+
+        if (RateLimiter::tooManyAttempts($chaveCooldown, 1)) {
+            return false;
+        }
+
+        RateLimiter::hit($chaveCooldown, self::EMAIL_RESEND_COOLDOWN);
+
         $codigo = (string) random_int(100000, 999999);
 
         Cache::put(
@@ -126,6 +140,8 @@ final class TwoFactorService
         );
 
         $usuario->notify(new CodigoVerificacaoEmailNotification($codigo, intdiv(self::EMAIL_CODE_TTL, 60)));
+
+        return true;
     }
 
     /**

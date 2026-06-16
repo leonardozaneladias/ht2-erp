@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
+use App\Actions\Admin\Security\ConfirmEmailTwoFactorAction;
 use App\Actions\Admin\Security\ConfirmTwoFactorAction;
+use App\Actions\Admin\Security\DisableEmailTwoFactorAction;
 use App\Actions\Admin\Security\DisableTwoFactorAction;
 use App\Actions\Admin\Security\EnableTwoFactorAction;
 use App\Actions\Admin\Security\RegenerateRecoveryCodesAction;
@@ -12,15 +14,17 @@ use App\Livewire\Concerns\ConfirmaSegundoFator;
 use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Services\Admin\Security\TwoFactorService;
+use App\Settings\SegurancaSettings;
 use App\Support\Impersonation\ImpersonationContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 /**
- * Segurança da conta: gestão do 2FA do próprio usuário. Ações sensíveis
- * (ativar, desativar, regenerar) exigem reconfirmação de senha (ConfirmsPassword)
- * — por isso resolvem as Actions via app(), já que são chamadas pelo trait.
+ * Segurança da conta: gestão do 2FA do próprio usuário (app autenticador e
+ * código por e-mail). Ações sensíveis (ativar, desativar, regenerar) exigem
+ * reconfirmação de senha (ConfirmsPassword) ou step-up de 2FA — por isso
+ * resolvem as Actions via app(), já que são chamadas pelo trait.
  */
 class SegurancaConta extends Component
 {
@@ -37,6 +41,10 @@ class SegurancaConta extends Component
     public array $recoveryCodes = [];
 
     public string $senhaDesconectar = '';
+
+    public bool $configurandoEmail = false;
+
+    public string $codigoEmailConfirmacao = '';
 
     public function ativar(): void
     {
@@ -96,6 +104,81 @@ class SegurancaConta extends Component
     }
 
     /**
+     * Inicia a ativação do código por e-mail: dispara um código de verificação
+     * (provando que o usuário recebe e-mails) e abre o passo de confirmação.
+     */
+    public function ativarEmailDoisFatores(): void
+    {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
+        $this->ensurePasswordIsConfirmed();
+
+        if (! app(SegurancaSettings::class)->permitir_2fa_email || $this->usuario()->two_factor_email_enabled) {
+            return;
+        }
+
+        app(TwoFactorService::class)->dispararCodigoEmail($this->usuario());
+
+        $this->configurandoEmail = true;
+        $this->reset('codigoEmailConfirmacao');
+
+        $this->notificarSucesso('Enviamos um código de verificação para o seu e-mail.');
+    }
+
+    public function reenviarCodigoEmailDoisFatores(): void
+    {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
+
+        if (! $this->configurandoEmail) {
+            return;
+        }
+
+        if (! app(TwoFactorService::class)->dispararCodigoEmail($this->usuario())) {
+            $this->addError('codigoEmailConfirmacao', 'Aguarde alguns segundos antes de pedir um novo código.');
+
+            return;
+        }
+
+        $this->notificarSucesso('Novo código enviado para o seu e-mail.');
+    }
+
+    public function confirmarEmailDoisFatores(ConfirmEmailTwoFactorAction $confirm): void
+    {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
+        $this->validate(['codigoEmailConfirmacao' => ['required', 'string']]);
+
+        if (! $confirm->execute($this->usuario(), trim($this->codigoEmailConfirmacao))) {
+            $this->addError('codigoEmailConfirmacao', 'Código inválido ou expirado. Verifique seu e-mail e tente novamente.');
+
+            return;
+        }
+
+        $this->configurandoEmail = false;
+        $this->reset('codigoEmailConfirmacao');
+
+        $this->notificarSucesso('Código por e-mail ativado como segundo fator.');
+    }
+
+    public function cancelarConfiguracaoEmail(): void
+    {
+        $this->configurandoEmail = false;
+        $this->reset('codigoEmailConfirmacao');
+    }
+
+    public function desativarEmailDoisFatores(): void
+    {
+        app(ImpersonationContext::class)->garantirNaoPersonificando();
+        // Step-up: desligar um segundo fator exige provar o controle da conta.
+        $this->ensureSegundoFatorConfirmado();
+
+        app(DisableEmailTwoFactorAction::class)->execute($this->usuario());
+
+        $this->configurandoEmail = false;
+        $this->reset('codigoEmailConfirmacao');
+
+        $this->notificarSucesso('Código por e-mail desativado.');
+    }
+
+    /**
      * Encerra as sessões do usuário em outros dispositivos (AuthenticateSession
      * invalida as demais sessões; a atual permanece).
      */
@@ -125,6 +208,8 @@ class SegurancaConta extends Component
         return view('livewire.admin.conta.seguranca-conta', [
             'ativo' => $usuario->hasTwoFactorEnabled(),
             'restantes' => count($usuario->two_factor_recovery_codes ?? []),
+            'emailAtivo' => $usuario->two_factor_email_enabled,
+            'emailPermitido' => app(SegurancaSettings::class)->permitir_2fa_email,
         ]);
     }
 

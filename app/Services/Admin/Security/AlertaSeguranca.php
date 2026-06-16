@@ -64,6 +64,16 @@ final class AlertaSeguranca
         $this->enviarAoUsuario($usuario, TipoAlertaSeguranca::CodigoRecuperacaoUtilizado);
     }
 
+    public function doisFatoresEmailAtivado(AdminUser $usuario): void
+    {
+        $this->enviarAoUsuario($usuario, TipoAlertaSeguranca::DoisFatoresEmailAtivado);
+    }
+
+    public function doisFatoresEmailDesativado(AdminUser $usuario): void
+    {
+        $this->enviarAoUsuario($usuario, TipoAlertaSeguranca::DoisFatoresEmailDesativado);
+    }
+
     /**
      * Alerta direcionado ao próprio dono da conta sobre mudanças no seu 2FA.
      * Sempre enviado (não depende de `alertas_seguranca_habilitados`, que rege

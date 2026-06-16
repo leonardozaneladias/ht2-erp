@@ -16,6 +16,8 @@ enum TipoAlertaSeguranca: string
             self::DoisFatoresDesativado => 'Verificação em duas etapas desativada',
             self::CodigosRecuperacaoRegenerados => 'Códigos de recuperação regenerados',
             self::CodigoRecuperacaoUtilizado => 'Código de recuperação utilizado',
+            self::DoisFatoresEmailAtivado => 'Código por e-mail ativado',
+            self::DoisFatoresEmailDesativado => 'Código por e-mail desativado',
         };
     }
 
@@ -29,6 +31,8 @@ enum TipoAlertaSeguranca: string
             self::DoisFatoresDesativado => 'A verificação em duas etapas foi desativada na sua conta. Se não foi você, redefina sua senha imediatamente.',
             self::CodigosRecuperacaoRegenerados => 'Novos códigos de recuperação foram gerados na sua conta; os códigos anteriores deixaram de valer.',
             self::CodigoRecuperacaoUtilizado => 'Um código de recuperação foi usado para acessar sua conta. Se não foi você, redefina sua senha imediatamente.',
+            self::DoisFatoresEmailAtivado => 'O recebimento de código por e-mail foi ativado como segundo fator na sua conta.',
+            self::DoisFatoresEmailDesativado => 'O recebimento de código por e-mail foi desativado na sua conta. Se não foi você, redefina sua senha imediatamente.',
         };
     }
 
@@ -41,6 +45,8 @@ enum TipoAlertaSeguranca: string
         return match ($this) {
             self::DoisFatoresAtivado,
             self::DoisFatoresDesativado,
+            self::DoisFatoresEmailAtivado,
+            self::DoisFatoresEmailDesativado,
             self::CodigosRecuperacaoRegenerados,
             self::CodigoRecuperacaoUtilizado => true,
             default => false,
@@ -54,4 +60,6 @@ enum TipoAlertaSeguranca: string
     case DoisFatoresDesativado = 'dois-fatores-desativado';
     case CodigosRecuperacaoRegenerados = 'codigos-recuperacao-regenerados';
     case CodigoRecuperacaoUtilizado = 'codigo-recuperacao-utilizado';
+    case DoisFatoresEmailAtivado = 'dois-fatores-email-ativado';
+    case DoisFatoresEmailDesativado = 'dois-fatores-email-desativado';
 }

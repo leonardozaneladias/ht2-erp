@@ -10,7 +10,6 @@ use App\Services\Admin\Security\AlertaSeguranca;
 use App\Services\Admin\Security\LimiteTentativas;
 use App\Services\Admin\Security\TwoFactorService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -52,7 +51,7 @@ final class TwoFactorChallenge extends Component
         // envio do código. Reenvios (inclusive ao recarregar) respeitam o cooldown.
         if (! $usuario->hasTwoFactorEnabled() && $usuario->emailDoisFatoresDisponivel()) {
             $this->usarEmail = true;
-            $this->enviarCodigoEmail($usuario, app(TwoFactorService::class));
+            app(TwoFactorService::class)->dispararCodigoEmail($usuario);
         }
     }
 
@@ -149,7 +148,7 @@ final class TwoFactorChallenge extends Component
         $this->reset('codigo', 'recoveryCode');
         $this->resetErrorBag();
 
-        if (! $this->enviarCodigoEmail($usuario, $service)) {
+        if (! $service->dispararCodigoEmail($usuario)) {
             $this->addError('codigo', 'Um código já foi enviado há instantes. Verifique seu e-mail.');
         }
     }
@@ -171,7 +170,7 @@ final class TwoFactorChallenge extends Component
             return;
         }
 
-        if (! $this->enviarCodigoEmail($usuario, $service)) {
+        if (! $service->dispararCodigoEmail($usuario)) {
             $this->addError('codigo', 'Aguarde alguns segundos antes de pedir um novo código.');
 
             return;
@@ -246,24 +245,6 @@ final class TwoFactorChallenge extends Component
         // Persiste a janela aceita: o mesmo código não vale uma segunda vez.
         $usuario->forceFill(['two_factor_last_timestamp' => $timestamp])->save();
         $this->metodoVerificado = 'totp';
-
-        return true;
-    }
-
-    /**
-     * Dispara o código por e-mail respeitando o cooldown de reenvio. Devolve
-     * false (sem enviar) quando ainda está no intervalo mínimo entre envios.
-     */
-    private function enviarCodigoEmail(AdminUser $usuario, TwoFactorService $service): bool
-    {
-        $chave = 'two-factor-email-send:' . $usuario->id;
-
-        if (RateLimiter::tooManyAttempts($chave, 1)) {
-            return false;
-        }
-
-        RateLimiter::hit($chave, TwoFactorService::EMAIL_RESEND_COOLDOWN);
-        $service->dispararCodigoEmail($usuario);
 
         return true;
     }

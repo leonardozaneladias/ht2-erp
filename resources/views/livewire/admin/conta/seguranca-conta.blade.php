@@ -113,6 +113,71 @@
             @endif
         </x-shared.card>
 
+        @if ($emailPermitido)
+            <x-shared.card
+                title="Código por e-mail"
+                subtitle="Receba um código de verificação no seu e-mail quando não tiver o aplicativo autenticador à mão."
+            >
+                @if ($emailAtivo)
+                    <div class="flex items-center gap-2">
+                        <x-shared.badge variant="success">Ativo</x-shared.badge>
+                        <span class="text-default-500 text-sm">Você pode receber um código por e-mail ao entrar.</span>
+                    </div>
+                    <div class="mt-5">
+                        <x-shared.button
+                            type="button"
+                            variant="danger"
+                            wire:click="iniciarConfirmacao2fa('desativarEmailDoisFatores')"
+                            icon="tabler--mail-off"
+                        >
+                            Desativar código por e-mail
+                        </x-shared.button>
+                    </div>
+                @elseif ($configurandoEmail)
+                    <p class="text-default-500 mb-4 text-sm">Enviamos um código de 6 dígitos para o seu e-mail. Informe-o abaixo para concluir a ativação.</p>
+                    <form wire:submit="confirmarEmailDoisFatores" class="grow md:max-w-xs">
+                        <x-shared.input
+                            name="codigoEmailConfirmacao"
+                            label="Código de verificação"
+                            wire:model="codigoEmailConfirmacao"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            placeholder="000000"
+                        />
+                        <div class="mt-3 flex flex-wrap gap-3">
+                            <x-shared.loading-button
+                                type="submit"
+                                target="confirmarEmailDoisFatores"
+                                icon="tabler--check"
+                            >
+                                Confirmar e ativar
+                            </x-shared.loading-button>
+                            <x-shared.button
+                                type="button"
+                                variant="light"
+                                wire:click="reenviarCodigoEmailDoisFatores"
+                                icon="tabler--refresh"
+                            >
+                                Reenviar código
+                            </x-shared.button>
+                            <x-shared.button type="button" variant="light" wire:click="cancelarConfiguracaoEmail">
+                                Cancelar
+                            </x-shared.button>
+                        </div>
+                    </form>
+                @else
+                    <p class="text-default-500 mb-4 text-sm">O envio de código por e-mail está desativado. Ative para usá-lo como segundo fator quando não tiver o aplicativo à mão.</p>
+                    <x-shared.button
+                        type="button"
+                        wire:click="iniciarConfirmacaoDeSenha('ativarEmailDoisFatores')"
+                        icon="tabler--mail"
+                    >
+                        Ativar código por e-mail
+                    </x-shared.button>
+                @endif
+            </x-shared.card>
+        @endif
+
         <x-shared.card
             title="Outros dispositivos"
             subtitle="Encerre as sessões abertas em outros navegadores e dispositivos. A sessão atual permanece ativa."

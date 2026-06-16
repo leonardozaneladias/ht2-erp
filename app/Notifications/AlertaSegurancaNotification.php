@@ -88,6 +88,7 @@ final class AlertaSegurancaNotification extends Notification implements ShouldQu
         return match ($this->tipo) {
             TipoAlertaSeguranca::LoginSuperAdmin,
             TipoAlertaSeguranca::DoisFatoresAtivado,
+            TipoAlertaSeguranca::DoisFatoresEmailAtivado,
             TipoAlertaSeguranca::CodigosRecuperacaoRegenerados => TipoNotificacao::Info,
             default => TipoNotificacao::Aviso,
         };
