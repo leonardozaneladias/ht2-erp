@@ -14,6 +14,7 @@ declare(strict_types=1);
 | Exemplo (vendor=ht2erp, namespace=HT2ERP, prefixo=modulo-):
 |   módulo "Rh"  ->  pacote ht2erp/modulo-rh  ·  namespace HT2ERP\Rh\
 |                ->  packages/modulo-rh  ·  views "rh::"
+|                ->  repo GitHub do release: {org}/erp-module-rh
 |
 */
 
@@ -24,8 +25,10 @@ return [
     // Namespace PHP base dos pacotes (sem barra final).
     'namespace' => 'HT2ERP',
 
-    // Organização no GitHub (usada nos runbooks de distribuição via VCS).
-    'org' => 'ht2-erp',
+    // Conta/org no GitHub (usada nos runbooks de distribuição e pelo bin/release-module.sh).
+    // Hoje é a conta pessoal; o repo de cada módulo é {org}/erp-module-{slug} (ex.:
+    // leonardozaneladias/erp-module-rh). Migra para a org ht2-erp depois, via transfer.
+    'org' => 'leonardozaneladias',
 
     // Diretório onde os pacotes em desenvolvimento vivem (path repository).
     'path' => 'packages',

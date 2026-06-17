@@ -64,16 +64,30 @@ Seeders criam `admin@example.com` / `password` (super-admin) e `gestor@example.c
 
 ---
 
-## Derivar um novo projeto desta base
+## Derivar um novo projeto ou instanciar um cliente
 
-A base administrativa do HT2 ERP é reutilizável como ponto de partida para outros sistemas. O script de inicialização renomeia marca / banco / Horizon / Pulse num único passo:
+Há **dois caminhos** distintos — não os confunda (detalhes no runbook **[docs/distribuicao-manutencao.md](docs/distribuicao-manutencao.md)** e no [ADR-0016](docs/architecture/adrs/ADR-0016-instancias-por-cliente.md)):
 
-```bash
-./bin/init-project.sh           # interativo
-./bin/init-project.sh --dry-run # mostra o que mudaria sem editar
-```
+- **Produto novo** (diverge da base para sempre) → `bin/init-project.sh`. Renomeia marca / banco / Horizon / Pulse e oferece reinicializar o git history (cortando o vínculo com a base).
 
-O script pergunta nome do projeto, slug e domínio de e-mail e aplica em `composer.json`, `package.json`, `.env.example`, `.env`, `README.md`, `CLAUDE.md`, `AGENTS.md`. Depois oferece (com confirmação) reset de `CHANGELOG.md`, `.claude/memory-log.md`, `docs/superpowers/plans|specs/` e reinicialização do git history.
+    ```bash
+    ./bin/init-project.sh           # interativo
+    ./bin/init-project.sh --dry-run # mostra o que mudaria sem editar
+    ```
+
+    Pergunta nome do projeto, slug e domínio de e-mail e aplica em `composer.json`, `package.json`, `.env.example`, `.env`, `README.md`, `CLAUDE.md`, `AGENTS.md`. Depois oferece (com confirmação) reset de `CHANGELOG.md`, `.claude/memory-log.md`, `docs/superpowers/plans|specs/` e reinicialização do git history.
+
+- **Cliente** (continua recebendo updates da base) → _clone + re-origin_ + `bin/new-client.sh`. **Preserva o histórico** (merge limpo) e configura remotes / `.env` / DDEV de forma aditiva, sem apagar o git.
+
+    ```bash
+    git clone git@github.com:leonardozaneladias/ht2-erp.git cliente-acme && cd cliente-acme
+    git remote rename origin upstream
+    git remote add origin git@github.com:leonardozaneladias/ht2-erp-acme.git
+    make new-client                 # provisiona o cliente (aditivo)
+    git push -u origin main && ddev start && make setup
+    ```
+
+    Depois, `make update-base` traz correções/melhorias da base para o cliente.
 
 ---
 
@@ -131,16 +145,18 @@ Mensagens de commit seguem **Conventional Commits** (`tipo(escopo): descrição 
 
 ## Documentação
 
-| Doc                                                                                              | Finalidade                                           |
-| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
-| [CLAUDE.md](CLAUDE.md)                                                                           | Contexto, regras e convenções do projeto             |
-| [docs/README.md](docs/README.md)                                                                 | Hub da documentação técnica                          |
-| [docs/plans/modules/rh/README.md](docs/plans/modules/rh/README.md)                               | Suíte de documentação do módulo de RH (Fase 1)       |
-| [docs/template/INSPINIA/CATALOGO-COMPONENTES.md](docs/template/INSPINIA/CATALOGO-COMPONENTES.md) | Catálogo de componentes Blade (fonte de verdade)     |
-| [docs/devops/ddev-setup.md](docs/devops/ddev-setup.md)                                           | **Guia DDEV + OrbStack** (instalar/configurar/rodar) |
-| [docs/devops/conventions.md](docs/devops/conventions.md)                                         | Convenções de código e Git                           |
-| [docs/devops/infra.md](docs/devops/infra.md)                                                     | Ambiente DDEV, Makefile, URLs                        |
-| [bin/init-project.sh](bin/init-project.sh)                                                       | Script de inicialização para novo projeto            |
+| Doc                                                                                              | Finalidade                                              |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| [CLAUDE.md](CLAUDE.md)                                                                           | Contexto, regras e convenções do projeto                |
+| [docs/README.md](docs/README.md)                                                                 | Hub da documentação técnica                             |
+| [docs/plans/modules/rh/README.md](docs/plans/modules/rh/README.md)                               | Suíte de documentação do módulo de RH (Fase 1)          |
+| [docs/template/INSPINIA/CATALOGO-COMPONENTES.md](docs/template/INSPINIA/CATALOGO-COMPONENTES.md) | Catálogo de componentes Blade (fonte de verdade)        |
+| [docs/devops/ddev-setup.md](docs/devops/ddev-setup.md)                                           | **Guia DDEV + OrbStack** (instalar/configurar/rodar)    |
+| [docs/devops/conventions.md](docs/devops/conventions.md)                                         | Convenções de código e Git                              |
+| [docs/devops/infra.md](docs/devops/infra.md)                                                     | Ambiente DDEV, Makefile, URLs                           |
+| [docs/distribuicao-manutencao.md](docs/distribuicao-manutencao.md)                               | **Runbook**: novo cliente, propagar correções, releases |
+| [bin/init-project.sh](bin/init-project.sh)                                                       | Inicialização de **produto novo** (diverge da base)     |
+| [bin/new-client.sh](bin/new-client.sh)                                                           | Instanciar um **cliente** (clone + re-origin, aditivo)  |
 
 ---
 

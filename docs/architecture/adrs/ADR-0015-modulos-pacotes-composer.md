@@ -68,4 +68,13 @@ O `make:modulo` ganha modo pacote (`--module=`) com namespaces/paths dinâmicos;
 ## Referências
 
 - [ADR-0002: Monólito modular](ADR-0002-monolito-modular.md) — esta decisão concretiza a "extração de módulos" lá prevista.
+- [ADR-0016: Instâncias por cliente via clone + re-origin](ADR-0016-instancias-por-cliente.md) — **refina** (não revoga) esta decisão; ver addendum abaixo.
 - Plano-mestre do épico: `docs/superpowers/specs/` / plano de produtização.
+
+## Refinamento (2026-06-17)
+
+> Refinado pelo [ADR-0016](ADR-0016-instancias-por-cliente.md), que **refina, não revoga** esta decisão. Pontos atualizados:
+>
+> - **Base distribuída por _clone + re-origin_**, não por "template repo". "Use this template" do GitHub squasha o histórico e o primeiro `git merge upstream` quebra com `unrelated histories`; o clone preserva o histórico comum e o merge fica limpo.
+> - **`packages/modulo-*` é versionado na base** (monorepo). A premissa original de tratar `packages/` como local-only/gitignored fica superada: o módulo desce ao cliente **embutido** no `git merge upstream` e é extraído para `erp-module-{slug}` via `git subtree split` no release (`bin/release-module.sh`).
+> - **Org/URLs:** por ora os repositórios vivem na conta pessoal **`leonardozaneladias`** (repo do módulo `erp-module-{slug}`, pacote `ht2erp/modulo-{slug}`); migram para a org `ht2-erp` depois via _transfer_. A nomenclatura `org GitHub ht2-erp` no topo refere-se ao destino futuro.

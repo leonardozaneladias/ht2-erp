@@ -24,6 +24,7 @@ Formato MADR. Referenciar pelo número: "conforme ADR-0010".
 | 0012 | [Spatie Permission com `guard_name` explícito por modelo](./adrs/ADR-0012-spatie-permission-guard-name.md) | auth, acl, spatie                       |
 | 0014 | [Valores monetários em INTEGER centavos](./adrs/ADR-0014-money-integer-centavos.md)                        | dinheiro, tipagem                       |
 | 0015 | [Módulos de negócio como pacotes Composer distribuíveis](./adrs/ADR-0015-modulos-pacotes-composer.md)      | arquitetura, modularidade, distribuição |
+| 0016 | [Instâncias por cliente via clone + re-origin](./adrs/ADR-0016-instancias-por-cliente.md)                  | arquitetura, distribuição, instâncias   |
 
 ## Convenções
 
