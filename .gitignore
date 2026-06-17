@@ -35,6 +35,12 @@ Thumbs.db
 
 # Husky
 /.husky/_
+# Opt-out local do bloqueio de push à main (instância de cliente; ver .husky/pre-push)
+/.husky/allow-main-push
+
+# DDEV — override local por instância de cliente (name do projeto / URL).
+# Também coberto por .ddev/.gitignore; explícito aqui para descoberta.
+/.ddev/config.local.yaml
 
 # Ferramentas de qualidade
 .phpstan.cache

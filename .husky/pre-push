@@ -1,9 +1,26 @@
 #!/usr/bin/env sh
-# Bloqueia push direto para a branch protegida (main).
+# Bloqueia push direto para a branch protegida.
 # Fluxo esperado: trabalhe em uma branch e abra um Pull Request no GitHub.
+#
+# Configurável (melhoria genérica vive na base e desce limpa aos clientes):
+#   .husky/protected-branch  -> nome da branch protegida (default: main)
+#   .husky/allow-main-push   -> se existir, libera o push (opt-out local; gitignored)
+#                               usado por instâncias de cliente (1 dev empurra direto)
 # Emergencia (burlar conscientemente): git push --no-verify
 
+HOOK_DIR="$(dirname "$0")"
+
+# Opt-out local (instância de cliente): a existência do arquivo libera o push.
+if [ -f "$HOOK_DIR/allow-main-push" ]; then
+  exit 0
+fi
+
+# Branch protegida configurável (default: main).
 protegida="main"
+if [ -f "$HOOK_DIR/protected-branch" ]; then
+  protegida="$(tr -d ' \t\r\n' < "$HOOK_DIR/protected-branch")"
+fi
+[ -n "$protegida" ] || exit 0
 
 while read -r _local_ref _local_sha remote_ref _remote_sha; do
   case "$remote_ref" in
@@ -13,6 +30,7 @@ while read -r _local_ref _local_sha remote_ref _remote_sha; do
     echo "  git switch -c minha-mudanca"
     echo "  git push -u origin minha-mudanca"
     echo "  gh pr create --fill --base $protegida"
+    echo "  Opt-out local (cliente): touch .husky/allow-main-push"
     echo "  Emergencia: git push --no-verify"
     echo ""
     exit 1
