@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# Bloqueia push direto para a branch protegida (main).
+# Fluxo esperado: trabalhe em uma branch e abra um Pull Request no GitHub.
+# Emergencia (burlar conscientemente): git push --no-verify
+
+protegida="main"
+
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+  case "$remote_ref" in
+  refs/heads/"$protegida")
+    echo ""
+    echo "[pre-push] Push direto para '$protegida' bloqueado -- use Pull Request."
+    echo "  git switch -c minha-mudanca"
+    echo "  git push -u origin minha-mudanca"
+    echo "  gh pr create --fill --base $protegida"
+    echo "  Emergencia: git push --no-verify"
+    echo ""
+    exit 1
+    ;;
+  esac
+done
+
+exit 0
