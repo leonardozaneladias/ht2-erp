@@ -26,11 +26,18 @@ php artisan vendor:publish --tag=rh-config
 
 ## Desenvolvimento
 
-Durante o desenvolvimento o pacote vive em `packages/rh` do
-boilerplate (path repository, symlink). Para gerar recursos CRUD dentro dele:
+Durante o desenvolvimento o pacote vive em `packages/modulo-rh` do
+monorepo (path repository, symlink). Para gerar recursos CRUD dentro dele:
 
 ```bash
 php artisan make:modulo Recurso --module=Rh --fields="..."
 ```
 
-Ao estabilizar, promova a um repositório Git próprio e versione por tag (semver).
+Para cortar um release (extrai para `erp-module-rh` via `git subtree split` + tag semver):
+
+```bash
+make release-modulo slug=rh versao=v0.1.0
+```
+
+Ver [ADR-0016](../../docs/architecture/adrs/ADR-0016-instancias-por-cliente.md) e
+`docs/distribuicao-manutencao.md`.
