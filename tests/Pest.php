@@ -33,6 +33,13 @@ pest()->beforeEach(function () {
     }
 })->in('Feature', 'Browser');
 
+// Desabilita o Vite nos testes Feature: eles renderizam views mas não dependem
+// de assets buildados (o build real é coberto pelo job de browser). Evita o
+// ViteManifestNotFoundException no CI, que não roda `npm run build` no job PHP.
+pest()->beforeEach(function () {
+    $this->withoutVite();
+})->in('Feature');
+
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
