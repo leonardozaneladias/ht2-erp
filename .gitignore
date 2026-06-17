@@ -65,6 +65,7 @@ __pycache__/
 /tests/Browser/Screenshots
 .workflows/.cache/
 
-# Módulos-pacote em desenvolvimento local (cada um tem seu próprio repo Git).
-# Ver ADR-0015 e docs/distribuicao-manutencao.md.
-/packages/
+# Módulos-pacote: versionados no monorepo da base (core + packages/modulo-*).
+# Cada pacote é extraído para seu repo próprio no release (git subtree split,
+# ver bin/release-module.sh). Ver ADR-0015/ADR-0016 e docs/distribuicao-manutencao.md.
+# O vendor/ e composer.lock de cada pacote ficam fora via packages/<modulo>/.gitignore.
