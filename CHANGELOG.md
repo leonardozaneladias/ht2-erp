@@ -18,6 +18,10 @@ Mantido no padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
   `bin/release-module.sh` (corta release de módulo via `git subtree split` + tag) e
   `bin/update-from-upstream.sh` (traz updates da base no cliente). Targets de Makefile:
   `new-client`, `release-modulo`, `update-base`.
+- Target `make setup-client` — setup inicial de uma instância de cliente **sem dados
+  demo** (roda `RolePermissionSeeder` em vez de `migrate --seed`; mantém `instalado=false`),
+  para que o Setup Wizard (`/admin/setup`) crie a empresa/branding/admin reais. O `make setup`
+  (dev) segue semeando demo e pulando o Wizard.
 
 ### Changed
 

@@ -6,7 +6,7 @@
 ARGS = $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: up down restart bash artisan migrate fresh seed horizon test \
-        test-e2e composer npm dev lint quality logs status setup \
+        test-e2e composer npm dev lint quality logs status setup setup-client \
         new-client release-modulo update-base
 
 up:
@@ -71,6 +71,18 @@ status:
 setup:
 	ddev artisan key:generate
 	ddev artisan migrate --seed
+	ddev artisan horizon:install
+	ddev artisan vendor:publish --tag=pulse-dashboard
+	ddev npm run build
+
+# Setup inicial de uma INSTÂNCIA DE CLIENTE (uma vez após `ddev start`).
+# Difere de `setup` (dev): NÃO roda `migrate --seed` (sem dados demo); apenas
+# semeia roles+permissões (RolePermissionSeeder, idempotente) e mantém
+# instalado=false, para que o Setup Wizard (/admin/setup) crie empresa/branding/admin.
+setup-client:
+	ddev artisan key:generate
+	ddev artisan migrate --force
+	ddev artisan db:seed --class=RolePermissionSeeder
 	ddev artisan horizon:install
 	ddev artisan vendor:publish --tag=pulse-dashboard
 	ddev npm run build
