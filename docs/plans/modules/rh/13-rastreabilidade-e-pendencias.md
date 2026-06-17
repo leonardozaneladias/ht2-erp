@@ -1,6 +1,6 @@
-# 13 — Rastreabilidade, Pendências e Sequência
+# 13 — Rastreabilidade, Pendências, Regras e Sequência
 
-> O **mapa de controle** da suíte: liga cada funcionalidade ao(s) documento(s), regra, fluxo, permissão, entidades, bloco/fase e critério de conclusão (DoD); consolida as **pendências e decisões em aberto**; e dá o **checklist final por etapa** + a **sequência de desenvolvimento**. Serve para o time não esquecer regra/fluxo/dependência durante a implementação ponto a ponto.
+> O **mapa de controle** da suíte: liga cada funcionalidade ao(s) documento(s), regra, fluxo, permissão, entidades, bloco/fase e critério de conclusão (DoD); consolida as **pendências e decisões em aberto**; e dá o **checklist final por etapa** + a **sequência de desenvolvimento**, o **catálogo de regras de negócio** (§5 — RN-xx) e o mapa de **relatórios e consultas** (§6). Serve para o time não esquecer regra/fluxo/dependência durante a implementação ponto a ponto.
 >
 > Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · banco **PostgreSQL 16**. Fonte de verdade de schema/permissões: [01](01-modelo-de-dominio.md) (§3 dicionário, §10 permissões). Blocos e DoD: [02](02-fase-1-blueprint.md); guia técnico/DoD do módulo: [08 §10](08-arquitetura-tecnica.md); roadmap de fases: [09](09-roadmap-fases.md).
 
@@ -47,14 +47,14 @@ Itens em aberto consolidados do diagnóstico. Para cada um: a **dúvida**, a **f
 | **PEND-04** | Máquina do atestado: reversibilidade do estorno + **delegação de aprovação** ao gestor (config? role?)             | Ausências (Fase 2)                          | [12 §2.4/§2.5](12-ausencias-faltas-atestados-afastamentos.md), [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md)           | quem aprova; estorno já definido como terminal                            | **Não**                                    | Fase 2                     | política de quem analisa/aprova atestado (RH vs gestor)               |
 | **PEND-05** | Conflito de **abono** quando a ocorrência já existe (sobrescreve? acumula? rejeita?)                               | Ausências (Fase 2)                          | [12 §4](12-ausencias-faltas-atestados-afastamentos.md)                                                                                   | regra de conciliação atestado→ocorrência                                  | **Não**                                    | Fase 2                     | regra de negócio do abono em conflito                                 |
 | **PEND-06** | Desligamento → **revogação de acesso**: gatilho, idempotência, tratamento de falha                                 | Self-service / ACL                          | [05 §9.1](05-organograma-acl-hierarquica.md), [06 §4.1](06-linha-do-tempo.md)                                                            | listener idempotente; o que fazer se a revogação falhar                   | **Parcial** (B3 entrega manual + listener) | Fase 1 (manual) / evolução | política de revogação (desativar login? remover papéis? prazo?)       |
-| **PEND-07** | Fallback de aprovação/cálculo de **HE sem salário/escala vigente** na data                                         | Horas extras (B6)                           | [07](07-jornada-horas-extras-folha.md)                                                                                                   | sem base de cálculo, a HE não calcula                                     | **Sim (para B6)**                          | antes de B6                | o que fazer quando falta escala/salário: bloquear? estimar? alertar?  |
+| **PEND-07** | ✅ **RESOLVIDA (D-HE)** — cálculo de **HE sem salário/escala vigente** na data                                     | Horas extras (B6)                           | [07](07-jornada-horas-extras-folha.md)                                                                                                   | sem base de cálculo, a HE não calcula                                     | **Não** (resolvida)                        | ✅ Fase 1 (feito)          | — decidido: **bloquear + alertar**, nunca estimar                     |
 | **PEND-08** | Disco **`rh_privado`** como dependência de instalação (registro do disk + `GerenciadorAnexos` parametrizado)       | Documentos (B2)                             | [02 §B2](02-fase-1-blueprint.md), [08 §6.4](08-arquitetura-tecnica.md), [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md) | upload seguro de PII depende do disk privado                              | **Sim (para B2)**                          | antes de B2 (instalação)   | confirmar disk `rh_privado` em `config/filesystems.php` na instalação |
 | **PEND-09** | Reconfirmar **códigos eSocial** (`codCateg`, tab. 18, tab. 03) contra o leiaute vigente                            | eSocial (Fase 4)                            | [01 §4.1](01-modelo-de-dominio.md), [00 §4.1](00-prd.md), [ADR-RH-006](adrs/ADR-RH-006-cobertura-esocial-dados-sensiveis-saude.md)       | códigos podem mudar no leiaute novo                                       | **Não**                                    | Fase 4                     | versão vigente do leiaute eSocial na implementação da transmissão     |
 | **PEND-10** | **Sistema de notificações** inexistente na Fase 1 (mover no organograma, atestado parado, doc a vencer não avisam) | Vários (organograma, ausências, documentos) | [00 §5](00-prd.md), [05 §13.1](05-organograma-acl-hierarquica.md)                                                                        | "alertas" são telas/KPIs, não push                                        | **Não**                                    | pós-Fase 1                 | o cliente exige notificação ativa (e-mail/in-app) e em quais eventos? |
 | **PEND-11** | Campos personalizados: tipos do **MVP vs evolução**; **condicionais**; **permissão por-campo**                     | Campos personalizados                       | [10 §3/§2.4/§9](10-campos-personalizados.md), [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)                                     | escopo do MVP vs evolução (faseado)                                       | **Não** (faseado)                          | Fase 1 (MVP) / evolução    | priorização do cliente: quais tipos/condicionais valem primeiro?      |
 | **PEND-12** | **Mudança de tipo** de campo personalizado com dados existentes (migração assistida)                               | Campos personalizados                       | [10 §2.5](10-campos-personalizados.md)                                                                                                   | política definida (proibir silencioso); ferramenta de migração é evolução | **Não** (política documentada)             | evolução                   | há demanda real de trocar tipo de campo com dados em produção?        |
 
-> **Bloqueantes do início:** apenas **PEND-07** (para B6) e **PEND-08** (para B2) bloqueiam parcialmente — ambos resolvíveis **dentro** da Fase 1, antes do bloco respectivo. PEND-06 é parcial (B3 entrega a ação manual + listener; a robustez total da revogação é evolução). Todo o resto é não-bloqueante (evolução ou fase futura).
+> **Bloqueantes do início:** **PEND-07** foi **resolvida** (D-HE — [07 §3.2.1](07-jornada-horas-extras-folha.md)); resta **PEND-08** (para B2, disco `rh_privado`) — resolvível **dentro** da Fase 1, antes do bloco. PEND-06 é parcial (B3 entrega a ação manual + listener; a robustez total da revogação é evolução). Todo o resto é não-bloqueante (evolução ou fase futura).
 
 ---
 
@@ -71,7 +71,7 @@ Itens a verificar ao concluir cada bloco **antes** de seguir — cruza com o DoD
 | **B3** | `EscopoOrganograma`/`VisivelNaHierarquia` (Postgres); anti-ciclo profundo; vínculo único por empresa; **3 eixos** testados; tela `OrganogramaView` navegável; self-service read-only | PEND-01/02/03 registradas (não bloqueiam); PEND-06 (revogação manual) |
 | **B4** | `funcionario_eventos` append-only (sem rota de edição/exclusão); Action transacional (evento + cache); `cid` protegido; timeline na ficha                                            | —                                                                     |
 | **B5** | `escala_dias`/`escala_funcionario` (Postgres: unique parcial vigência aberta); travessia de meia-noite; não-sobreposição; carga calculada                                            | —                                                                     |
-| **B6** | cálculo com **snapshot imutável** pós-aprovação; máquina de estados (transições válidas/inválidas); aprovação pela cadeia do organograma                                             | **PEND-07** (fallback sem base) **resolver antes**                    |
+| **B6** | cálculo com **snapshot imutável** pós-aprovação; máquina de estados (transições válidas/inválidas); aprovação pela cadeia do organograma                                             | **PEND-07** ✅ resolvida (D-HE: bloquear + alerta)                    |
 | **B7** | `rubricas` completas + `tabelas_legais` por vigência; ponte HE→rubrica; consulta read-only de tabelas legais                                                                         | —                                                                     |
 
 ---
@@ -105,4 +105,160 @@ B1 ──> B2 ──> B3
 
 ---
 
-> **Como manter este doc:** ao concluir um bloco, atualize a coluna "situação"/DoD da §1 e baixe as pendências resolvidas na §2 (movendo-as para "resolvida" com a decisão tomada). Novas dúvidas durante a implementação entram como `PEND-NN` aqui — este é o registro único de pendências da suíte.
+## 5. Catálogo de regras de negócio (RN-xx)
+
+> Índice rastreável das **regras de negócio** que governam o módulo — as invariantes que um desenvolvedor **precisa respeitar** para não violar o comportamento esperado. Complementa a matriz §1 (funcionalidade↔doc↔DoD): aqui a granularidade é a **regra**. Cada RN aponta o doc/§ de origem (detalhe completo lá) e o bloco/fase. É um checklist de conformidade, não substitui os specs. Decisões confirmadas marcadas com **D-\***.
+
+**Cadastro de pessoa e documentos** — [03](03-cadastro-pessoa-documentos.md) · [01 §B](01-modelo-de-dominio.md)
+
+| RN    | Regra                                                                                                                                              | Origem                                                                                  | Bloco/Fase |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------- |
+| RN-01 | Funcionário é o agregado-raiz; as 5 filhas (contatos, endereços, bancários, dependentes, documentos) são gravadas na **mesma transação**.          | [03 §12](03-cadastro-pessoa-documentos.md)                                              | B2         |
+| RN-02 | CPF, PIS/PASEP e datas validados por Rules; CPF único por empresa.                                                                                 | [03 §3](03-cadastro-pessoa-documentos.md)                                               | B2         |
+| RN-03 | Matrícula é sequencial por empresa (único parcial), auto-sugerida e editável; geração em lote **serializa** a sequência (nunca `max+1` por linha). | [03 §3.1](03-cadastro-pessoa-documentos.md) · [11 §3](11-importacao-exportacao.md)      | B2         |
+| RN-04 | No máx. **1 "principal"** por coleção (contato por tipo, endereço, conta bancária); se nenhum marcado, o 1º é promovido.                           | [03 §4/§5](03-cadastro-pessoa-documentos.md)                                            | B2         |
+| RN-05 | Campos do documento (numero/validade/órgão/arquivo) são condicionalmente obrigatórios pelas flags `exige_*` do tipo.                               | [03 §8.2](03-cadastro-pessoa-documentos.md) · [04 §4](04-catalogos-configuraveis.md)    | B1/B2      |
+| RN-06 | Grupo **PCD** só é visível/editável com `rh.funcionarios.ver_dados_sensiveis`; sem ela a UI oculta e a Action ignora (defesa no servidor).         | [03 §2.1](03-cadastro-pessoa-documentos.md) · [01 §8.1](01-modelo-de-dominio.md)        | B2         |
+| RN-07 | `cargo_nivel` é **cache derivado** de `cargo_id` na Action, nunca editado na tela.                                                                 | [03 §2](03-cadastro-pessoa-documentos.md) · [05 §10](05-organograma-acl-hierarquica.md) | B2/B3      |
+| RN-08 | `data_demissao ≥ data_admissao` (CHECK); preencher demissão leva `status` a `desligado` e grava evento de desligamento na mesma transação.         | [03 §7/§9](03-cadastro-pessoa-documentos.md)                                            | B2/B4      |
+
+**Catálogos configuráveis** — [04](04-catalogos-configuraveis.md) · [01 §A](01-modelo-de-dominio.md)
+
+| RN    | Regra                                                                                                                                               | Origem                                                                                               | Bloco/Fase |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------- |
+| RN-09 | Catálogo em uso é protegido por `restrictOnDelete`; soft-delete **não cascateia**; unicidade por empresa é parcial (`WHERE deleted_at IS NULL`).    | [04 §9](04-catalogos-configuraveis.md)                                                               | B1         |
+| RN-10 | Flags dos tipos (documento/afastamento) dirigem o formulário e a folha; `codigo_esocial` mapeia tabelas oficiais (18 afastamento, 03 rubrica).      | [04 §4/§5/§7](04-catalogos-configuraveis.md)                                                         | B1         |
+| RN-11 | `ProvisionarCatalogosRh` semeia os catálogos por empresa via `firstOrCreate` (**idempotente**: 2 execuções = no-op); enums/refs globais não entram. | [04 §10](04-catalogos-configuraveis.md)                                                              | B1         |
+| RN-12 | Centro de custo é catálogo **opcional/aditivo** (FK `centro_custo_id` nullable); dimensão paralela que **não governa a ACL**.                       | [04 §7.1](04-catalogos-configuraveis.md) · [05 §3.2](05-organograma-acl-hierarquica.md)              | B1 (opc.)  |
+| RN-13 | **Cargo é referência global (CBO)**, não catálogo tenant na Fase 1 — `cargos_empresa` é evolução (**D-CARGO**).                                     | [04 §8](04-catalogos-configuraveis.md) · [ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md) | B2         |
+
+**Organograma e ACL hierárquica** — [05](05-organograma-acl-hierarquica.md)
+
+| RN    | Regra                                                                                                                                      | Origem                                                | Bloco/Fase |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- | ---------- |
+| RN-14 | Visibilidade = **TENANT AND RBAC AND ORGANOGRAMA** (subárvore de `gestor_id`).                                                             | [05 §1](05-organograma-acl-hierarquica.md)            | B3         |
+| RN-15 | `rh.funcionarios.ver_todos` desliga **só** o eixo organograma (tenant continua valendo).                                                   | [05 §1.1](05-organograma-acl-hierarquica.md)          | B3         |
+| RN-16 | **Fail-closed:** sem vínculo, sem `ver_todos` e sem super-admin → vê **ZERO** funcionários.                                                | [05 §2.4](05-organograma-acl-hierarquica.md)          | B3         |
+| RN-17 | Vínculo `funcionarios.admin_user_id` é **opcional** e único por empresa (1:1); a maioria nasce **sem** login.                              | [05 §2.1/§2.2](05-organograma-acl-hierarquica.md)     | B2/B3      |
+| RN-18 | `gestor_id` nullable (NULL=topo), CHECK `gestor_id<>id`; subárvore via `WITH RECURSIVE` (Postgres) com filtro `deleted_at` nos dois ramos. | [05 §3/§4.2](05-organograma-acl-hierarquica.md)       | B3         |
+| RN-19 | Mudança de gestor passa pela **`AtribuirGestorAction`** com anti-ciclo (novo gestor ∉ subárvore do alvo); nunca `update` direto; auditada. | [05 §8.7/§11.2](05-organograma-acl-hierarquica.md)    | B3         |
+| RN-20 | Desligar gestor com subordinados **exige reatribuição antes** (RESTRICT de domínio); funcionário afastado permanece na árvore.             | [05 §3/§13](05-organograma-acl-hierarquica.md)        | B3         |
+| RN-21 | Provisionar acesso é ação do **RH** (nunca auto-serviço); desligamento **revoga** acesso por listener idempotente.                         | [05 §9.1](05-organograma-acl-hierarquica.md)          | B3         |
+| RN-22 | Toda mutação estrutural (mover/gestor/lotação) exige `rh.funcionarios.editar` e é confinada à subárvore (salvo `ver_todos`).               | [05 §10.1.2/§11.2](05-organograma-acl-hierarquica.md) | B3         |
+
+**Self-service do colaborador** — [05 §9](05-organograma-acl-hierarquica.md) · [03 §11](03-cadastro-pessoa-documentos.md)
+
+| RN    | Regra                                                                                                                                               | Origem                                                                                  | Bloco/Fase |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------- |
+| RN-23 | Colaborador vê **só o próprio** registro (`self.ver`); edita contato/endereço/**bancário** (**D-COLAB**); nunca cargo/salário/status/CPF/matrícula. | [03 §11](03-cadastro-pessoa-documentos.md) · [05 §9](05-organograma-acl-hierarquica.md) | B3         |
+| RN-24 | Campos vedados renderizam **só-leitura** e a Action **ignora** alterações (defesa no servidor, não só na UI).                                       | [03 §11.1](03-cadastro-pessoa-documentos.md)                                            | B3         |
+
+**Histórico / linha do tempo** — [06](06-linha-do-tempo.md)
+
+| RN    | Regra                                                                                                                                           | Origem                        | Bloco/Fase |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------- |
+| RN-25 | `funcionario_eventos` é **append-only** (sem `deleted_at`, sem `UPDATE`/`DELETE`); correção = **evento de estorno**.                            | [06 §3](06-linha-do-tempo.md) | B4         |
+| RN-26 | Snapshot JSONB **congela** o estado e nunca muda; **nunca** entra em `WHERE` (só colunas tipadas filtram).                                      | [06 §3](06-linha-do-tempo.md) | B4         |
+| RN-27 | Evento **+** atualização do cache "atual" do funcionário ocorrem na **mesma transação** (cache nunca diverge da timeline).                      | [06 §4](06-linha-do-tempo.md) | B4         |
+| RN-28 | Mudança **isolada** de gestor **não** gera `TipoEventoFuncional` na Fase 1 (auditada via activitylog); transferência dept/filial gera o evento. | [06 §2](06-linha-do-tempo.md) | B3/B4      |
+
+**Afastamentos** — [06 §5](06-linha-do-tempo.md)
+
+| RN    | Regra                                                                                                                                                 | Origem                                                               | Bloco/Fase  |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ----------- |
+| RN-29 | Afastamento é **período**; `RegistrarAfastamentoAction` concilia status (afastado/férias) + grava evento; `EncerrarAfastamentoAction` devolve status. | [06 §5.2](06-linha-do-tempo.md)                                      | B4          |
+| RN-30 | **CID** (afastamento e atestado) é `encrypted`, fora de auditoria, **mascarado** sem `ver_cid` — dado de saúde (LGPD art. 11).                        | [06 §5.3](06-linha-do-tempo.md) · [01 §8.1](01-modelo-de-dominio.md) | B4 / Fase 2 |
+
+**Jornada e escalas** — [07 §1–2](07-jornada-horas-extras-folha.md)
+
+| RN    | Regra                                                                                                                                          | Origem                                                                               | Bloco/Fase |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------- |
+| RN-31 | Escala tem **≤1 vigência aberta** por funcionário (único parcial `WHERE vigencia_fim IS NULL`); a escala vigente na data resolve o valor-hora. | [07 §1.5](07-jornada-horas-extras-folha.md)                                          | B5         |
+| RN-32 | `escala_dias`: **dia de folga OU entrada+saída** preenchidas (CHECK); turno que cruza meia-noite tem duração `(24:00−entrada)+saída`.          | [04 §6](04-catalogos-configuraveis.md) · [07 §1.2](07-jornada-horas-extras-folha.md) | B5         |
+| RN-33 | Valor-hora mensalista = `round(salário/divisor)`; divisor por precedência **escala > config > 220**.                                           | [07 §2.1/§2.3](07-jornada-horas-extras-folha.md)                                     | B5/B6      |
+
+**Horas extras** — [07 §3–5](07-jornada-horas-extras-folha.md)
+
+| RN    | Regra                                                                                                                                       | Origem                                           | Bloco/Fase |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------- |
+| RN-34 | Fator em **basis points inteiros**; `valor_he = round(valor_hora×(10000+fator_bps)/10000×min/60)` — aritmética inteira, único round no fim. | [07 §3.2](07-jornada-horas-extras-folha.md)      | B6         |
+| RN-35 | **HE sem salário OU escala vigente na data é BLOQUEADA + alerta; nunca estima** (**D-HE** — resolve PEND-07).                               | [07 §3.2.1](07-jornada-horas-extras-folha.md)    | B6         |
+| RN-36 | Override de fator por empresa sobrepõe o enum: `fator_efetivo = override_ativo ?? fatorPadraoBps()`.                                        | [07 §3.3](07-jornada-horas-extras-folha.md)      | B6         |
+| RN-37 | Aprovação **congela** valor/percentual/valor-hora/`snapshot_calculo` (imutável); o preview "ao vivo" é volátil.                             | [07 §4.1/§4.2](07-jornada-horas-extras-folha.md) | B6         |
+| RN-38 | Máquina de estados da HE: transições válidas por §5.2; proibidas lançam exceção; **`cancelada` é status** (sem soft-delete).                | [07 §5.1/§5.2](07-jornada-horas-extras-folha.md) | B6         |
+| RN-39 | Gestor lança/aprova HE **só da subárvore** (escopo independente da permissão); segregação opcional impede aprovar a própria (**D-GESTOR**). | [07 §5.3/§5.4](07-jornada-horas-extras-folha.md) | B6         |
+| RN-40 | `rh.horas_extras.ver_valores` controla a visibilidade das colunas monetárias e do snapshot.                                                 | [07 §5.6](07-jornada-horas-extras-folha.md)      | B6         |
+
+**Fundação de folha** — [07 §6](07-jornada-horas-extras-folha.md)
+
+| RN    | Regra                                                                                                                             | Origem                                           | Bloco/Fase |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------- |
+| RN-41 | `rubricas` declaram natureza + incidências (INSS/FGTS/IRRF) **sem cálculo**; HE aprovada aponta rubrica via `referencia_he_tipo`. | [07 §6.1/§6.3](07-jornada-horas-extras-folha.md) | B7         |
+| RN-42 | `tabelas_legais` são referência **versionada por vigência** (JSONB de faixas); Fase 1 só **consulta** (apuração = Fase 3).        | [07 §6.2/§6.4](07-jornada-horas-extras-folha.md) | B7         |
+
+**Ausências — fundação na Fase 1, workflow na Fase 2** — [12](12-ausencias-faltas-atestados-afastamentos.md)
+
+| RN    | Regra                                                                                                                                                                                            | Origem                                                         | Bloco/Fase |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- | ---------- |
+| RN-43 | Atestado é entidade com **workflow**: transições válidas `pendente→{em_analise,aprovado,rejeitado}`, `em_analise→{aprovado,rejeitado}`, `aprovado→estornado`; `rejeitado`/`estornado` terminais. | [12 §2.4](12-ausencias-faltas-atestados-afastamentos.md)       | Fase 2     |
+| RN-44 | Rejeição exige **motivo**; estorno **reverte** o efeito (ocorrência volta / afastamento encerra) preservando a trilha.                                                                           | [12 §2.4/§4/§5](12-ausencias-faltas-atestados-afastamentos.md) | Fase 2     |
+| RN-45 | Origem do atestado (`portal_colaborador`/`gestor`/`rh`/`importacao`) discrimina o canal; colaborador envia mas **não se autoanalisa**; gestor limitado à subárvore.                              | [12 §2.3/§2.5](12-ausencias-faltas-atestados-afastamentos.md)  | Fase 2     |
+| RN-46 | Atestado aprovado abona de 3 formas (horas / dias / gera afastamento >15d com `suspende_contrato`); liga `ocorrencias.atestado_id`.                                                              | [12 §4/§5](12-ausencias-faltas-atestados-afastamentos.md)      | Fase 2     |
+| RN-47 | Ocorrência é ausência **pontual**; classificação **derivada** (injustificada/justificada/abonada), sem coluna de status.                                                                         | [12 §3.1/§3.2](12-ausencias-faltas-atestados-afastamentos.md)  | Fase 2     |
+
+**Campos personalizados** — [10](10-campos-personalizados.md)
+
+| RN    | Regra                                                                                                                                   | Origem                                      | Bloco/Fase |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------- |
+| RN-48 | Definições em `campos_personalizados` (por empresa); valores em `funcionarios.dados_personalizados` (JSONB chave→valor).                | [10 §2.1/§2.2](10-campos-personalizados.md) | B2 (incr.) |
+| RN-49 | Chaves **órfãs permanecem** no JSONB (não purgadas); a UI só renderiza definições ativas.                                               | [10 §2.2](10-campos-personalizados.md)      | B2 (incr.) |
+| RN-50 | Trocar o **tipo** de um campo com dados é **proibido silenciosamente** (criar campo novo ou migração assistida).                        | [10 §2.5](10-campos-personalizados.md)      | B2 (incr.) |
+| RN-51 | MVP = **8 tipos planos**; condicionais e demais tipos são evolução.                                                                     | [10 §3.1/§2.4](10-campos-personalizados.md) | B2 (incr.) |
+| RN-52 | Valor segue a permissão da **entidade** (`rh.funcionarios.editar`); campo `sensivel=true` mascara + sai da auditoria **dinamicamente**. | [10 §6](10-campos-personalizados.md)        | B2 (incr.) |
+| RN-53 | Dados de **saúde** (art. 11) **não** são campo personalizado livre — usam estruturas dedicadas (`cid`, PCD).                            | [10 §6](10-campos-personalizados.md)        | B2 (incr.) |
+
+**Importação / Exportação** — [11](11-importacao-exportacao.md)
+
+| RN    | Regra                                                                                                                                                     | Origem                                                                   | Bloco/Fase |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------- |
+| RN-54 | **Exportação é Fase 1**; importação multi-aba é **pós-Fase 1**; a planilha é **round-trip** (mesma estrutura nas duas pontas).                            | [11 §6.2](11-importacao-exportacao.md) · [02 §7](02-fase-1-blueprint.md) | B2 / pós-1 |
+| RN-55 | Importação **idempotente por chave** (matrícula precede, CPF alternativa); `empresa_id` é **sempre** o da empresa ativa (anti cross-tenant).              | [11 §3/§4](11-importacao-exportacao.md)                                  | pós-1      |
+| RN-56 | Catálogos/refs citados por **código/nome** (não id); referência inválida = **erro de linha** (nunca FK órfã nem catálogo on-the-fly).                     | [11 §4](11-importacao-exportacao.md)                                     | pós-1      |
+| RN-57 | Transação **por funcionário** (núcleo+filhas); exportação é **PII** (aviso + auditoria + disco privado + URL assinada); CID/saúde nunca no layout padrão. | [11 §4/§8](11-importacao-exportacao.md)                                  | B2 / pós-1 |
+
+**LGPD e segurança** — [01 §8](01-modelo-de-dominio.md) · [ADR-RH-006](adrs/ADR-RH-006-cobertura-esocial-dados-sensiveis-saude.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)
+
+| RN    | Regra                                                                                                                                                        | Origem                                                                                                                                              | Bloco/Fase  |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| RN-58 | **PII** (CPF, RG, PIS, nome dos pais, dados bancários, nº de documento) em `atributosNaoAuditados()`; nunca em logs.                                         | [01 §8.1/§8.2](01-modelo-de-dominio.md)                                                                                                             | transversal |
+| RN-59 | **Dados de saúde** (PCD, CID) art. 11: `encrypted` + permissão dedicada + fora de auditoria; permissões sensíveis **separadas** do CRUD; super-admin bypass. | [01 §8.1/§8.2](01-modelo-de-dominio.md)                                                                                                             | transversal |
+| RN-60 | Foto e binários de documentos em **disco privado** (`rh_privado`) + URL assinada + download por Policy (nunca `public`).                                     | [01 §8.1](01-modelo-de-dominio.md) · [03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md) | B2          |
+
+> As regras acima são o **núcleo** de conformidade; o detalhe fino (validações campo a campo, pseudocódigo das Actions) mora nos specs citados. Ao implementar um bloco, cruze o seu DoD (§3) com as RN da sua área.
+
+---
+
+## 6. Relatórios e consultas (Fase 1)
+
+> Os "relatórios" da Fase 1 são **telas e consultas** (listagens filtráveis, KPIs, exportação) — **não há motor de notificação/push** (**PEND-10** em §2; [00 §5](00-prd.md)). BI/dashboards ricos e relatórios sobre campos personalizados são **evolução** ([10 §8.1](10-campos-personalizados.md)). Toda consulta respeita a **ACL hierárquica** (subárvore, salvo `ver_todos`) e o tenant.
+
+| Relatório / consulta                       | O que mostra                                                            | Origem                                                 | Fase      | Escopo / permissão                       |
+| ------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------ | --------- | ---------------------------------------- |
+| **Documentos a vencer**                    | docs com `data_validade ≤ hoje + janela` (default 30 dias; já vencidos) | [03 §8.4](03-cadastro-pessoa-documentos.md)            | B2        | ACL + `rh.funcionarios`                  |
+| **Histórico salarial**                     | eventos `afetaSalario()` com variação e %                               | [06 §6.3](06-linha-do-tempo.md)                        | B4        | ACL + `rh.horas_extras.ver_valores`      |
+| **Tempo no cargo / departamento**          | desde o último `mudanca_cargo`/`promocao`/`transferencia_*`             | [06 §6.3](06-linha-do-tempo.md)                        | B4        | ACL + `rh.eventos.listar`                |
+| **Afastamentos a retornar**                | afastamentos `data_fim_efetiva IS NULL` (atrasados em destaque)         | [06 §6.3](06-linha-do-tempo.md)                        | B4        | ACL + `rh.afastamentos.listar`           |
+| **Funcionários sem vínculo / lotação**     | `gestor_id IS NULL` (fora da diretoria) ou `departamento_id IS NULL`    | [05 §10.1.4](05-organograma-acl-hierarquica.md)        | B3        | `rh.organograma.ver`                     |
+| **Departamentos sem responsável**          | `responsavel_funcionario_id IS NULL`                                    | [05 §10.1.4](05-organograma-acl-hierarquica.md)        | B1/B3     | `rh.organograma.ver`                     |
+| **Headcount por área / centro de custo**   | contagem viva por departamento / centro de custo                        | [05 §10.1.4](05-organograma-acl-hierarquica.md)        | B3        | `rh.organograma.ver`                     |
+| **Organograma visual**                     | árvore navegável de pessoas (expand/collapse, busca, filtros)           | [05 §10.1](05-organograma-acl-hierarquica.md)          | B3        | `rh.organograma.ver`                     |
+| **Linha do tempo do funcionário**          | eventos do funcionário (timeline com filtros por tipo)                  | [06 §6](06-linha-do-tempo.md)                          | B4        | ACL + `rh.eventos.listar`                |
+| **Horas extras por status / competência**  | listagem filtrável de `horas_extras`                                    | [07 §5](07-jornada-horas-extras-folha.md)              | B6        | ACL + `rh.horas_extras` (+`ver_valores`) |
+| **Consulta de tabelas legais**             | INSS/IRRF/salário-família por vigência (read-only)                      | [07 §6.2](07-jornada-horas-extras-folha.md)            | B7        | `rh.tabelas_legais.{listar,ver}`         |
+| **Exportação de funcionários (Excel)**     | planilha multi-aba (PII — auditada, disco privado, URL assinada)        | [11 §6](11-importacao-exportacao.md)                   | B2        | `rh.funcionarios.exportar`               |
+| **Listagens (PowerGrid)**                  | toda tela Index é consulta filtrável/ordenável                          | specs (03–12)                                          | por bloco | ACL + `<recurso>.listar`                 |
+| **Atestados pendentes de análise** _(KPI)_ | `atestados` em `pendente`/`em_analise`                                  | [12 §8](12-ausencias-faltas-atestados-afastamentos.md) | Fase 2    | ACL + `rh.atestados.listar`              |
+
+---
+
+> **Como manter este doc:** ao concluir um bloco, atualize a coluna "situação"/DoD da §1 e baixe as pendências resolvidas na §2 (movendo-as para "resolvida" com a decisão tomada). Novas dúvidas durante a implementação entram como `PEND-NN` aqui — este é o registro único de pendências da suíte. Novas regras de negócio descobertas viram `RN-NN` na §5; novos relatórios/consultas entram na §6.

@@ -271,6 +271,10 @@ $valorHe = (int) round(
 );
 ```
 
+### 3.2.1 Pré-condição: base de cálculo obrigatória (decisão D-HE)
+
+O cálculo exige **base completa na data do lançamento**: (a) `salario_base_centavos` do funcionário e (b) uma **escala vigente** naquela data (para o divisor / valor-hora — §2.3). **Decisão D-HE (resolve [PEND-07](13-rastreabilidade-e-pendencias.md)):** se faltar salário **ou** escala vigente na data, o sistema **bloqueia** o lançamento/aprovação da HE e **alerta** o operador a completar a base — **nunca** estima com valor parcial ou com o último valor conhecido. A guarda é validada na Action/FormRequest do lançamento e **reconfirmada na transição de aprovação** (§5.2), pois o snapshot só pode congelar um valor íntegro (§4). Sem base íntegra, a HE **não sai de `rascunho`**.
+
 ### 3.3 Override de fator por empresa (catálogo que sobrepõe o enum)
 
 O enum dá **type-safety** (os tipos de HE são finitos e dirigem lógica → ENUM, ver a fronteira em [04 §1](04-catalogos-configuraveis.md)), mas algumas empresas negociam fatores diferentes (ex.: acordo coletivo com HE a 60%, ou domingo a 110%). A solução **mantém o enum** e adiciona uma **tabela de override de fator por empresa** — um catálogo tenant fino que sobrepõe o default do enum, linha a linha:

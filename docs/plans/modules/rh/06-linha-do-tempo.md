@@ -21,7 +21,7 @@ Por isso `funcionario_eventos` é uma das poucas tabelas do módulo **sem `delet
 - A **verdade temporal** mora na linha do tempo (`funcionario_eventos`): _o que aconteceu, quando, e qual era o estado_.
 - A **verdade do "agora"** mora em colunas desnormalizadas de `funcionarios` (`cargo_id`, `departamento_id`, `filial_id`, `salario_base_centavos`, `cargo_nivel`, `status`): um **cache** do estado corrente para que listagens, organograma e folha não precisem varrer o histórico a cada consulta.
 
-Quem mantém as duas em sincronia é a **Action** que registra o evento — ela grava o evento **e** atualiza o cache **na mesma transação** (§4). Nunca se altera a coluna "atual" do funcionário "à revelia": toda mudança em salário/cargo/departamento/filial/status após a criação passa por um evento ([03 §contratação](03-cadastro-pessoa-documentos.md)).
+Quem mantém as duas em sincronia é a **Action** que registra o evento — ela grava o evento **e** atualiza o cache **na mesma transação** (§4). Nunca se altera a coluna "atual" do funcionário "à revelia": toda mudança em salário/cargo/departamento/filial/status após a criação passa por um evento ([03 §7](03-cadastro-pessoa-documentos.md)).
 
 ---
 
@@ -151,7 +151,7 @@ O afastamento tem **duas Actions** (em `packages/modulo-rh/src/Actions/Afastamen
 - **`RegistrarAfastamentoAction`** — cria a linha de `funcionario_afastamentos` (`data_fim_efetiva = null`), grava o evento `inicio_afastamento` na timeline e **concilia o `status`** do funcionário para `afastado` (ou `ferias` quando o `tipo_afastamento` for férias). Se `tipos_afastamento.exige_atestado`, exige o anexo (binário via `anexos`, polimórfico — [01 §3 C2](01-modelo-de-dominio.md)); o `cid` é capturado quando informado (§5.3).
 - **`EncerrarAfastamentoAction`** — preenche `data_fim_efetiva`, recalcula `dias` (cache), grava o evento `fim_afastamento` e **devolve o `status`** do funcionário a `ativo` (ou ao estado anterior coerente). Encerrar é a operação **"encerrar/retornar"** — não é editar nem excluir o período.
 
-`StatusFuncionario` ([01 §4](01-modelo-de-dominio.md)) tem os casos `afastado` e `ferias`; o status **derivado do afastamento** é **conciliado pela Action**, nunca digitado solto na tela de cadastro ([03 §status](03-cadastro-pessoa-documentos.md)). As **flags** do tipo (`remunerado`, `conta_como_falta`, `suspende_contrato`) são lidas na exibição e ficam reservadas para a apuração de folha (fronteira em [07](07-jornada-horas-extras-folha.md)); na Fase 1 não há cálculo de folha.
+`StatusFuncionario` ([01 §4](01-modelo-de-dominio.md)) tem os casos `afastado` e `ferias`; o status **derivado do afastamento** é **conciliado pela Action**, nunca digitado solto na tela de cadastro ([03 §9](03-cadastro-pessoa-documentos.md)). As **flags** do tipo (`remunerado`, `conta_como_falta`, `suspende_contrato`) são lidas na exibição e ficam reservadas para a apuração de folha (fronteira em [07](07-jornada-horas-extras-folha.md)); na Fase 1 não há cálculo de folha.
 
 > **Correção de afastamento:** por ser soft-deletável (com lixeira/`ComLixeira`, 3 permissões), um afastamento **lançado por engano** pode ir para a lixeira. Os **eventos** `inicio_afastamento`/`fim_afastamento` que ele gerou na timeline, porém, **permanecem** (append-only) — um estorno se faz com nota/observação, mantendo a trilha. A regra de ouro (§3) vale para a timeline, não para a tabela de período.
 
@@ -161,7 +161,7 @@ O `cid` (código da doença) é **categoria especial de dado pessoal** (LGPD art
 
 - **`encrypted`** — cast de criptografia no model (mesmo padrão do `two_factor_secret` do `AdminUser`); nunca em claro no banco.
 - **Fora de auditoria** — `cid` em `atributosNaoAuditados()`: não vaza para o diff do activitylog (reforça "dados sensíveis nunca em logs" — CLAUDE §19).
-- **Permissão dedicada `rh.afastamentos.ver_cid`** — exibir/editar o CID exige **essa** permissão, **além** de poder ver o afastamento. Sem ela, a UI mostra o afastamento mas **mascara** o CID; a tela de cadastro do funcionário ([03 §abas](03-cadastro-pessoa-documentos.md)) **não** exibe o CID. Defesa no servidor (Policy/escopo), não só na UI.
+- **Permissão dedicada `rh.afastamentos.ver_cid`** — exibir/editar o CID exige **essa** permissão, **além** de poder ver o afastamento. Sem ela, a UI mostra o afastamento mas **mascara** o CID; a tela de cadastro do funcionário ([03 §1](03-cadastro-pessoa-documentos.md)) **não** exibe o CID. Defesa no servidor (Policy/escopo), não só na UI.
 
 ---
 
@@ -189,7 +189,7 @@ O componente recebe os eventos já **projetados pela camada Livewire** (não mon
 - **Ordenação:** `data_evento` desc, desempate por `id` desc (mesma regra da reconstrução, §3.1).
 - **Filtros:** por `tipo_evento` (multi-select via `x-shared.select-search :multiple=true` — nunca `<select>` cru, CLAUDE §19) e por intervalo de datas. Filtro **sempre** nas colunas tipadas, nunca no JSONB (§3).
 - **ACL hierárquica ([05](05-organograma-acl-hierarquica.md)):** **só quem pode ver o funcionário vê a linha do tempo dele.** A visibilidade segue o organograma/escopo (gestor vê a subárvore; colaborador vê a própria — modo `proprio` vs `rh` de [03](03-cadastro-pessoa-documentos.md)). A timeline **não** é uma porta lateral: a Policy do funcionário governa o acesso à sua história.
-- **Lançar evento pela UI:** ações "Registrar promoção", "Alterar salário", "Transferir departamento/filial", "Registrar afastamento" abrem um **drawer/modal** (Livewire → DTO → Action), guardadas por `@can` das permissões de §7. O colaborador, no autoatendimento, **vê** sua linha do tempo mas **não lança** eventos sujeitos a evento funcional ([03 §self-service](03-cadastro-pessoa-documentos.md)).
+- **Lançar evento pela UI:** ações "Registrar promoção", "Alterar salário", "Transferir departamento/filial", "Registrar afastamento" abrem um **drawer/modal** (Livewire → DTO → Action), guardadas por `@can` das permissões de §7. O colaborador, no autoatendimento, **vê** sua linha do tempo mas **não lança** eventos sujeitos a evento funcional ([03 §11](03-cadastro-pessoa-documentos.md)).
 
 ### 6.3 Relatórios úteis (derivados da timeline)
 

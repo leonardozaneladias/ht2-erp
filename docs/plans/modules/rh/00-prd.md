@@ -67,6 +67,8 @@ O objetivo de longo prazo é um RH **muito completo**. Mas "completo" não signi
 
 ## 3. Personas
 
+> A **atribuição consolidada** de permissões por perfil está na matriz **[01 §10.1](01-modelo-de-dominio.md)** (fonte única); as "permissões típicas" de cada persona abaixo são o resumo narrativo.
+
 ### P1 — RH / DP (operador do módulo)
 
 - **Quem é:** analista de RH ou departamento pessoal; opera o módulo no dia a dia, geralmente para mais de uma empresa do grupo.
@@ -264,5 +266,6 @@ Decisões tomadas **com o cliente** e que governam o recorte da Fase 1:
 1. **Folha — só fundação.** A Fase 1 inclui a **fundação** de folha (catálogo `rubricas`, `tabelas_legais` INSS/IRRF por vigência, e HE aprovada virando rubrica), mas **não** inclui apuração mensal, holerite nem eSocial transmitido (fases futuras — [09](09-roadmap-fases.md)).
 2. **Self-service do colaborador — dentro.** O colaborador comum **loga e vê os próprios dados**, podendo **editar alguns campos**, sempre sob a **ACL hierárquica** (RF-05).
 3. **Modelo eSocial-ready — sim, transmitir — não.** Campos e catálogos já contemplam **domínios e códigos oficiais brasileiros** (raça/cor, afastamentos tab. 18, rubricas tab. 03, etc.), **sem transmitir** ao eSocial nesta fase.
+4. **Permissões por perfil, cargo e base de HE (revisão da auditoria).** Confirmadas nesta auditoria: o **gestor** vê a subárvore (leitura) e **lança e aprova** horas extras (**D-GESTOR**); o **colaborador** edita os próprios contato, endereço e **dados bancários** no portal, nunca cargo/salário/status (**D-COLAB**); **cargo** na Fase 1 usa **só a referência CBO** (`cargos`), com `cargos_empresa` como evolução aditiva (**D-CARGO**, [ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md)); hora extra **sem** salário ou escala vigente na data é **bloqueada** com alerta, **nunca estimada** (**D-HE**, resolve [PEND-07](13-rastreabilidade-e-pendencias.md)). Atribuição por perfil em [01 §10.1](01-modelo-de-dominio.md); base de HE em [07 §3.2.1](07-jornada-horas-extras-folha.md); registro completo em [14](14-auditoria-e-validacao.md).
 
 > Estas três decisões são a referência para resolver dúvidas de fronteira durante a implementação. Mudanças de escopo devem atualizar este PRD e o roadmap [09](09-roadmap-fases.md).
