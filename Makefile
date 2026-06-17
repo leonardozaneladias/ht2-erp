@@ -6,7 +6,8 @@
 ARGS = $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: up down restart bash artisan migrate fresh seed horizon test \
-        test-e2e composer npm dev lint quality logs status setup
+        test-e2e composer npm dev lint quality logs status setup \
+        new-client release-modulo update-base
 
 up:
 	ddev start
@@ -73,6 +74,22 @@ setup:
 	ddev artisan horizon:install
 	ddev artisan vendor:publish --tag=pulse-dashboard
 	ddev npm run build
+
+# --- Instâncias por cliente (rodam no HOST, fora do container DDEV) ---
+# Ver ADR-0016 e docs/distribuicao-manutencao.md.
+
+# Provisiona um cliente após o clone + re-origin da base (aditivo; aceita --dry-run).
+new-client:
+	./bin/new-client.sh $(ARGS)
+
+# Corta release de um módulo (subtree split + push + tag). Ex.:
+#   make release-modulo slug=rh versao=v0.1.0
+release-modulo:
+	./bin/release-module.sh $(slug) $(versao)
+
+# (NO CLIENTE) traz updates da base: git merge upstream/main + ações pós-merge.
+update-base:
+	./bin/update-from-upstream.sh $(ARGS)
 
 %:
 	@:
