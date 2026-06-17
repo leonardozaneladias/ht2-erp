@@ -36,7 +36,7 @@ brew install ddev/ddev/ddev
 **Subir o projeto:**
 
 ```bash
-git clone <repo> && cd erp
+git clone git@github.com:leonardozaneladias/ht2-erp.git erp && cd erp
 cp .env.example .env
 ddev start       # sobe tudo + hooks (composer/npm install + migrate)
 make setup       # 1x: key:generate, seed, assets Horizon/Pulse, build
@@ -133,6 +133,7 @@ Mensagens de commit seguem **Conventional Commits** (`tipo(escopo): descrição 
 | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
 | [CLAUDE.md](CLAUDE.md)                                                                           | Contexto, regras e convenções do projeto             |
 | [docs/README.md](docs/README.md)                                                                 | Hub da documentação técnica                          |
+| [docs/plans/modules/rh/README.md](docs/plans/modules/rh/README.md)                               | Suíte de documentação do módulo de RH (Fase 1)       |
 | [docs/template/INSPINIA/CATALOGO-COMPONENTES.md](docs/template/INSPINIA/CATALOGO-COMPONENTES.md) | Catálogo de componentes Blade (fonte de verdade)     |
 | [docs/devops/ddev-setup.md](docs/devops/ddev-setup.md)                                           | **Guia DDEV + OrbStack** (instalar/configurar/rodar) |
 | [docs/devops/conventions.md](docs/devops/conventions.md)                                         | Convenções de código e Git                           |
