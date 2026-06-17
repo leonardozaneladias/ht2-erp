@@ -132,8 +132,17 @@ jobs:
             - name: Instalar dependências Node
               run: npm ci
 
+            - name: Cache Playwright (Chromium)
+              uses: actions/cache@v5
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: playwright-${{ hashFiles('package-lock.json') }}
+                  restore-keys: playwright-
+
             - name: Instalar Chromium do Playwright
-              run: npx playwright install --with-deps chromium
+              # Sem --with-deps: as libs de sistema já vêm no ubuntu-latest.
+              # O --with-deps roda apt-get (baixa fontes etc.) e trava no runner.
+              run: npx playwright install chromium
 
             - name: Copiar .env
               run: cp .env.example .env
