@@ -19,6 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // O painel usa a rota nomeada 'admin.login' (não há 'login'). Sobrescreve o
+        // default do framework (route('login')) para Authenticate E AuthenticateSession
+        // — este desloga por hash de senha divergente e resolvia o redirect via callback
+        // estático, estourando RouteNotFoundException antes do handler de exceções.
+        $middleware->redirectGuestsTo(fn (): string => route('admin.login'));
+
         $middleware->statefulApi();
         $middleware->encryptCookies(except: ['appearance', 'admin-mode']);
         $middleware->alias([
