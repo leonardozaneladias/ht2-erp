@@ -16,6 +16,9 @@
 #           HORIZON_PREFIX, MAIL_FROM_ADDRESS.
 #   - .ddev/config.local.yaml: name=<slug> (override local do DDEV; gitignored).
 #   - .husky/allow-main-push: opt-out local do bloqueio de push à main (gitignored).
+#   - .github/dependabot.yml: desativa composer/npm (deps vêm do base via
+#     `make update-base`); mantém github-actions. É a ÚNICA edição versionada
+#     que o script faz — precisa ser commitada (ver "Próximos passos").
 #
 # O que NÃO faz: não toca composer.json, não apaga git, não renomeia títulos
 # versionados (branding é runtime, via Setup Wizard em /admin/setup).
@@ -159,6 +162,31 @@ EOF
     echo -e "  ${GREEN}✓${NC} .husky/allow-main-push criado"
 fi
 
+# --- 5. Dependabot: desativa composer/npm (deps vêm do base via update-base) ---
+echo ""
+echo -e "${GREEN}— Dependabot (instância de cliente) —${NC}"
+if $DRY_RUN; then
+    echo -e "  ${YELLOW}[dry-run]${NC} .github/dependabot.yml → apenas github-actions (remove composer/npm)"
+else
+    cat > .github/dependabot.yml <<'EOF'
+version: 2
+
+# Instância de cliente do HT2 ERP: as dependências PHP (composer) e JS (npm) são
+# conduzidas no base (ht2-erp) e descem via `make update-base`. O Dependabot de
+# composer/npm no cliente só geraria PRs redundantes ou com drift de composer.lock.
+# Mantém apenas github-actions. Ver docs/distribuicao-manutencao.md.
+
+updates:
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
+      commit-message:
+          prefix: 'ci(deps)'
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/dependabot.yml → apenas github-actions"
+fi
+
 echo ""
 echo -e "${GREEN}============================================${NC}"
 if $DRY_RUN; then
@@ -169,8 +197,9 @@ fi
 echo -e "${GREEN}============================================${NC}"
 echo ""
 echo -e " Próximos passos:"
-echo -e "  1. ${YELLOW}git push -u origin main${NC}"
-echo -e "  2. ${YELLOW}ddev start && make setup-client${NC}  (sem dados demo → o Setup Wizard roda)"
-echo -e "  3. Acesse ${YELLOW}https://${SLUG}.ddev.site/admin/setup${NC} (Setup Wizard: empresa, branding e admin)"
-echo -e "  4. Updates da base: ${YELLOW}make update-base${NC}"
+echo -e "  1. ${YELLOW}git add .github/dependabot.yml && git commit -m 'chore(ci): Dependabot apenas github-actions (cliente)'${NC}"
+echo -e "  2. ${YELLOW}git push -u origin main${NC}"
+echo -e "  3. ${YELLOW}ddev start && make setup-client${NC}  (sem dados demo → o Setup Wizard roda)"
+echo -e "  4. Acesse ${YELLOW}https://${SLUG}.ddev.site/admin/setup${NC} (Setup Wizard: empresa, branding e admin)"
+echo -e "  5. Updates da base: ${YELLOW}make update-base${NC}"
 echo ""
