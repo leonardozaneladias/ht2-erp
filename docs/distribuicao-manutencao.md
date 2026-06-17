@@ -1,25 +1,45 @@
 # Distribuição e manutenção do HT2 ERP
 
-> Como desenvolver o **HT2 ERP** (produto/base), distribuí-lo para clientes e
+> Como desenvolver o **HT2 ERP** (produto/base), instanciá-lo por cliente e
 > propagar correções/melhorias de forma sustentável e com custo zero de infra.
-> Decisão de arquitetura: [`ADR-0015`](architecture/adrs/ADR-0015-modulos-pacotes-composer.md).
+> Decisões de arquitetura: [`ADR-0015`](architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
+> (módulos como pacotes) e [`ADR-0016`](architecture/adrs/ADR-0016-instancias-por-cliente.md)
+> (instâncias por cliente via _clone + re-origin_).
 
 ## Visão geral
 
-| Camada                                  | Onde vive                              | Como distribui                  | Como propaga correção                |
-| --------------------------------------- | -------------------------------------- | ------------------------------- | ------------------------------------ |
-| **Base/core** (HT2 ERP)                 | repo template `ht2-erp/erp-base`       | "Use this template" por cliente | `git merge upstream/main` no cliente |
-| **Módulo de negócio** (RH, Financeiro…) | pacote Composer `ht2erp/modulo-{slug}` | `composer require`              | `composer update` no cliente         |
+| Camada                                  | Onde vive                                                                     | Como distribui (1º cliente)               | Como propaga correção                                     |
+| --------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------- |
+| **Base/core** (HT2 ERP)                 | repo `leonardozaneladias/ht2-erp` — monorepo: core + `packages/modulo-*`      | _clone + re-origin_ (`bin/new-client.sh`) | `make update-base` no cliente                             |
+| **Módulo de negócio** (RH, Financeiro…) | `packages/modulo-{slug}` na base; repo próprio `erp-module-{slug}` no release | **embutido** no clone/merge (agora)       | embutido: `make update-base`; Composer: `composer update` |
 
 - **HT2 ERP** é o produto. **Grupo GDF** é o primeiro cliente (uma instância).
+- Os repositórios vivem hoje na conta pessoal **`leonardozaneladias`** (migram para a org `ht2-erp` depois via _transfer_).
 - Módulos são **iguais entre clientes** (config-driven); a customização por cliente
   vai em config publicável (`config/{slug}.php`), no banco (settings, menu) ou em
   views publicadas — **nunca** editando o core.
-- **Regra de ouro:** o repositório do cliente é **aditivo**. Negócio vem de pacotes;
-  personalização vai para banco/config publicada. É isso que mantém o `git merge upstream`
-  sem conflitos e o `composer update` seguro.
 
-A marca é configurável em [`config/modulos.php`](../config/modulos.php) (`vendor`,
+### Regra de ouro — customização aditiva
+
+O repositório do cliente é **aditivo**; nunca edita arquivos da base. É isso que mantém o
+`git merge upstream` sem conflitos. Toda customização cai em um destes três baldes:
+
+- **(a) config/banco em runtime** — Setup Wizard, settings, branding por empresa.
+- **(b) arquivos novos** do cliente — crie arquivos próprios; não edite arquivos da base.
+- **(c) pontos de extensão** da base — eventos, config, _bindings_. Mudar o comportamento do
+  core = a base **expõe um gancho** e o cliente registra num arquivo próprio.
+
+### `init-project.sh` (produto novo) × `new-client.sh` (cliente) — não confunda
+
+| Script                | Quando usar                                                      | O que faz com o git                                                |
+| --------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `bin/init-project.sh` | **Derivar um PRODUTO NOVO** que diverge da base **para sempre**  | Oferece **reinicializar o git history** (corta o vínculo)          |
+| `bin/new-client.sh`   | **Instanciar um CLIENTE** que continua recebendo updates da base | **Preserva o histórico**; só configura remotes/.env/DDEV (aditivo) |
+
+> Para instanciar um cliente, use **`new-client.sh`**. O `init-project.sh` apaga o vínculo
+> `upstream` e impede `git merge upstream` — serve só para nascer um produto independente.
+
+A marca de pacotes é configurável em [`config/modulos.php`](../config/modulos.php) (`vendor`,
 `namespace`, `org`, `path`, `prefixo_pacote`).
 
 ---
@@ -30,7 +50,7 @@ A marca é configurável em [`config/modulos.php`](../config/modulos.php) (`vend
 # 1. Cria a casca do pacote em packages/modulo-rh e registra o path repository
 php artisan make:modulo-pacote Rh
 
-# 2. Instala o pacote local (symlink) para desenvolvê-lo dentro do boilerplate
+# 2. Instala o pacote local (symlink) para desenvolvê-lo dentro do monorepo
 composer require "ht2erp/modulo-rh:@dev"
 
 # 3. Gera um recurso CRUD DENTRO do pacote (namespaces HT2ERP\Rh\..., views rh::)
@@ -60,10 +80,10 @@ ao core é automática e **sem editar o core**:
 
 ## 2. Desenvolvimento local de um módulo
 
-Durante o desenvolvimento o pacote vive em `packages/` do boilerplate, instalado via
-**path repository** com `symlink: true` — editar `packages/modulo-rh/src/...` reflete na
-hora, igual a editar `app/`. O `make:modulo-pacote` adiciona o repository ao
-`composer.json` raiz:
+O pacote vive em `packages/` **versionado no monorepo da base** (core + `packages/modulo-*`,
+ver ADR-0016), instalado via **path repository** com `symlink: true` — editar
+`packages/modulo-rh/src/...` reflete na hora, igual a editar `app/`. O `make:modulo-pacote`
+adiciona o repository ao `composer.json` raiz:
 
 ```json
 "repositories": [
@@ -71,23 +91,24 @@ hora, igual a editar `app/`. O `make:modulo-pacote` adiciona o repository ao
 ]
 ```
 
-Teste o módulo a partir do próprio boilerplate (reusa `TestCase`/`Pest.php` do app).
+Teste o módulo a partir do próprio monorepo (reusa `TestCase`/`Pest.php` do app).
 Só invista em testbench isolado quando o módulo precisar de CI próprio.
 
 ---
 
-## 3. Promover e publicar um módulo (semver)
+## 3. Cortar um release de módulo (semver) — `release-module.sh`
 
-Quando o módulo estabiliza, mova-o para um repositório Git próprio e versione por tag:
+Quando o módulo estabiliza, extraia a pasta para um repositório Git próprio e versione por tag.
+O `bin/release-module.sh` automatiza o `git subtree split` + push + tag, lendo
+`vendor`/`prefixo`/`org` de `config/modulos.php`:
 
 ```bash
-# extrai a pasta como repo próprio preservando histórico (ou simplesmente copie + git init)
-git subtree split --prefix=packages/modulo-rh -b modulo-rh-split
-# crie ht2-erp/erp-module-rh no GitHub (privado) e empurre a branch como main
-git push git@github.com:ht2-erp/erp-module-rh.git modulo-rh-split:main
+# cria o repo do módulo 1x (privado)
+gh repo create leonardozaneladias/erp-module-rh --private
 
-# no repo do módulo, versione (semver):
-git tag v1.0.0 && git push --tags
+# corta o release a partir do monorepo (subtree split + push + tag semver)
+make release-modulo slug=rh versao=v0.1.0
+# equivale a: ./bin/release-module.sh rh v0.1.0
 ```
 
 Convenção semver para módulos:
@@ -96,104 +117,131 @@ Convenção semver para módulos:
 - **minor** (`v1.1.0`) — campo/feature retrocompatível.
 - **major** (`v2.0.0`) — breaking: migração incompatível, rename de permissão/rota.
 
-No boilerplate/cliente, troque o `path` repository por um **VCS** repository:
-
-```json
-"repositories": [
-  { "type": "vcs", "url": "git@github.com:ht2-erp/erp-module-rh.git" }
-]
-```
-
-```bash
-composer require "ht2erp/modulo-rh:^1.0"
-```
+O release deixa o `erp-module-rh` populado e versionado. O **consumo por Composer** (trocar o
+`path` por um `vcs` repository e `composer require "ht2erp/modulo-rh:^1.0"`) fica **latente**
+até o gatilho da seção 9.
 
 ---
 
-## 4. Novo cliente a partir do template
+## 4. Novo cliente — _clone + re-origin_ (não "Use this template")
 
-1. No GitHub, marque `ht2-erp/erp-base` como **Template repository**.
-2. "Use this template" → `ht2-erp/cliente-acme` (privado).
-3. No clone do cliente:
-    ```bash
-    git remote add upstream git@github.com:ht2-erp/erp-base.git
-    cp .env.example .env
-    ./bin/init-project.sh          # renomeia marca/slug
-    ddev start && make setup
-    ```
-4. Instale os módulos contratados pelo cliente:
-    ```bash
-    composer require "ht2erp/modulo-rh:^1.0" "ht2erp/modulo-financeiro:^1.0"
-    php artisan migrate --force && php artisan access:sync && php artisan cache:clear
-    ```
-5. Atribua as permissões dos módulos aos perfis em `/admin/acesso`.
+> Por que não template/fork: "Use this template" squasha o histórico (o 1º `git merge upstream`
+> quebra com `unrelated histories`) e fork na mesma conta não é permitido. O **clone preserva o
+> histórico comum** → merge limpo. Detalhes no [ADR-0016](architecture/adrs/ADR-0016-instancias-por-cliente.md).
+
+```bash
+# 1. Crie o repo do cliente (privado)
+gh repo create leonardozaneladias/ht2-erp-gdf --private
+
+# 2. Clone a base e troque os remotes (origin = cliente, upstream = base)
+git clone git@github.com:leonardozaneladias/ht2-erp.git cliente-gdf
+cd cliente-gdf
+git remote rename origin upstream
+git remote add origin git@github.com:leonardozaneladias/ht2-erp-gdf.git
+
+# 3. Provisiona o cliente de forma ADITIVA (remotes/.env/DDEV/opt-out de push)
+make new-client            # ou: ./bin/new-client.sh
+#    → pergunta nome/slug/e-mail, cria .env, .ddev/config.local.yaml (name=<slug>)
+#      e .husky/allow-main-push (opt-out local do pre-push). NÃO apaga git.
+
+# 4. Sobe e configura
+git push -u origin main
+ddev start && make setup
+#    → acesse /admin/setup (Setup Wizard cria empresa/branding/admin do cliente)
+```
+
+O **módulo de negócio vem embutido** no clone (a base é um monorepo e já versiona
+`packages/modulo-*`); não há infra de Composer privado para o 1º cliente. Para ativar o consumo
+por Composer (2º cliente / módulos contratados distintos), ver a seção 9.
 
 ---
 
-## 5. Propagar uma correção do CORE (upstream merge)
+## 5. Propagar uma correção do CORE (base → clientes)
 
 ```bash
-# no erp-base: corrija, commite, push para main
+# na base (ht2-erp): corrija numa branch, abra PR, faça merge na main
 
 # em cada cliente:
-git fetch upstream
-git merge upstream/main        # ou rebase, conforme preferência
-# rode as "ações pós-merge" que o CHANGELOG indicar:
-php artisan migrate --force && php artisan access:sync && php artisan cache:clear
+make update-base
+#   = git fetch upstream && git merge --no-edit upstream/main
+#     && php artisan migrate --force && php artisan access:sync && php artisan cache:clear
+#     (usa `ddev artisan` automaticamente se em DDEV)
 ```
 
-Conflitos são raros **se a regra de ouro for respeitada** (cliente aditivo; negócio em
-pacotes; personalização no banco/config publicada). Mantenha um `CHANGELOG.md` no
-`erp-base` com as ações pós-merge de cada release.
+Conflitos são raros **se a regra de ouro for respeitada** (cliente aditivo; negócio no
+monorepo/pacote; personalização no banco/config publicada). Em conflito, `update-base` para e
+instrui. Mantenha o `CHANGELOG.md` da base com as **ações pós-merge** de cada release.
 
 ---
 
 ## 6. Propagar uma correção de MÓDULO
 
-```bash
-# no repo do módulo: corrija, commite
-git tag v1.0.1 && git push --tags
+- **Fase embutida (agora):** a correção do módulo está no monorepo da base, então **desce junto**
+  com `make update-base` — nada de `composer update` ainda.
+- **Fase Composer (depois):** após cortar o release (`make release-modulo slug=rh versao=v1.0.1`):
 
-# em cada cliente que usa o módulo:
-composer update ht2erp/modulo-rh
-php artisan migrate --force && php artisan access:sync && php artisan cache:clear
+    ```bash
+    # em cada cliente que consome o módulo via Composer:
+    composer update ht2erp/modulo-rh
+    php artisan migrate --force && php artisan access:sync && php artisan cache:clear
+    ```
+
+---
+
+## 7. PR de volta (cliente → base) — subir uma melhoria genérica
+
+Descobriu no cliente uma melhoria **genérica** (serve a todos)? Suba via PR **bifurcando de
+`upstream/main`**, para não arrastar nenhum commit de customização do cliente:
+
+```bash
+git fetch upstream
+git switch -c fix/algo-generico upstream/main
+# ... commit SÓ do que é genérico (nada específico do cliente) ...
+git push -u origin fix/algo-generico
+gh pr create --repo leonardozaneladias/ht2-erp --base main
 ```
 
-Um patch chega a todos os clientes com um `composer update` por cliente.
+Depois do merge na base, a melhoria volta ao cliente pelo caminho normal: `make update-base`.
 
 ---
 
-## 7. Autenticação de repositórios privados
+## 8. Autenticação de repositórios privados (só na fase Composer)
 
-Para o Composer baixar pacotes privados (`ht2-erp/erp-module-*`) no deploy:
+Enquanto o módulo é **embutido**, não há nada a autenticar (vem no `git merge`). Ao ativar o
+consumo por Composer (seção 9), para o Composer baixar `erp-module-*` privados no deploy:
 
-- **SSH deploy keys** (custo zero, recomendado p/ poucos clientes): adicione uma deploy
-  key (read-only) por repo de módulo no ambiente de deploy e use URLs `git@github.com:...`.
-- **Token de máquina** (`auth.json` / `COMPOSER_AUTH`): um Personal Access Token com escopo
-  de leitura nos repos privados, útil em CI.
+- **SSH deploy keys** (custo zero, recomendado p/ poucos clientes): uma deploy key (read-only)
+  por repo de módulo no ambiente de deploy, com URLs `git@github.com:...`.
+- **Token de máquina** (`auth.json` / `COMPOSER_AUTH`): um PAT com escopo de leitura nos repos
+  privados, útil em CI.
 
 ---
 
-## 8. Quando evoluir a infraestrutura (futuro)
+## 9. Quando ativar o Composer / evoluir a infraestrutura
 
-Hoje (solo, 2-5 clientes): **template + upstream** para a base e **VCS repositories** para
-módulos bastam. Evolua quando doer:
+Hoje (solo, 1 cliente): **clone + re-origin** para a base e **módulo embutido** bastam. Evolua
+quando houver gatilho real:
 
-- `git merge upstream` virar custoso (muitos clientes/conflitos) → extrair o core como
-  pacote `ht2erp/erp-core` e o cliente vira um `create-project` fino.
-- gerenciar `repositories` VCS em cada cliente ficar tedioso → **Satis** (estático, custo
-  ~zero) ou **Private Packagist** (pago) centraliza a descoberta de pacotes.
+- **2º cliente** ou clientes com **conjuntos de módulos contratados distintos** → ative o consumo
+  por **Composer VCS**: publique `erp-module-{slug}` (seção 3), troque o `path` por um `vcs`
+  repository no `composer.json` do cliente e configure o **merge driver `ours`** para
+  `composer.json`/`composer.lock` (evita que `git merge upstream` sobrescreva as versões
+  contratadas do cliente). Passo-a-passo no [ADR-0016](architecture/adrs/ADR-0016-instancias-por-cliente.md).
+- `git merge upstream` virar custoso (muitos clientes/conflitos) → extrair o core como pacote
+  `ht2erp/erp-core` e o cliente vira um `create-project` fino.
+- gerenciar `repositories` VCS em cada cliente ficar tedioso → **Satis** (estático, custo ~zero)
+  ou **Private Packagist** (pago) centraliza a descoberta de pacotes.
 
 ---
 
 ## Referência rápida de comandos
 
-| Tarefa                      | Comando                                                                             |
-| --------------------------- | ----------------------------------------------------------------------------------- |
-| Criar casca de pacote       | `php artisan make:modulo-pacote Rh`                                                 |
-| Gerar CRUD no pacote        | `php artisan make:modulo Funcionario --module=Rh --fields="..."`                    |
-| Instalar módulo (dev local) | `composer require "ht2erp/modulo-rh:@dev"`                                          |
-| Publicar versão de módulo   | `git tag v1.0.0 && git push --tags`                                                 |
-| Atualizar módulo no cliente | `composer update ht2erp/modulo-rh`                                                  |
-| Propagar correção do core   | `git fetch upstream && git merge upstream/main`                                     |
-| Pós-instalação/atualização  | `php artisan migrate --force && php artisan access:sync && php artisan cache:clear` |
+| Tarefa                         | Comando                                                                             |
+| ------------------------------ | ----------------------------------------------------------------------------------- |
+| Criar casca de pacote          | `php artisan make:modulo-pacote Rh`                                                 |
+| Gerar CRUD no pacote           | `php artisan make:modulo Funcionario --module=Rh --fields="..."`                    |
+| Cortar release de módulo       | `make release-modulo slug=rh versao=v0.1.0`                                         |
+| Novo cliente (clone+re-origin) | `make new-client` (após clone + re-origin)                                          |
+| Trazer update da base          | `make update-base` (no cliente)                                                     |
+| PR de volta (genérico)         | `git switch -c fix/x upstream/main && gh pr create --repo …/ht2-erp`                |
+| Pós-merge/instalação           | `php artisan migrate --force && php artisan access:sync && php artisan cache:clear` |

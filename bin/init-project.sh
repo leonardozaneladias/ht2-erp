@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# init-project.sh — renomeia este boilerplate para um novo projeto.
+# init-project.sh — renomeia este boilerplate para um PRODUTO NOVO (diverge da base
+# para sempre). Oferece reinicializar o git history, cortando o vínculo `upstream`.
+#
+# NÃO use para instanciar um CLIENTE que deve continuar recebendo updates da base —
+# para isso use `bin/new-client.sh` (preserva o histórico). Ver docs/distribuicao-manutencao.md.
 #
 # Uso:
 #   ./bin/init-project.sh           # modo interativo
@@ -36,6 +40,9 @@ if [[ "${1:-}" == "--dry-run" ]]; then
 fi
 
 echo -e "${GREEN}🚀 Inicializando novo projeto a partir do boilerplate${NC}"
+echo ""
+echo -e "${YELLOW}⚠  Este script é para um PRODUTO NOVO (diverge da base para sempre).${NC}"
+echo -e "${YELLOW}   Para instanciar um CLIENTE que recebe updates, use bin/new-client.sh.${NC}"
 echo ""
 
 if $DRY_RUN; then
