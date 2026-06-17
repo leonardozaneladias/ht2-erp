@@ -144,9 +144,9 @@ make new-client            # ou: ./bin/new-client.sh
 #    → pergunta nome/slug/e-mail, cria .env, .ddev/config.local.yaml (name=<slug>)
 #      e .husky/allow-main-push (opt-out local do pre-push). NÃO apaga git.
 
-# 4. Sobe e configura
+# 4. Sobe e configura (setup-client = SEM dados demo → o Setup Wizard roda)
 git push -u origin main
-ddev start && make setup
+ddev start && make setup-client
 #    → acesse /admin/setup (Setup Wizard cria empresa/branding/admin do cliente)
 ```
 
@@ -242,6 +242,7 @@ quando houver gatilho real:
 | Gerar CRUD no pacote           | `php artisan make:modulo Funcionario --module=Rh --fields="..."`                    |
 | Cortar release de módulo       | `make release-modulo slug=rh versao=v0.1.0`                                         |
 | Novo cliente (clone+re-origin) | `make new-client` (após clone + re-origin)                                          |
+| Setup inicial do cliente       | `make setup-client` (sem dados demo → o Setup Wizard cria empresa/admin)            |
 | Trazer update da base          | `make update-base` (no cliente)                                                     |
 | PR de volta (genérico)         | `git switch -c fix/x upstream/main && gh pr create --repo …/ht2-erp`                |
 | Pós-merge/instalação           | `php artisan migrate --force && php artisan access:sync && php artisan cache:clear` |

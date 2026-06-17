@@ -84,10 +84,10 @@ Há **dois caminhos** distintos — não os confunda (detalhes no runbook **[doc
     git remote rename origin upstream
     git remote add origin git@github.com:leonardozaneladias/ht2-erp-acme.git
     make new-client                 # provisiona o cliente (aditivo)
-    git push -u origin main && ddev start && make setup
+    git push -u origin main && ddev start && make setup-client
     ```
 
-    Depois, `make update-base` traz correções/melhorias da base para o cliente.
+    `make setup-client` não semeia dados demo (instalado=false) → o Setup Wizard em `/admin/setup` cria a empresa/branding/admin. Depois, `make update-base` traz correções/melhorias da base para o cliente.
 
 ---
 
