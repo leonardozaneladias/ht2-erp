@@ -18,6 +18,9 @@
 /public/storage
 /storage/*.key
 /storage/pail
+# Exports gerados pelo PowerGrid (storage_path) — artefatos, não versionar.
+/storage/*.xlsx
+/storage/*.csv
 # Conteúdo das pastas de framework é ignorado pelos .gitignore internos de cada
 # diretório (padrão Laravel: `*` + `!.gitignore`), preservando a pasta vazia.
 /storage/framework/cache/data/*
