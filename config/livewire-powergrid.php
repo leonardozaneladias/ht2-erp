@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use PowerComponents\LivewirePowerGrid\Components\Exports\OpenSpout\v5\ExportToCsv;
-use PowerComponents\LivewirePowerGrid\Components\Exports\OpenSpout\v5\ExportToXLS;
+use App\Support\PowerGrid\Exports\ExportToCsv;
+use App\Support\PowerGrid\Exports\ExportToXLS;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\Boolean;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\InputText;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\Number;
