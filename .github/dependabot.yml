@@ -20,6 +20,13 @@ updates:
       open-pull-requests-limit: 10
       commit-message:
           prefix: 'chore(deps)'
+      # cropperjs v2 é uma reescrita em Web Components — encaixe ruim para o
+      # avatar-cropper (máscara circular fixa + imagem que se move). Sem CVE no
+      # v1, mantemos ^1.6.2 deliberadamente. Security updates seguem passando;
+      # só o bump automático de major é ignorado. Ver docs/devops/tools-and-packages.md §3.7.
+      ignore:
+          - dependency-name: 'cropperjs'
+            update-types: ['version-update:semver-major']
       groups:
           js-deps:
               patterns:
