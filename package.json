@@ -16,7 +16,6 @@
     "test:e2e": "npm run build && ./vendor/bin/pest --group=browser",
     "quality": "npm run lint:php:check && npm run lint:js:check && npm run format:check && npm run analyse && npm run test",
     "lint:last-commit-msg": "git log -1 --pretty=%B | npx --no-install commitlint",
-    "commit": "git-cz",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -40,13 +39,11 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
-    "@commitlint/cz-commitlint": "^21.0.2",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/postcss": "^4.3.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.3.1",
-    "commitizen": "^4.3.1",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.4.0",
@@ -80,10 +77,5 @@
     "simplebar": "^6.3.3",
     "sortablejs": "^1.15.6",
     "sweetalert2": "^11.22.5"
-  },
-  "config": {
-    "commitizen": {
-      "path": "@commitlint/cz-commitlint"
-    }
   }
 }

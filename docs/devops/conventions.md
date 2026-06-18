@@ -71,21 +71,16 @@ Os hooks **Husky** já rodam **`commitlint`** em todo `git commit` (`.husky/comm
 composer run lint:last-commit-msg
 ```
 
-**Commit assistido no terminal** (tipo e escopo vêm do `commitlint.config.cjs`; prompts em pt-BR):
-
-```bash
-git add ...
-npm run commit
-# mesmo fluxo, via Composer na raíz do projeto:
-composer run commit
-```
+**A mensagem é validada no commit:** o hook `commit-msg` (Husky) roda o `commitlint`
+contra o `commitlint.config.cjs` (tipos, escopos e limites permitidos). Escreva a mensagem
+no formato `tipo(escopo): descrição` — commits fora do padrão são barrados na hora.
 
 O hook **`prepare-commit-msg`** (Husky):
 
 - Reescreve na **primeira linha** escopos inválidos **`(database|db|sql)` → `(models)`** para alinhar ao `commitlint`;
 - Remove **`Co-authored-by`** que mencione **Cursor** (IDE).
 
-A sugestão _Generate Commit Message_ do Cursor (ou de extensões Git) **não valida** contra o `commitlint` — use **`npm run commit`** quando quiser mensagem guiada e compatível, ou edite a sugestão antes de confirmar.
+A sugestão _Generate Commit Message_ do Cursor (ou de extensões Git) **não valida** contra o `commitlint` — confira o formato antes de confirmar (o hook `commit-msg` rejeita o que estiver fora do padrão).
 
 ---
 
