@@ -1,11 +1,21 @@
-import Choices from 'choices.js';
-import Dropzone from 'dropzone';
-import flatpickr from 'flatpickr';
-import Inputmask from 'inputmask';
+import ChoicesModule from 'choices.js';
+import DropzoneModule from 'dropzone';
+import flatpickrModule from 'flatpickr';
+import InputmaskModule from 'inputmask';
 import Quill from 'quill';
 import { Portuguese } from 'flatpickr/dist/l10n/pt.js';
 import 'quill/dist/quill.snow.css';
 import { notify } from './toast';
+
+// Vite 8 (Rolldown) tornou o interop de módulos CJS/UMD consistente: o default
+// pode resolver como o próprio valor ou como `{ default: valor }`. Normalizamos
+// aqui para que os usos abaixo (new Choices/Dropzone/Inputmask, flatpickr())
+// funcionem em qualquer um dos shapes — sem depender de compat deprecado.
+// Quill é ESM nativo e dispensa normalização.
+const Choices = ChoicesModule?.default ?? ChoicesModule;
+const Dropzone = DropzoneModule?.default ?? DropzoneModule;
+const flatpickr = flatpickrModule?.default ?? flatpickrModule;
+const Inputmask = InputmaskModule?.default ?? InputmaskModule;
 
 const passwordMeterStates = [
   {

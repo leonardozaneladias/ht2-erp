@@ -1,5 +1,8 @@
-import Swal from 'sweetalert2';
+import SwalModule from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+
+// Vite 8 (Rolldown): normaliza o interop CJS/UMD do default export.
+const Swal = SwalModule?.default ?? SwalModule;
 
 function resolvePopupClass() {
   const html = document.documentElement;

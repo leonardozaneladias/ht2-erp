@@ -12,7 +12,7 @@ import 'animate.css/animate.min.css';
 import 'plyr/dist/plyr.css';
 
 import { createIcons, icons } from 'lucide';
-import moment from 'moment';
+import momentModule from 'moment';
 import './admin/preline';
 import './admin/sidebar';
 import './admin/theme';
@@ -28,6 +28,8 @@ import './admin/sortable';
 import './admin/charts';
 import './admin/copy';
 
+// Vite 8 (Rolldown): normaliza o interop CJS/UMD do default export do moment.
+const moment = momentModule?.default ?? momentModule;
 window.moment = moment;
 
 createIcons({ icons });

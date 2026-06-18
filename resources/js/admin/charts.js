@@ -1,4 +1,7 @@
-import ApexCharts from 'apexcharts';
+import ApexChartsModule from 'apexcharts';
+
+// Vite 8 (Rolldown): normaliza o interop CJS/UMD do default export.
+const ApexCharts = ApexChartsModule?.default ?? ApexChartsModule;
 
 const charts = new Map();
 
