@@ -77,7 +77,6 @@
       "@php artisan test"
     ],
     "lint:last-commit-msg": "git log -1 --pretty=%B | npx --no-install commitlint",
-    "commit": "npm run commit",
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover --ansi"
