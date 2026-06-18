@@ -54,7 +54,7 @@
 | `sortablejs`  | Drag-and-drop        | Reordenação de listas               |
 | `dropzone`    | Upload de arquivos   | Uploads com drag-and-drop           |
 | `sweetalert2` | Alerts/confirmações  | Confirmações de ação                |
-| `tinymce`     | Editor WYSIWYG       | Conteúdo rich text                  |
+| `quill`       | Editor WYSIWYG       | Conteúdo rich text                  |
 
 ---
 
