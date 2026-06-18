@@ -16,6 +16,9 @@ class ExportToCsv extends BaseExportToCsv
 {
     use CleansExportData;
 
+    /**
+     * @param  Exportable|array<string, mixed>  $exportOptions
+     */
     public function build(Exportable|array $exportOptions): void
     {
         // O Livewire serializa o setUp, então aqui exportOptions pode chegar

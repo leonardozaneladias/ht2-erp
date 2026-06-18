@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
 trait CleansExportData
 {
     /**
+     * @param  Collection<int, mixed>  $data
      * @param  array<int, \PowerComponents\LivewirePowerGrid\Column>  $columns
      * @return array{headers: array<int, string>, rows: array<int, array<int, mixed>>}
      */
