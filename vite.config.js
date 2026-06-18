@@ -10,6 +10,14 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  // Vite 8 (Rolldown) mudou o interop de módulos CommonJS: libs UMD/CJS importadas
+  // como default (Inputmask, Choices em resources/js/admin/forms.js, etc.) passaram a
+  // resolver como `{ default: ... }`, quebrando `new X()` em runtime
+  // ("X.default is not a constructor"). Esta flag restaura o interop do Vite 7.
+  // É compat temporário (deprecado pelo Vite): migrar os imports e removê-la é follow-up.
+  legacy: {
+    inconsistentCjsInterop: true,
+  },
   // Dev server acessível atrás do DDEV (HMR via *.ddev.site:5173).
   server: {
     host: '0.0.0.0',
