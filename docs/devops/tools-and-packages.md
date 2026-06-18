@@ -98,6 +98,14 @@ Justificativa: Pest é construído sobre o PHPUnit mas com syntax mais limpa e e
 
 Justificativa: O Laravel já oferece canais de log por arquivo (`daily` driver), rotação automática, e suporte a múltiplos canais simultâneos. Se no futuro for necessário monitoramento de erros em produção, o **Sentry** (`sentry/sentry-laravel`) é a recomendação.
 
+### 3.7 Avatar cropper: `cropperjs` v1 (não migrar para v2 por ora)
+
+**Decisão:** Manter `cropperjs` em `^1.6.2` (v1); não migrar para o v2.
+
+Justificativa: O v2 é uma reescrita completa em Web Components (`<cropper-canvas>`, `<cropper-image>`, `<cropper-selection>`), orientada a seleções móveis/redimensionáveis. Nosso `avatar-cropper.js` precisa do oposto — **máscara circular fixa e centrada, com a imagem se movendo/ampliando por baixo** — caso em que o v1 (`dragMode: 'move'` + crop box travado) encaixa direto e o v2 exigiria recriar template, matemática de zoom (agora relativo, via matriz) e a máscara, com ganho marginal. O v1.6.2 **não tem CVE** (ausente do `npm audit`) e o componente é usado em produção (`form-usuario`, `perfil-conta`). O caret `^1.6.2` já bloqueia o major 2.0 e ainda recebe correções 1.x; o `.github/dependabot.yml` ignora o bump automático de major (security updates seguem passando).
+
+**Revisitar se:** surgir CVE no v1, o componente precisar de recursos só do v2, ou o v2 amadurecer um modo "imagem move sob seleção fixa". Nesse caso, reescrever `resources/js/admin/avatar-cropper.js` para a API de Web Components.
+
 ---
 
 ## 4. Instalação Inicial — Checklist de Pacotes
