@@ -1,4 +1,7 @@
-import Sortable from 'sortablejs';
+import SortableModule from 'sortablejs';
+
+// Vite 8 (Rolldown): normaliza o interop CJS/UMD do default export.
+const Sortable = SortableModule?.default ?? SortableModule;
 
 let observerStarted = false;
 
