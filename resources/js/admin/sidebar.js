@@ -108,9 +108,46 @@ function bindGlobalListeners() {
   document.body.dataset.afSidenavGlobalBound = 'true';
 }
 
+// Rola a lista do menu até o item ativo. Os links do sidebar navegam por full
+// page load, então o scroll do SimpleBar reseta a cada clique — sem isso, em
+// listas longas o item da tela atual fica fora da área visível.
+function scrollMenuToActive() {
+  const active = document.querySelector('#sidenav-menu a.menu-link.active');
+
+  if (!active) {
+    return;
+  }
+
+  const wrapper = document.querySelector(`#${MENU_ID} .simplebar-content-wrapper`);
+
+  if (!wrapper) {
+    // SimpleBar ainda não montou (ex.: aside re-renderizado por navegação SPA).
+    active.scrollIntoView({ block: 'nearest' });
+
+    return;
+  }
+
+  const wrapperRect = wrapper.getBoundingClientRect();
+  const activeRect = active.getBoundingClientRect();
+
+  // Item oculto (ex.: flyout do modo condensado) ou já visível: não mexe no scroll.
+  if (activeRect.height === 0) {
+    return;
+  }
+
+  if (activeRect.top >= wrapperRect.top && activeRect.bottom <= wrapperRect.bottom) {
+    return;
+  }
+
+  wrapper.scrollTop += activeRect.top - wrapperRect.top - (wrapperRect.height - activeRect.height) / 2;
+}
+
 function bootSidenav() {
   bindToggleButton();
   bindGlobalListeners();
+
+  // Após o auto-init do SimpleBar (import 'simplebar' registra o listener antes).
+  requestAnimationFrame(scrollMenuToActive);
 }
 
 if (document.readyState === 'loading') {
@@ -122,4 +159,5 @@ if (document.readyState === 'loading') {
 document.addEventListener('livewire:navigated', () => {
   closeOffcanvas();
   bindToggleButton();
+  requestAnimationFrame(scrollMenuToActive);
 });

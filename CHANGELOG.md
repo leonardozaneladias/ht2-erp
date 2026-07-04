@@ -34,3 +34,21 @@ Mantido no padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
   re-origin"; URLs apontam para a conta `leonardozaneladias`.
 
     _Ações pós-merge:_ `php artisan migrate --force && php artisan access:sync && php artisan cache:clear`.
+
+### Fixed
+
+- Sidebar rola até o item de menu ativo ao carregar a página (e após `wire:navigate`):
+  os links navegam por full page load e o scroll do SimpleBar resetava a cada clique —
+  em menus longos o item da tela atual ficava fora da área visível.
+- Espaço do ícone nos inputs com `input-icon-group`: o seletor de padding passou de
+  irmão adjacente (`+`) para irmão geral (`~`) — o `altInput` do flatpickr insere o
+  input visível depois do original (hidden) e ficava sem o `ps-10` (placeholder
+  sobreposto ao ícone do calendário).
+- Upstream das correções do laudo 18 do módulo RH nos componentes compartilhados:
+  **F9-01** — `x-shared.date-picker`/`date-range-picker` guardam o valor canônico ISO
+  no input original e exibem d/m/Y no `altInput` (antes o ISO hidratado era re-parseado
+  como d/m/Y: data exibida errada e mês/dia trocados na digitação); **F9-02** —
+  o combobox do `select-search` re-sincroniza com o `<select>` nativo hidratado pelo
+  Livewire (antes a edição mostrava o placeholder mesmo com valor salvo). Novo
+  componente `x-shared.required-indicator` e regressão browser em
+  `tests/Browser/Admin/ComponentesFormRegressaoTest.php`.

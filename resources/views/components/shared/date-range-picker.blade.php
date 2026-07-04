@@ -20,8 +20,12 @@
     $hintId = filled($hint) ? "{$fieldId}-hint" : null;
     $errorId = $hasError ? "{$fieldId}-error" : null;
     $describedBy = collect([$errorId, $hintId])->filter()->implode(' ') ?: null;
+    // Mesmo desenho do x-shared.date-picker (F9-01): valor canônico ISO no input
+    // original; exibição d/m/Y no altInput do flatpickr.
     $flatpickrConfig = array_filter([
-        'dateFormat' => $format,
+        'dateFormat' => 'Y-m-d',
+        'altInput' => true,
+        'altFormat' => $format,
         'mode' => 'range',
         'minDate' => $minDate,
         'maxDate' => $maxDate,
@@ -36,13 +40,13 @@
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
 
     <div class="input-icon-group">
-        <i class="iconify tabler--calendar-event input-icon"></i>
+        <i class="iconify tabler--calendar-event input-icon" aria-hidden="true"></i>
         <input
             id="{{ $fieldId }}"
             name="{{ $name }}"

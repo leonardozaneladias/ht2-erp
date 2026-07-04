@@ -48,6 +48,15 @@ document.addEventListener('alpine:init', () => {
       this.carregarOpcoes();
       this.carregarSelecionados();
 
+      // wire:model hidrata o <select> nativo DEPOIS deste init (o resumo ficava no
+      // placeholder mesmo com valor salvo — laudo 18, F9-02): re-sincroniza num tick
+      // pós-boot e sempre que o valor nativo mudar programaticamente.
+      const select = this.selectNativo();
+      if (select) {
+        select.addEventListener('change', () => this.sincronizarDoNativo());
+        window.requestAnimationFrame(() => this.sincronizarDoNativo());
+      }
+
       if (this.mode === 'pg-filter') {
         this.ouvirLimpezaPowerGrid();
       }
@@ -116,6 +125,12 @@ document.addEventListener('alpine:init', () => {
         return;
       }
 
+      this.sincronizarDoNativo();
+    },
+
+    // Fonte de verdade do modo form é o <select> nativo: espelha o estado atual dele
+    // no resumo (usado no boot e quando o valor muda por fora — Livewire, outros JS).
+    sincronizarDoNativo() {
       const select = this.selectNativo();
       if (select) {
         this.selected = Array.from(select.selectedOptions)

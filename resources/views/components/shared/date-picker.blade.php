@@ -21,8 +21,14 @@
     $hintId = filled($hint) ? "{$fieldId}-hint" : null;
     $errorId = $hasError ? "{$fieldId}-error" : null;
     $describedBy = collect([$errorId, $hintId])->filter()->implode(' ') ?: null;
+    // O input ORIGINAL carrega o valor canônico ISO (o que o Livewire hidrata e o
+    // servidor valida com a regra `date`); a exibição d/m/Y fica no altInput do
+    // flatpickr. Sem isso, o valor ISO era re-parseado como d/m/Y (datas erradas na
+    // tela) e a digitação d/m/Y persistia com mês/dia trocados (laudo 18, F9-01).
     $flatpickrConfig = array_filter([
-        'dateFormat' => $format,
+        'dateFormat' => $enableTime ? 'Y-m-d H:i' : 'Y-m-d',
+        'altInput' => true,
+        'altFormat' => $format . ($enableTime && ! str_contains($format, 'H') ? ' H:i' : ''),
         'enableTime' => $enableTime,
         'minDate' => $minDate,
         'maxDate' => $maxDate,
@@ -38,13 +44,13 @@
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
 
     <div class="input-icon-group">
-        <i class="iconify tabler--calendar input-icon"></i>
+        <i class="iconify tabler--calendar input-icon" aria-hidden="true"></i>
         <input
             id="{{ $fieldId }}"
             name="{{ $name }}"
