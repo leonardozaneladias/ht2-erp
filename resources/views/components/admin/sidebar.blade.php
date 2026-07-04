@@ -59,7 +59,9 @@
                 </a>
             </div>
 
-            <div id="sidenav-menu">
+            {{-- Landmark de navegação nomeado (WAI-ARIA Landmarks): expõe o menu principal --}}
+            {{-- como região "navigation", permitindo pular direto para a navegação no leitor de tela. --}}
+            <div id="sidenav-menu" role="navigation" aria-label="Menu principal">
                 <ul class="side-nav hs-accordion-group px-2.5 pb-16.5">
                     @foreach ($sections as $section)
                         <li @class (['menu-title', 'mt-0!' => $loop->first])>
@@ -85,7 +87,9 @@
                                         aria-controls="{{ $submenuId }}"
                                         aria-expanded="{{ $isActive ? 'true' : 'false' }}"
                                     >
-                                        <span class="menu-icon"><i class="iconify {{ $item['icon'] }}"></i></span>
+                                        <span class="menu-icon"
+                                            ><i class="iconify {{ $item['icon'] }}" aria-hidden="true"></i
+                                        ></span>
                                         <span class="menu-text">{{ $item['label'] }}</span>
                                         <span class="menu-arrow"></span>
                                     </a>
@@ -105,6 +109,7 @@
                                             <li class="menu-item">
                                                 <a
                                                     @class (['menu-link', 'active' => $childActive])
+                                                    @if ($childActive) aria-current="page" @endif
                                                     href="{{ route($child['route']) }}"
                                                 >
                                                     <span class="menu-text">{{ $child['label'] }}</span>
@@ -115,8 +120,14 @@
                                 </li>
                             @else
                                 <li class="menu-item">
-                                    <a @class (['menu-link', 'active' => $isActive]) href="{{ route($item['route']) }}">
-                                        <span class="menu-icon"><i class="iconify {{ $item['icon'] }}"></i></span>
+                                    <a
+                                        @class (['menu-link', 'active' => $isActive])
+                                        @if ($isActive) aria-current="page" @endif
+                                        href="{{ route($item['route']) }}"
+                                    >
+                                        <span class="menu-icon"
+                                            ><i class="iconify {{ $item['icon'] }}" aria-hidden="true"></i
+                                        ></span>
                                         <span class="menu-text">{{ $item['label'] }}</span>
                                     </a>
                                 </li>

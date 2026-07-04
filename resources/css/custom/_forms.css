@@ -306,8 +306,11 @@ input:checked + .form-label.btn {
         @apply pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-lg text-default-400;
     }
 
-    > .input-icon:first-child + .form-input,
-    > .input-icon:first-child + .form-select {
+    /* Irmão geral (~), não adjacente (+): o altInput do flatpickr insere o input
+       visível DEPOIS do original (que vira hidden) — o clone deixa de ser adjacente
+       ao ícone, mas continua precisando do espaço à esquerda. */
+    > .input-icon:first-child ~ .form-input,
+    > .input-icon:first-child ~ .form-select {
         @apply !ps-10;
     }
 
