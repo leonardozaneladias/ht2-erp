@@ -20,18 +20,22 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    <x-shared.card>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <x-shared.input name="ispb" label="ISPB" wire:model="ispb" required maxlength="8" />
-            <x-shared.input name="codigo_compe" label="Código COMPE" wire:model="codigo_compe" maxlength="3" />
-            <x-shared.input name="nome" label="Nome" wire:model="nome" required />
-            <x-shared.input name="nome_completo" label="Nome completo" wire:model="nome_completo" />
-            <x-shared.toggle name="ativo" label="Ativo" wire:model="ativo" stacked />
-        </div>
-    </x-shared.card>
+    {{-- wire:submit + form-footer submit: salva com Enter (e mantém o clique no botão). --}}
+    <form wire:submit="salvar" class="space-y-6">
+        <x-shared.card>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <x-shared.input name="ispb" label="ISPB" wire:model="ispb" required maxlength="8" />
+                <x-shared.input name="codigo_compe" label="Código COMPE" wire:model="codigo_compe" maxlength="3" />
+                <x-shared.input name="nome" label="Nome" wire:model="nome" required />
+                <x-shared.input name="nome_completo" label="Nome completo" wire:model="nome_completo" />
+                <x-shared.toggle name="ativo" label="Ativo" wire:model="ativo" stacked />
+            </div>
+        </x-shared.card>
 
-    <x-admin.form-footer
-        :cancel-href="route('admin.referencia.bancos.index')"
-        :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
-    />
+        <x-admin.form-footer
+            :cancel-href="route('admin.referencia.bancos.index')"
+            :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
+            submit
+        />
+    </form>
 </div>

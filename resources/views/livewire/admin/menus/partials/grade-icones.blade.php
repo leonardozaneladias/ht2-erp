@@ -7,13 +7,15 @@
             type="button"
             wire:click="$set('{{ $modelo }}', '{{ $opcao }}')"
             title="{{ $opcao }}"
+            aria-label="Selecionar ícone {{ $opcao }}"
+            aria-pressed="{{ $selecionado === $opcao ? 'true' : 'false' }}"
             @class ([
                 'border-default-200 hover:border-primary/60 hover:bg-light flex size-9 cursor-pointer items-center justify-center rounded-lg border transition-colors duration-200',
                 'border-primary bg-primary/10 text-primary' => $selecionado === $opcao,
                 'text-default-600' => $selecionado !== $opcao,
             ])
         >
-            <i class="iconify {{ $opcao }} text-lg"></i>
+            <i class="iconify {{ $opcao }} text-lg" aria-hidden="true"></i>
         </button>
     @endforeach
 </div>

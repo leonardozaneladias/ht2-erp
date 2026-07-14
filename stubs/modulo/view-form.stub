@@ -15,10 +15,14 @@
         </x-slot:actions>
     </x-admin.page-header>
 
+    {{-- wire:submit + form-footer submit: salva com Enter (e mantém o clique no botão). --}}
+    <form wire:submit="salvar" class="space-y-6">
 __FORM_BODY__
 
-    <x-admin.form-footer
-        :cancel-href="route('admin.__MODULO_ROTA_NOME__.index')"
-        :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
-    />
+        <x-admin.form-footer
+            :cancel-href="route('admin.__MODULO_ROTA_NOME__.index')"
+            :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
+            submit
+        />
+    </form>
 </div>

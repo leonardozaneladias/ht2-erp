@@ -39,6 +39,7 @@ Refs: #issue-number
 | `auth`   | Autenticação (guard admin)              |
 | `infra`  | DDEV, Docker, CI, deploy                |
 | `models` | Models, migrations, seeders             |
+| `rh`     | Módulo de RH (`ht2erp/modulo-rh`)       |
 | `docs`   | Documentação                            |
 | `ui`     | Interface, componentes visuais          |
 | `skills` | Skills e automações `.claude`/`.agents` |
@@ -329,6 +330,7 @@ Decididos no fechamento da fase base. Todo CRUD/tela nova segue estas regras —
 - **Abas** = somente quando pelo menos um grupo tem ação de salvar própria ou só existe após persistência (modo edição). Exemplo: Form de Usuário (Empresas/Acessos salvam separado).
 - Com abas, todo `tab-trigger` recebe `:has-error="$errors->hasAny([...campos da aba...])"` — erro em aba inativa precisa de feedback visível.
 - Rodapé de form sempre via `<x-admin.form-footer :cancel-href="..." :label="..." />`.
+- Para salvar com **Enter**, envolva o corpo em `<form wire:submit="salvar" class="space-y-6">` e passe `submit` ao rodapé (`<x-admin.form-footer ... submit />`): isso torna o botão primário `type="submit"`, disparado pelo `<form>` (Enter ou clique). Sem `submit`, o rodapé mantém o disparo por `wire:click` (retrocompatível). O gerador `make:modulo` e o módulo Exemplo já nascem nesse padrão.
 
 **Breadcrumbs**
 
@@ -350,7 +352,7 @@ O menu do admin tem duas camadas, mescladas pelo `App\Services\Admin\Menu\MenuSe
 - **Registro** (`config/admin-menu.php`) — fonte de verdade dos módulos, sempre **FLAT**. Toda seção e item exigem uma **`key` estável** (o serviço lança `LogicException` sem ela); o item declara `label`, `icon` (tabler), `route`, `permission` e `active`. Módulo novo = item novo aqui — ele aparece automaticamente na sidebar e na tela de gestão.
 - **Personalizações** (`menu_personalizacoes`, tela `/admin/menus`, permissão `configuracoes.menus`) — ordem, label, ícone, container e `ativo` por cima do registro, além de **seções custom** e **grupos (submenus)** criados pela tela (`e_custom = true`, keys `secao-*`/`grupo-*` geradas por slug). Valores iguais ao padrão viram `null` (linha 100% padrão é removida); key que sumiu do config vira personalização **órfã** (ignorada na sidebar, listada na gestão para limpeza) — customs nunca são órfãs.
 - **Grupos** são apresentação pura: sem rota/permissão, só aparecem na sidebar quando têm filho visível ao usuário; inativo esconde o grupo e os filhos. Excluir grupo/seção custom devolve os registros ao fallback natural. Um item pertence a `grupo_key` (prioridade) > `secao_key` > seção natural do config.
-- **Disposição padrão do starter kit** (grupos Cadastros e Segurança): `AplicarMenuPadraoAction` — idempotente e não-destrutiva (no-op se já existe grupo; `firstOrCreate` por linha). Chamada pelo `MenuPadraoSeeder` (dev) e pelo `ConcluirSetupAction` (produção — deploy não roda seeders).
+- **Disposição padrão do starter kit**: `AplicarMenuPadraoAction` — grupos Organização/Segurança (Administração), Cadastros (Tabelas Auxiliares) e a seção **Recursos Humanos** (itens de uso diário soltos + grupos temáticos, constantes `ITENS_SOLTOS_RH`/`GRUPOS_RH`). Idempotente e não-destrutiva (no-op se já existe grupo; `firstOrCreate` por linha). Chamada pelo `MenuPadraoSeeder` (dev) e pelo `ConcluirSetupAction` (produção — deploy não roda seeders); instalações já organizadas recebem só o arranjo de RH via `aplicarSecaoRh()` (data migration `2026_07_07_100000`, no-op quando o grupo `grupo-rh-*` já existe).
 
 Regras:
 

@@ -99,3 +99,13 @@ it('exige permissão para listar Tipos de logradouro', function () {
     expect($comum->can('tipos_logradouro.listar'))->toBeFalse()
         ->and($this->admin->can('tipos_logradouro.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de tipo de logradouro pelo evento do kebab', function () {
+    $registro = TipoLogradouro::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexTipoLogradouro::class)
+        ->dispatch('tipos_logradouro::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

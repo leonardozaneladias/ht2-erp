@@ -20,15 +20,19 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    <x-shared.card>
-        <div class="grid grid-cols-1 gap-4">
-            <x-shared.input name="codigo" label="Código" wire:model="codigo" required maxlength="8" />
-            <x-shared.textarea name="descricao" label="Descrição" wire:model="descricao" :rows="6" required />
-        </div>
-    </x-shared.card>
+    {{-- wire:submit + form-footer submit: salva com Enter (e mantém o clique no botão). --}}
+    <form wire:submit="salvar" class="space-y-6">
+        <x-shared.card>
+            <div class="grid grid-cols-1 gap-4">
+                <x-shared.input name="codigo" label="Código" wire:model="codigo" required maxlength="8" />
+                <x-shared.textarea name="descricao" label="Descrição" wire:model="descricao" :rows="6" required />
+            </div>
+        </x-shared.card>
 
-    <x-admin.form-footer
-        :cancel-href="route('admin.referencia.ncms.index')"
-        :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
-    />
+        <x-admin.form-footer
+            :cancel-href="route('admin.referencia.ncms.index')"
+            :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
+            submit
+        />
+    </form>
 </div>

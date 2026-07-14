@@ -13,11 +13,12 @@
 >
     <i
         class="iconify tabler--grip-vertical {{ $handle }} text-default-400 shrink-0 cursor-grab text-lg"
+        aria-hidden="true"
         x-bind:class="busca.trim() !== '' ? 'pointer-events-none opacity-30' : ''"
     ></i>
 
     <span class="bg-light text-default-600 flex size-8 shrink-0 items-center justify-center rounded-lg">
-        <i class="iconify {{ $item['icon'] }} text-base"></i>
+        <i class="iconify {{ $item['icon'] }} text-base" aria-hidden="true"></i>
     </span>
 
     <div class="min-w-0 grow">
@@ -41,7 +42,8 @@
                 class="text-info flex size-6 items-center justify-center"
                 title="Personalizado (difere do padrão do módulo)"
             >
-                <i class="iconify tabler--pencil-star text-sm"></i>
+                <i class="iconify tabler--pencil-star text-sm" aria-hidden="true"></i>
+                <span class="sr-only">Personalizado (difere do padrão do módulo)</span>
             </span>
         @endif
 
@@ -50,11 +52,13 @@
                 class="text-default-400 flex size-6 items-center justify-center"
                 title="Visível para quem tem {{ $item['permission'] }}"
             >
-                <i class="iconify tabler--lock text-sm"></i>
+                <i class="iconify tabler--lock text-sm" aria-hidden="true"></i>
+                <span class="sr-only">Visível para quem tem {{ $item['permission'] }}</span>
             </span>
         @else
             <span class="text-success flex size-6 items-center justify-center" title="Visível para todos os perfis">
-                <i class="iconify tabler--world text-sm"></i>
+                <i class="iconify tabler--world text-sm" aria-hidden="true"></i>
+                <span class="sr-only">Visível para todos os perfis</span>
             </span>
         @endif
 

@@ -196,70 +196,65 @@
                         </div>
                     @endif
                 @endif
-                <div class="overflow-x-auto">
-                    <table class="table w-full">
-                        <thead>
-                            <tr>
-                                <th>Tipo</th>
-                                <th>Permissão</th>
-                                <th>Validade</th>
-                                <th>Motivo</th>
-                                @if ($podeGerirAcessos)
-                                    <th class="text-end">Ações</th>
+                <x-shared.static-table>
+                    <x-slot:head>
+                        <tr>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Permissão</th>
+                            <th scope="col">Validade</th>
+                            <th scope="col">Motivo</th>
+                            @if ($podeGerirAcessos)
+                                <th scope="col" class="text-end">Ações</th>
+                            @endif
+                        </tr>
+                    </x-slot:head>
+
+                    @forelse ($this->acessosDiretos as $grant)
+                        <tr wire:key="grant-{{ $grant->id }}">
+                            <td>
+                                @if ($grant->type === \App\Enums\TipoConcessao::Deny)
+                                    <x-shared.badge variant="danger" icon="tabler--ban">Nega</x-shared.badge>
+                                @else
+                                    <x-shared.badge variant="success" icon="tabler--plus"> Concede</x-shared.badge>
                                 @endif
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($this->acessosDiretos as $grant)
-                                <tr wire:key="grant-{{ $grant->id }}">
-                                    <td>
-                                        @if ($grant->type === \App\Enums\TipoConcessao::Deny)
-                                            <x-shared.badge variant="danger" icon="tabler--ban">Nega</x-shared.badge>
-                                        @else
-                                            <x-shared.badge variant="success" icon="tabler--plus">
-                                                Concede</x-shared.badge
-                                            >
-                                        @endif
-                                    </td>
-                                    <td>{{ $grant->permission?->label ?? $grant->permission?->name }}</td>
-                                    <td>
-                                        @if ($grant->expires_at)
-                                            <x-shared.badge variant="warning" icon="tabler--clock">
-                                                {{ $grant->expires_at->format('d/m/Y H:i') }}
-                                            </x-shared.badge>
-                                        @else
-                                            <x-shared.badge variant="neutral">Permanente</x-shared.badge>
-                                        @endif
-                                    </td>
-                                    <td class="text-default-600 max-w-xs truncate">{{ $grant->reason }}</td>
-                                    @if ($podeGerirAcessos)
-                                        <td class="text-end">
-                                            <x-shared.button
-                                                variant="danger"
-                                                appearance="outline"
-                                                size="sm"
-                                                wire:click="solicitarRevogarAcesso({{ $grant->id }})"
-                                            >
-                                                Revogar
-                                            </x-shared.button>
-                                        </td>
-                                    @endif
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="{{ $podeGerirAcessos ? 5 : 4 }}">
-                                        <x-shared.empty-state
-                                            size="sm"
-                                            icon="tabler--key-off"
-                                            title="Nenhum acesso específico"
-                                            description="Esta pessoa usa apenas as permissões dos perfis."
-                                        />
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                            </td>
+                            <td>{{ $grant->permission?->label ?? $grant->permission?->name }}</td>
+                            <td>
+                                @if ($grant->expires_at)
+                                    <x-shared.badge variant="warning" icon="tabler--clock">
+                                        {{ $grant->expires_at->format('d/m/Y H:i') }}
+                                    </x-shared.badge>
+                                @else
+                                    <x-shared.badge variant="neutral">Permanente</x-shared.badge>
+                                @endif
+                            </td>
+                            <td class="text-default-600 max-w-xs truncate">{{ $grant->reason }}</td>
+                            @if ($podeGerirAcessos)
+                                <td class="text-end">
+                                    <x-shared.button
+                                        variant="danger"
+                                        appearance="outline"
+                                        size="sm"
+                                        wire:click="solicitarRevogarAcesso({{ $grant->id }})"
+                                    >
+                                        Revogar
+                                    </x-shared.button>
+                                </td>
+                            @endif
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="{{ $podeGerirAcessos ? 5 : 4 }}">
+                                <x-shared.empty-state
+                                    size="sm"
+                                    icon="tabler--key-off"
+                                    title="Nenhum acesso específico"
+                                    description="Esta pessoa usa apenas as permissões dos perfis."
+                                />
+                            </td>
+                        </tr>
+                    @endforelse
+                </x-shared.static-table>
             @else
                 {{-- ── Aba Acesso efetivo ─────────────────────────────────── --}}
                 <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -291,62 +286,47 @@
                             :title="$moduloLabel . ' (' . $permitidasNoModulo . '/' . $itens->count() . ')'"
                             :open="$loop->first"
                         >
-                            <div class="overflow-x-auto">
-                                <table class="table w-full text-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Permissão</th>
-                                            <th>Situação</th>
-                                            <th>Origem</th>
-                                            <th>Detalhes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($itens as $dto)
-                                            <tr wire:key="efe-{{ $modulo }}-{{ $dto->ability }}">
-                                                <td class="font-medium">{{ $dto->ability }}</td>
-                                                <td>
-                                                    @if ($dto->permitido)
-                                                        <x-shared.badge variant="success" icon="tabler--check">
-                                                            Permitido</x-shared.badge
-                                                        >
-                                                    @elseif ($dto->origem === \App\Enums\OrigemAcesso::Deny)
-                                                        <x-shared.badge variant="danger" icon="tabler--ban">
-                                                            Negado</x-shared.badge
-                                                        >
-                                                    @else
-                                                        <x-shared.badge variant="neutral" icon="tabler--minus">
-                                                            Sem acesso</x-shared.badge
-                                                        >
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <x-shared.badge :variant="$dto->origem->variant()">
-                                                        {{ $dto->origem->label() }}
-                                                        @if ($dto->roleDeOrigem)
-                                                            — {{ $dto->roleDeOrigem }}
-                                                        @endif
-                                                    </x-shared.badge>
-                                                </td>
-                                                <td class="text-default-600">
-                                                    @if ($dto->expiraEm)
-                                                        <span class="inline-flex items-center gap-1">
-                                                            <span class="iconify tabler--clock size-4"></span>
-                                                            expira {{ $dto->expiraEm->format('d/m/Y H:i') }}
-                                                        </span>
-                                                    @endif
-                                                    @if ($dto->motivo)
-                                                        <span
-                                                            class="text-default-400 block text-xs"
-                                                            >{{ $dto->motivo }}</span
-                                                        >
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                            <x-shared.static-table :headers="['Permissão', 'Situação', 'Origem', 'Detalhes']">
+                                @foreach ($itens as $dto)
+                                    <tr wire:key="efe-{{ $modulo }}-{{ $dto->ability }}">
+                                        <td class="font-medium">{{ $dto->ability }}</td>
+                                        <td>
+                                            @if ($dto->permitido)
+                                                <x-shared.badge variant="success" icon="tabler--check">
+                                                    Permitido</x-shared.badge
+                                                >
+                                            @elseif ($dto->origem === \App\Enums\OrigemAcesso::Deny)
+                                                <x-shared.badge variant="danger" icon="tabler--ban">
+                                                    Negado</x-shared.badge
+                                                >
+                                            @else
+                                                <x-shared.badge variant="neutral" icon="tabler--minus">
+                                                    Sem acesso</x-shared.badge
+                                                >
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <x-shared.badge :variant="$dto->origem->variant()">
+                                                {{ $dto->origem->label() }}
+                                                @if ($dto->roleDeOrigem)
+                                                    — {{ $dto->roleDeOrigem }}
+                                                @endif
+                                            </x-shared.badge>
+                                        </td>
+                                        <td class="text-default-600">
+                                            @if ($dto->expiraEm)
+                                                <span class="inline-flex items-center gap-1">
+                                                    <span class="iconify tabler--clock size-4"></span>
+                                                    expira {{ $dto->expiraEm->format('d/m/Y H:i') }}
+                                                </span>
+                                            @endif
+                                            @if ($dto->motivo)
+                                                <span class="text-default-400 block text-xs">{{ $dto->motivo }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </x-shared.static-table>
                         </x-shared.accordion-item>
                     @endforeach
                 </x-shared.accordion>

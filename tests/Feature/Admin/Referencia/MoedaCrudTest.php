@@ -101,3 +101,13 @@ it('exige permissão para listar Moedas', function () {
     expect($comum->can('moedas.listar'))->toBeFalse()
         ->and($this->admin->can('moedas.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de moeda pelo evento do kebab', function () {
+    $registro = Moeda::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexMoeda::class)
+        ->dispatch('moedas::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

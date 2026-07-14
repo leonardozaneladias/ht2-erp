@@ -42,6 +42,12 @@ trait ComLixeira
     /** Alterna a listagem entre registros ativos e a lixeira (só excluídos). */
     public bool $verLixeira = false;
 
+    /** Permissão que libera a lixeira. Lida pela view da toolbar. */
+    public function permissaoRestaurar(): string
+    {
+        return $this->permissaoBase() . '.restaurar';
+    }
+
     /** Alterna entre ativos e lixeira, voltando à 1ª página e limpando seleção. */
     public function alternarLixeira(): void
     {
@@ -123,6 +129,13 @@ trait ComLixeira
         $registro = $this->registroNaLixeira($id);
         $this->authorize('forceDelete', $registro);
 
+        $bloqueio = $this->bloqueioExclusaoDefinitiva($registro);
+        if ($bloqueio !== null) {
+            $this->notificarErro($bloqueio);
+
+            return;
+        }
+
         $this->dispatch(
             'confirm',
             title: 'Excluir definitivamente?',
@@ -140,9 +153,31 @@ trait ComLixeira
         $registro = $this->registroNaLixeira($id);
         $this->authorize('forceDelete', $registro);
 
+        $bloqueio = $this->bloqueioExclusaoDefinitiva($registro);
+        if ($bloqueio !== null) {
+            $this->notificarErro($bloqueio);
+
+            return;
+        }
+
         $registro->forceDelete();
         $this->notificarSucesso('Registro excluído definitivamente.');
     }
+
+    /**
+     * Prefixo das permissões do recurso — "cnaes", "empresas", "exemplos".
+     *
+     * A toolbar da lixeira (uma view ÚNICA: `admin.partials.lixeira-toolbar`) deriva daqui
+     * a permissão `{prefixo}.restaurar`, que decide se o botão "Ver lixeira" aparece.
+     *
+     * Antes, cada CRUD tinha um `_lixeira-toggle.blade.php` próprio — 26 arquivos de 24
+     * linhas que só diferiam nessa string e em incluir (ou não) o botão de exportar PDF.
+     *
+     * A convenção é `{recurso}.restaurar`, mas o prefixo não é derivável do nome da classe
+     * (ele acompanha a permissão registrada, que nem sempre casa com o plural do model).
+     * Por isso é declarado, não adivinhado.
+     */
+    abstract protected function permissaoBase(): string;
 
     /**
      * Classe do model da tabela — precisa usar SoftDeletes e implementar UsaSoftDeletes.
@@ -163,6 +198,17 @@ trait ComLixeira
 
     /** Hook: mensagem que IMPEDE a restauração (ex.: e-mail já em uso por um ativo), ou null. */
     protected function bloqueioRestauracao(Model $registro): ?string
+    {
+        return null;
+    }
+
+    /**
+     * Hook: mensagem que IMPEDE a exclusão DEFINITIVA (force-delete), ou null.
+     * Regras de guarda (ex.: LGPD — retenção legal) vivem aqui, em complemento à
+     * policy `forceDelete`: o hook vale inclusive para o super-admin, que bypassa
+     * policies via Gate::before.
+     */
+    protected function bloqueioExclusaoDefinitiva(Model $registro): ?string
     {
         return null;
     }

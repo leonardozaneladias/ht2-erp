@@ -33,7 +33,7 @@ Para `make:modulo Cliente` o gerador cria (tudo com `declare(strict_types=1)`):
 | Service (§5.6)        | `app/Services/Admin/ClienteService.php`                                                                          |
 | Policy                | `app/Policies/ClientePolicy.php` (auto-descoberta por convenção)                                                 |
 | Livewire              | `app/Livewire/Admin/Clientes/{IndexCliente,FormCliente,ClienteTable}.php`                                        |
-| Views                 | `resources/views/livewire/admin/clientes/{index-clientes,form-cliente,_acoes}.blade.php`                         |
+| Views                 | `resources/views/livewire/admin/clientes/{index-clientes,form-cliente,_acoes,_ficha}.blade.php`                  |
 | Teste Feature         | `tests/Feature/Admin/Clientes/ClienteCrudTest.php`                                                               |
 | Rotas                 | injetadas em `routes/admin.php` (`admin.clientes.{index,create,edit}`)                                           |
 | Permissões            | injetadas em `config/access.php` (`clientes.{listar,criar,editar,deletar,restaurar,excluir_permanente}`)         |
@@ -166,6 +166,14 @@ Crie um case em `app/Enums/ModuloAcesso.php` (com os braços de `match`
 correspondentes) e mova as permissões do módulo para a chave dele em
 `config/access.php`.
 
+## Ficha "Ver" (visualização em drawer)
+
+O módulo já nasce com a opção **Ver** no kebab: drawer largo read-only
+(`x-admin.ficha-drawer` + trait `ComFicha` no Index), com os campos formatados
+por tipo em `_ficha.blade.php`. Sem permissão nova — a ability `view` mapeia
+`{modulo}.listar`, então um perfil só com `.listar` consulta sem editar/excluir.
+Padrão completo (e como adotar em módulo legado): [`docs/visualizacao.md`](visualizacao.md).
+
 ## O que você ainda faz (a regra de negócio)
 
 1. **Migration:** ajuste colunas, índices e relacionamentos específicos.
@@ -187,7 +195,9 @@ php artisan make:modulo Funcionario --module=Rh --fields="..."   # CRUD dentro d
 
 O CRUD nasce com namespaces do pacote (`HT2ERP\Rh\...`), views namespaced (`rh::`) e se
 integra ao core **sem editá-lo** (rotas via `ModuleRegistry`, permissões/menu via
-`config/rh.php` publicável, Livewire/Policy no provider do pacote). Sem `--module`, o
+`config/rh.php` publicável, Livewire/Policy no provider do pacote). O pacote de RH
+registra a **própria seção** "Recursos Humanos" na sidebar (e o módulo
+`recursos_humanos` na matriz de acesso) em vez de cair em "Negócio". Sem `--module`, o
 comportamento é o atual (gera em `app/`).
 
 Guia completo de distribuição e manutenção:

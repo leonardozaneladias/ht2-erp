@@ -20,17 +20,27 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    <x-shared.card>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <x-shared.input name="codigo_ibge" label="Código IBGE" wire:model="codigo_ibge" required maxlength="2" />
-            <x-shared.input name="sigla" label="Sigla" wire:model="sigla" required maxlength="2" />
-            <x-shared.input name="nome" label="Nome" wire:model="nome" required />
-            <x-shared.select-search name="regiao" label="Região" wire:model="regiao" :options="$regioes" required />
-        </div>
-    </x-shared.card>
+    {{-- wire:submit + form-footer submit: salva com Enter (e mantém o clique no botão). --}}
+    <form wire:submit="salvar" class="space-y-6">
+        <x-shared.card>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <x-shared.input
+                    name="codigo_ibge"
+                    label="Código IBGE"
+                    wire:model="codigo_ibge"
+                    required
+                    maxlength="2"
+                />
+                <x-shared.input name="sigla" label="Sigla" wire:model="sigla" required maxlength="2" />
+                <x-shared.input name="nome" label="Nome" wire:model="nome" required />
+                <x-shared.select-search name="regiao" label="Região" wire:model="regiao" :options="$regioes" required />
+            </div>
+        </x-shared.card>
 
-    <x-admin.form-footer
-        :cancel-href="route('admin.referencia.estados.index')"
-        :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
-    />
+        <x-admin.form-footer
+            :cancel-href="route('admin.referencia.estados.index')"
+            :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
+            submit
+        />
+    </form>
 </div>

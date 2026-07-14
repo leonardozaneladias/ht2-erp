@@ -99,3 +99,13 @@ it('exige permissão para listar Estados', function () {
     expect($comum->can('estados.listar'))->toBeFalse()
         ->and($this->admin->can('estados.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de estado pelo evento do kebab', function () {
+    $registro = Estado::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexEstado::class)
+        ->dispatch('estados::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

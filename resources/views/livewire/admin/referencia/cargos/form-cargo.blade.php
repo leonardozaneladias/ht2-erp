@@ -20,16 +20,20 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    <x-shared.card>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <x-shared.input name="codigo_cbo" label="Código CBO" wire:model="codigo_cbo" required maxlength="6" />
-            <x-shared.input name="descricao" label="Descrição" wire:model="descricao" required />
-            <x-shared.toggle name="ativo" label="Ativo" wire:model="ativo" stacked />
-        </div>
-    </x-shared.card>
+    {{-- wire:submit + form-footer submit: salva com Enter (e mantém o clique no botão). --}}
+    <form wire:submit="salvar" class="space-y-6">
+        <x-shared.card>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <x-shared.input name="codigo_cbo" label="Código CBO" wire:model="codigo_cbo" required maxlength="6" />
+                <x-shared.input name="descricao" label="Descrição" wire:model="descricao" required />
+                <x-shared.toggle name="ativo" label="Ativo" wire:model="ativo" stacked />
+            </div>
+        </x-shared.card>
 
-    <x-admin.form-footer
-        :cancel-href="route('admin.referencia.cargos.index')"
-        :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
-    />
+        <x-admin.form-footer
+            :cancel-href="route('admin.referencia.cargos.index')"
+            :label="$modo === 'criar' ? 'Criar' : 'Salvar alterações'"
+            submit
+        />
+    </form>
 </div>

@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
+use App\Livewire\Concerns\ComFicha;
 use App\Models\Referencia\Cnae;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -18,9 +21,17 @@ use Livewire\Component;
 #[Title('CNAEs')]
 class IndexCnae extends Component
 {
+    use ComFicha;
+
     public function mount(): void
     {
         $this->authorize('viewAny', Cnae::class);
+    }
+
+    #[On('cnaes::ver')]
+    public function verRegistro(int $id): void
+    {
+        $this->abrirFicha($id);
     }
 
     public function render(): View
@@ -28,5 +39,15 @@ class IndexCnae extends Component
         return view('livewire.admin.referencia.cnaes.index-cnaes', [
             'podeCriar' => Auth::guard('admin')->user()?->can('create', Cnae::class) ?? false,
         ]);
+    }
+
+    protected function modelClassFicha(): string
+    {
+        return Cnae::class;
+    }
+
+    protected function urlEditarFicha(Model $registro): ?string
+    {
+        return route('admin.referencia.cnaes.edit', ['cnae' => $registro->getKey()]);
     }
 }

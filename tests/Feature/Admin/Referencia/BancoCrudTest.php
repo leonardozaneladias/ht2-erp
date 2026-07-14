@@ -99,3 +99,13 @@ it('exige permissão para listar Bancos', function () {
     expect($comum->can('bancos.listar'))->toBeFalse()
         ->and($this->admin->can('bancos.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de banco pelo evento do kebab', function () {
+    $registro = Banco::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexBanco::class)
+        ->dispatch('bancos::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

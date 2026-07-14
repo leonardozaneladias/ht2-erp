@@ -31,6 +31,18 @@ final class ExemploTable extends PowerGridComponent
 
     public string $tableName = 'exemplos-table';
 
+    public function noDataLabel(): View
+    {
+        $podeCriar = auth('admin')->user()?->can('create', Exemplo::class) ?? false;
+
+        return view('admin.partials.powergrid-empty', [
+            'titulo' => 'Nenhum registro encontrado',
+            'descricao' => 'Cadastre o primeiro registro para começar.',
+            'ctaUrl' => $podeCriar ? route('admin.exemplos.create') : null,
+            'ctaLabel' => $podeCriar ? 'Novo registro' : null,
+        ]);
+    }
+
     /**
      * @return array<int, mixed>
      */
@@ -40,7 +52,7 @@ final class ExemploTable extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.exemplos._lixeira-toggle'),
+                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -192,6 +204,12 @@ final class ExemploTable extends PowerGridComponent
         }
 
         return view('livewire.admin.exemplos._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
+    }
+
+    /** Prefixo das permissões do recurso (ComLixeira). */
+    protected function permissaoBase(): string
+    {
+        return 'exemplos';
     }
 
     protected function permissaoListagem(): string

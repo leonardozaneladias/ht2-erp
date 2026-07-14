@@ -127,6 +127,12 @@ final class DepartamentoTable extends PowerGridComponent
         return 'departamentos.listar';
     }
 
+    /** Prefixo das permissões do recurso (ComLixeira). */
+    protected function permissaoBase(): string
+    {
+        return 'rh.departamentos';
+    }
+
     /**
      * Dados da listagem para exportação em PDF (trait ExportaPdf).
      */

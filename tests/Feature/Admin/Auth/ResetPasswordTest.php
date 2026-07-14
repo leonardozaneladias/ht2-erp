@@ -25,6 +25,15 @@ it('preenche o token via mount', function () {
         ->assertSet('token', 'meu-token');
 });
 
+it('liga o medidor de força ao campo de senha', function () {
+    // Regressão: o meter standalone só ativa via JS quando o Blade emite
+    // data-password-meter-standalone="{id-do-input}". O id do campo "password"
+    // é "password". Se o call-site usar uma prop inexistente (ex.: target=), o
+    // atributo some e o medidor fica inerte (barra nunca atualiza).
+    Livewire::test(ResetPassword::class, ['token' => 'fake-token'])
+        ->assertSeeHtml('data-password-meter-standalone="password"');
+});
+
 it('exibe erro se as senhas não coincidem', function () {
     Livewire::test(ResetPassword::class, ['token' => 'fake-token'])
         ->set('email', 'admin@teste.com')

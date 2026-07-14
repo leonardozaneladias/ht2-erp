@@ -1,0 +1,11 @@
+@php
+    /** @var \__NS_MODELS__\__MODULO_STUDLY__ $registro */
+@endphp
+
+{{-- Ficha de visualização ("Ver") — corpo do x-admin.ficha-drawer.
+     Padrão em docs/visualizacao.md; formatação por tipo já gerada. --}}
+<div class="space-y-6">
+    <x-admin.ficha-section title="Dados do registro">
+__FICHA_CAMPOS__
+    </x-admin.ficha-section>
+</div>

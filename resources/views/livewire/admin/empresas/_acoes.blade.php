@@ -8,6 +8,12 @@
     (diretivas @can não compilam como atributo de componente Blade).
 --}}
 <x-admin.row-actions>
+    @if ($ator?->can('view', $row))
+        <x-shared.dropdown-item icon="tabler--eye" wire:click="$dispatch('empresas::ver', { id: {{ $row->id }} })">
+            Ver
+        </x-shared.dropdown-item>
+    @endif
+
     @if (! $verLixeira)
         @if ($ator?->can('update', $row))
             <x-shared.dropdown-item

@@ -101,3 +101,13 @@ it('exige permissão para listar Municípios', function () {
     expect($comum->can('municipios.listar'))->toBeFalse()
         ->and($this->admin->can('municipios.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de município pelo evento do kebab', function () {
+    $registro = Municipio::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexMunicipio::class)
+        ->dispatch('municipios::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

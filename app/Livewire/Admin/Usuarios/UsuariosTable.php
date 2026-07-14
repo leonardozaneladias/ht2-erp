@@ -344,6 +344,17 @@ final class UsuariosTable extends PowerGridComponent
     }
 
     /**
+     * Prefixo das permissões do recurso (ComLixeira).
+     *
+     * Esta tabela não usa a toolbar padrão — tem a sua própria (ações em massa), com o
+     * toggle da lixeira embutido. O prefixo, ainda assim, é a mesma fonte de verdade.
+     */
+    protected function permissaoBase(): string
+    {
+        return 'usuarios';
+    }
+
+    /**
      * @return class-string<AdminUser>
      */
     protected function modelClassLixeira(): string

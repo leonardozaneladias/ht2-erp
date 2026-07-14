@@ -269,66 +269,61 @@
                     </div>
                 @endif
 
-                <div class="overflow-x-auto">
-                    <table class="table w-full">
-                        <thead>
-                            <tr>
-                                <th>Tipo</th>
-                                <th>Permissão</th>
-                                <th>Validade</th>
-                                <th>Motivo</th>
-                                <th class="text-end">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($this->acessosExtras as $grant)
-                                <tr wire:key="grant-{{ $grant->id }}">
-                                    <td>
-                                        @if ($grant->type === \App\Enums\TipoConcessao::Deny)
-                                            <x-shared.badge variant="danger" icon="tabler--ban">Nega</x-shared.badge>
-                                        @else
-                                            <x-shared.badge variant="success" icon="tabler--plus">
-                                                Concede</x-shared.badge
-                                            >
-                                        @endif
-                                    </td>
-                                    <td>{{ $grant->permission?->label ?? $grant->permission?->name }}</td>
-                                    <td>
-                                        @if ($grant->expires_at)
-                                            <x-shared.badge variant="warning" icon="tabler--clock">
-                                                {{ $grant->expires_at->format('d/m/Y H:i') }}
-                                            </x-shared.badge>
-                                        @else
-                                            <x-shared.badge variant="neutral">Permanente</x-shared.badge>
-                                        @endif
-                                    </td>
-                                    <td class="text-default-600 max-w-xs truncate">{{ $grant->reason }}</td>
-                                    <td class="text-end">
-                                        <x-shared.button
-                                            variant="danger"
-                                            appearance="outline"
-                                            size="sm"
-                                            wire:click="solicitarRevogarAcessoExtra({{ $grant->id }})"
-                                        >
-                                            Revogar
-                                        </x-shared.button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5">
-                                        <x-shared.empty-state
-                                            size="sm"
-                                            icon="tabler--key-off"
-                                            title="Nenhum acesso específico"
-                                            description="Este usuário usa apenas as permissões dos perfis."
-                                        />
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                <x-shared.static-table>
+                    <x-slot:head>
+                        <tr>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Permissão</th>
+                            <th scope="col">Validade</th>
+                            <th scope="col">Motivo</th>
+                            <th scope="col" class="text-end">Ações</th>
+                        </tr>
+                    </x-slot:head>
+
+                    @forelse ($this->acessosExtras as $grant)
+                        <tr wire:key="grant-{{ $grant->id }}">
+                            <td>
+                                @if ($grant->type === \App\Enums\TipoConcessao::Deny)
+                                    <x-shared.badge variant="danger" icon="tabler--ban">Nega</x-shared.badge>
+                                @else
+                                    <x-shared.badge variant="success" icon="tabler--plus"> Concede</x-shared.badge>
+                                @endif
+                            </td>
+                            <td>{{ $grant->permission?->label ?? $grant->permission?->name }}</td>
+                            <td>
+                                @if ($grant->expires_at)
+                                    <x-shared.badge variant="warning" icon="tabler--clock">
+                                        {{ $grant->expires_at->format('d/m/Y H:i') }}
+                                    </x-shared.badge>
+                                @else
+                                    <x-shared.badge variant="neutral">Permanente</x-shared.badge>
+                                @endif
+                            </td>
+                            <td class="text-default-600 max-w-xs truncate">{{ $grant->reason }}</td>
+                            <td class="text-end">
+                                <x-shared.button
+                                    variant="danger"
+                                    appearance="outline"
+                                    size="sm"
+                                    wire:click="solicitarRevogarAcessoExtra({{ $grant->id }})"
+                                >
+                                    Revogar
+                                </x-shared.button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5">
+                                <x-shared.empty-state
+                                    size="sm"
+                                    icon="tabler--key-off"
+                                    title="Nenhum acesso específico"
+                                    description="Este usuário usa apenas as permissões dos perfis."
+                                />
+                            </td>
+                        </tr>
+                    @endforelse
+                </x-shared.static-table>
             </x-shared.tab-panel>
         @endif
 

@@ -283,7 +283,17 @@ final class EspecificacaoModulo
             '__TRAIT_COM_LIXEIRA__' => $this->softDelete ? 'use ComLixeira;' : '',
             '__DS_LIXEIRA_OPEN__' => $this->softDelete ? '$this->aplicarLixeira(' : '',
             '__DS_LIXEIRA_CLOSE__' => $this->softDelete ? ')' : '',
-            '__HEADER_LIXEIRA_VIEW__' => $this->softDelete ? '_lixeira-toggle' : '_export-pdf',
+            // A toolbar do grid (lixeira + exportar PDF) é uma VIEW ÚNICA do core
+            // (livewire.admin.partials.lixeira-toolbar) — o gerador não copia mais um
+            // `_lixeira-toggle` e um `_export-pdf` por módulo. O que ela precisa saber é
+            // o prefixo das permissões, que vem daqui.
+            '__PERMISSAO_BASE__' => $this->softDelete
+                ? "/** Prefixo das permissões do recurso (ComLixeira). */\n"
+                    . "    protected function permissaoBase(): string\n"
+                    . "    {\n"
+                    . "        return '{$this->permissaoBase()}';\n"
+                    . '    }'
+                : '',
             '__VERLIXEIRA_PARAM__' => $this->softDelete ? ", 'verLixeira' => \$this->verLixeira" : '',
             '__MODEL_USE_LIXEIRA__' => $this->softDelete ? 'use App\Models\Contracts\UsaSoftDeletes;' : '',
             '__MODEL_IMPLEMENTS_LIXEIRA__' => $this->softDelete ? ' implements UsaSoftDeletes' : '',
@@ -607,6 +617,33 @@ final class EspecificacaoModulo
         $linhas[] = "    ->dataSource({$this->statusEnumShort()}::options())";
         $linhas[] = "    ->optionValue('value')";
         $linhas[] = "    ->optionLabel('label'),";
+
+        return $this->bloco($linhas, $espacos);
+    }
+
+    /**
+     * Corpo da ficha de visualização ("Ver"): um field-display por campo,
+     * status incluído como badge (token __FICHA_CAMPOS__ do view-ficha.stub).
+     */
+    public function fichaCampos(int $espacos = 12): string
+    {
+        $linhas = [];
+        $temStatus = false;
+
+        foreach ($this->campos as $campo) {
+            $temStatus = $temStatus || $campo->ehStatus();
+
+            foreach ($campo->componenteFicha() as $linha) {
+                $linhas[] = $linha;
+            }
+        }
+
+        // O enum de status é gerado à parte dos --fields (como em pgColumns).
+        if (! $temStatus) {
+            $linhas[] = '<x-shared.field-display label="Status">';
+            $linhas[] = '    <x-shared.badge :variant="$registro->status->variant()" pill size="sm">{{ $registro->status->label() }}</x-shared.badge>';
+            $linhas[] = '</x-shared.field-display>';
+        }
 
         return $this->bloco($linhas, $espacos);
     }

@@ -52,7 +52,7 @@ final class EmpresasTable extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.empresas._lixeira-toggle'),
+                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -130,6 +130,12 @@ final class EmpresasTable extends PowerGridComponent
         }
 
         return view('livewire.admin.empresas._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
+    }
+
+    /** Prefixo das permissões do recurso (ComLixeira). */
+    protected function permissaoBase(): string
+    {
+        return 'empresas';
     }
 
     /**

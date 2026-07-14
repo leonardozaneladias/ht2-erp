@@ -97,3 +97,13 @@ it('exige permissão para listar NCMs', function () {
     expect($comum->can('ncms.listar'))->toBeFalse()
         ->and($this->admin->can('ncms.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de NCM pelo evento do kebab', function () {
+    $registro = Ncm::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexNcm::class)
+        ->dispatch('ncms::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

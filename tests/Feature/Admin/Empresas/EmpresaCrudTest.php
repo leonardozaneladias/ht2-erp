@@ -71,3 +71,13 @@ it('bloqueia quem não pode listar empresas', function () {
         ->test(IndexEmpresas::class)
         ->assertForbidden();
 });
+
+it('abre a ficha Ver de empresa pelo evento do kebab', function () {
+    $registro = Empresa::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexEmpresas::class)
+        ->dispatch('empresas::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

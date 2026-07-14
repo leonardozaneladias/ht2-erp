@@ -55,28 +55,19 @@
                                 <summary class="text-primary cursor-pointer text-xs font-medium select-none">
                                     {{ count($mudancas) }} {{ count($mudancas) === 1 ? 'campo alterado' : 'campos alterados' }}
                                 </summary>
-                                <div class="border-default-200 mt-2 overflow-x-auto rounded-lg border">
-                                    <table class="table w-full text-xs">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-start">Campo</th>
-                                                <th class="text-start">Antes</th>
-                                                <th class="text-start">Depois</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($mudancas as $mudanca)
-                                                <tr wire:key="historico-{{ $atividade->id }}-{{ $mudanca['campo'] }}">
-                                                    <td class="text-default-500 font-mono">{{ $mudanca['campo'] }}</td>
-                                                    <td class="text-default-500">{{ $mudanca['antes'] ?? '—' }}</td>
-                                                    <td class="text-body-color font-medium">
-                                                        {{ $mudanca['depois'] ?? '—' }}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <x-shared.static-table
+                                    class="border-default-200 mt-2 border"
+                                    :headers="['Campo', 'Antes', 'Depois']"
+                                    compact
+                                >
+                                    @foreach ($mudancas as $mudanca)
+                                        <tr wire:key="historico-{{ $atividade->id }}-{{ $mudanca['campo'] }}">
+                                            <td class="text-default-500 font-mono">{{ $mudanca['campo'] }}</td>
+                                            <td class="text-default-500">{{ $mudanca['antes'] ?? '—' }}</td>
+                                            <td class="text-body-color font-medium">{{ $mudanca['depois'] ?? '—' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </x-shared.static-table>
                             </details>
                         @endif
                     </li>

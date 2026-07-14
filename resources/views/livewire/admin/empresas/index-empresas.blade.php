@@ -10,4 +10,10 @@
     </x-admin.page-header>
 
     <livewire:admin.empresas.empresas-table />
+
+    <x-admin.ficha-drawer :registro="$this->ficha" :titulo="$this->fichaTitulo" :editar-url="$this->fichaUrlEditar">
+        @if ($this->ficha)
+            @include ('livewire.admin.empresas._ficha', ['registro' => $this->ficha])
+        @endif
+    </x-admin.ficha-drawer>
 </div>

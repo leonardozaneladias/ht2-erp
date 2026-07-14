@@ -71,3 +71,28 @@ it('abre o formulário de edição de Exemplo', function () {
         ->assertOk()
         ->assertSet('exemploId', $registro->id);
 });
+
+// O formulário deve envolver os campos em <form wire:submit="salvar"> para que o
+// Enter dentro de um campo salve o registro (PEND-01). O Exemplo é a referência viva
+// copiada para novos módulos (CLAUDE.md §16), logo demonstra o padrão correto.
+it('envolve os campos em <form wire:submit="salvar"> para salvar com Enter', function () {
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(FormExemplo::class)
+        ->assertSeeHtml('wire:submit="salvar"')
+        ->assertSeeHtml('type="submit"');
+});
+
+// O módulo Exemplo é a "referência viva" copiada para novos módulos (CLAUDE.md §16);
+// seus rótulos devem ser exemplares em PT-BR (acentuação correta, terminologia consistente).
+it('exibe os rótulos de campo corretamente acentuados em PT-BR', function () {
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(FormExemplo::class)
+        ->assertSee('Descrição')
+        ->assertSee('E-mail')
+        ->assertSee('Preço (centavos)')
+        ->assertSee('Serviço')
+        ->assertSee('Data início')
+        ->assertDontSee('Descricao')
+        ->assertDontSee('Preco (centavos)')
+        ->assertDontSee('Data inicio');
+});

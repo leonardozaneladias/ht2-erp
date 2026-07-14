@@ -379,4 +379,51 @@ final class CampoModulo
             default => "<x-shared.input name=\"{$nome}\" label=\"{$label}\" wire:model=\"{$nome}\"{$req} />",
         };
     }
+
+    /**
+     * Linhas da ficha de visualização ("Ver") deste campo — um
+     * x-shared.field-display com o valor formatado por tipo
+     * (ver docs/visualizacao.md).
+     *
+     * @return list<string>
+     */
+    public function componenteFicha(): array
+    {
+        $nome = $this->nome;
+        $label = $this->label();
+
+        if ($this->ehStatus()) {
+            return [
+                '<x-shared.field-display label="Status">',
+                '    <x-shared.badge :variant="$registro->status->variant()" pill size="sm">{{ $registro->status->label() }}</x-shared.badge>',
+                '</x-shared.field-display>',
+            ];
+        }
+
+        if ($this->tipo === 'color') {
+            return [
+                "<x-shared.field-display label=\"{$label}\">",
+                '    <span class="inline-flex items-center gap-2">',
+                "        <span class=\"border-default-300 size-4 rounded border\" style=\"background: {{ \$registro->{$nome} }}\"></span>",
+                "        {{ \$registro->{$nome} ?: '—' }}",
+                '    </span>',
+                '</x-shared.field-display>',
+            ];
+        }
+
+        $valor = match ($this->tipo) {
+            'money' => "{{ \$registro->{$nome}?->formatado() ?? '—' }}",
+            'decimal' => "{{ \$registro->{$nome} !== null ? number_format((float) \$registro->{$nome}, 2, ',', '.') : '—' }}",
+            'boolean' => "{{ \$registro->{$nome} ? 'Sim' : 'Não' }}",
+            'date' => "{{ \$registro->{$nome}?->format('d/m/Y') ?? '—' }}",
+            'datetime' => "{{ \$registro->{$nome}?->format('d/m/Y H:i') ?? '—' }}",
+            'multiselect' => "{{ filled(\$registro->{$nome}) ? implode(', ', (array) \$registro->{$nome}) : '—' }}",
+            // richtext é sanitizado na gravação (HtmlSanitizer no DTO).
+            'richtext' => "{!! \$registro->{$nome} ?: '—' !!}",
+            'enum' => "{{ \$registro->{$nome} ? ucfirst(str_replace('_', ' ', (string) \$registro->{$nome})) : '—' }}",
+            default => "{{ \$registro->{$nome} ?: '—' }}",
+        };
+
+        return ["<x-shared.field-display label=\"{$label}\">{$valor}</x-shared.field-display>"];
+    }
 }
