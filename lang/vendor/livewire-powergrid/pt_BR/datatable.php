@@ -13,6 +13,8 @@ return [
         'all' => 'Todos',
         'selected' => 'Selecionados',
         'filtered' => 'Filtrados',
+        // Nome acessivel (sr-only) do seletor de operador do filtro input-text.
+        'filter_operator' => 'Operador do filtro :column',
     ],
     'placeholders' => [
         'search' => 'Buscar ...',

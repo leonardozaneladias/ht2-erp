@@ -23,6 +23,8 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <!-- Módulo "Exemplo (demo)" habilitado nos testes (a instância do cliente usa EXEMPLO_DEMO=false). -->
+        <env name="EXEMPLO_DEMO" value="true"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>

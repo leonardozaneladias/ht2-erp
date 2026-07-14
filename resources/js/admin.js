@@ -5,7 +5,6 @@ import 'simplebar';
 // helpers Alpine pgRenderActions/pgRowAttributes/etc. no alpine:init).
 import '../../vendor/power-components/livewire-powergrid/dist/powergrid.js';
 
-import { createIcons, icons } from 'lucide';
 import momentModule from 'moment';
 import './admin/preline';
 import './admin/sidebar';
@@ -26,4 +25,6 @@ import './admin/copy';
 const moment = momentModule?.default ?? momentModule;
 window.moment = moment;
 
-createIcons({ icons });
+// Sem Lucide: os ícones da base são todos `iconify tabler--*` (via @iconify/tailwind4),
+// e `data-lucide` não tem uma única ocorrência no projeto. O import trazia o barrel de
+// ícones inteiro — que, por ser um objeto, o tree-shaking não conseguia podar.
