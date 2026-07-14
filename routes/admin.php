@@ -26,6 +26,8 @@ if (app()->isLocal()) {
         Route::view('/breadcrumb', 'admin.dev.components.breadcrumb')->name('breadcrumb');
         Route::view('/dropdown', 'admin.dev.components.dropdown')->name('dropdown');
         Route::view('/drawer', 'admin.dev.components.drawer')->name('drawer');
+        Route::view('/field-display', 'admin.dev.components.field-display')->name('field-display');
+        Route::view('/ficha-drawer', 'admin.dev.components.ficha-drawer')->name('ficha-drawer');
         Route::view('/collapse', 'admin.dev.components.collapse')->name('collapse');
         Route::view('/toast', 'admin.dev.components.toast')->name('toast');
         Route::view('/empty-state', 'admin.dev.components.empty-state')->name('empty-state');
@@ -51,6 +53,7 @@ if (app()->isLocal()) {
         Route::view('/phone-input', 'admin.dev.components.phone-input')->name('phone-input');
         Route::view('/money-input', 'admin.dev.components.money-input')->name('money-input');
         Route::view('/cep-input', 'admin.dev.components.cep-input')->name('cep-input');
+        Route::view('/masked-input', 'admin.dev.components.masked-input')->name('masked-input');
         Route::view('/file-upload', 'admin.dev.components.file-upload')->name('file-upload');
         Route::view('/layout', 'admin.dev.components.layout')->name('layout');
         Route::view('/sidebar', 'admin.dev.components.sidebar')->name('sidebar');
@@ -60,6 +63,9 @@ if (app()->isLocal()) {
         Route::view('/pagination', 'admin.dev.components.pagination')->name('pagination');
         Route::view('/spinner', 'admin.dev.components.spinner')->name('spinner');
         Route::view('/skeleton', 'admin.dev.components.skeleton')->name('skeleton');
+        Route::view('/reveal', 'admin.dev.components.reveal')->name('reveal');
+        Route::view('/stat-tile', 'admin.dev.components.stat-tile')->name('stat-tile');
+        Route::view('/step-guide', 'admin.dev.components.step-guide')->name('step-guide');
         Route::view('/data-table', 'admin.dev.components.data-table')->name('data-table');
         Route::view('/list-group', 'admin.dev.components.list-group')->name('list-group');
         Route::view('/static-table', 'admin.dev.components.static-table')->name('static-table');
@@ -72,6 +78,7 @@ if (app()->isLocal()) {
         Route::view('/chart-column', 'admin.dev.components.chart-column')->name('chart-column');
         Route::view('/chart-pie', 'admin.dev.components.chart-pie')->name('chart-pie');
         Route::view('/progress-bar', 'admin.dev.components.progress-bar')->name('progress-bar');
+        Route::view('/wizard', 'admin.dev.components.wizard')->name('wizard');
         Route::view('/accordion', 'admin.dev.components.accordion')->name('accordion');
         Route::view('/modal', 'admin.dev.components.modal')->name('modal');
         Route::view('/tooltip', 'admin.dev.components.tooltip')->name('tooltip');

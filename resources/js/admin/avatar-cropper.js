@@ -222,6 +222,26 @@ function alternarLoadingAplicar(botao, ativo) {
   icone?.classList.toggle('animate-spin', ativo);
 }
 
+/**
+ * Progresso do upload. O $wire.$upload aceita um 5º callback com o percentual — ele
+ * simplesmente não era usado, e um recorte de 512×512 numa conexão ruim ficava sem
+ * nenhum sinal de vida entre o "Aplicar" e o preview.
+ */
+function atualizarProgresso(modal, percentual) {
+  const barra = modal?.querySelector('[data-af-avatar-progress-bar]');
+  const caixa = modal?.querySelector('[data-af-avatar-progress]');
+
+  if (!barra || !caixa) {
+    return;
+  }
+
+  const concluido = percentual >= 100;
+
+  caixa.classList.toggle('hidden', percentual <= 0 || concluido);
+  caixa.setAttribute('aria-valuenow', String(percentual));
+  barra.style.width = `${percentual}%`;
+}
+
 function aplicarCrop() {
   if (!sessao?.cropper) {
     return;
@@ -261,17 +281,46 @@ function aplicarCrop() {
         file,
         () => {
           alternarLoadingAplicar(botao, false);
+          atualizarProgresso(modal, 100);
           encerrarSessao();
         },
         () => {
           alternarLoadingAplicar(botao, false);
+          atualizarProgresso(modal, 0);
           notify('error', 'Falha ao enviar a imagem. Tente novamente.');
         },
+        (evento) => atualizarProgresso(modal, evento.detail.progress),
       );
     },
     'image/jpeg',
     0.9,
   );
+}
+
+/* --- Entradas: arquivo, arrastar-soltar, colar ---------------------------- */
+
+/**
+ * O cropper aceita a imagem por três caminhos, e todos caem aqui: escolher o arquivo,
+ * arrastar sobre o avatar, ou colar (Ctrl+V) — colar é o mais rápido quando a foto veio
+ * de um print ou do WhatsApp, e era o que faltava.
+ */
+function primeiraImagemDe(lista) {
+  return [...(lista ?? [])].find((item) => item.type?.startsWith('image/')) ?? null;
+}
+
+/** Onde o Ctrl+V deve cair: o cropper com foco dentro, ou o único visível na tela. */
+function wrapperParaColar() {
+  const visiveis = [...document.querySelectorAll('[data-af-avatar-cropper]')].filter(
+    (w) => w.checkVisibility?.() ?? w.offsetParent !== null,
+  );
+
+  if (visiveis.length === 0) {
+    return null;
+  }
+
+  const comFoco = visiveis.find((w) => w.contains(document.activeElement));
+
+  return comFoco ?? (visiveis.length === 1 ? visiveis[0] : null);
 }
 
 /* --- Delegação ------------------------------------------------------------ */
@@ -287,6 +336,63 @@ document.addEventListener('change', (event) => {
   const file = input.files?.[0];
 
   if (wrapper && file) {
+    abrirCropper(wrapper, file);
+  }
+});
+
+// Arrastar e soltar sobre o avatar.
+document.addEventListener('dragover', (event) => {
+  const wrapper = event.target.closest?.('[data-af-avatar-cropper]');
+
+  if (!wrapper) {
+    return;
+  }
+
+  event.preventDefault(); // sem isso o browser abre a imagem numa aba
+  wrapper.classList.add('is-dragging');
+});
+
+document.addEventListener('dragleave', (event) => {
+  const wrapper = event.target.closest?.('[data-af-avatar-cropper]');
+
+  // relatedTarget fora do wrapper = o ponteiro saiu de verdade (não só trocou de filho).
+  if (wrapper && !wrapper.contains(event.relatedTarget)) {
+    wrapper.classList.remove('is-dragging');
+  }
+});
+
+document.addEventListener('drop', (event) => {
+  const wrapper = event.target.closest?.('[data-af-avatar-cropper]');
+
+  if (!wrapper) {
+    return;
+  }
+
+  event.preventDefault();
+  wrapper.classList.remove('is-dragging');
+
+  const file = primeiraImagemDe(event.dataTransfer?.files);
+
+  if (file) {
+    abrirCropper(wrapper, file);
+  } else {
+    notify('warning', 'Solte um arquivo de imagem (PNG, JPG ou WebP).');
+  }
+});
+
+// Colar (Ctrl+V) — só quando não estamos digitando num campo.
+document.addEventListener('paste', (event) => {
+  const digitando = event.target.closest?.('input, textarea, [contenteditable]');
+
+  if (digitando || sessao) {
+    return;
+  }
+
+  const file = primeiraImagemDe(event.clipboardData?.files);
+  const wrapper = file ? wrapperParaColar() : null;
+
+  if (wrapper) {
+    event.preventDefault();
     abrirCropper(wrapper, file);
   }
 });

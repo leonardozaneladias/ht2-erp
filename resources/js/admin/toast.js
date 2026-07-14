@@ -38,6 +38,12 @@ const VARIANTS = {
   info: { icon: 'tabler--info-circle', color: 'text-info' },
 };
 
+// Severidade -> urgência da live region (WAI-ARIA APG). Espelha o critério do
+// x-shared.alert: erros e avisos interrompem o leitor de tela
+// (role="alert"/aria-live="assertive"); as demais variantes mantêm o
+// role="status"/aria-live="polite" declarado no <template> do toast-container.
+const ASSERTIVE_VARIANTS = new Set(['danger', 'warning']);
+
 // Posições aplicadas via inline-style (classes dinâmicas não são escaneadas pelo
 // Tailwind). `edge` define a direção da animação de entrada/saída.
 const POSITIONS = {
@@ -210,6 +216,14 @@ function buildToast(payload) {
 
   const toast = template.content.firstElementChild.cloneNode(true);
 
+  // Erros e avisos elevam a live region para assertiva, interrompendo o leitor de
+  // tela; sucesso/info seguem com o padrão polite do <template>. Só sobrescreve os
+  // atributos ARIA — não toca em classes nem na aparência.
+  if (ASSERTIVE_VARIANTS.has(variantName)) {
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+  }
+
   const iconEl = toast.querySelector('[data-toast-icon]');
   if (iconEl) {
     const iconClasses = (data.icon || variant.icon).split(' ').filter(Boolean);
@@ -242,6 +256,12 @@ function buildToast(payload) {
 }
 
 function showToast(payload) {
+  // O container é recriado a cada navegação SPA e o reposicionamento via
+  // `livewire:navigated` só roda DEPOIS dos scripts do body — um toast disparado
+  // pelo flash do layout nasceria na posição default. Reaplicar aqui (idempotente)
+  // torna o toast independente da ordem de execução.
+  applyContainerPosition();
+
   const container = getContainer();
 
   if (!container) {

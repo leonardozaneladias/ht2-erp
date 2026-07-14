@@ -1,5 +1,41 @@
 /* _dropzone.css */
 
+/* Drag ativo: o Dropzone toggla `dz-drag-hover` por JS na zona, então o estado
+   não é estilizável só com utilities. A zona "acende" com a cor da marca —
+   sempre via token (--color-primary é sobrescrito em runtime pelo branding). */
+[data-af-dropzone] {
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+[data-af-dropzone].dz-drag-hover {
+    border-style: solid;
+    border-color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 6%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+[data-af-dropzone] [data-af-dz-zone-icon] {
+    transition: transform 0.2s ease;
+}
+
+[data-af-dropzone].dz-drag-hover [data-af-dz-zone-icon] {
+    transform: translateY(-3px) scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-af-dropzone],
+    [data-af-dropzone] [data-af-dz-zone-icon] {
+        transition: none;
+    }
+
+    [data-af-dropzone].dz-drag-hover [data-af-dz-zone-icon] {
+        transform: none;
+    }
+}
+
 .dropzone-close {
     width: 16px;
     height: 16px;

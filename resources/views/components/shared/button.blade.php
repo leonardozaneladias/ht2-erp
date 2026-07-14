@@ -139,9 +139,12 @@
         @if ($isInactive) aria-disabled="true" tabindex="-1" @endif
     >
         @if ($loading)
-            <span class="iconify tabler--loader-2 {{ $iconSizeClasses[$size] }} shrink-0 animate-spin"></span>
+            <span
+                class="iconify tabler--loader-2 {{ $iconSizeClasses[$size] }} shrink-0 animate-spin motion-reduce:animate-none"
+                aria-hidden="true"
+            ></span>
         @elseif ($leadingIcon)
-            <i class="iconify {{ $leadingIcon }} {{ $iconSizeClasses[$size] }} shrink-0"></i>
+            <i class="iconify {{ $leadingIcon }} {{ $iconSizeClasses[$size] }} shrink-0" aria-hidden="true"></i>
         @endif
 
         @if ($hasLabel)
@@ -149,15 +152,18 @@
         @endif
 
         @if ($trailingIcon && ! $loading)
-            <i class="iconify {{ $trailingIcon }} {{ $iconSizeClasses[$size] }} shrink-0"></i>
+            <i class="iconify {{ $trailingIcon }} {{ $iconSizeClasses[$size] }} shrink-0" aria-hidden="true"></i>
         @endif
     </a>
 @else
     <button type="{{ $type }}" {{ $elementAttributes }} @disabled ($isInactive)>
         @if ($loading)
-            <span class="iconify tabler--loader-2 {{ $iconSizeClasses[$size] }} shrink-0 animate-spin"></span>
+            <span
+                class="iconify tabler--loader-2 {{ $iconSizeClasses[$size] }} shrink-0 animate-spin motion-reduce:animate-none"
+                aria-hidden="true"
+            ></span>
         @elseif ($leadingIcon)
-            <i class="iconify {{ $leadingIcon }} {{ $iconSizeClasses[$size] }} shrink-0"></i>
+            <i class="iconify {{ $leadingIcon }} {{ $iconSizeClasses[$size] }} shrink-0" aria-hidden="true"></i>
         @endif
 
         @if ($hasLabel)
@@ -165,7 +171,7 @@
         @endif
 
         @if ($trailingIcon && ! $loading)
-            <i class="iconify {{ $trailingIcon }} {{ $iconSizeClasses[$size] }} shrink-0"></i>
+            <i class="iconify {{ $trailingIcon }} {{ $iconSizeClasses[$size] }} shrink-0" aria-hidden="true"></i>
         @endif
     </button>
 @endif

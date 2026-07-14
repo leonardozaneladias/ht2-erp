@@ -45,12 +45,14 @@ $attributes->class([
     <div class="card-body">
         <div class="flex items-start justify-between gap-4">
             <div class="min-w-0 flex-1">
-                <p class="text-default-400 text-2xs font-semibold tracking-[0.22em] uppercase">{{ $label }}</p>
+                {{-- tracking menor + break-normal: "DEPENDENTES" quebrava no meio ("DEPENDENTE/S")
+                     no grid de 5 KPIs da ficha (A-15 do doc 31 do RH). --}}
+                <p class="text-default-400 text-2xs font-semibold tracking-[0.12em] break-normal uppercase">{{ $label }}</p>
                 <p class="text-body-color mt-2 truncate text-2xl font-semibold">{{ $value }}</p>
 
                 @if ($trendValue !== null)
                     <div class="mt-3 inline-flex items-center gap-1.5 text-xs font-medium {{ $trendClasses }}">
-                        <i class="iconify {{ $trendIcon }} text-sm"></i>
+                        <i class="iconify {{ $trendIcon }} text-sm" aria-hidden="true"></i>
                         <span>{{ $trendPrefix }}{{ number_format($trendValue, 1, ',', '.') }}%</span>
                         <span class="text-default-400">{{ $trendLabel }}</span>
                     </div>
@@ -58,7 +60,7 @@ $attributes->class([
             </div>
 
             <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl {{ $palette['soft'] }}">
-                <i class="iconify {{ $icon }} text-2xl"></i>
+                <i class="iconify {{ $icon }} text-2xl" aria-hidden="true"></i>
             </span>
         </div>
 

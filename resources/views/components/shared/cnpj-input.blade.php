@@ -5,21 +5,13 @@
     'required' => false,
 ])
 
-@php
-    $inputmaskConfig = [
-        'mask' => '99.999.999/9999-99',
-        'clearIncomplete' => true,
-    ];
-@endphp
-
-<x-shared.input
+<x-shared.masked-input
     :name="$name"
     :label="$label"
     :hint="$hint"
     :required="$required"
-    type="text"
+    mask="99.999.999/9999-99"
     placeholder="00.000.000/0000-00"
-    :data-af-inputmask="\Illuminate\Support\Js::encode($inputmaskConfig)"
-    class="font-mono"
+    data-af-validate="cnpj"
     {{ $attributes }}
 />

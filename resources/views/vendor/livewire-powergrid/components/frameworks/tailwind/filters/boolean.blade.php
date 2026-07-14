@@ -23,6 +23,12 @@
     $defaultAttributes = $fieldClassName::getWireAttributes($field, $title);
 
     $params = array_merge([...data_get($filter, 'attributes'), ...$defaultAttributes], $filter);
+
+    // Nome acessivel do gatilho (WCAG 4.1.2). O id do <label>/rotulo bate com o
+    // id que o combobox geraria internamente ($comboboxId . '-label'), entao no
+    // modo nao-inline o <label> visivel nomeia o gatilho via labelId, e no modo
+    // inline (sem <label>) o combobox gera um rotulo sr-only com o mesmo id.
+    $comboboxId = "filtro-boolean-{$tableName}-{$field}";
 @endphp
 
 @if ($params['component'])
@@ -35,7 +41,7 @@
 @else
     <div @class([theme_style($theme, 'filterBoolean.base'), 'space-y-1' => !$inline])>
         @unless ($inline)
-            <label class="text-pg-primary-700 dark:text-pg-primary-300 block text-sm font-semibold">
+            <label id="{{ $comboboxId }}-label" class="text-pg-primary-700 dark:text-pg-primary-300 block text-sm font-semibold">
                 {{ $title }}
             </label>
         @endunless
@@ -44,7 +50,9 @@
             mode="form"
             empty-value="all"
             placeholder="{{ trans('livewire-powergrid::datatable.boolean_filter.all') }}"
-            id="filtro-boolean-{{ $tableName }}-{{ $field }}"
+            label="{{ $title }}"
+            :label-id="$inline ? null : $comboboxId . '-label'"
+            id="{{ $comboboxId }}"
         >
             <select x-ref="native" class="sr-only" tabindex="-1" aria-hidden="true" {{ $defaultAttributes['selectAttributes'] }}>
                 <option value="all">{{ trans('livewire-powergrid::datatable.boolean_filter.all') }}</option>

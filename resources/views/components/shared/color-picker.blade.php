@@ -38,7 +38,7 @@
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
@@ -63,6 +63,7 @@
             "
             class="size-9 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
             aria-label="{{ $label ?? 'Cor' }}"
+            @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
             aria-invalid="{{ $hasError ? 'true' : 'false' }}"
         />
 
@@ -82,17 +83,13 @@
                 class="text-default-400 hover:text-danger hover:bg-light ms-auto flex size-5 items-center justify-center rounded-full transition-colors"
                 aria-label="Limpar cor (herda do tema)"
             >
-                <i class="iconify tabler--x text-sm"></i>
+                <i class="iconify tabler--x text-sm" aria-hidden="true"></i>
             </button>
         @endif
 
-        <input
-            type="hidden"
-            x-ref="bound"
-            value="{{ $val }}"
-            {{ $attributes }}
-            @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
-        />
+        {{-- O aria-describedby (erro/hint) vai no <input type="color"> focável acima,
+             não aqui: o hidden não é focável nem anunciado por leitores de tela. --}}
+        <input type="hidden" x-ref="bound" value="{{ $val }}" {{ $attributes }} />
     </div>
 
     @if ($hasError)

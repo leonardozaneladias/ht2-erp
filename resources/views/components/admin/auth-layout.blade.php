@@ -17,7 +17,7 @@
         ? \Illuminate\Support\Facades\Storage::disk('public')->url($loginSettings->fundo_imagem_arquivo)
         : null;
 
-    $heroTexto = $heroSubtitle ?? ($brandingService->slogan() ?: 'Painel administrativo.');
+    $heroTexto = $heroSubtitle;
 @endphp
 
 <!DOCTYPE html>
@@ -27,11 +27,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ $pageTitle }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <link rel="icon" href="{{ $brandingService->faviconUrl() }}" />
 
     <x-admin.partials.theme-bootstrap />
 
     @vite (['resources/css/admin.css', 'resources/js/admin.js'])
+
+    {{-- Favicon + cores da marca (CSS vars sobrescrevem o tema do build em runtime). --}}
+    <x-admin.branding-css />
 </head>
 <body>
     <div class="min-h-screen">
@@ -50,12 +52,14 @@
                         @if ($loginSettings->mostrar_logo)
                             <img
                                 alt="{{ $brandingService->nomeSistema() }}"
-                                class="mb-5 h-7"
+                                class="mb-5 h-10"
                                 src="{{ $brandingService->logoUrl('light') }}"
                             />
                         @endif
                         <p class="text-lg font-bold text-white">{{ $brandingService->nomeSistema() }}</p>
-                        <p class="mt-1 text-sm text-white/60">{{ $heroTexto }}</p>
+                        @if (filled($heroTexto))
+                            <p class="mt-1 text-sm text-white/60">{{ $heroTexto }}</p>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -8,12 +8,12 @@
             <a href="{{ route('admin.login') }}">
                 <img
                     alt="{{ $brandingService->nomeSistema() }}"
-                    class="flex h-8 dark:hidden"
+                    class="flex h-14 dark:hidden"
                     src="{{ $brandingService->logoUrl('dark') }}"
                 />
                 <img
                     alt="{{ $brandingService->nomeSistema() }}"
-                    class="hidden h-8 dark:flex"
+                    class="hidden h-14 dark:flex"
                     src="{{ $brandingService->logoUrl('light') }}"
                 />
             </a>

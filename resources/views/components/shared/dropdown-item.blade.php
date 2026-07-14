@@ -30,7 +30,7 @@
 @if ($href && ! $disabled)
     <a href="{{ $href }}" {{ $attributes->class($classes) }} role="menuitem">
         @if ($icon)
-            <i class="iconify {{ $icon }} shrink-0 text-base"></i>
+            <i class="iconify {{ $icon }} shrink-0 text-base" aria-hidden="true"></i>
         @endif
 
         <span>{{ $slot }}</span>
@@ -38,7 +38,7 @@
 @elseif ($href)
     <span {{ $attributes->class($classes) }} aria-disabled="true" role="menuitem">
         @if ($icon)
-            <i class="iconify {{ $icon }} shrink-0 text-base"></i>
+            <i class="iconify {{ $icon }} shrink-0 text-base" aria-hidden="true"></i>
         @endif
 
         <span>{{ $slot }}</span>
@@ -46,7 +46,7 @@
 @else
     <button type="button" {{ $attributes->class($classes) }} @disabled ($disabled) role="menuitem">
         @if ($icon)
-            <i class="iconify {{ $icon }} shrink-0 text-base"></i>
+            <i class="iconify {{ $icon }} shrink-0 text-base" aria-hidden="true"></i>
         @endif
 
         <span>{{ $slot }}</span>

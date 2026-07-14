@@ -40,7 +40,7 @@
             :aria-expanded="open ? 'true' : 'false'"
             aria-label="{{ $label }}"
         >
-            <i class="iconify tabler--dots-vertical text-lg"></i>
+            <i class="iconify tabler--dots-vertical text-lg" aria-hidden="true"></i>
         </button>
 
         <div
@@ -61,6 +61,11 @@
             class="bg-card border-default-300 fixed z-[1080] min-w-52 rounded border py-1 shadow-lg motion-reduce:transition-none"
             role="menu"
             aria-orientation="vertical"
+            {{-- Nome acessivel do menu (WAI-ARIA Menu Button Pattern): sem ele o
+                 leitor de tela anuncia apenas "menu" ao abrir. Usa a mesma label do
+                 gatilho (aria-label, nao aria-labelledby, para nao exigir id unico
+                 por instancia — ha um row-actions por linha de tabela). --}}
+            aria-label="{{ $label }}"
         >
             {{ $slot }}
         </div>

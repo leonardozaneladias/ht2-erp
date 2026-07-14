@@ -5,6 +5,7 @@
     'value' => '1',
     'hint' => null,
     'checked' => false,
+    'required' => false,
 ])
 
 @php
@@ -33,16 +34,20 @@ $attributes->class([
             ])
 }}
             @checked ($isChecked)
+            @if ($required) aria-required="true" @endif
             @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
             aria-invalid="{{ $hasError ? 'true' : 'false' }}"
         />
 
         @if ($label)
             <span class="min-w-0">
-                <span
-                    class="text-body-color group-hover:text-default-900 block text-sm font-medium select-none"
-                    >{{ $label }}</span
-                >
+                <span class="text-body-color group-hover:text-default-900 block text-sm font-medium select-none">
+                    {{ $label }}
+
+                    @if ($required)
+                        <x-shared.required-indicator />
+                    @endif
+                </span>
                 @if ($hint)
                     <small class="text-default-400 mt-0.5 block text-xs" id="{{ $hintId }}">{{ $hint }}</small>
                 @endif

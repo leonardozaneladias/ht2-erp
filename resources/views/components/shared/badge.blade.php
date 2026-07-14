@@ -68,7 +68,7 @@ $attributes->class([
 }}
 >
     @if ($icon)
-        <i class="iconify {{ $icon }} text-sm shrink-0"></i>
+        <i class="iconify {{ $icon }} text-sm shrink-0" aria-hidden="true"></i>
     @endif
 
     {{ $slot }}

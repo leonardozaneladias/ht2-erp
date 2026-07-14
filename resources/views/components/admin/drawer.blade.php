@@ -5,17 +5,20 @@
     'size' => 'md',
     'bodyScroll' => false,
     'backdrop' => true,
+    'blur' => false,
+    'flush' => false,
 ])
 
 @php
     $position = in_array($position, ['start', 'end', 'top', 'bottom'], true) ? $position : 'end';
-    $size = in_array($size, ['sm', 'md', 'lg', 'xl', 'full'], true) ? $size : 'md';
+    $size = in_array($size, ['sm', 'md', 'lg', 'xl', 'wide', 'full'], true) ? $size : 'md';
 
     $widthSizes = [
         'sm' => 'max-w-xs',
         'md' => 'max-w-sm',
         'lg' => 'max-w-md',
         'xl' => 'max-w-lg',
+        'wide' => 'max-w-[min(120rem,94vw)]',
         'full' => 'max-w-full',
     ];
 
@@ -24,6 +27,7 @@
         'md' => 'max-h-80',
         'lg' => 'max-h-[32rem]',
         'xl' => 'max-h-[40rem]',
+        'wide' => 'max-h-[94vh]',
         'full' => 'max-h-screen',
     ];
 
@@ -56,6 +60,11 @@
             'aria-modal' => $backdrop ? 'true' : 'false',
             'aria-labelledby' => $title ? "{$id}-label" : null,
             'aria-label' => $title ? null : 'Painel lateral',
+            // O Preline recria o backdrop a cada abertura lendo estas opções do
+            // próprio painel; extra classes preservam o bg global de _modal.css.
+            'data-hs-overlay-options' => $blur && $backdrop
+                ? json_encode(['backdropExtraClasses' => 'backdrop-blur-md'])
+                : null,
         ]);
 @endphp
 
@@ -73,12 +82,13 @@
                     aria-label="Fechar"
                     data-hs-overlay="#{{ $id }}"
                 >
-                    <i class="iconify tabler--x text-xl"></i>
+                    <i class="iconify tabler--x text-xl" aria-hidden="true"></i>
                 </button>
             </div>
         @endif
 
-        <div class="grow overflow-y-auto p-5">{{ $slot }}</div>
+        {{-- flush: o slot assume o próprio scroll (layouts de painéis internos) --}}
+        <div @class (['grow', 'overflow-hidden' => $flush, 'overflow-y-auto p-5' => ! $flush])>{{ $slot }}</div>
 
         @isset ($footer)
             <div class="border-default-300 shrink-0 border-t p-5">{{ $footer }}</div>

@@ -63,14 +63,16 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 
 ### Props
 
-| Prop         | Tipo      | Obrigatório | Default | Descrição                                                                                  |
-| ------------ | --------- | :---------: | ------- | ------------------------------------------------------------------------------------------ |
-| `id`         | `string`  |     ✅      | —       | ID único (usado por `data-hs-overlay="#id"`)                                               |
-| `title`      | `?string` |     ❌      | `null`  | Título no header                                                                           |
-| `position`   | `string`  |     ❌      | `'end'` | start, end, top, bottom                                                                    |
-| `size`       | `string`  |     ❌      | `'md'`  | Em `start/end`, controla largura (`max-w-*`). Em `top/bottom`, controla altura (`max-h-*`) |
-| `bodyScroll` | `bool`    |     ❌      | `false` | Permitir scroll do body quando drawer aberto                                               |
-| `backdrop`   | `bool`    |     ❌      | `true`  | Mostrar overlay escuro atrás                                                               |
+| Prop         | Tipo      | Obrigatório | Default | Descrição                                                                                                                                                                                       |
+| ------------ | --------- | :---------: | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`         | `string`  |     ✅      | —       | ID único (usado por `data-hs-overlay="#id"`)                                                                                                                                                    |
+| `title`      | `?string` |     ❌      | `null`  | Título no header                                                                                                                                                                                |
+| `position`   | `string`  |     ❌      | `'end'` | start, end, top, bottom                                                                                                                                                                         |
+| `size`       | `string`  |     ❌      | `'md'`  | `sm`–`xl`, `wide`, `full`. Em `start/end`, controla largura (`max-w-*`). Em `top/bottom`, controla altura (`max-h-*`). `wide` = quase tela cheia (`min(120rem, 94vw)`) para painéis de consulta |
+| `bodyScroll` | `bool`    |     ❌      | `false` | Permitir scroll do body quando drawer aberto                                                                                                                                                    |
+| `backdrop`   | `bool`    |     ❌      | `true`  | Mostrar overlay escuro atrás                                                                                                                                                                    |
+| `blur`       | `bool`    |     ❌      | `false` | Aplica `backdrop-blur-md` no overlay via `data-hs-overlay-options` (`backdropExtraClasses` do Preline). Ignorado quando `:backdrop="false"`                                                     |
+| `flush`      | `bool`    |     ❌      | `false` | Remove `p-5`/scroll do corpo (`overflow-hidden`); o slot assume o próprio scroll — para layouts internos de painéis (rail + conteúdo)                                                           |
 
 ### Slots
 
@@ -90,17 +92,20 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
     'size' => 'md',
     'bodyScroll' => false,
     'backdrop' => true,
+    'blur' => false,
+    'flush' => false,
 ])
 
 @php
     $position = in_array($position, ['start', 'end', 'top', 'bottom'], true) ? $position : 'end';
-    $size = in_array($size, ['sm', 'md', 'lg', 'xl', 'full'], true) ? $size : 'md';
+    $size = in_array($size, ['sm', 'md', 'lg', 'xl', 'wide', 'full'], true) ? $size : 'md';
 
     $widthSizes = [
         'sm' => 'max-w-xs',
         'md' => 'max-w-sm',
         'lg' => 'max-w-md',
         'xl' => 'max-w-lg',
+        'wide' => 'max-w-[min(120rem,94vw)]',
         'full' => 'max-w-full',
     ];
 
@@ -109,8 +114,9 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
         'md' => 'max-h-80',
         'lg' => 'max-h-[32rem]',
         'xl' => 'max-h-[40rem]',
+        'wide' => 'max-h-[94vh]',
         'full' => 'max-h-screen',
-    };
+    ];
 
     $positionClasses = match ($position) {
         'start' => 'start-0 top-0 h-full w-full -translate-x-full border-e',
@@ -141,6 +147,11 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
             'aria-modal' => $backdrop ? 'true' : 'false',
             'aria-labelledby' => $title ? "{$id}-label" : null,
             'aria-label' => $title ? null : 'Painel lateral',
+            // O Preline recria o backdrop a cada abertura lendo estas opções do
+            // próprio painel; extra classes preservam o bg global de _modal.css.
+            'data-hs-overlay-options' => $blur && $backdrop
+                ? json_encode(['backdropExtraClasses' => 'backdrop-blur-md'])
+                : null,
         ]);
 @endphp
 
@@ -163,7 +174,8 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
             </div>
         @endif
 
-        <div class="grow overflow-y-auto p-5">{{ $slot }}</div>
+        {{-- flush: o slot assume o próprio scroll (layouts de painéis internos) --}}
+        <div @class (['grow', 'overflow-hidden' => $flush, 'overflow-y-auto p-5' => ! $flush])>{{ $slot }}</div>
 
         @isset ($footer)
             <div class="border-default-300 shrink-0 border-t p-5">{{ $footer }}</div>
@@ -263,4 +275,5 @@ Painel lateral deslizante para formulários rápidos, filtros avançados e previ
 4. **Footer fixo** permanece via `shrink-0`, com corpo em `grow overflow-y-auto` para rolagem interna correta
 5. **Position `start`/`end`** respeita RTL; em pt-BR o default `end` continua sendo a lateral direita
 6. **`[--body-scroll:true]`** e `:backdrop="false"` já estão cobertos na implementação final
-7. **Preview pronto:** acessar `/admin/dev/components/drawer` para validar drawer lateral, drawer de filtros e variação inferior
+7. **Preview pronto:** acessar `/admin/dev/components/drawer` para validar drawer lateral, drawer de filtros, variação inferior e o painel quase tela cheia
+8. **`size="wide"` + `blur` + `flush`** (2026-07-07): preset de "workspace overlay" — painel de consulta com ~94vw de largura, blur no backdrop (via `backdropExtraClasses` do Preline, sem tocar no bg global de `_modal.css`) e corpo entregue ao slot para layouts com scrolls próprios. Caso de uso de referência: dicionário de colunas da importação de funcionários

@@ -25,7 +25,7 @@
             <div
                 class="text-default-400 border-default-300 flex h-16 items-center justify-center gap-1.5 rounded-lg border text-xs"
             >
-                <i class="iconify tabler--layout-sidebar size-4"></i>
+                <i class="iconify tabler--layout-sidebar size-4" aria-hidden="true"></i>
                 menu recolhido
             </div>
         </div>

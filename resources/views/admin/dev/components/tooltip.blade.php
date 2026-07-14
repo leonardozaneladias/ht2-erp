@@ -22,15 +22,31 @@
                     </x-shared.tooltip>
                 </div>
 
+                {{-- Gatilho focável: passe um id estável e repita aria-describedby no
+                     próprio botão para o leitor de tela anunciar a dica ao focar. --}}
                 <div class="flex items-center gap-4">
-                    <x-shared.tooltip content="Reemitir boleto" placement="bottom">
-                        <button type="button" class="btn btn-icon bg-light text-dark hover:text-primary">
+                    <x-shared.tooltip id="dica-reemitir" content="Reemitir boleto" placement="bottom">
+                        <button
+                            type="button"
+                            class="btn btn-icon bg-light text-dark hover:text-primary"
+                            aria-label="Reemitir boleto"
+                            aria-describedby="dica-reemitir"
+                        >
                             <i class="iconify tabler--receipt-2 text-base"></i>
                         </button>
                     </x-shared.tooltip>
 
-                    <x-shared.tooltip content="Última sincronização há 12 minutos" placement="left">
-                        <button type="button" class="btn btn-icon bg-light text-dark hover:text-primary">
+                    <x-shared.tooltip
+                        id="dica-sincronizar"
+                        content="Última sincronização há 12 minutos"
+                        placement="left"
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-icon bg-light text-dark hover:text-primary"
+                            aria-label="Sincronizar"
+                            aria-describedby="dica-sincronizar"
+                        >
                             <i class="iconify tabler--refresh text-base"></i>
                         </button>
                     </x-shared.tooltip>

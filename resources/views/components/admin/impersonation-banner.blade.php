@@ -26,7 +26,7 @@
         "
     >
         <div class="flex items-center gap-2">
-            <span class="iconify tabler--user-shield"></span>
+            <span class="iconify tabler--user-shield" aria-hidden="true"></span>
             <span>
                 Você está personificando <strong>{{ $alvo?->nome }}</strong>
                 @if ($impersonation->motivo())
@@ -42,7 +42,7 @@
                 type="submit"
                 class="btn btn-sm bg-warning/25 hover:bg-warning/35 text-warning-800 inline-flex items-center gap-x-1.5"
             >
-                <span class="iconify tabler--logout"></span>
+                <span class="iconify tabler--logout" aria-hidden="true"></span>
                 Sair da personificação
             </button>
         </form>

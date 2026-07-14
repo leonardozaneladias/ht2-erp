@@ -24,7 +24,7 @@
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
@@ -54,7 +54,7 @@ $attributes->class([
             aria-label="Mostrar senha"
             aria-pressed="false"
         >
-            <i class="iconify tabler--eye text-lg" data-password-toggle-icon></i>
+            <i class="iconify tabler--eye text-lg" data-password-toggle-icon aria-hidden="true"></i>
         </button>
     </div>
 
