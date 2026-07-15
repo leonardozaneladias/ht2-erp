@@ -32,7 +32,7 @@ jobs:
               run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
             - name: Setup Node 22
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v7
               with:
                   node-version: '22'
                   cache: 'npm'
@@ -124,7 +124,7 @@ jobs:
               run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
             - name: Setup Node 22
-              uses: actions/setup-node@v6
+              uses: actions/setup-node@v7
               with:
                   node-version: '22'
                   cache: 'npm'
