@@ -14,6 +14,12 @@
 /* dark mode deste projeto = atributo data-theme (nao a classe .dark) */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* Alpine.js: elementos com x-cloak ficam ocultos ate o Alpine iniciar e
+   remover o atributo (sem esta regra global o x-cloak e um no-op). */
+[x-cloak] {
+    display: none !important;
+}
+
 /* Tailwind precisa escanear as classes do PowerGrid, do tema e dos grids */
 @source "../../vendor/power-components/livewire-powergrid/src/Themes/Tailwind.php";
 @source "../../vendor/power-components/livewire-powergrid/resources/views/**/*.php";
