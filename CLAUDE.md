@@ -388,3 +388,17 @@ Implementar em batches pequenos e controlados. Não componentizar tudo de uma ve
 ❌ <select> HTML direto nas views (usar x-shared.select-search)
 ❌ x-shared.select nativo (usar x-shared.select-search para single ou :multiple=true para multi)
 ```
+
+---
+
+## 20. Agent skills
+
+Configuração que os skills de engenharia leem antes de agir.
+
+### Issue tracker
+
+Issues e specs vivem no **GitHub Issues** de `leonardozaneladias/ht2-erp`, operado via `gh` CLI. Ver [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md).
+
+### Domain docs
+
+Layout **multi-context**: `CONTEXT-MAP.md` na raiz aponta para um `CONTEXT.md` por contexto (core em `app/`, módulos em `packages/modulo-*/`); ADRs do sistema em `docs/architecture/adrs/`. Ver [`docs/agents/domain.md`](docs/agents/domain.md).
