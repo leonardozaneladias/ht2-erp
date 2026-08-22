@@ -53,6 +53,9 @@ Thumbs.db
 # Também coberto por .ddev/.gitignore; explícito aqui para descoberta.
 /.ddev/config.local.yaml
 
+# dev-stack — manifesto local do ambiente (slug, PHP, banco); varia por máquina.
+/.dev-stack.json
+
 # Ferramentas de qualidade
 .phpstan.cache
 coverage/
