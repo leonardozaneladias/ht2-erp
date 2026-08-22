@@ -27,6 +27,16 @@ _Avoid_: template, clone da base
 Unidade de funcionalidade de negócio que vive dentro do próprio produto.
 _Avoid_: feature, submódulo
 
+**Extensão**:
+Unidade de funcionalidade de negócio distribuída como pacote, instalável em
+qualquer produto. Um módulo vive no produto; uma extensão atravessa produtos.
+_Avoid_: plugin, módulo-pacote, módulo empacotado
+
+**Pacote**:
+A forma de distribuição — o artefato Composer. Core, extensões e skeleton são
+todos pacotes; "pacote" descreve como a coisa viaja, não o que ela é.
+_Avoid_: biblioteca, dependência
+
 ## Contextos
 
 - [Core](./app/CONTEXT.md): plataforma compartilhada — acesso, contexto, auditoria, aparência
