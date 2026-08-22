@@ -6,12 +6,14 @@ namespace __NS_LIVEWIRE__;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
 use __NS_ENUMS__\__STATUS_ENUM__;
+use App\Livewire\Concerns\ComAcoesCrud;
 __USE_COM_LIXEIRA__
 use App\Livewire\Concerns\ExportaPdf;
 __USE_MULTI_EMPRESA__
 use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
@@ -24,6 +26,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class __MODULO_STUDLY__Table extends PowerGridComponent
 {
+    use ComAcoesCrud;
     __TRAIT_COM_LIXEIRA__
     use ExportaPdf;
     __TRAIT_MULTI_EMPRESA__
@@ -33,7 +36,21 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
 
     __PERMISSAO_LISTAGEM__
 
+    __PERMISSAO_BASE__
+
     __MODEL_CLASS_LIXEIRA__
+
+    public function noDataLabel(): View
+    {
+        $podeCriar = auth('admin')->user()?->can('create', __MODULO_STUDLY__::class) ?? false;
+
+        return view('admin.partials.powergrid-empty', [
+            'titulo' => 'Nenhum registro encontrado',
+            'descricao' => 'Cadastre o primeiro registro para começar.',
+            'ctaUrl' => $podeCriar ? route('admin.__MODULO_ROTA_NOME__.create') : null,
+            'ctaLabel' => $podeCriar ? 'Novo registro' : null,
+        ]);
+    }
 
     /**
      * @return array<int, mixed>
@@ -44,7 +61,7 @@ final class __MODULO_STUDLY__Table extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('__VIEW_PREFIX__.__HEADER_LIXEIRA_VIEW__'),
+                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -90,13 +107,16 @@ __PG_FILTERS__
         ];
     }
 
-    public function actionsFromView(mixed $row): ?View
+    /** Evento que abre a ficha "Ver" (ComAcoesCrud). */
+    protected function eventoVer(): string
     {
-        if (! $row instanceof __MODULO_STUDLY__) {
-            return null;
-        }
+        return '__MODULO_SNAKE_PLURAL__::ver';
+    }
 
-        return view('__VIEW_PREFIX__._acoes', ['row' => $row__VERLIXEIRA_PARAM__]);
+    /** Rota de edição do registro (ComAcoesCrud). */
+    protected function rotaEditar(Model $row): string
+    {
+        return route('admin.__MODULO_ROTA_NOME__.edit', ['__MODULO_PARAM__' => $row->getKey()]);
     }
 
     /**

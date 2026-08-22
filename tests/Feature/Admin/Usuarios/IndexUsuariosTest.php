@@ -106,3 +106,15 @@ it('nega acesso a gestor (sem permissão usuarios.listar)', function () {
         ->test(IndexUsuarios::class)
         ->assertForbidden();
 })->skip('Gestor padrão tem usuarios.listar pelo seeder; ajustar quando permissões evoluírem.');
+
+it('abre a ficha Ver de usuário pelo evento do kebab', function () {
+    $admin = criarAdmin();
+    $alvo = criarAdmin('gestor');
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(IndexUsuarios::class)
+        ->dispatch('usuarios::ver', id: $alvo->id)
+        ->assertSet('fichaId', $alvo->id)
+        ->assertDispatched('ficha-abrir')
+        ->assertSee($alvo->email);
+});

@@ -99,3 +99,13 @@ it('exige permissão para listar Países', function () {
     expect($comum->can('paises.listar'))->toBeFalse()
         ->and($this->admin->can('paises.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de país pelo evento do kebab', function () {
+    $registro = Pais::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexPais::class)
+        ->dispatch('paises::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

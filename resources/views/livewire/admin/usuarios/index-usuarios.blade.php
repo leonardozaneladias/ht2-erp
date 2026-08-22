@@ -13,4 +13,10 @@
 
     <livewire:admin.impersonation.iniciar-impersonation />
     <livewire:admin.lgpd.anonimizar-usuario />
+
+    <x-admin.ficha-drawer :registro="$this->ficha" :titulo="$this->fichaTitulo" :editar-url="$this->fichaUrlEditar">
+        @if ($this->ficha)
+            @include ('livewire.admin.usuarios._ficha', ['registro' => $this->ficha])
+        @endif
+    </x-admin.ficha-drawer>
 </div>

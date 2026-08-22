@@ -104,6 +104,7 @@
                                     <i
                                         class="iconify tabler--grip-vertical secao-drag-handle text-default-400 shrink-0 cursor-grab text-xl"
                                         title="Arraste para reordenar a seção"
+                                        aria-hidden="true"
                                         x-bind:class="busca.trim() !== '' ? 'pointer-events-none opacity-30' : ''"
                                     ></i>
 
@@ -115,6 +116,7 @@
                                     >
                                         <i
                                             class="iconify tabler--chevron-down text-base transition-transform duration-200"
+                                            aria-hidden="true"
                                             x-bind:class="colapsada('secao-{{ $secao['key'] }}') ? '-rotate-90' : ''"
                                         ></i>
                                     </button>
@@ -189,6 +191,7 @@
                                             <div class="flex items-center gap-2.5 px-2 py-2">
                                                 <i
                                                     class="iconify tabler--grip-vertical drag-handle text-default-400 shrink-0 cursor-grab text-lg"
+                                                    aria-hidden="true"
                                                     x-bind:class="
                                                         busca.trim() !== '' ? 'pointer-events-none opacity-30' : ''
                                                     "
@@ -202,6 +205,7 @@
                                                 >
                                                     <i
                                                         class="iconify tabler--chevron-down text-sm transition-transform duration-200"
+                                                        aria-hidden="true"
                                                         x-bind:class="colapsada('grupo-{{ $entry['key'] }}') ? '-rotate-90' : ''"
                                                     ></i>
                                                 </button>
@@ -209,7 +213,10 @@
                                                 <span
                                                     class="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg"
                                                 >
-                                                    <i class="iconify {{ $entry['icon'] }} text-base"></i>
+                                                    <i
+                                                        class="iconify {{ $entry['icon'] }} text-base"
+                                                        aria-hidden="true"
+                                                    ></i>
                                                 </span>
 
                                                 <div class="min-w-0 grow">
@@ -343,7 +350,7 @@
                     <span
                         class="bg-light text-default-600 flex size-10 shrink-0 items-center justify-center rounded-lg"
                     >
-                        <i class="iconify {{ $novoGrupoIcone }} text-xl"></i>
+                        <i class="iconify {{ $novoGrupoIcone }} text-xl" aria-hidden="true"></i>
                     </span>
                     <p class="text-default-400 truncate text-xs">{{ $novoGrupoIcone }}</p>
                 </div>
@@ -396,7 +403,7 @@
                             <span
                                 class="bg-light text-default-600 flex size-10 shrink-0 items-center justify-center rounded-lg"
                             >
-                                <i class="iconify {{ $icone }} text-xl"></i>
+                                <i class="iconify {{ $icone }} text-xl" aria-hidden="true"></i>
                             </span>
                             <p class="text-default-400 truncate text-xs">{{ $icone }}</p>
                         </div>

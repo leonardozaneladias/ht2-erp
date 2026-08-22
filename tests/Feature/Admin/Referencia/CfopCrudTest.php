@@ -99,3 +99,13 @@ it('exige permissão para listar CFOPs', function () {
     expect($comum->can('cfops.listar'))->toBeFalse()
         ->and($this->admin->can('cfops.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de CFOP pelo evento do kebab', function () {
+    $registro = Cfop::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexCfop::class)
+        ->dispatch('cfops::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

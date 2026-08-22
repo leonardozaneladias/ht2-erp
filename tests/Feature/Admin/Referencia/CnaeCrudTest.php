@@ -97,3 +97,13 @@ it('exige permissão para listar CNAEs', function () {
     expect($comum->can('cnaes.listar'))->toBeFalse()
         ->and($this->admin->can('cnaes.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de CNAE pelo evento do kebab', function () {
+    $registro = Cnae::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexCnae::class)
+        ->dispatch('cnaes::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

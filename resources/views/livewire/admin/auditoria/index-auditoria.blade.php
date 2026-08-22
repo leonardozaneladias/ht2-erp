@@ -82,26 +82,18 @@
                 @if ($this->mudancas !== [])
                     <div>
                         <h4 class="text-body-color mb-2 text-sm font-semibold">Mudanças de dados</h4>
-                        <div class="border-default-300 overflow-x-auto rounded-lg border">
-                            <table class="table w-full text-sm">
-                                <thead>
-                                    <tr>
-                                        <th class="text-start">Campo</th>
-                                        <th class="text-start">Antes</th>
-                                        <th class="text-start">Depois</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($this->mudancas as $mudanca)
-                                        <tr wire:key="mudanca-{{ $atividade->id }}-{{ $mudanca['campo'] }}">
-                                            <td class="text-default-500 font-mono text-xs">{{ $mudanca['campo'] }}</td>
-                                            <td class="text-default-500">{{ $mudanca['antes'] ?? '—' }}</td>
-                                            <td class="text-body-color font-medium">{{ $mudanca['depois'] ?? '—' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                        <x-shared.static-table
+                            class="border-default-300 border"
+                            :headers="['Campo', 'Antes', 'Depois']"
+                        >
+                            @foreach ($this->mudancas as $mudanca)
+                                <tr wire:key="mudanca-{{ $atividade->id }}-{{ $mudanca['campo'] }}">
+                                    <td class="text-default-500 font-mono text-xs">{{ $mudanca['campo'] }}</td>
+                                    <td class="text-default-500">{{ $mudanca['antes'] ?? '—' }}</td>
+                                    <td class="text-body-color font-medium">{{ $mudanca['depois'] ?? '—' }}</td>
+                                </tr>
+                            @endforeach
+                        </x-shared.static-table>
                     </div>
                 @else
                     <x-shared.alert variant="info" :dismissible="false">

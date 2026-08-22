@@ -1,5 +1,5 @@
 {{-- Empty state padrão das tabelas PowerGrid (retornado por noDataLabel()). --}}
-<x-shared.empty-state size="sm" :icon="$icon ?? 'tabler--inbox'" :title="$titulo">
+<x-shared.empty-state size="sm" :icon="$icon ?? 'tabler--inbox'" :title="$titulo" title-level="h5">
     @if ($descricao ?? null)
         <p>{{ $descricao }}</p>
     @endif

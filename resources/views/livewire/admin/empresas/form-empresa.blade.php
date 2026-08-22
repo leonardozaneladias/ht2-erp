@@ -172,106 +172,103 @@
                 </div>
             @endif
 
-            <div class="overflow-x-auto">
-                <table class="table w-full">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>CNPJ</th>
-                            <th>Cidade/UF</th>
-                            <th>Status</th>
-                            <th class="text-end">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($this->filiais as $filial)
-                            <tr wire:key="filial-{{ $filial->id }}">
-                                <td>
-                                    <span class="font-medium">{{ $filial->nome }}</span>
-                                    @if ($filial->e_matriz)
-                                        <x-shared.badge variant="primary" class="ms-2">Matriz</x-shared.badge>
-                                    @endif
-                                </td>
-                                <td>{{ $filial->cnpj ?: '—' }}</td>
-                                <td>
-                                    {{ $filial->cidade ? $filial->cidade . ($filial->estado ? '/' . $filial->estado : '') : '—' }}
-                                </td>
-                                <td>
-                                    @if ($filial->ativo)
-                                        <x-shared.badge variant="success">Ativa</x-shared.badge>
-                                    @else
-                                        <x-shared.badge variant="neutral">Inativa</x-shared.badge>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <div class="inline-flex flex-wrap justify-end gap-2">
-                                        @if (! $verFiliaisLixeira)
-                                            <x-shared.button
-                                                variant="default"
-                                                appearance="outline"
-                                                size="sm"
-                                                icon="tabler--pencil"
-                                                wire:click="abrirFormFilial({{ $filial->id }})"
-                                            >
-                                                Editar
-                                            </x-shared.button>
-                                            @unless ($filial->e_matriz)
-                                                <x-shared.button
-                                                    variant="danger"
-                                                    appearance="outline"
-                                                    size="sm"
-                                                    icon="tabler--trash"
-                                                    wire:click="solicitarExcluirFilial({{ $filial->id }})"
-                                                >
-                                                    Excluir
-                                                </x-shared.button>
-                                            @endunless
-                                        @else
-                                            @if (auth('admin')->user()?->can('empresas.restaurar'))
-                                                <x-shared.button
-                                                    variant="default"
-                                                    appearance="outline"
-                                                    size="sm"
-                                                    icon="tabler--arrow-back-up"
-                                                    wire:click="solicitarRestaurarFilial({{ $filial->id }})"
-                                                >
-                                                    Restaurar
-                                                </x-shared.button>
-                                            @endif
-                                            @if (auth('admin')->user()?->can('empresas.excluir_permanente'))
-                                                <x-shared.button
-                                                    variant="danger"
-                                                    appearance="outline"
-                                                    size="sm"
-                                                    icon="tabler--trash-x"
-                                                    wire:click="solicitarExcluirDefinitivoFilial({{ $filial->id }})"
-                                                >
-                                                    Excluir def.
-                                                </x-shared.button>
-                                            @endif
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5">
-                                    <x-shared.empty-state
+            <x-shared.static-table>
+                <x-slot:head>
+                    <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">CNPJ</th>
+                        <th scope="col">Cidade/UF</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end">Ações</th>
+                    </tr>
+                </x-slot:head>
+
+                @forelse ($this->filiais as $filial)
+                    <tr wire:key="filial-{{ $filial->id }}">
+                        <td>
+                            <span class="font-medium">{{ $filial->nome }}</span>
+                            @if ($filial->e_matriz)
+                                <x-shared.badge variant="primary" class="ms-2">Matriz</x-shared.badge>
+                            @endif
+                        </td>
+                        <td>{{ $filial->cnpj ?: '—' }}</td>
+                        <td>
+                            {{ $filial->cidade ? $filial->cidade . ($filial->estado ? '/' . $filial->estado : '') : '—' }}
+                        </td>
+                        <td>
+                            @if ($filial->ativo)
+                                <x-shared.badge variant="success">Ativa</x-shared.badge>
+                            @else
+                                <x-shared.badge variant="neutral">Inativa</x-shared.badge>
+                            @endif
+                        </td>
+                        <td class="text-end">
+                            <div class="inline-flex flex-wrap justify-end gap-2">
+                                @if (! $verFiliaisLixeira)
+                                    <x-shared.button
+                                        variant="default"
+                                        appearance="outline"
                                         size="sm"
-                                        icon="tabler--building-off"
-                                        :title="$verFiliaisLixeira ? 'Lixeira vazia' : 'Nenhuma filial'"
-                                        :description="
-                                            $verFiliaisLixeira
-                                                ? 'Nenhuma filial na lixeira.'
-                                                : 'A Matriz é criada junto com a empresa.'
-                                        "
-                                    />
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                        icon="tabler--pencil"
+                                        wire:click="abrirFormFilial({{ $filial->id }})"
+                                    >
+                                        Editar
+                                    </x-shared.button>
+                                    @unless ($filial->e_matriz)
+                                        <x-shared.button
+                                            variant="danger"
+                                            appearance="outline"
+                                            size="sm"
+                                            icon="tabler--trash"
+                                            wire:click="solicitarExcluirFilial({{ $filial->id }})"
+                                        >
+                                            Excluir
+                                        </x-shared.button>
+                                    @endunless
+                                @else
+                                    @if (auth('admin')->user()?->can('empresas.restaurar'))
+                                        <x-shared.button
+                                            variant="default"
+                                            appearance="outline"
+                                            size="sm"
+                                            icon="tabler--arrow-back-up"
+                                            wire:click="solicitarRestaurarFilial({{ $filial->id }})"
+                                        >
+                                            Restaurar
+                                        </x-shared.button>
+                                    @endif
+                                    @if (auth('admin')->user()?->can('empresas.excluir_permanente'))
+                                        <x-shared.button
+                                            variant="danger"
+                                            appearance="outline"
+                                            size="sm"
+                                            icon="tabler--trash-x"
+                                            wire:click="solicitarExcluirDefinitivoFilial({{ $filial->id }})"
+                                        >
+                                            Excluir def.
+                                        </x-shared.button>
+                                    @endif
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5">
+                            <x-shared.empty-state
+                                size="sm"
+                                icon="tabler--building-off"
+                                :title="$verFiliaisLixeira ? 'Lixeira vazia' : 'Nenhuma filial'"
+                                :description="
+                                    $verFiliaisLixeira
+                                        ? 'Nenhuma filial na lixeira.'
+                                        : 'A Matriz é criada junto com a empresa.'
+                                "
+                            />
+                        </td>
+                    </tr>
+                @endforelse
+            </x-shared.static-table>
         </x-shared.card>
     @endif
 

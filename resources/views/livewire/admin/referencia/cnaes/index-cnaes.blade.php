@@ -10,4 +10,10 @@
     </x-admin.page-header>
 
     <livewire:admin.referencia.cnae-table />
+
+    <x-admin.ficha-drawer :registro="$this->ficha" :titulo="$this->fichaTitulo" :editar-url="$this->fichaUrlEditar">
+        @if ($this->ficha)
+            @include ('livewire.admin.referencia.cnaes._ficha', ['registro' => $this->ficha])
+        @endif
+    </x-admin.ficha-drawer>
 </div>

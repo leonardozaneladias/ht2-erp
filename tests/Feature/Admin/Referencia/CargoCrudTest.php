@@ -98,3 +98,13 @@ it('exige permissão para listar Cargos', function () {
     expect($comum->can('cargos.listar'))->toBeFalse()
         ->and($this->admin->can('cargos.listar'))->toBeTrue();
 });
+
+it('abre a ficha Ver de cargo pelo evento do kebab', function () {
+    $registro = Cargo::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(IndexCargo::class)
+        ->dispatch('cargos::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});

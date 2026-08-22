@@ -158,7 +158,11 @@ it('com soft-delete, os tokens e blocos de lixeira são preenchidos', function (
         ->and($tokens['__TRAIT_COM_LIXEIRA__'])->toBe('use ComLixeira;')
         ->and($tokens['__DS_LIXEIRA_OPEN__'])->toBe('$this->aplicarLixeira(')
         ->and($tokens['__DS_LIXEIRA_CLOSE__'])->toBe(')')
-        ->and($tokens['__HEADER_LIXEIRA_VIEW__'])->toBe('_lixeira-toggle')
+        // A toolbar do grid virou uma VIEW ÚNICA do core; o gerador não copia mais um
+        // `_lixeira-toggle` e um `_export-pdf` por módulo. Ele só declara o prefixo das
+        // permissões, de onde a view deriva `{prefixo}.restaurar`.
+        ->and($tokens['__PERMISSAO_BASE__'])->toContain('permissaoBase')
+        ->and($tokens['__PERMISSAO_BASE__'])->toContain("return 'exemplos';")
         ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe(", 'verLixeira' => \$this->verLixeira")
         ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('use App\Models\Contracts\UsaSoftDeletes;')
         ->and($tokens['__MODEL_IMPLEMENTS_LIXEIRA__'])->toBe(' implements UsaSoftDeletes')
@@ -178,7 +182,9 @@ it('sem soft-delete, os tokens de lixeira ficam vazios e o header usa _export-pd
         ->and($tokens['__TRAIT_COM_LIXEIRA__'])->toBe('')
         ->and($tokens['__DS_LIXEIRA_OPEN__'])->toBe('')
         ->and($tokens['__DS_LIXEIRA_CLOSE__'])->toBe('')
-        ->and($tokens['__HEADER_LIXEIRA_VIEW__'])->toBe('_export-pdf')
+        // Sem SoftDeletes não há lixeira: o método não é gerado, e a view única exibe
+        // apenas a metade do "Exportar PDF".
+        ->and($tokens['__PERMISSAO_BASE__'])->toBe('')
         ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe('')
         ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('')
         ->and($tokens['__MODEL_IMPLEMENTS_LIXEIRA__'])->toBe('')

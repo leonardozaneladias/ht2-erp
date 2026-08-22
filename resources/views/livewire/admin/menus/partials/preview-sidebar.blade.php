@@ -15,11 +15,17 @@
                 @foreach ($secao['items'] as $item)
                     <li wire:key="preview-item-{{ $item['key'] }}">
                         <div class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-white/80">
-                            <i class="iconify {{ $item['icon'] }} shrink-0 text-base text-white/60"></i>
+                            <i
+                                class="iconify {{ $item['icon'] }} shrink-0 text-base text-white/60"
+                                aria-hidden="true"
+                            ></i>
                             <span class="truncate">{{ $item['label'] }}</span>
 
                             @if ($item['children'] !== [])
-                                <i class="iconify tabler--chevron-down ms-auto shrink-0 text-xs text-white/40"></i>
+                                <i
+                                    class="iconify tabler--chevron-down ms-auto shrink-0 text-xs text-white/40"
+                                    aria-hidden="true"
+                                ></i>
                             @endif
                         </div>
 

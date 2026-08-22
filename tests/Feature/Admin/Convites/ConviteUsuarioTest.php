@@ -82,6 +82,18 @@ it('aceitar convite define senha, verifica e-mail e consome o token', function (
     expect(Activity::where('log_name', 'auth')->where('event', 'convite-aceito')->exists())->toBeTrue();
 });
 
+it('liga o medidor de força ao campo de senha na tela de aceite', function () {
+    // Regressão: o meter standalone só ativa via JS quando o Blade emite
+    // data-password-meter-standalone="{id-do-input}" (aqui, "password"). Uma prop
+    // inexistente no call-site (ex.: target=) é descartada e o medidor fica inerte.
+    $usuario = criarAdminUser('meter@teste.com');
+    [, $token] = convidar($usuario);
+
+    Livewire::test(AceitarConvite::class, ['token' => $token])
+        ->assertSet('conviteValido', true)
+        ->assertSeeHtml('data-password-meter-standalone="password"');
+});
+
 it('registra auditoria ao enviar convite', function () {
     $usuario = criarAdminUser('audit@teste.com');
     convidar($usuario);

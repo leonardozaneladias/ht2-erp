@@ -14,4 +14,10 @@
     </x-admin.page-header>
 
     <livewire:admin.referencia.tipo-logradouro-table />
+
+    <x-admin.ficha-drawer :registro="$this->ficha" :titulo="$this->fichaTitulo" :editar-url="$this->fichaUrlEditar">
+        @if ($this->ficha)
+            @include ('livewire.admin.referencia.tipos_logradouro._ficha', ['registro' => $this->ficha])
+        @endif
+    </x-admin.ficha-drawer>
 </div>

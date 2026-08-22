@@ -42,6 +42,16 @@ __TEST_SET_CAMPOS__
     expect(__MODULO_STUDLY__::query()->count())->toBe(1);
 });
 
+it('abre a ficha Ver de __MODULO_LABEL__ pelo evento do kebab', function () {
+    $registro = __MODULO_STUDLY__::factory()->create();
+
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(Index__MODULO_STUDLY__::class)
+        ->dispatch('__MODULO_SNAKE_PLURAL__::ver', id: $registro->id)
+        ->assertSet('fichaId', $registro->id)
+        ->assertDispatched('ficha-abrir');
+});
+
 it('abre o formulário de edição de __MODULO_LABEL__', function () {
     $registro = __MODULO_STUDLY__::factory()->create();
 

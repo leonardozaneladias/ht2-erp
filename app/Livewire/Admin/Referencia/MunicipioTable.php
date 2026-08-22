@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
+use App\Livewire\Concerns\ComAcoesCrud;
 use App\Livewire\Concerns\ComLixeira;
 use App\Models\Referencia\Estado;
 use App\Models\Referencia\Municipio;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -20,6 +21,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class MunicipioTable extends PowerGridComponent
 {
+    use ComAcoesCrud;
     use ComLixeira;
     use WithExport;
 
@@ -34,7 +36,7 @@ final class MunicipioTable extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.referencia.municipios._lixeira-toggle'),
+                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -101,13 +103,22 @@ final class MunicipioTable extends PowerGridComponent
         ];
     }
 
-    public function actionsFromView(mixed $row): ?View
+    /** Prefixo das permissões do recurso (ComLixeira). */
+    protected function permissaoBase(): string
     {
-        if (! $row instanceof Municipio) {
-            return null;
-        }
+        return 'municipios';
+    }
 
-        return view('livewire.admin.referencia.municipios._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
+    /** Evento que abre a ficha "Ver" (ComAcoesCrud). */
+    protected function eventoVer(): string
+    {
+        return 'municipios::ver';
+    }
+
+    /** Rota de edição do registro (ComAcoesCrud). */
+    protected function rotaEditar(Model $row): string
+    {
+        return route('admin.referencia.municipios.edit', ['municipio' => $row->getKey()]);
     }
 
     /**

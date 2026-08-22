@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
+use App\Livewire\Concerns\ComAcoesCrud;
 use App\Livewire\Concerns\ComLixeira;
 use App\Models\Referencia\Pais;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -19,6 +20,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class PaisTable extends PowerGridComponent
 {
+    use ComAcoesCrud;
     use ComLixeira;
     use WithExport;
 
@@ -33,7 +35,7 @@ final class PaisTable extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.referencia.paises._lixeira-toggle'),
+                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -105,13 +107,22 @@ final class PaisTable extends PowerGridComponent
         ];
     }
 
-    public function actionsFromView(mixed $row): ?View
+    /** Prefixo das permissões do recurso (ComLixeira). */
+    protected function permissaoBase(): string
     {
-        if (! $row instanceof Pais) {
-            return null;
-        }
+        return 'paises';
+    }
 
-        return view('livewire.admin.referencia.paises._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
+    /** Evento que abre a ficha "Ver" (ComAcoesCrud). */
+    protected function eventoVer(): string
+    {
+        return 'paises::ver';
+    }
+
+    /** Rota de edição do registro (ComAcoesCrud). */
+    protected function rotaEditar(Model $row): string
+    {
+        return route('admin.referencia.paises.edit', ['pais' => $row->getKey()]);
     }
 
     /**

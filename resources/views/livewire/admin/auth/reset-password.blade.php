@@ -29,7 +29,7 @@
         </div>
 
         <div class="mb-6">
-            <x-shared.password-strength-meter target="password" />
+            <x-shared.password-strength-meter field-id="password" />
         </div>
 
         @if ($errors->any())

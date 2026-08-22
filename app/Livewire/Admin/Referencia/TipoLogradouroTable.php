@@ -33,7 +33,7 @@ final class TipoLogradouroTable extends PowerGridComponent
             PowerGrid::header()
                 ->showSearchInput()
                 ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.referencia.tipos_logradouro._lixeira-toggle'),
+                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
             PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
@@ -106,6 +106,12 @@ final class TipoLogradouroTable extends PowerGridComponent
         }
 
         return view('livewire.admin.referencia.tipos_logradouro._acoes', ['row' => $row, 'verLixeira' => $this->verLixeira]);
+    }
+
+    /** Prefixo das permissões do recurso (ComLixeira). */
+    protected function permissaoBase(): string
+    {
+        return 'tipos_logradouro';
     }
 
     /**
