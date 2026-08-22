@@ -108,9 +108,9 @@ npx prettier --write resources/
 
 | Recurso | URL / Comando                     |
 | ------- | --------------------------------- |
-| Admin   | https://gdf-erp.ddev.site/admin   |
-| Horizon | https://gdf-erp.ddev.site/horizon |
-| Pulse   | https://gdf-erp.ddev.site/pulse   |
+| Admin   | https://ht2ml-platform.ddev.site/admin   |
+| Horizon | https://ht2ml-platform.ddev.site/horizon |
+| Pulse   | https://ht2ml-platform.ddev.site/pulse   |
 | Mailpit | `ddev mailpit`                    |
 | Banco   | `ddev psql`                       |
 

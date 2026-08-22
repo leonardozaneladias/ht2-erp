@@ -22,8 +22,8 @@ it('cada preset retorna um DTO com cores hex válidas e chrome de enum válido',
         ->and(TemaPadrao::valores())->toContain($dto->tema_padrao);
 })->with(ThemePreset::cases());
 
-it('o preset padrão HT2 ERP usa a paleta de fábrica', function () {
-    $dto = (new ThemePresetCatalog)->paraEnum(ThemePreset::HT2_ERP);
+it('o preset padrão Safira usa a paleta de fábrica', function () {
+    $dto = (new ThemePresetCatalog)->paraEnum(ThemePreset::SAFIRA);
 
     expect($dto->cor_primaria)->toBe('#1577ce')
         ->and($dto->cor_info)->toBe('#36a8ff')

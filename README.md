@@ -1,8 +1,10 @@
-# HT2 ERP
+# HT2ML Platform
 
-**ERP administrativo multiempresa** da HT2 — backoffice desktop-first e server-side, construído em **Laravel 13 + Livewire 4 + Inspinia (Tailwind 4)**, com guard `admin`, RBAC de dois níveis (papéis globais + por empresa), auditoria, filas (Horizon) e monitoramento (Pulse).
+**Plataforma de backoffice administrativo** — a base sobre a qual se constrói ERP, sistema de gestão de restaurantes, CRM ou qualquer outro sistema administrativo. Desktop-first e server-side, em **Laravel 13 + Livewire 4 + Inspinia (Tailwind 4)**, com guard `admin`, RBAC de dois níveis (perfis globais + por empresa), auditoria, filas (Horizon) e monitoramento (Pulse).
 
-O produto é **modular**: cada módulo de negócio é distribuído como **pacote Composer** aditivo ao core ([ADR-0015](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Em desenvolvimento: o **módulo de RH / Departamento Pessoal** (`ht2ml/extensao-rh`) — visão, modelo e blueprint na [suíte de documentação do RH](docs/plans/modules/rh/README.md).
+> **A plataforma é abstrata: nenhum produto vive dentro dela** ([ADR-0019](docs/architecture/adrs/ADR-0019-plataforma-abstrata-sem-produto.md)). O que é de um domínio de negócio específico sai para **extensões** — pacotes Composer instaláveis em qualquer produto ([ADR-0015](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). A raiz deste repositório é o **app de desenvolvimento e vitrine** da plataforma, não um produto.
+
+Vocabulário (glossário completo em [CONTEXT-MAP.md](CONTEXT-MAP.md)): **core** são os pacotes `ht2ml/*`; **produto** é uma aplicação que instala o core; **instância** é um deploy de um produto para um cliente; **módulo** vive dentro do produto e **extensão** atravessa produtos.
 
 O onboarding detalhado para agentes e humanos está em [CLAUDE.md](CLAUDE.md).
 
@@ -43,7 +45,7 @@ cp .env.example .env
 ddev start       # sobe tudo + hooks (composer/npm install + migrate)
 make setup       # 1x: key:generate, seed, assets Horizon/Pulse, build
 mkcert -install  # 1x por máquina: HTTPS confiável (pede admin) → ddev restart
-ddev launch      # abre https://gdf-erp.ddev.site
+ddev launch      # abre https://ht2ml-platform.ddev.site
 ```
 
 > Guia completo (instalar, configurar, rodar, troubleshooting e projeto novo): **[docs/devops/ddev-setup.md](docs/devops/ddev-setup.md)**.
@@ -64,36 +66,33 @@ Seeders criam `admin@example.com` / `password` (super-admin) e `gestor@example.c
 
 ---
 
-## Derivar um novo projeto ou instanciar um cliente
+## Derivar um produto ou instanciar um cliente
 
-Há **dois caminhos** distintos — não os confunda (detalhes no runbook **[docs/distribuicao-manutencao.md](docs/distribuicao-manutencao.md)** e no [ADR-0016](docs/architecture/adrs/ADR-0016-instancias-por-cliente.md)):
+Dois caminhos distintos — não os confunda (runbook em **[docs/distribuicao-manutencao.md](docs/distribuicao-manutencao.md)**):
 
-- **Produto novo** (diverge da base para sempre) → `bin/init-project.sh`. Renomeia marca / banco / Horizon / Pulse e oferece reinicializar o git history (cortando o vínculo com a base).
+- **Produto novo** → `composer create-project ht2ml/skeleton meu-produto`, e o core chega por `composer require ht2ml/core` ([ADR-0017](docs/architecture/adrs/ADR-0017-produto-novo-via-skeleton.md)).
 
-    ```bash
-    ./bin/init-project.sh           # interativo
-    ./bin/init-project.sh --dry-run # mostra o que mudaria sem editar
-    ```
+    Um produto **não clona** este repositório. Clonar a plataforma faria o produto novo nascer com a identidade dela no `composer.json`, no `.env` e no banco — que é exatamente o problema que aposentou o `bin/init-project.sh`.
 
-    Pergunta nome do projeto, slug e domínio de e-mail e aplica em `composer.json`, `package.json`, `.env.example`, `.env`, `README.md`, `CLAUDE.md`, `AGENTS.md`. Depois oferece (com confirmação) reset de `CHANGELOG.md`, `.claude/memory-log.md`, `docs/superpowers/plans|specs/` e reinicialização do git history.
+    > ⚠️ O `ht2ml/skeleton` ainda não existe: ele nasce quando a extração das extensões terminar. Até lá, `bin/init-project.sh` continua no repositório como caminho legado.
 
-- **Cliente** (continua recebendo updates da base) → _clone + re-origin_ + `bin/new-client.sh`. **Preserva o histórico** (merge limpo) e configura remotes / `.env` / DDEV de forma aditiva, sem apagar o git.
+- **Instância de cliente** (mesmo produto, cliente diferente) → _clone + re-origin_ + `bin/new-client.sh`. **Preserva o histórico** e configura remotes, `.env` e DDEV de forma aditiva ([ADR-0016](docs/architecture/adrs/ADR-0016-instancias-por-cliente.md)).
 
     ```bash
-    git clone git@github.com:leonardozaneladias/ht2-erp.git cliente-acme && cd cliente-acme
+    git clone git@github.com:{org}/{produto}.git cliente-acme && cd cliente-acme
     git remote rename origin upstream
-    git remote add origin git@github.com:leonardozaneladias/ht2-erp-acme.git
-    make new-client                 # provisiona o cliente (aditivo)
+    git remote add origin git@github.com:{org}/{produto}-acme.git
+    make new-client
     git push -u origin main && ddev start && make setup-client
     ```
 
-    `make setup-client` não semeia dados demo (instalado=false) → o Setup Wizard em `/admin/setup` cria a empresa/branding/admin. Depois, `make update-base` traz correções/melhorias da base para o cliente.
+    `make setup-client` não semeia dados demo → o Setup Wizard em `/admin/setup` cria a empresa, o branding e o admin. Depois, `make update-base` traz correções do produto para a instância.
 
 ---
 
 ## Depois do setup — primeiros passos
 
-1. Acesse **`https://gdf-erp.ddev.site/admin/login`** com `admin@example.com` / `password`.
+1. Acesse **`https://ht2ml-platform.ddev.site/admin/login`** com `admin@example.com` / `password`.
 2. Confira o **módulo de referência do stack** em `/admin/usuarios`, `/admin/perfis` e `/admin/auditoria` — implementação completa de FormRequest/Service/Action/DTO/Policy/Livewire/Activity Log que serve de molde para novos módulos.
 3. Para criar seu próprio módulo, siga o passo-a-passo em [CLAUDE.md §16](CLAUDE.md#16-iniciando-um-novo-projeto-com-este-boilerplate).
 
@@ -112,9 +111,9 @@ Arquivos-chave do módulo de referência:
 
 | O quê      | URL / Comando                     |
 | ---------- | --------------------------------- |
-| Aplicação  | https://gdf-erp.ddev.site         |
-| Horizon    | https://gdf-erp.ddev.site/horizon |
-| Pulse      | https://gdf-erp.ddev.site/pulse   |
+| Aplicação  | https://ht2ml-platform.ddev.site         |
+| Horizon    | https://ht2ml-platform.ddev.site/horizon |
+| Pulse      | https://ht2ml-platform.ddev.site/pulse   |
 | Mailpit    | `ddev mailpit`                    |
 | PostgreSQL | `ddev psql` (ou `ddev describe`)  |
 

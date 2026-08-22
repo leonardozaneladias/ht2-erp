@@ -102,7 +102,7 @@ O `.env.example` já vem alinhado ao DDEV. As credenciais de **banco** são geri
 | App                     | `APP_NAME`         | `"Laravel Admin"`           |                                           |
 |                         | `APP_ENV`          | `local`                     | `production` em prod                      |
 |                         | `APP_KEY`          | `<gerar>`                   | `make setup` roda `key:generate`          |
-|                         | `APP_URL`          | `https://gdf-erp.ddev.site` | bate com o `name` do `.ddev/config.yaml`  |
+|                         | `APP_URL`          | `https://ht2ml-platform.ddev.site` | bate com o `name` do `.ddev/config.yaml`  |
 |                         | `APP_DEBUG`        | `true`                      | `false` em prod/staging                   |
 |                         | `APP_LOCALE`       | `pt_BR`                     |                                           |
 | Banco (Postgres)        | `DB_CONNECTION`    | `pgsql`                     | gerido pelo DDEV                          |
@@ -169,13 +169,13 @@ As filas padrão são `default`, `emails`, `exports` e `pdf` (ver `conventions.m
 make dev         # = ddev npm run dev
 ```
 
-O Vite é exposto via `web_extra_exposed_ports` (config em `vite.config.js`, bloco `server`) e publica os entry points do admin em `https://gdf-erp.ddev.site:5173` com HMR. Se surgir `Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest`, rode `ddev npm run build` para gerar `public/build/manifest.json`.
+O Vite é exposto via `web_extra_exposed_ports` (config em `vite.config.js`, bloco `server`) e publica os entry points do admin em `https://ht2ml-platform.ddev.site:5173` com HMR. Se surgir `Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest`, rode `ddev npm run build` para gerar `public/build/manifest.json`.
 
 ### 2.7 Passo 7 — Smoke test
 
 ```bash
-for u in https://gdf-erp.ddev.site https://gdf-erp.ddev.site/admin \
-         https://gdf-erp.ddev.site/horizon https://gdf-erp.ddev.site/pulse; do
+for u in https://ht2ml-platform.ddev.site https://ht2ml-platform.ddev.site/admin \
+         https://ht2ml-platform.ddev.site/horizon https://ht2ml-platform.ddev.site/pulse; do
   printf "%-44s " "$u"
   curl -sk -o /dev/null -w "%{http_code}\n" "$u"
 done
@@ -186,10 +186,10 @@ Esperado:
 
 | URL                                 | Status         | Motivo                           |
 | ----------------------------------- | -------------- | -------------------------------- |
-| `https://gdf-erp.ddev.site`         | `302`          | redireciona para `/admin`        |
-| `https://gdf-erp.ddev.site/admin`   | `200` ou `302` | login admin se não autenticado   |
-| `https://gdf-erp.ddev.site/horizon` | `200` ou `302` | exige auth admin em staging/prod |
-| `https://gdf-erp.ddev.site/pulse`   | `200` ou `302` | idem                             |
+| `https://ht2ml-platform.ddev.site`         | `302`          | redireciona para `/admin`        |
+| `https://ht2ml-platform.ddev.site/admin`   | `200` ou `302` | login admin se não autenticado   |
+| `https://ht2ml-platform.ddev.site/horizon` | `200` ou `302` | exige auth admin em staging/prod |
+| `https://ht2ml-platform.ddev.site/pulse`   | `200` ou `302` | idem                             |
 
 ---
 
@@ -226,15 +226,15 @@ Referência única para saber "o que roda onde". Coincide com `docs/devops/infra
 
 | Serviço                 | URL / Comando                       | Container | Observação                        |
 | ----------------------- | ----------------------------------- | --------- | --------------------------------- |
-| Aplicação Laravel (web) | `https://gdf-erp.ddev.site`         | `web`     | redireciona para `/admin`         |
-| Admin                   | `https://gdf-erp.ddev.site/admin`   | `web`     | painel backoffice                 |
-| Horizon dashboard       | `https://gdf-erp.ddev.site/horizon` | `web`     | gate `web + auth:admin`           |
-| Pulse dashboard         | `https://gdf-erp.ddev.site/pulse`   | `web`     | gate `web + auth:admin`           |
+| Aplicação Laravel (web) | `https://ht2ml-platform.ddev.site`         | `web`     | redireciona para `/admin`         |
+| Admin                   | `https://ht2ml-platform.ddev.site/admin`   | `web`     | painel backoffice                 |
+| Horizon dashboard       | `https://ht2ml-platform.ddev.site/horizon` | `web`     | gate `web + auth:admin`           |
+| Pulse dashboard         | `https://ht2ml-platform.ddev.site/pulse`   | `web`     | gate `web + auth:admin`           |
 | Mailpit (UI)            | `ddev mailpit`                      | `web`     | captura de e-mails                |
 | Mailpit (SMTP)          | `localhost:1025` (interno)          | `web`     | usado por `MAIL_HOST` na app      |
 | PostgreSQL              | `ddev psql` · interno `db:5432`     | `db`      | porta no host via `ddev describe` |
 | Redis                   | interno `redis:6379`                | `redis`   | sem senha em dev                  |
-| Vite HMR                | `https://gdf-erp.ddev.site:5173`    | `web`     | `make dev`                        |
+| Vite HMR                | `https://ht2ml-platform.ddev.site:5173`    | `web`     | `make dev`                        |
 
 ### 4.1 Conexões a partir do host
 

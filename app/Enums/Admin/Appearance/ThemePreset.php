@@ -13,7 +13,7 @@ enum ThemePreset: string
     public function label(): string
     {
         return match ($this) {
-            self::HT2_ERP => 'HT2 ERP',
+            self::SAFIRA => 'Safira',
             self::GRAFITE => 'Grafite',
             self::ESMERALDA => 'Esmeralda',
             self::VIOLETA => 'Violeta',
@@ -23,7 +23,7 @@ enum ThemePreset: string
     public function descricao(): string
     {
         return match ($this) {
-            self::HT2_ERP => 'Identidade padrão — azul HT2, claro.',
+            self::SAFIRA => 'Azul clássico, claro. Padrão de fábrica.',
             self::GRAFITE => 'Escuro e sóbrio, com acento índigo.',
             self::ESMERALDA => 'Verde, claro e fresco.',
             self::VIOLETA => 'Violeta moderno, claro.',
@@ -34,7 +34,7 @@ enum ThemePreset: string
     public function corAmostra(): string
     {
         return match ($this) {
-            self::HT2_ERP => '#1577ce',
+            self::SAFIRA => '#1577ce',
             self::GRAFITE => '#4f46e5',
             self::ESMERALDA => '#047857',
             self::VIOLETA => '#7c3aed',
@@ -43,9 +43,9 @@ enum ThemePreset: string
 
     public static function padrao(): self
     {
-        return self::HT2_ERP;
+        return self::SAFIRA;
     }
-    case HT2_ERP = 'ht2_erp';
+    case SAFIRA = 'safira';
     case GRAFITE = 'grafite';
     case ESMERALDA = 'esmeralda';
     case VIOLETA = 'violeta';

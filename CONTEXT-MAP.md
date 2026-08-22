@@ -12,7 +12,8 @@ _Avoid_: base, boilerplate
 
 **Produto**:
 Uma aplicação que instala o core e resolve um domínio de negócio próprio.
-O HT2 ERP é um produto como qualquer outro, não a plataforma.
+Um ERP, um sistema de restaurante e um CRM são todos produtos; nenhum deles
+vive dentro da plataforma (ADR-0019).
 _Avoid_: projeto derivado, aplicação derivada
 
 **Instância**:
@@ -43,8 +44,8 @@ _Avoid_: biblioteca, dependência
 - RH (`packages/extensao-rh/`): departamento pessoal — funcionários e departamentos. Glossário ainda não escrito.
 
 > **O vocabulário específico de ERP não é glosado, por decisão.** Documento
-> numerado, referência fiscal e afins pertencem ao produto HT2 ERP, não à
-> plataforma, e vão embora de `app/` quando a extração terminar. Registra-se
+> numerado e referência fiscal pertencem a produtos de ERP, não à plataforma,
+> e saem de `app/` para extensões (ADR-0019). Registra-se
 > aqui apenas a linguagem que sobrevive à extração. A ausência é deliberada.
 
 ## Relações

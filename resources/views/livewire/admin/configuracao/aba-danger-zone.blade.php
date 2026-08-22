@@ -2,7 +2,7 @@
     <div class="border-danger/30 rounded-lg border p-1">
         <x-shared.card
             title="Restaurar identidade e aparência"
-            subtitle="Volta marca, cores e layout ao padrão HT2 ERP. Remove logos/favicon enviados. Não afeta empresa, e-mail, segurança ou localização."
+            subtitle="Volta marca, cores e layout ao padrão de fábrica. Remove logos/favicon enviados. Não afeta empresa, e-mail, segurança ou localização."
         >
             <div class="grid max-w-md gap-3">
                 <x-shared.input

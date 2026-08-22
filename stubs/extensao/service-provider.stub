@@ -8,7 +8,7 @@ use App\Support\Modules\ModuleRegistry;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * ServiceProvider do módulo __MODULO_STUDLY__ (HT2 ERP).
+ * ServiceProvider da extensão __MODULO_STUDLY__.
  *
  * Integra o pacote ao core sem editar arquivos do boilerplate (ver ADR-0015):
  * - Rotas entram no grupo autenticado /admin via ModuleRegistry (herdam o middleware).

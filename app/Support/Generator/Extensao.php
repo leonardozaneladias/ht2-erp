@@ -7,7 +7,7 @@ namespace App\Support\Generator;
 use Illuminate\Support\Str;
 
 /**
- * Identidade de um módulo-pacote (HT2 ERP), derivada do nome e de config/extensoes.php.
+ * Identidade de uma extensão, derivada do nome e de config/extensoes.php.
  *
  * Concentra toda a resolução de nomes/paths/namespaces de um pacote de módulo,
  * para que o gerador não espalhe convenções de nomenclatura (ver ADR-0015).

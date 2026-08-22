@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
 |--------------------------------------------------------------------------
-| Configuração do módulo __MODULO_STUDLY__ (HT2 ERP)
+| Configuração da extensão __MODULO_STUDLY__
 |--------------------------------------------------------------------------
 |
 | Publicável: php artisan vendor:publish --tag=__MODULO_SLUG__-config

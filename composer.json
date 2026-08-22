@@ -1,6 +1,6 @@
 {
   "$schema": "https://getcomposer.org/schema.json",
-  "name": "boilerplate/laravel-admin-inspinia",
+  "name": "ht2ml/platform",
   "type": "project",
   "description": "Boilerplate Laravel + Livewire + Inspinia para sistemas administrativos backoffice.",
   "keywords": [

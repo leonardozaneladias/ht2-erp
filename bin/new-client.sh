@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# new-client.sh — instancia um CLIENTE do HT2 ERP de forma ADITIVA.
+# new-client.sh — instancia um CLIENTE de um produto, de forma ADITIVA.
 #
 # Diferente de init-project.sh (que deriva um PRODUTO NOVO e corta o git history),
 # este script PRESERVA o histórico para que o cliente continue recebendo updates da
@@ -43,7 +43,7 @@ if [[ "${1:-}" == "--dry-run" ]]; then
     echo -e "${YELLOW}=== Modo dry-run: nenhuma mudança será aplicada ===${NC}"
 fi
 
-echo -e "${GREEN}👤 Instanciando um novo CLIENTE a partir da base HT2 ERP${NC}"
+echo -e "${GREEN}👤 Instanciando um novo CLIENTE a partir do produto${NC}"
 echo ""
 
 # sed portável (macOS BSD e GNU)
@@ -171,7 +171,7 @@ else
     cat > .github/dependabot.yml <<'EOF'
 version: 2
 
-# Instância de cliente do HT2 ERP: as dependências PHP (composer) e JS (npm) são
+# Instância de cliente de um produto: as dependências PHP (composer) e JS (npm) são
 # conduzidas no base (ht2-erp) e descem via `make update-base`. O Dependabot de
 # composer/npm no cliente só geraria PRs redundantes ou com drift de composer.lock.
 # Mantém apenas github-actions. Ver docs/distribuicao-manutencao.md.

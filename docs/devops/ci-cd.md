@@ -51,7 +51,7 @@ Toda PR passa por CI antes de poder ser mergeada (branch protection força statu
 
 | Ambiente  | Domínio                          | Região    | Réplica DB    | Horizon        | Sentry |
 | --------- | -------------------------------- | --------- | ------------- | -------------- | ------ |
-| `local`   | `https://gdf-erp.ddev.site`      | —         | —             | DDEV           | —      |
+| `local`   | `https://ht2ml-platform.ddev.site`      | —         | —             | DDEV           | —      |
 | `staging` | `https://staging.exemplo.com.br` | us-east-1 | 1 leitor      | 1 supervisor   | Ativo  |
 | `prod`    | `https://exemplo.com.br`         | us-east-1 | 1 leitor + DR | 4 supervisores | Ativo  |
 

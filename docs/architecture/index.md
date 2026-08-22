@@ -27,6 +27,7 @@ Formato MADR. Referenciar pelo número: "conforme ADR-0010".
 | 0016 | [Instâncias por cliente via clone + re-origin](./adrs/ADR-0016-instancias-por-cliente.md)                  | arquitetura, distribuição, instâncias   |
 | 0017 | [Produto novo nasce do skeleton via Composer](./adrs/ADR-0017-produto-novo-via-skeleton.md)                 | arquitetura, distribuição, composer     |
 | 0018 | [Multiempresa no core, atrás de um modo single-tenant](./adrs/ADR-0018-multiempresa-no-core-modo-single-tenant.md) | arquitetura, multiempresa, core |
+| 0019 | [A plataforma é abstrata — nenhum produto vive dentro dela](./adrs/ADR-0019-plataforma-abstrata-sem-produto.md) | arquitetura, plataforma, fronteira |
 
 ## Convenções
 

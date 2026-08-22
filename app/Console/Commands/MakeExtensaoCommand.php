@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 /**
- * Cria a casca de um módulo-pacote (HT2 ERP) em packages/ e registra o path
+ * Cria a casca de uma extensão em packages/ e registra o path
  * repository na raiz, para desenvolvimento local com symlink (ver ADR-0015).
  *
  *   php artisan make:extensao Rh

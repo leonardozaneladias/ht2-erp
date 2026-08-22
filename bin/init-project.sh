@@ -92,13 +92,13 @@ echo -e "${GREEN}— Aplicando renomeações —${NC}"
 # composer.json
 if [[ -f composer.json ]]; then
     apply "composer.json → name '${SLUG}/admin'" \
-        sed_inplace "s|\"name\": \"boilerplate/laravel-admin-inspinia\"|\"name\": \"${SLUG}/admin\"|" composer.json
+        sed_inplace "s|\"name\": \"ht2ml/platform\"|\"name\": \"${SLUG}/admin\"|" composer.json
 fi
 
 # package.json
 if [[ -f package.json ]]; then
     apply "package.json → name '${SLUG}-admin'" \
-        sed_inplace "s|\"name\": \"laravel-admin-inspinia\"|\"name\": \"${SLUG}-admin\"|" package.json
+        sed_inplace "s|\"name\": \"ht2ml-platform\"|\"name\": \"${SLUG}-admin\"|" package.json
 fi
 
 # .env.example (DB_* NÃO é tocado — gerido pelo DDEV)
@@ -158,7 +158,7 @@ Mantido no padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [Unreleased]
 
-- Início do projeto a partir do boilerplate HT2 ERP + Inspinia.
+- Início do projeto a partir da plataforma HT2ML + Inspinia.
 EOF
         echo -e "  ${GREEN}✓${NC} CHANGELOG.md resetado"
     fi

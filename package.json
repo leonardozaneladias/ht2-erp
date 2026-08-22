@@ -58,7 +58,7 @@
     "tailwindcss": "^4.3.1",
     "vite": "^8.0.16"
   },
-  "name": "laravel-admin-inspinia",
+  "name": "ht2ml-platform",
   "version": "0.1.0",
   "description": "Frontend do boilerplate admin Laravel (Livewire 4 + Inspinia + Tailwind 4).",
   "dependencies": {

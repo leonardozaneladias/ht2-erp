@@ -1,7 +1,7 @@
 # Auditoria de Usabilidade — Painel Admin
 
 > Revisão geral de UI/UX conduzida em 2026-06-12 via Playwright (navegador real)
-> contra o ambiente DDEV (`https://gdf-erp.ddev.site`), viewport **1366×768**,
+> contra o ambiente DDEV (`https://ht2ml-platform.ddev.site`), viewport **1366×768**,
 > nos temas **claro e escuro**, com inspeção do console em cada tela.
 
 ## Metodologia
