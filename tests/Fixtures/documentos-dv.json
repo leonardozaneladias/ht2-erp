@@ -1,0 +1,42 @@
+{
+  "_comentario": "Fixture ÚNICO do dígito verificador. É rodado contra as Rules do PHP (tests/Feature/Componentes/ValidadoresDvTest.php) e contra o resources/js/admin/validators.js no browser (tests/Browser/Admin/ValidadoresDvTest.php). Qualquer divergência entre as duas implementações vira teste vermelho — é o que torna a duplicação segura.",
+  "cpf": {
+    "validos": ["529.982.247-25", "111.444.777-35", "52998224725", "11144477735"],
+    "invalidos": [
+      "111.111.111-11",
+      "000.000.000-00",
+      "999.999.999-99",
+      "529.982.247-24",
+      "111.444.777-30",
+      "123.456.789-00",
+      "529.982.247-2",
+      "529.982.247-255"
+    ]
+  },
+  "cnpj": {
+    "validos": ["11.222.333/0001-81", "11222333000181", "04.252.011/0001-10"],
+    "invalidos": [
+      "11.111.111/1111-11",
+      "00.000.000/0000-00",
+      "11.222.333/0001-80",
+      "04.252.011/0001-11",
+      "11.222.333/0001-8",
+      "11.222.333/0001-812"
+    ]
+  },
+  "pis": {
+    "validos": ["120.12345.61-3", "12012345613", "123.45678.90-0"],
+    "invalidos": [
+      "111.11111.11-1",
+      "000.00000.00-0",
+      "120.12345.61-7",
+      "120.12345.61-8",
+      "120.12345.61",
+      "120.12345.61-33"
+    ]
+  },
+  "titulo_eleitor": {
+    "validos": ["123456780191", "876543210329", "111111110116", "111111110507"],
+    "invalidos": ["123456780192", "876543210320", "12345678019", "123456782911", "111111111111"]
+  }
+}

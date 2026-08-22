@@ -2,7 +2,7 @@
 
 .form-input {
     @apply text-body-color placeholder:text-default-400 block h-9.25 w-full rounded border py-0 text-sm outline-0 transition-all;
-    @apply hover:border-default-500! focus:border-default-500! focus-visible:border-default-500 focus:outline-0 focus-visible:ring-0 focus-visible:outline-none;
+    @apply hover:border-default-500! focus:border-default-500! focus-visible:border-default-500 focus:outline-0 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none;
     @apply aria-invalid:border-danger/60 aria-invalid:ring-danger/10;
     transition-property: color, box-shadow;
 }
@@ -56,13 +56,13 @@
 
 .form-textarea {
     @apply px-3 py-2 text-body-color placeholder:text-default-400 block w-full rounded border text-sm h-auto! outline-0 transition-all;
-    @apply hover:border-default-500 focus:border-default-500 focus-visible:border-default-500 focus:outline-0 focus-visible:ring-0 focus-visible:outline-none;
+    @apply hover:border-default-500 focus:border-default-500 focus-visible:border-default-500 focus:outline-0 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none;
     transition-property: color, box-shadow;
 }
 
 .form-select {
     @apply bg-card border-default-300 text-body-color placeholder:text-body-color block h-9.25 w-full rounded border py-0 text-sm outline-0 transition-all;
-    @apply hover:border-default-500 focus:border-default-500 focus-visible:border-default-500 focus:outline-0 focus-visible:ring-0 focus-visible:outline-none;
+    @apply hover:border-default-500 focus:border-default-500 focus-visible:border-default-500 focus:outline-0 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none;
     @apply disabled:cursor-not-allowed disabled:opacity-70;
     @apply [[readonly]]:text-body-color [[readonly]]:cursor-not-allowed;
     @apply aria-invalid:border-danger/60 aria-invalid:ring-danger/10;
@@ -377,5 +377,5 @@ input:checked + .form-label.btn {
 .form-input[type="file"] {
     @apply p-0 text-sm cursor-pointer;
     @apply file:h-full file:px-3 file:me-3 file:border-0 file:border-e file:border-default-300 file:bg-default-100 file:text-default-700 file:font-medium file:cursor-pointer;
-    @apply focus:ring-0 hover:border-default-500 focus:border-default-500 focus-visible:border-default-500 focus:outline-0 focus-visible:ring-0 focus-visible:outline-none hover:file:border-default-300;
+    @apply focus:ring-0 hover:border-default-500 focus:border-default-500 focus-visible:border-default-500 focus:outline-0 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none hover:file:border-default-300;
 }

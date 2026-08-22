@@ -41,11 +41,18 @@ class RolePermissionSeeder extends Seeder
         DB::table('roles')
             ->where('id', $gestor->getKey())
             ->update(['nivel' => $niveis['gestor'] ?? 50]);
-        $gestor->syncPermissions([
+        $permissoesGestor = [
             'dashboard.view',
             'usuarios.listar',
-            'exemplos.listar',
             'listagens.multi_empresa',
-        ]);
+        ];
+
+        // As permissões 'exemplos.*' só existem com o módulo demo habilitado
+        // (EXEMPLO_DEMO); evita atribuir uma permissão inexistente no cliente.
+        if (config('modulos.exemplo_demo')) {
+            $permissoesGestor[] = 'exemplos.listar';
+        }
+
+        $gestor->syncPermissions($permissoesGestor);
     }
 }

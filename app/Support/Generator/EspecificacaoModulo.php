@@ -481,7 +481,9 @@ final class EspecificacaoModulo
             // precisam virar string no formato do input antes de cair na prop.
             $col = "\$registro->{$campo->nome}";
             $rhs = match ($campo->tipo) {
-                'integer', 'money' => "(int) {$col}",
+                // MoneyCast devolve o VO — a prop do form guarda centavos (int).
+                'money' => $campo->nullable ? "{$col}?->centavos() ?? 0" : "{$col}->centavos()",
+                'integer' => "(int) {$col}",
                 'boolean' => "(bool) {$col}",
                 'multiselect' => "(array) {$col}",
                 'date' => $campo->nullable ? "{$col}?->format('Y-m-d')" : "{$col}->format('Y-m-d')",

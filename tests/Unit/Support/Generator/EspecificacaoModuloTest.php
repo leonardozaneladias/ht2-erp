@@ -88,6 +88,20 @@ it('formata date/datetime no mount load e anota @property Carbon', function (): 
         ->and($spec->modelDateProperties())->toContain('@property \Illuminate\Support\Carbon|null $publicado_em');
 });
 
+it('lê centavos do VO no mount load de money, sem cast (int) do objeto', function (): void {
+    $mount = specDeTokens(['preco:money', 'desconto:money:nullable'])->formMountLoad();
+
+    // O MoneyCast devolve um VO: `(int) $registro->preco` era um cast de objeto para int.
+    expect($mount)->toContain('$registro->preco->centavos();')
+        ->and($mount)->toContain('$registro->desconto?->centavos() ?? 0;')
+        ->and($mount)->not->toContain('(int) $registro->preco')
+        ->and($mount)->not->toContain('(int) $registro->desconto');
+
+    // `integer` continua com o cast — é escalar, não VO.
+    expect(specDeTokens(['quantidade:integer'])->formMountLoad())
+        ->toContain('(int) $registro->quantidade;');
+});
+
 it('anota @var list<string> na prop multiselect do formulário', function (): void {
     expect(specDeTokens(['tags:multiselect(a|b|c)'])->formProps())->toContain('@var list<string>');
 });
