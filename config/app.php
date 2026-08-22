@@ -82,7 +82,9 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    // Projeto PT-BR de ponta a ponta: o default acompanha o .env para o idioma
+    // não regredir a inglês com config cacheada sem env (deploy/artisan).
+    'locale' => env('APP_LOCALE', 'pt_BR'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 

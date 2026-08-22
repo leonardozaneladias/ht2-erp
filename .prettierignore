@@ -14,7 +14,13 @@ public/vendor/
 
 # prettier-plugin-blade não-idempotente em <textarea> (whitespace-sensitive):
 # insere uma linha em branco no conteúdo a cada passada e nunca converge.
+# O conteúdo do <textarea> É o valor do campo: a quebra de linha injetada vira
+# whitespace fantasma no wire:model/POST/old(). O rich-editor tem o mesmo <textarea>
+# oculto e ficou de fora desta lista — o bug voltou no primeiro `npm run format` que
+# tocou o arquivo (o commit "remove whitespace fantasma do textarea oculto" corrigiu o
+# valor, mas não protegeu o arquivo do formatador).
 resources/views/components/shared/textarea.blade.php
+resources/views/components/shared/rich-editor.blade.php
 
 # Inspinia template assets — reference-only, nao serao formatados.
 # Nossos proprios views/CSS/JS ficam em admin/ e portal/ (a criar nas sprints).

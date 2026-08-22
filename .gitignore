@@ -4,6 +4,14 @@
 .env.backup
 .env.bak
 .env.production
+
+# Backups locais do .env e de configs — o padrão `.env.bak` acima NÃO cobre os sufixados
+# (`.env.bak-20260710-2336`, `.env.bak-ddev`), e um `git add -A` os arrastava para dentro
+# do commit COM os segredos (APP_KEY, DB_PASSWORD).
+.env.bak*
+.env.*.bak
+*.bak-*
+*.backup-*
 .phpactor.json
 .phpunit.result.cache
 /.fleet
