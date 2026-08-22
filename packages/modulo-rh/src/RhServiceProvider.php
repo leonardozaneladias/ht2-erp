@@ -69,7 +69,11 @@ final class RhServiceProvider extends ServiceProvider
             return;
         }
 
-        config(['access.modules' => array_merge_recursive(
+        // array_replace_recursive, e não array_merge_recursive: com `config:cache`
+        // a config é fotografada JÁ mesclada, então este boot roda de novo sobre
+        // o próprio resultado. O merge recursivo funde valores iguais e transforma
+        // 'label' => 'X' em 'label' => ['X', 'X']; o replace é idempotente.
+        config(['access.modules' => array_replace_recursive(
             (array) config('access.modules', []),
             ['negocio' => $permissoes],
         )]);
@@ -92,7 +96,16 @@ final class RhServiceProvider extends ServiceProvider
 
         foreach ($menu as $i => $secao) {
             if (($secao['key'] ?? null) === 'negocio') {
-                $menu[$i]['items'] = [...($secao['items'] ?? []), ...$itens];
+                // Ignora o que já está na seção: com `config:cache` os itens do
+                // pacote já foram gravados no cache, e sem este filtro eles
+                // entrariam uma segunda vez a cada boot.
+                $presentes = array_column($secao['items'] ?? [], 'key');
+                $novos = array_values(array_filter(
+                    $itens,
+                    static fn (array $item): bool => ! in_array($item['key'] ?? null, $presentes, true),
+                ));
+
+                $menu[$i]['items'] = [...($secao['items'] ?? []), ...$novos];
             }
         }
 
