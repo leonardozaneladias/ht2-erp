@@ -2,7 +2,7 @@
 
 > Como o módulo trata as três faces de uma **ausência**: a **falta/ocorrência** (ausência pontual — um dia/algumas horas), o **atestado** (documento que justifica/abona, com **workflow de análise**) e o **afastamento** (período — já modelado em [06](06-linha-do-tempo.md)). Este documento acrescenta o **atestado como entidade com máquina de estados** e a **falta/ocorrência**, e descreve como os três se relacionam. O **schema é definido em [01](01-modelo-de-dominio.md)** (§C2 afastamentos, §C3 atestados, §C4 ocorrências, §4.2 enums, §10 permissões — fonte de verdade).
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · views `rh::` · **PostgreSQL 16** · multi-tenant por `empresa_id`. Decisão de modelagem em [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md).
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · views `rh::` · **PostgreSQL 16** · multi-tenant por `empresa_id`. Decisão de modelagem em [ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md).
 
 Relacionados: [01](01-modelo-de-dominio.md) · [04 §5](04-catalogos-configuraveis.md) · [05](05-organograma-acl-hierarquica.md) · [06](06-linha-do-tempo.md) · [07](07-jornada-horas-extras-folha.md) · [adrs/ADR-RH-010](adrs/ADR-RH-010-atestados-workflow-e-ausencias.md)
 

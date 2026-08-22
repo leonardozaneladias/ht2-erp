@@ -2,7 +2,7 @@
 
 > Mecânica de **jornada/escalas**, **cálculo e aprovação de horas extras** com **snapshot imutável**, e a **fundação de folha** (catálogo `rubricas` + referência `tabelas_legais`) do módulo de RH. Este documento detalha fórmulas, máquina de estados, configuração e exemplos numéricos; **não redefine schema** — os nomes de tabelas, colunas, enums e permissões são da fonte de verdade [01 — Modelo de Domínio](01-modelo-de-dominio.md), e qualquer divergência se corrige **lá primeiro**.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · `packages/modulo-rh/` · views `rh::` · multi-tenant lógico por `empresa_id` · banco **PostgreSQL 16** · dinheiro em **INTEGER centavos** ([ADR-0014](../../../architecture/adrs/ADR-0014-money-integer-centavos.md)), duração em **minutos inteiros**.
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · `packages/extensao-rh/` · views `rh::` · multi-tenant lógico por `empresa_id` · banco **PostgreSQL 16** · dinheiro em **INTEGER centavos** ([ADR-0014](../../../architecture/adrs/ADR-0014-money-integer-centavos.md)), duração em **minutos inteiros**.
 
 Relacionados: [01](01-modelo-de-dominio.md) · [04](04-catalogos-configuraveis.md) · [05](05-organograma-acl-hierarquica.md) · [09](09-roadmap-fases.md) · [adrs/ADR-RH-004](adrs/ADR-RH-004-jornada-horas-extras-folha.md)
 
@@ -168,7 +168,7 @@ Há ainda uma opção de **modo** de cálculo do divisor, `config('rh.calculo.mo
 ### 2.4 Helper de cálculo
 
 ```php
-// HT2ERP\Rh\Support\Calculo\ValorHora
+// HT2ML\Rh\Support\Calculo\ValorHora
 final class ValorHora
 {
     /** Retorna o valor-hora em centavos (inteiro). */
@@ -222,7 +222,7 @@ valor_hora_centavos = round(330000 / 200) = 1650   // R$ 16,50/h
 Uma HE vive em `horas_extras` ([01 §3 D1](01-modelo-de-dominio.md)): `minutos` (INTEGER, CHECK `> 0`), `tipo` (`TipoHoraExtra`), `status` (`StatusHoraExtra`), os campos de snapshot (§4) e o vínculo de workflow (`lancado_por`/`aprovado_por_admin_user_id`). O `tipo` carrega o **fator** em **basis points (bps) inteiros** — um bps é 1/10000, então 50% = 5000 bps, 100% = 10000 bps. Usar bps inteiros mantém a aritmética longe de float.
 
 ```php
-// HT2ERP\Rh\Enums\TipoHoraExtra
+// HT2ML\Rh\Enums\TipoHoraExtra
 enum TipoHoraExtra: string
 {
     case HE_50   = 'he_50';     // hora extra 50% (dias úteis)
@@ -265,7 +265,7 @@ Lendo em partes:
 Para preservar a precisão inteira o máximo possível, a implementação acumula em inteiro e divide **uma vez**:
 
 ```php
-// HT2ERP\Rh\Support\Calculo\ValorHoraExtra
+// HT2ML\Rh\Support\Calculo\ValorHoraExtra
 $valorHe = (int) round(
     $valorHoraCentavos * (10000 + $fatorBps) * $minutos / (10000 * 60)
 );
@@ -498,7 +498,7 @@ Quando `true`, a transição `lancada → aprovada` exige `aprovado_por_admin_us
 Cada transição é uma **Action atômica** (`execute()`), com `match` no enum de status validando o estado de origem, e a autorização na **Policy**:
 
 ```php
-// HT2ERP\Rh\Actions\HorasExtras\AprovarHoraExtra
+// HT2ML\Rh\Actions\HorasExtras\AprovarHoraExtra
 final class AprovarHoraExtra
 {
     public function __construct(
@@ -536,7 +536,7 @@ final class AprovarHoraExtra
 A autorização (permissão + subárvore + segregação) é checada na `HoraExtraPolicy::aprovar()` **antes** da Action ser chamada (no componente Livewire). A Action assume já-autorizado e cuida só do invariante de estado + cálculo + snapshot.
 
 ```php
-// HT2ERP\Rh\Policies\HoraExtraPolicy
+// HT2ML\Rh\Policies\HoraExtraPolicy
 public function aprovar(AdminUser $ator, HoraExtra $he): bool
 {
     return $ator->can('rh.horas_extras.aprovar')
@@ -676,7 +676,7 @@ Imutabilidade garantida: a partir do passo 3f, `snapshot_calculo` e `valor_calcu
 
 ## 8. Configuração
 
-Todas as chaves vivem em `config/rh.php` do pacote (`packages/modulo-rh/config/rh.php`), com defaults seguros e sobrepujáveis por `.env`/publish.
+Todas as chaves vivem em `config/rh.php` do pacote (`packages/extensao-rh/config/rh.php`), com defaults seguros e sobrepujáveis por `.env`/publish.
 
 ### 8.1 `config('rh.calculo.*')` — cálculo de HE e valor-hora
 
@@ -701,7 +701,7 @@ Todas as chaves vivem em `config/rh.php` do pacote (`packages/modulo-rh/config/r
 ### 8.3 Esboço do arquivo
 
 ```php
-// packages/modulo-rh/config/rh.php  (trecho)
+// packages/extensao-rh/config/rh.php  (trecho)
 return [
     'calculo' => [
         'divisor_horas_mensais' => env('RH_DIVISOR_HORAS_MENSAIS', 220),

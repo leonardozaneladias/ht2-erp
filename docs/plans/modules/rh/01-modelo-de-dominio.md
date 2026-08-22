@@ -2,7 +2,7 @@
 
 > **Fonte de verdade de schema** do módulo de RH. Todos os demais documentos da suíte referenciam os nomes de tabelas, colunas, enums e permissões definidos aqui. Ao implementar, divergências devem ser corrigidas **neste** documento primeiro.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · `packages/modulo-rh/` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`.
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · `packages/extensao-rh/` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`.
 
 Relacionados: [00-prd.md](00-prd.md) · [05-organograma-acl-hierarquica.md](05-organograma-acl-hierarquica.md) · [07-jornada-horas-extras-folha.md](07-jornada-horas-extras-folha.md) · [adrs/ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md)
 
@@ -20,7 +20,7 @@ Verificadas no código real (`app/Models/Exemplo.php`, `app/Models/Concerns/*`, 
 - **Enums** — PHP backed (ADR-0010): coluna `VARCHAR` + **CHECK constraint** Postgres com a lista de valores + cast `EnumClass::class` no model.
 - **Chave pública** — o core hoje faz route binding por `id` (ex.: rota `exemplos/{exemplo}`); **não há `HasUlid` implementado**. O ADR-0004 (ULID público) é **aspiracional**: este módulo segue o padrão real (`id` interno) e adota ULID apenas se/quando o core introduzir a trait compartilhada. Onde uma URL amigável é desejável, usa-se `slug`/`matricula`, não ULID.
 - **`unique` por tenant** — `Rule::unique()->where('empresa_id', ...)` na validação **+** índice único composto **parcial** no banco: `UNIQUE (empresa_id, <coluna>) WHERE deleted_at IS NULL` (libera o valor após soft-delete; padrão real visto em `add_deleted_at_*`).
-- **Migrations incrementais** — `create_<tabela>_table` + migrations aditivas separadas (`add_<coluna>_to_<tabela>_table`), como em `exemplos`. No pacote, vivem em `packages/modulo-rh/database/migrations` (carregadas por `loadMigrationsFrom`).
+- **Migrations incrementais** — `create_<tabela>_table` + migrations aditivas separadas (`add_<coluna>_to_<tabela>_table`), como em `exemplos`. No pacote, vivem em `packages/extensao-rh/database/migrations` (carregadas por `loadMigrationsFrom`).
 - **Tipos Postgres** — `BIGINT`/`BIGSERIAL` (FK/PK), `VARCHAR(n)`, `TEXT`, `DATE`, `TIMESTAMP`, `TIME`, `BOOLEAN`, `SMALLINT`, `INTEGER`, `JSONB`. `NUMERIC(p,s)` apenas para percentuais/quantidades — **nunca** dinheiro.
 
 ### Catálogos de **referência global** já existentes — REAPROVEITADOS (não recriar)
@@ -651,7 +651,7 @@ Registro **opcional** de cada importação de planilha ([11](11-importacao-expor
 
 ---
 
-## 4. Enums a criar (`packages/modulo-rh/src/Enums/`)
+## 4. Enums a criar (`packages/extensao-rh/src/Enums/`)
 
 Todos backed `string` (exceto `DiaSemana` = `int`), com `label()`, `options()`, `variant()/color()` quando viram badge, e métodos de lógica indicados. Cada um acompanha **CHECK constraint** na migration.
 
@@ -729,7 +729,7 @@ Greenfield: a Fase 1 cria as tabelas já completas. O padrão para evoluções f
 2. Enum novo = coluna `VARCHAR` + CHECK adicionado **após** eventual backfill.
 3. FK `admin_user_id`/`gestor_id` entram `nullable` + índice (único parcial onde aplicável). Não tocam o core.
 4. Catálogos novos e tabelas-filhas são puramente aditivos.
-5. Empacotamento (ADR-0015): migrations em `packages/modulo-rh/database/migrations` (via `loadMigrationsFrom`); permissões/menu mesclados em runtime no `boot()`; **aditivo, nunca edita o core**.
+5. Empacotamento (ADR-0015): migrations em `packages/extensao-rh/database/migrations` (via `loadMigrationsFrom`); permissões/menu mesclados em runtime no `boot()`; **aditivo, nunca edita o core**.
 
 > **Itens desta revisão (todos aditivos).** As tabelas novas — `campos_personalizados` (§A11) + coluna `funcionarios.dados_personalizados`, `atestados` (§C3), `ocorrencias` (§C4) e `importacoes` (§F, opcional) — e os enums de §4.2 entram pelas regras acima (colunas/tabelas novas `NULL`/com default; FKs nullable; CHECK após backfill). **Faseamento:** campos personalizados é **fundação reutilizável** aplicada ao funcionário já na Fase 1 (candidata a promoção ao core — [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)); atestado/ocorrência entram como **fundação na Fase 1** (entidade + estados + anexo), com workflow/abono completos nas fases seguintes ([12](12-ausencias-faltas-atestados-afastamentos.md), [09](09-roadmap-fases.md)); a importação é **pós-Fase 1** ([11](11-importacao-exportacao.md)).
 

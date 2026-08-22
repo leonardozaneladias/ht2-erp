@@ -6,21 +6,21 @@ Relacionados: [01](01-modelo-de-dominio.md) (fonte de verdade de schema) · [02]
 >
 > **O que este documento não é.** Não redefine schema (qualquer divergência de coluna/enum/tabela resolve-se **primeiro** no [01](01-modelo-de-dominio.md)) nem detalha a mecânica de organograma/HE/folha (vive em [05](05-organograma-acl-hierarquica.md) e [07](07-jornada-horas-extras-folha.md)).
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · `packages/modulo-rh/` · views `rh::` · banco **PostgreSQL 16** · **aditivo ao core** (nunca edita o boilerplate — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · `packages/extensao-rh/` · views `rh::` · banco **PostgreSQL 16** · **aditivo ao core** (nunca edita o boilerplate — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
 
 ---
 
 ## 0. Princípios de execução (resumo operacional)
 
-Verificados no código real do gerador (`app/Console/Commands/MakeModuloCommand.php`, `MakeModuloPacoteCommand.php`), nos stubs (`stubs/modulo-pacote/*`) e na infraestrutura de wiring (`app/Support/Modules/ModuleRegistry.php`, `app/Support/Generator/ModuloPacote.php`):
+Verificados no código real do gerador (`app/Console/Commands/MakeModuloCommand.php`, `MakeExtensaoCommand.php`), nos stubs (`stubs/extensao/*`) e na infraestrutura de wiring (`app/Support/Modules/ModuleRegistry.php`, `app/Support/Generator/Extensao.php`):
 
-1. **Gerador, não mão.** Toda a casca CRUD nasce de `make:modulo-pacote` + `make:modulo --module=Rh`. A mão entra **depois**, customizando migration/model/Rules/Actions para o que o [01](01-modelo-de-dominio.md) exige além do scaffold.
+1. **Gerador, não mão.** Toda a casca CRUD nasce de `make:extensao` + `make:modulo --module=Rh`. A mão entra **depois**, customizando migration/model/Rules/Actions para o que o [01](01-modelo-de-dominio.md) exige além do scaffold.
 2. **Aditivo ao core ([ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).** Rotas via `ModuleRegistry`, permissões mescladas em `config('access.modules')`, menu mesclado em `config('admin-menu')`, Livewire/Policies registrados **explicitamente** no `RhServiceProvider`. Zero edição de arquivos do boilerplate.
 3. **Multi-tenant lógico.** Toda tabela usa `App\Models\Concerns\BelongsToEmpresa` (global scope `empresa` + auto-fill no `creating`); `unique` sempre por empresa (`Rule::unique()->where('empresa_id', …)` **+** índice único parcial `WHERE deleted_at IS NULL`).
 4. **Lixeira + LGPD por padrão.** `SoftDeletes`/`UsaSoftDeletes` + `ComLixeira` onde aplicável; PII em `atributosNaoAuditados()`; `cid`/financeiro `encrypted`; foto/documentos em disco privado.
-5. **Gate de qualidade por bloco.** `./vendor/bin/pint` · `npx prettier --write packages/modulo-rh/` · `./vendor/bin/phpstan analyse` (level 6) · `php artisan test`. Pós-instalação/migração: `php artisan migrate && php artisan access:sync && php artisan cache:clear`.
+5. **Gate de qualidade por bloco.** `./vendor/bin/pint` · `npx prettier --write packages/extensao-rh/` · `./vendor/bin/phpstan analyse` (level 6) · `php artisan test`. Pós-instalação/migração: `php artisan migrate && php artisan access:sync && php artisan cache:clear`.
 
-> **Nota de nomenclatura (catálogo de departamento).** Os documentos de planejamento ([01](01-modelo-de-dominio.md)/[02](02-fase-1-blueprint.md)) são a **fonte de verdade** e nomeiam o catálogo de departamentos como tabela `departamentos`/model `Departamento`. Os testes-semente já presentes no repo (`tests/Feature/Rh/RhLixeiraTest.php`) referenciam `HT2ERP\Rh\Models\Departamento` e a key de menu `rh-departamentos` (ver `App\Actions\Admin\Menu\AplicarMenuPadraoAction`). **Decida a nomenclatura final no [01](01-modelo-de-dominio.md) antes de gerar** e mantenha test + menu coerentes. Este guia usa `Departamento` (seguindo o blueprint); onde você optar por `Departamento`, troque o nome do recurso no `make:modulo` e os identificadores correspondentes — o resto do fluxo é idêntico.
+> **Nota de nomenclatura (catálogo de departamento).** Os documentos de planejamento ([01](01-modelo-de-dominio.md)/[02](02-fase-1-blueprint.md)) são a **fonte de verdade** e nomeiam o catálogo de departamentos como tabela `departamentos`/model `Departamento`. Os testes-semente já presentes no repo (`tests/Feature/Rh/RhLixeiraTest.php`) referenciam `HT2ML\Rh\Models\Departamento` e a key de menu `rh-departamentos` (ver `App\Actions\Admin\Menu\AplicarMenuPadraoAction`). **Decida a nomenclatura final no [01](01-modelo-de-dominio.md) antes de gerar** e mantenha test + menu coerentes. Este guia usa `Departamento` (seguindo o blueprint); onde você optar por `Departamento`, troque o nome do recurso no `make:modulo` e os identificadores correspondentes — o resto do fluxo é idêntico.
 
 ---
 
@@ -29,17 +29,17 @@ Verificados no código real do gerador (`app/Console/Commands/MakeModuloCommand.
 ### 1.1 Comando
 
 ```bash
-php artisan make:modulo-pacote Rh
+php artisan make:extensao Rh
 ```
 
-O `MakeModuloPacoteCommand` resolve a identidade do pacote via `ModuloPacote::paraNome('Rh')` (a partir de `config/modulos.php`: `vendor=ht2erp`, `namespace=HT2ERP`, `path=packages`, `prefixo_pacote=modulo-`) e gera, a partir de `stubs/modulo-pacote/*`:
+O `MakeExtensaoCommand` resolve a identidade do pacote via `Extensao::paraNome('Rh')` (a partir de `config/extensoes.php`: `vendor=ht2ml`, `namespace=HT2ML`, `path=packages`, `prefixo_pacote=modulo-`) e gera, a partir de `stubs/extensao/*`:
 
 - `src/RhServiceProvider.php` (de `service-provider.stub`)
 - `config/rh.php` (de `config.stub` — âncoras de permissões e menu)
 - `routes/admin.php` (de `routes.stub` — âncora de rotas)
 - `README.md`, `.gitignore`
 - diretórios vazios com `.gitkeep`: `database/migrations`, `database/factories`, `resources/views`, `tests`
-- `composer.json` do pacote (PSR-4 `HT2ERP\Rh\` → `src/`, factories → `database/factories/`, `autoload-dev` `HT2ERP\Rh\Tests\` → `tests/`, `extra.laravel.providers` apontando para `HT2ERP\Rh\RhServiceProvider`)
+- `composer.json` do pacote (PSR-4 `HT2ML\Rh\` → `src/`, factories → `database/factories/`, `autoload-dev` `HT2ML\Rh\Tests\` → `tests/`, `extra.laravel.providers` apontando para `HT2ML\Rh\RhServiceProvider`)
 
 E **registra o path repository** no `composer.json` raiz (idempotente):
 
@@ -52,7 +52,7 @@ E **registra o path repository** no `composer.json` raiz (idempotente):
 ### 1.2 Instalação (symlink, desenvolvimento dentro do boilerplate)
 
 ```bash
-composer require "ht2erp/modulo-rh:@dev"
+composer require "ht2ml/extensao-rh:@dev"
 ```
 
 O Composer resolve via symlink; o auto-discovery do Laravel (`extra.laravel.providers`) carrega o `RhServiceProvider`. Em seguida:
@@ -66,7 +66,7 @@ php artisan access:sync && php artisan cache:clear
 A casca nasce mínima; abaixo a árvore **após** B1–B7 (o `make:modulo --module=Rh` preenche `src/`, `database/`, `resources/`, `tests/` recurso a recurso). Caminhos de pacote confirmados no `mapaArquivosPacote()` do `MakeModuloCommand`:
 
 ```
-packages/modulo-rh/
+packages/extensao-rh/
 ├── composer.json
 ├── README.md
 ├── .gitignore
@@ -99,13 +99,13 @@ packages/modulo-rh/
     └── Feature/                     # CRUD + tenant scope + policy + regras (Pest)
 ```
 
-> Namespaces (de `ModuloPacote`): models `HT2ERP\Rh\Models\*`, enums `HT2ERP\Rh\Enums\*`, Livewire `HT2ERP\Rh\Livewire\{Plural}\*`, policies `HT2ERP\Rh\Policies\*`. As views resolvem por `rh::livewire.…` (namespace `rh` registrado por `loadViewsFrom`).
+> Namespaces (de `Extensao`): models `HT2ML\Rh\Models\*`, enums `HT2ML\Rh\Enums\*`, Livewire `HT2ML\Rh\Livewire\{Plural}\*`, policies `HT2ML\Rh\Policies\*`. As views resolvem por `rh::livewire.…` (namespace `rh` registrado por `loadViewsFrom`).
 
 ---
 
 ## 2. Geração dos CRUDs `[B1–B7]`
 
-Cada recurso geral roda `php artisan make:modulo <Recurso> --module=Rh --tenant --fields="..."`. O `--module=Rh` ativa o **modo pacote**: arquivos vão para `packages/modulo-rh/`, e o comando **integra ao pacote** (não ao core) — injeta rotas em `routes/admin.php` do pacote, permissões+menu em `config/rh.php`, e registra `Livewire::component()` + `Gate::policy()` no `RhServiceProvider` (ver `integrarNoPacote()`).
+Cada recurso geral roda `php artisan make:modulo <Recurso> --module=Rh --tenant --fields="..."`. O `--module=Rh` ativa o **modo pacote**: arquivos vão para `packages/extensao-rh/`, e o comando **integra ao pacote** (não ao core) — injeta rotas em `routes/admin.php` do pacote, permissões+menu em `config/rh.php`, e registra `Livewire::component()` + `Gate::policy()` no `RhServiceProvider` (ver `integrarNoPacote()`).
 
 ### 2.1 Tipos de campo suportados (`--fields`), ancorados no `CampoModulo` real
 
@@ -209,14 +209,14 @@ Flags úteis (de `MakeModuloCommand`): `--sem-soft-delete` (recursos append-only
 
 ## 3. ServiceProvider do pacote (`RhServiceProvider`)
 
-Gerado de `stubs/modulo-pacote/service-provider.stub`. O esqueleto abaixo reflete o stub real (`mergeConfigFrom` no `register()`, rotas via `ModuleRegistry`, `loadViewsFrom`/`loadMigrationsFrom` + merges no `boot()`), com os registros explícitos de Livewire/Policy que o `make:modulo` injeta na âncora à medida que cada recurso é gerado.
+Gerado de `stubs/extensao/service-provider.stub`. O esqueleto abaixo reflete o stub real (`mergeConfigFrom` no `register()`, rotas via `ModuleRegistry`, `loadViewsFrom`/`loadMigrationsFrom` + merges no `boot()`), com os registros explícitos de Livewire/Policy que o `make:modulo` injeta na âncora à medida que cada recurso é gerado.
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace HT2ERP\Rh;
+namespace HT2ML\Rh;
 
 use App\Support\Modules\ModuleRegistry;
 use Illuminate\Support\ServiceProvider;
@@ -253,17 +253,17 @@ final class RhServiceProvider extends ServiceProvider
 
         // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha
         // Exemplos (injetados pelo gerador, recurso a recurso):
-        // \Livewire\Livewire::component('rh.departamentos.index', \HT2ERP\Rh\Livewire\Departamentos\IndexDepartamento::class);
-        // \Livewire\Livewire::component('rh.departamentos.form',  \HT2ERP\Rh\Livewire\Departamentos\FormDepartamento::class);
-        // \Livewire\Livewire::component('rh-departamentos-table', \HT2ERP\Rh\Livewire\Departamentos\DepartamentoTable::class);
-        // \Illuminate\Support\Facades\Gate::policy(\HT2ERP\Rh\Models\Departamento::class, \HT2ERP\Rh\Policies\DepartamentoPolicy::class);
+        // \Livewire\Livewire::component('rh.departamentos.index', \HT2ML\Rh\Livewire\Departamentos\IndexDepartamento::class);
+        // \Livewire\Livewire::component('rh.departamentos.form',  \HT2ML\Rh\Livewire\Departamentos\FormDepartamento::class);
+        // \Livewire\Livewire::component('rh-departamentos-table', \HT2ML\Rh\Livewire\Departamentos\DepartamentoTable::class);
+        // \Illuminate\Support\Facades\Gate::policy(\HT2ML\Rh\Models\Departamento::class, \HT2ML\Rh\Policies\DepartamentoPolicy::class);
     }
 }
 ```
 
 Pontos de integração (sem tocar o core — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)):
 
-- **Rotas** — `App\Support\Modules\ModuleRegistry::routes(...)` acumula closures; o grupo autenticado de `routes/admin.php` (core) itera `routeCallbacks()` e dá `require` em `packages/modulo-rh/routes/admin.php` **dentro** da stack admin. O arquivo de rotas usa prefixos/names **relativos** (ex.: `Route::prefix('rh/departamentos')->name('rh.departamentos.')`).
+- **Rotas** — `App\Support\Modules\ModuleRegistry::routes(...)` acumula closures; o grupo autenticado de `routes/admin.php` (core) itera `routeCallbacks()` e dá `require` em `packages/extensao-rh/routes/admin.php` **dentro** da stack admin. O arquivo de rotas usa prefixos/names **relativos** (ex.: `Route::prefix('rh/departamentos')->name('rh.departamentos.')`).
 - **Permissões** — `contribuirPermissoes()` faz `array_merge_recursive` de `config('rh.permissoes')` em `config('access.modules')['negocio']`. Assim `access:sync`, a matriz de acesso e o `RolePermissionSeeder` enxergam as `rh.*`.
 - **Menu** — `contribuirMenu()` mescla `config('rh.menu')` nos `items` da seção `negocio` de `config('admin-menu')`. Keys estáveis → personalização do cliente (`MenuPersonalizacao`) sobrevive a updates. O `AplicarMenuPadraoAction` do core **reposiciona** os itens RH (keys `rh-departamentos`, `rh-funcionarios`) para o grupo "RH" da seção **Tabelas Auxiliares** — use keys de menu coerentes com esse Action.
 - **Livewire/Policy** — registrados **explicitamente** no `boot()` (não há auto-discovery fora de `App\`). O `make:modulo` injeta `Livewire::component('rh.<recurso>.index|form', ...)`, `Livewire::component('<tag-da-table>', ...)` e `Gate::policy(Model::class, Policy::class)` na âncora.
@@ -272,11 +272,11 @@ Pontos de integração (sem tocar o core — [ADR-0015](../../../architecture/ad
 
 ## 4. Camadas por recurso (padrão do core)
 
-Mesma stack do módulo **Exemplo** (`app/Models/Exemplo.php`, `app/Livewire/Admin/Exemplos/*`), agora dentro de `HT2ERP\Rh\`. Cada recurso CRUD do RH replica:
+Mesma stack do módulo **Exemplo** (`app/Models/Exemplo.php`, `app/Livewire/Admin/Exemplos/*`), agora dentro de `HT2ML\Rh\`. Cada recurso CRUD do RH replica:
 
 | Camada                         | Responsabilidade                                                                                                                                  | Exemplo no RH                                                                                                     |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Model**                      | Eloquent + traits `Auditavel` + `BelongsToEmpresa` + `SoftDeletes` (impl. `UsaSoftDeletes`), `casts()`, relações, `atributosNaoAuditados()` (PII) | `HT2ERP\Rh\Models\Funcionario` (casts de enums/datas/`MoneyCast`; PII fora de auditoria)                          |
+| **Model**                      | Eloquent + traits `Auditavel` + `BelongsToEmpresa` + `SoftDeletes` (impl. `UsaSoftDeletes`), `casts()`, relações, `atributosNaoAuditados()` (PII) | `HT2ML\Rh\Models\Funcionario` (casts de enums/datas/`MoneyCast`; PII fora de auditoria)                          |
 | **Enum (backed)**              | Domínio finito + `label()`/`options()`/`variant()` + lógica; coluna `VARCHAR` + CHECK + cast no model                                             | `StatusFuncionario` (`isAtivo()`), `TipoHoraExtra` (`fatorPadraoBps(): int`)                                      |
 | **DTO (readonly)**             | Transporte entre camadas; `fromArray()` + `paraModel()`; nunca array genérico                                                                     | `FuncionarioDTO`, `HoraExtraDTO`                                                                                  |
 | **FormRequest + Rules**        | Validação de input (nunca no controller/componente); `unique` por tenant                                                                          | `StoreFuncionarioRequest` + `FuncionarioRules` (`Rule::unique()->where('empresa_id', …)`, `new \App\Rules\Cpf()`) |
@@ -294,7 +294,7 @@ Referência canônica de Table: `app/Livewire/Admin/Exemplos/ExemploTable.php` (
 
 ## 5. Migrations
 
-**Onde.** Em `packages/modulo-rh/database/migrations`, carregadas por `loadMigrationsFrom` (não publicadas; rodam com `php artisan migrate`). Padrão incremental do core: `create_<tabela>_table` + aditivas (`add_<coluna>_to_<tabela>_table`) para evoluções.
+**Onde.** Em `packages/extensao-rh/database/migrations`, carregadas por `loadMigrationsFrom` (não publicadas; rodam com `php artisan migrate`). Padrão incremental do core: `create_<tabela>_table` + aditivas (`add_<coluna>_to_<tabela>_table`) para evoluções.
 
 **Ordem de criação** (respeita as FKs — catálogos antes do funcionário; filhas/eventos/HE depois):
 
@@ -355,7 +355,7 @@ Pontos de instalação/arquitetura que os incrementos da revisão acrescentam (a
 
 ## 7. Testes (Pest)
 
-Vivem em `packages/modulo-rh/tests/Feature/` (gerados por recurso) e em `tests/Feature/Rh/` do app para cenários transversais já presentes (`FuncionarioCargoTest.php`, `RhLixeiraTest.php`). Cobertura por bloco:
+Vivem em `packages/extensao-rh/tests/Feature/` (gerados por recurso) e em `tests/Feature/Rh/` do app para cenários transversais já presentes (`FuncionarioCargoTest.php`, `RhLixeiraTest.php`). Cobertura por bloco:
 
 | Bloco | O que testar                                                                                                                                                                                                                                         |
 | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -411,7 +411,7 @@ php artisan test --group=postgres   # DB_CONNECTION=pgsql_test no ambiente do jo
 
 ```bash
 ./vendor/bin/pint                              # PSR-12 + Laravel
-npx prettier --write packages/modulo-rh/       # Blade/JS/CSS/JSON/MD do pacote
+npx prettier --write packages/extensao-rh/       # Blade/JS/CSS/JSON/MD do pacote
 ./vendor/bin/phpstan analyse                   # Larastan level 6 — sem warnings
 php artisan test                               # Pest verde (suíte RH em Postgres)
 ```
@@ -428,8 +428,8 @@ Caminho crítico `B1 → B2 → B3`; depois B4 (paralelo) e a trilha de folha `B
 
 ```bash
 # ── B1 · Fundação + catálogos ─────────────────────────────────────────────
-php artisan make:modulo-pacote Rh
-composer require "ht2erp/modulo-rh:@dev"
+php artisan make:extensao Rh
+composer require "ht2ml/extensao-rh:@dev"
 php artisan make:modulo Departamento            --module=Rh --tenant --fields="..."   # (ver §2.2)
 php artisan make:modulo Funcao           --module=Rh --tenant --fields="..."
 php artisan make:modulo TipoDocumentoRh  --module=Rh --tenant --fields="..."
@@ -438,7 +438,7 @@ php artisan make:modulo Escala           --module=Rh --tenant --fields="..."
 php artisan make:modulo Rubrica          --module=Rh --tenant --fields="..."
 # À mão: customizar migrations (FKs/uniques parciais/CHECKs), self-relation de Departamento,
 #        ProvisionarCatalogosRh + gancho de criação de empresa, TabelasLegaisSeeder.
-./vendor/bin/pint && npx prettier --write packages/modulo-rh/
+./vendor/bin/pint && npx prettier --write packages/extensao-rh/
 php artisan migrate && php artisan access:sync && php artisan cache:clear
 ./vendor/bin/phpstan analyse && php artisan test
 
@@ -446,7 +446,7 @@ php artisan migrate && php artisan access:sync && php artisan cache:clear
 php artisan make:modulo Funcionario      --module=Rh --tenant --fields="..."
 # À mão: 5 tabelas-filhas (+ models/repeaters), enums de B2 com CHECK, documentos via Anexo
 #        (disco privado + URL assinada), uniques parciais (CPF/matrícula).
-./vendor/bin/pint && npx prettier --write packages/modulo-rh/ && php artisan migrate && php artisan test
+./vendor/bin/pint && npx prettier --write packages/extensao-rh/ && php artisan migrate && php artisan test
 
 # ── B3 · Organograma + ACL + vínculo AdminUser + self-service ─────────────
 # À mão: migration do pivot funcionario_funcao; EscopoOrganograma (CTE recursiva) +
@@ -477,7 +477,7 @@ php artisan access:sync && php artisan cache:clear && php artisan test
 
 ## 10. Definition of Done do módulo (Fase 1)
 
-- [ ] `make:modulo-pacote Rh` rodado; pacote instalado via path repository (symlink) e carregando (`/admin` responde com rotas RH).
+- [ ] `make:extensao Rh` rodado; pacote instalado via path repository (symlink) e carregando (`/admin` responde com rotas RH).
 - [ ] `RhServiceProvider`: rotas via `ModuleRegistry`; permissões mescladas em `config('access.modules')`; menu mesclado (keys coerentes com `AplicarMenuPadraoAction` → grupo "RH" em Tabelas Auxiliares); `Livewire::component()` + `Gate::policy()` de **todos** os recursos.
 - [ ] 8 recursos geráveis (Departamento, Funcao, TipoDocumentoRh, TipoAfastamento, Escala, Rubrica, Funcionario, HoraExtra) com a stack completa (model+enum+DTO+Rules+Actions+Service+Policy+Livewire+views+teste).
 - [ ] Tabelas à mão entregues: 5 filhas de `funcionarios`, `funcionario_funcao`, `escala_dias`, `escala_funcionario`, `funcionario_eventos`, `funcionario_afastamentos`, `tabelas_legais`.

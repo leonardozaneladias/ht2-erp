@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Dados de Referência — Fiscal (CNAE, CFOP, NCM). Catálogos globais, consulta.
- * Candidatos a virar um pacote ht2erp/dados-fiscais no futuro — por isso os
+ * Candidatos a virar um pacote ht2ml/dados-fiscais no futuro — por isso os
  * models são autocontidos.
  */
 return new class extends Migration

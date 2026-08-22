@@ -39,7 +39,7 @@ Refs: #issue-number
 | `auth`   | Autenticação (guard admin)              |
 | `infra`  | DDEV, Docker, CI, deploy                |
 | `models` | Models, migrations, seeders             |
-| `rh`     | Módulo de RH (`ht2erp/modulo-rh`)       |
+| `rh`     | Módulo de RH (`ht2ml/extensao-rh`)       |
 | `docs`   | Documentação                            |
 | `ui`     | Interface, componentes visuais          |
 | `skills` | Skills e automações `.claude`/`.agents` |

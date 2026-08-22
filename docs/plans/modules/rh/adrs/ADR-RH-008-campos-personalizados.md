@@ -9,13 +9,13 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** modelagem, rh, extensibilidade, lgpd
 
-> Pacote `ht2erp/modulo-rh` (namespace `HT2ERP\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema em [01 §A11/§B1/§4.2](../01-modelo-de-dominio.md); mecânica completa em [10](../10-campos-personalizados.md). Decisão de modelagem — **fundação reutilizável**, aplicada ao funcionário na Fase 1.
+> Pacote `ht2ml/extensao-rh` (namespace `HT2ML\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema em [01 §A11/§B1/§4.2](../01-modelo-de-dominio.md); mecânica completa em [10](../10-campos-personalizados.md). Decisão de modelagem — **fundação reutilizável**, aplicada ao funcionário na Fase 1.
 
 ## Contexto e problema
 
 O cliente pediu **flexibilidade total para ajustar o sistema sem código**. Os catálogos configuráveis ([04](../04-catalogos-configuraveis.md)) resolvem "adicionar linhas" a conceitos existentes (um departamento a mais), mas **não** cobrem "adicionar **campos**" à ficha da pessoa — atributos que o engenheiro não previu e que variam por empresa ("tamanho da camiseta", "matrícula legada", "número do crachá").
 
-Criar **coluna + migration por pedido** não é opção: cada cliente teria um schema diferente, o que **quebra o pacote distribuível** (`modulo-rh` é um produto com várias instalações — [ADR-RH-007](ADR-RH-007-rh-familia-modulos-pacote.md)) e contraria a evolução aditiva controlada ([01 §6](../01-modelo-de-dominio.md)). Precisa-se de um mecanismo em que o **cliente define** os campos pela UI e o sistema os **renderiza, valida, persiste e audita** genericamente — sem deploy.
+Criar **coluna + migration por pedido** não é opção: cada cliente teria um schema diferente, o que **quebra o pacote distribuível** (`extensao-rh` é um produto com várias instalações — [ADR-RH-007](ADR-RH-007-rh-familia-modulos-pacote.md)) e contraria a evolução aditiva controlada ([01 §6](../01-modelo-de-dominio.md)). Precisa-se de um mecanismo em que o **cliente define** os campos pela UI e o sistema os **renderiza, valida, persiste e audita** genericamente — sem deploy.
 
 ## Drivers da decisão
 

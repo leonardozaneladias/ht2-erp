@@ -9,7 +9,7 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** historico, auditoria, rh
 
-> Pacote `ht2erp/modulo-rh` (namespace `HT2ERP\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). `Funcionario` é o agregado-raiz ([ADR-RH-001](ADR-RH-001-funcionario-agregado-e-vinculo-adminuser.md)). Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md).
+> Pacote `ht2ml/extensao-rh` (namespace `HT2ML\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). `Funcionario` é o agregado-raiz ([ADR-RH-001](ADR-RH-001-funcionario-agregado-e-vinculo-adminuser.md)). Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md).
 
 ## Contexto e problema
 

@@ -25,7 +25,7 @@ NC='\033[0m'
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-# Convenção do nome do repo do módulo (ver comentário em config/modulos.php).
+# Convenção do nome do repo do módulo (ver comentário em config/extensoes.php).
 REPO_PREFIX="erp-module-"
 
 # --- Parse de argumentos (2 posicionais + --dry-run em qualquer posição) ---
@@ -66,14 +66,14 @@ if [[ -z "$(git ls-files "${PREFIX}" | head -1)" ]]; then
     exit 1
 fi
 
-# --- Lê a org de config/modulos.php (stub de env() evita bootar o Laravel) ---
+# --- Lê a org de config/extensoes.php (stub de env() evita bootar o Laravel) ---
 read_cfg() {
     php -r 'function env($k=null,$d=null){return $d;} $c=require $argv[1]; echo $c[$argv[2]] ?? "";' \
-        "config/modulos.php" "$1"
+        "config/extensoes.php" "$1"
 }
 ORG="$(read_cfg org)"
 if [[ -z "${ORG}" ]]; then
-    echo -e "${RED}Não consegui ler 'org' de config/modulos.php.${NC}"
+    echo -e "${RED}Não consegui ler 'org' de config/extensoes.php.${NC}"
     exit 1
 fi
 

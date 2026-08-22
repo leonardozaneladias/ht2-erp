@@ -9,7 +9,7 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** modelagem, rh, multi-tenant
 
-> Nomenclatura: o módulo de RH é o pacote `ht2erp/modulo-rh` (namespace `HT2ERP\Rh\`), **aditivo ao core** ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)) — nunca edita o boilerplate. Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md).
+> Nomenclatura: o módulo de RH é o pacote `ht2ml/extensao-rh` (namespace `HT2ML\Rh\`), **aditivo ao core** ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)) — nunca edita o boilerplate. Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md).
 
 ## Contexto e problema
 
@@ -62,7 +62,7 @@ Todas herdam `BelongsToEmpresa` (global scope `empresa` + auto-fill) e `SoftDele
 
 O **vínculo com o login** é uma FK **1:1 opcional** no agregado:
 
-- Coluna `funcionarios.admin_user_id` `BIGINT NULL`, FK `nullOnDelete`, **no pacote** (`packages/modulo-rh/database/migrations`, via `loadMigrationsFrom`) — o core fica intocado.
+- Coluna `funcionarios.admin_user_id` `BIGINT NULL`, FK `nullOnDelete`, **no pacote** (`packages/extensao-rh/database/migrations`, via `loadMigrationsFrom`) — o core fica intocado.
 - Unicidade por tenant: índice único **parcial** `UNIQUE (empresa_id, admin_user_id) WHERE deleted_at IS NULL` (um login mapeia a no máximo um funcionário **por empresa**; o multi-tenant lógico permite o mesmo `AdminUser` em empresas diferentes).
 - A relação inversa `AdminUser::funcionario(): HasOne` é adicionada **por um model do pacote** (macro/método sobre o model do core), **sem migration nem alteração no `admin_users`** — respeitando [ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md).
 

@@ -9,7 +9,7 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** modelagem, rh, workflow, lgpd
 
-> Pacote `ht2erp/modulo-rh`, aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema em [01 §C2/§C3/§C4/§4.2](../01-modelo-de-dominio.md); mecânica em [12](../12-ausencias-faltas-atestados-afastamentos.md). O **afastamento** permanece em [06](../06-linha-do-tempo.md); esta decisão acrescenta **atestado** e **falta/ocorrência** e a relação entre os três.
+> Pacote `ht2ml/extensao-rh`, aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema em [01 §C2/§C3/§C4/§4.2](../01-modelo-de-dominio.md); mecânica em [12](../12-ausencias-faltas-atestados-afastamentos.md). O **afastamento** permanece em [06](../06-linha-do-tempo.md); esta decisão acrescenta **atestado** e **falta/ocorrência** e a relação entre os três.
 
 ## Contexto e problema
 

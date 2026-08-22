@@ -1,0 +1,28 @@
+{
+  "name": "ht2ml/extensao-rh",
+  "description": "Extensão Rh.",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "HT2ML\\Rh\\": "src/",
+      "HT2ML\\Rh\\Database\\Factories\\": "database/factories/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HT2ML\\Rh\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "HT2ML\\Rh\\RhServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable"
+}

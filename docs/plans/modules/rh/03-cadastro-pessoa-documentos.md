@@ -2,7 +2,7 @@
 
 > Especificação funcional e técnica do **agregado Funcionário** (cadastro de pessoa + documentos) do módulo de RH. Telas, abas, campos, componentes, validações e fluxo Livewire → DTO → Action. O **schema é definido em [01](01-modelo-de-dominio.md)** (fonte de verdade); aqui só consumimos os nomes de tabelas/colunas/enums de lá.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · views `rh::` · multi-tenant por `empresa_id`. **eSocial-ready** e **self-service** são decisões fechadas do cliente e moldam várias seções abaixo.
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · views `rh::` · multi-tenant por `empresa_id`. **eSocial-ready** e **self-service** são decisões fechadas do cliente e moldam várias seções abaixo.
 
 Relacionados: [01](01-modelo-de-dominio.md) · [04](04-catalogos-configuraveis.md) · [05](05-organograma-acl-hierarquica.md) · [06](06-linha-do-tempo.md)
 
@@ -10,7 +10,7 @@ Relacionados: [01](01-modelo-de-dominio.md) · [04](04-catalogos-configuraveis.m
 
 ## 1. Visão geral da tela
 
-O cadastro de funcionário é um **formulário único em abas** (não um wizard linear), servido pelo componente Livewire `HT2ERP\Rh\Livewire\Funcionarios\FormFuncionario` no layout admin (Inspinia). A lista vem de `IndexFuncionario` (com `FuncionarioTable` via PowerGrid); a edição/criação abre o `FormFuncionario`.
+O cadastro de funcionário é um **formulário único em abas** (não um wizard linear), servido pelo componente Livewire `HT2ML\Rh\Livewire\Funcionarios\FormFuncionario` no layout admin (Inspinia). A lista vem de `IndexFuncionario` (com `FuncionarioTable` via PowerGrid); a edição/criação abre o `FormFuncionario`.
 
 As abas espelham os blocos do modelo (01 §3, Bloco B):
 
@@ -118,7 +118,7 @@ Campos de `funcionarios` que identificam a pessoa (CPF/RG/PIS). Documentos digit
 | `matricula`            | `x-shared.input`                                | `required`, `max:30`, **unique `(empresa_id, matricula)`** (auto-sugerida — ver §3.1) |
 
 - **CPF** reutiliza a `Rule` do core `App\Rules\Cpf` (valida 11 dígitos, rejeita sequências repetidas e confere os 2 dígitos verificadores). A máscara é só visual; a Rule normaliza para dígitos antes de validar, e a coluna grava 11 dígitos.
-- **PIS/PASEP** ganha uma `Rule` nova no pacote (`HT2ERP\Rh\Rules\PisPasep`): 11 dígitos + cálculo do dígito verificador (pesos 3,2,9,8,7,6,5,4,3,2). Máscara `999.99999.99-9`; grava só dígitos.
+- **PIS/PASEP** ganha uma `Rule` nova no pacote (`HT2ML\Rh\Rules\PisPasep`): 11 dígitos + cálculo do dígito verificador (pesos 3,2,9,8,7,6,5,4,3,2). Máscara `999.99999.99-9`; grava só dígitos.
 - `pis_pasep` e `raca_cor`/`escolaridade`/nacionalidade (aba 1) são os campos que tornam o cadastro **eSocial-ready** — sinalizados na UI com um selo discreto "eSocial" no rótulo (`x-shared.tooltip`), nunca como `<select>` ou texto livre.
 
 ### 3.1 Geração da matrícula
@@ -255,7 +255,7 @@ As flags do `tipos_documento` (01 §3 A4: `exige_numero`, `exige_validade`, `exi
 
 ### 8.3 Upload seguro (disco **privado**) reaproveitando o core
 
-- O binário entra como `App\Models\Anexo` com `anexavel_type = HT2ERP\Rh\Models\Funcionario` (morph map) e `anexavel_id = funcionario.id`; `funcionario_documentos.anexo_id` aponta para ele (FK `nullOnDelete`).
+- O binário entra como `App\Models\Anexo` com `anexavel_type = HT2ML\Rh\Models\Funcionario` (morph map) e `anexavel_id = funcionario.id`; `funcionario_documentos.anexo_id` aponta para ele (FK `nullOnDelete`).
 - O `GerenciadorAnexos` do core hoje grava no **disco `public`** com caminho fixo (`store('anexos','public')`) e monta a lista chamando `Anexo::url()`. Documentos de RH são **sensíveis** → disco **privado**. Como o driver `local`/privado **não** serve `url()` pública, a abordagem fiel ao [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) é um **componente próprio do pacote** (`GerenciadorAnexosRh`) que **reusa o _model_ `Anexo`** com `disco='rh_privado'` e caminho `rh/{empresa_id}/...` (§8.3 endurecimento), **sem editar** o componente do core. **Acesso sempre por rota de download assinada autorizada por Policy** (`Storage::disk('rh_privado')->download(...)`), **nunca** `Anexo::url()` nem link público. _Alternativa:_ tornar o `GerenciadorAnexos` do core parametrizável (disco + caminho + geração de URL) como mudança **aditiva aprovada** — mais invasiva ([ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)).
 - Ciclo de vida do arquivo segue o core: soft-delete do `Anexo` mantém o binário (retenção/auditoria); o arquivo físico só some no force-delete (evento `forceDeleted`). Combina com a guarda legal trabalhista (01 §8).
 
@@ -379,7 +379,7 @@ FormFuncionario (mount / salvar)
 
 ### Peças
 
-- **`FuncionarioRules`** (classe estática, `HT2ERP\Rh\Http\Requests\FuncionarioRules::regras(?int $ignorarId)`) — única fonte de validação, consumida tanto pelo `FormFuncionario` quanto por `Store/UpdateFuncionarioRequest` (API-ready). Inclui:
+- **`FuncionarioRules`** (classe estática, `HT2ML\Rh\Http\Requests\FuncionarioRules::regras(?int $ignorarId)`) — única fonte de validação, consumida tanto pelo `FormFuncionario` quanto por `Store/UpdateFuncionarioRequest` (API-ready). Inclui:
     - `cpf` → `App\Rules\Cpf` + `Rule::unique('funcionarios','cpf')->where('empresa_id', app(TenantContext::class)->empresaAtivaId())->ignore($ignorarId)` (**unique por empresa**; índice parcial `WHERE deleted_at IS NULL` no banco libera CPF da lixeira).
     - `matricula` → `Rule::unique('funcionarios','matricula')->where('empresa_id', ...)->ignore($ignorarId)`.
     - enums via `Rule::enum(...)`; `data_demissao` → `after_or_equal:data_admissao`; coleções via `array` + regras por item (contatos/enderecos/bancarios/dependentes/documentos), incl. PIX por `pix_tipo` e campos de documento por flags do tipo.

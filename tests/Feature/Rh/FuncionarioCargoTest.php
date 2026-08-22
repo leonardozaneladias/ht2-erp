@@ -6,7 +6,7 @@ use App\Models\Empresa;
 use App\Support\Tenancy\TenantContext;
 use Database\Seeders\Referencia\CargoSeeder;
 use Database\Seeders\RolePermissionSeeder;
-use HT2ERP\Rh\Livewire\Funcionarios\FormFuncionario;
+use HT2ML\Rh\Livewire\Funcionarios\FormFuncionario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

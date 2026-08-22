@@ -40,7 +40,7 @@ _Avoid_: biblioteca, dependência
 ## Contextos
 
 - [Core](./app/CONTEXT.md): plataforma compartilhada — acesso, contexto, auditoria, aparência
-- RH (`packages/modulo-rh/`): departamento pessoal — funcionários e departamentos. Glossário ainda não escrito.
+- RH (`packages/extensao-rh/`): departamento pessoal — funcionários e departamentos. Glossário ainda não escrito.
 
 > **O vocabulário específico de ERP não é glosado, por decisão.** Documento
 > numerado, referência fiscal e afins pertencem ao produto HT2 ERP, não à

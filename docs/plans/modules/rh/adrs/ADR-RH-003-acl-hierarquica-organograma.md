@@ -9,7 +9,7 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** acl, segurança, rh, multi-tenant
 
-> Pacote `ht2erp/modulo-rh` (namespace `HT2ERP\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Vínculo funcionário↔login em [ADR-RH-001](ADR-RH-001-funcionario-agregado-e-vinculo-adminuser.md). Mecânica completa em [05 — Organograma e ACL hierárquica](../05-organograma-acl-hierarquica.md).
+> Pacote `ht2ml/extensao-rh` (namespace `HT2ML\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Vínculo funcionário↔login em [ADR-RH-001](ADR-RH-001-funcionario-agregado-e-vinculo-adminuser.md). Mecânica completa em [05 — Organograma e ACL hierárquica](../05-organograma-acl-hierarquica.md).
 
 ## Contexto e problema
 

@@ -2,7 +2,7 @@
 
 **ERP administrativo multiempresa** da HT2 — backoffice desktop-first e server-side, construído em **Laravel 13 + Livewire 4 + Inspinia (Tailwind 4)**, com guard `admin`, RBAC de dois níveis (papéis globais + por empresa), auditoria, filas (Horizon) e monitoramento (Pulse).
 
-O produto é **modular**: cada módulo de negócio é distribuído como **pacote Composer** aditivo ao core ([ADR-0015](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Em desenvolvimento: o **módulo de RH / Departamento Pessoal** (`ht2erp/modulo-rh`) — visão, modelo e blueprint na [suíte de documentação do RH](docs/plans/modules/rh/README.md).
+O produto é **modular**: cada módulo de negócio é distribuído como **pacote Composer** aditivo ao core ([ADR-0015](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Em desenvolvimento: o **módulo de RH / Departamento Pessoal** (`ht2ml/extensao-rh`) — visão, modelo e blueprint na [suíte de documentação do RH](docs/plans/modules/rh/README.md).
 
 O onboarding detalhado para agentes e humanos está em [CLAUDE.md](CLAUDE.md).
 

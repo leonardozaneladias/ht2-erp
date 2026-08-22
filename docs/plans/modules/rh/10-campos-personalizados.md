@@ -2,7 +2,7 @@
 
 > Como o **cliente** acrescenta campos próprios ao cadastro — sem código, sem migration, sem deploy. Define-se um **catálogo de definições** por empresa (tabela `campos_personalizados`) e os **valores** moram numa coluna JSONB na entidade hospedeira (`funcionarios.dados_personalizados`). Um trait reutilizável (`TemCamposPersonalizados`) e um enum (`TipoCampoPersonalizado`) dão o cast, a validação dinâmica e o mapeamento tipo→componente. O **schema é definido em [01](01-modelo-de-dominio.md)** (§A11, §B1, §4.2, §10 — fonte de verdade); aqui detalhamos o modelo, o trait, a UI e o reuso.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`. Decisão de modelagem em [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md).
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`. Decisão de modelagem em [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md).
 
 Relacionados: [01](01-modelo-de-dominio.md) · [03](03-cadastro-pessoa-documentos.md) · [11 §7](11-importacao-exportacao.md) · [adrs/ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)
 
@@ -229,17 +229,17 @@ Consumidos pela view e pelas Rules (valem para MVP e evolução):
 
 ## 4. Abstração reutilizável: o trait `TemCamposPersonalizados`
 
-O coração reutilizável é o trait `HT2ERP\Rh\Models\Concerns\TemCamposPersonalizados`, aplicado ao `Funcionario` (e a qualquer model futuro que ganhe campos personalizados — §7). Ele resolve as definições da empresa ativa, valida e expõe acessores.
+O coração reutilizável é o trait `HT2ML\Rh\Models\Concerns\TemCamposPersonalizados`, aplicado ao `Funcionario` (e a qualquer model futuro que ganhe campos personalizados — §7). Ele resolve as definições da empresa ativa, valida e expõe acessores.
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace HT2ERP\Rh\Models\Concerns;
+namespace HT2ML\Rh\Models\Concerns;
 
-use HT2ERP\Rh\Models\CampoPersonalizado;
-use HT2ERP\Rh\Enums\TipoCampoPersonalizado;
+use HT2ML\Rh\Models\CampoPersonalizado;
+use HT2ML\Rh\Enums\TipoCampoPersonalizado;
 
 /**
  * Dá ao model campos definidos pelo cliente: valores em `dados_personalizados`
@@ -370,14 +370,14 @@ O atributo `sensivel` de cada definição replica, **por dado**, o rigor que o m
 
 ## 7. Reuso em outros módulos (fundação candidata a promoção ao core)
 
-O mecanismo nasce no `modulo-rh`, mas é **agnóstico de domínio**. Adotá-lo em outra entidade (no RH ou num satélite — [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md)) é um passo-a-passo curto:
+O mecanismo nasce no `extensao-rh`, mas é **agnóstico de domínio**. Adotá-lo em outra entidade (no RH ou num satélite — [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md)) é um passo-a-passo curto:
 
 1. **Coluna**: migration aditiva `add_dados_personalizados_to_<tabela>` (`JSONB NULL`).
 2. **Trait**: `use TemCamposPersonalizados` no model + cast `'dados_personalizados' => 'array'`; sobrescrever `entidadePersonalizada()` com o slug da entidade (ex.: `'cliente'`).
 3. **Definições**: a tabela `campos_personalizados` já discrimina por `entidade` — a tela de definição (§4.1) filtra pelo novo slug, sem schema novo.
 4. **Form + Rules**: embutir o componente genérico (§4.2) e fundir `regrasPersonalizadas()` nas Rules da entidade.
 
-> **Promoção ao core.** Por ser fundação reutilizável (tabela + trait + enum + componente, sem domínio de RH), é **candidata a promoção ao core** — mesma lógica do [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md). Enquanto vive no `modulo-rh`, qualquer satélite que precise depende do `modulo-rh`; promovida, vira infra compartilhada. A decisão de quando promover está em [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md). Esta suíte **documenta** o mecanismo no RH (decisão confirmada com o cliente), marcando-o como candidato — não força a promoção agora.
+> **Promoção ao core.** Por ser fundação reutilizável (tabela + trait + enum + componente, sem domínio de RH), é **candidata a promoção ao core** — mesma lógica do [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md). Enquanto vive no `extensao-rh`, qualquer satélite que precise depende do `extensao-rh`; promovida, vira infra compartilhada. A decisão de quando promover está em [ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md). Esta suíte **documenta** o mecanismo no RH (decisão confirmada com o cliente), marcando-o como candidato — não força a promoção agora.
 
 ### 7.1 O motor genérico — detalhes de reuso (checklist 2.5)
 
@@ -388,7 +388,7 @@ O cliente pediu uma **base reutilizável** (não só "campos no funcionário"). 
 - **Variação por empresa/filial** — as definições já são **por empresa** (`empresa_id`, tenant). Variar **por filial** dentro da empresa (um campo só para a Filial X) é **[Evolução]**, via condicional de contexto (§2.4).
 - **Agrupamento em seções e posição** — `grupo` (seção/aba) + `ordem` posicionam o campo no formulário da entidade hospedeira (§4.2); a mesma estrutura serve a qualquer entidade.
 - **Armazenamento / consulta / alteração** — armazenamento em JSONB na entidade (§2.2); consulta por operadores JSONB tenant-scoped (§8); alteração preservando dados (§2.5) — **idêntico** em qualquer entidade que adote o trait.
-- **Critério de promoção ao core** — promover quando **um segundo módulo/entidade** (no RH ou num satélite — [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md)) precisar do mecanismo: aí a tabela `campos_personalizados` + trait + enum + componente saem do `modulo-rh` para a infra compartilhada do core, sem reabrir esta decisão ([ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)). Até lá, satélites que precisem dependem do `modulo-rh`.
+- **Critério de promoção ao core** — promover quando **um segundo módulo/entidade** (no RH ou num satélite — [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md)) precisar do mecanismo: aí a tabela `campos_personalizados` + trait + enum + componente saem do `extensao-rh` para a infra compartilhada do core, sem reabrir esta decisão ([ADR-RH-008](adrs/ADR-RH-008-campos-personalizados.md)). Até lá, satélites que precisem dependem do `extensao-rh`.
 
 ---
 

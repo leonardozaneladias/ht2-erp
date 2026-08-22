@@ -6,7 +6,7 @@ Relacionados: [01](01-modelo-de-dominio.md) (fonte de verdade de schema) · [03]
 >
 > **O que este documento não é.** Não redefine schema — qualquer divergência de coluna/enum/tabela é resolvida **primeiro no [01](01-modelo-de-dominio.md)**. Não detalha mecânica de organograma/ACL, linha do tempo, jornada/HE/folha — isso vive em [05](05-organograma-acl-hierarquica.md), [06](06-linha-do-tempo.md) e [07](07-jornada-horas-extras-folha.md). A arquitetura técnica transversal (camadas, services, snapshots) é o [08](08-arquitetura-tecnica.md).
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · `packages/modulo-rh/` · views `rh::` · **aditivo ao core** (nunca edita o boilerplate — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · `packages/extensao-rh/` · views `rh::` · **aditivo ao core** (nunca edita o boilerplate — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
 
 ---
 
@@ -14,12 +14,12 @@ Relacionados: [01](01-modelo-de-dominio.md) (fonte de verdade de schema) · [03]
 
 Aplicáveis a **todos** os blocos (herdadas do core e do [01 §0](01-modelo-de-dominio.md)):
 
-- **Geração via gerador, não à mão.** Bootstrap do pacote com `php artisan make:modulo-pacote Rh`; cada recurso CRUD com `php artisan make:modulo <Recurso> --module=Rh --tenant`. O gerador emite migration, factory, model (`BelongsToEmpresa` + `Auditavel`), enum de status, DTO `readonly`, `Rules`, Actions `execute()`, Policy (registrada no provider), Livewire **Index/Form/Table** (PowerGrid), views (`rh::`), teste Pest, e injeta permissões em `config/rh.php` (agregadas a `config('access.modules')['negocio']`) + item de menu na seção `negocio` + rotas via `ModuleRegistry`. Depois do gerador, **customiza-se** a migration (colunas/índices/FKs do [01](01-modelo-de-dominio.md)), o model (relações, casts, `atributosNaoAuditados()`), as `Rules` e as Actions.
+- **Geração via gerador, não à mão.** Bootstrap do pacote com `php artisan make:extensao Rh`; cada recurso CRUD com `php artisan make:modulo <Recurso> --module=Rh --tenant`. O gerador emite migration, factory, model (`BelongsToEmpresa` + `Auditavel`), enum de status, DTO `readonly`, `Rules`, Actions `execute()`, Policy (registrada no provider), Livewire **Index/Form/Table** (PowerGrid), views (`rh::`), teste Pest, e injeta permissões em `config/rh.php` (agregadas a `config('access.modules')['negocio']`) + item de menu na seção `negocio` + rotas via `ModuleRegistry`. Depois do gerador, **customiza-se** a migration (colunas/índices/FKs do [01](01-modelo-de-dominio.md)), o model (relações, casts, `atributosNaoAuditados()`), as `Rules` e as Actions.
 - **Multi-tenant** — toda tabela de negócio e catálogo tenant usa `App\Models\Concerns\BelongsToEmpresa` (global scope `empresa` + auto-fill no `creating`); `unique` sempre por empresa (`Rule::unique()->where('empresa_id', …)` **+** índice único parcial `WHERE deleted_at IS NULL`).
 - **Lixeira** — models de negócio implementam `App\Models\Contracts\UsaSoftDeletes` (`SoftDeletes`); as Tables usam `App\Livewire\Concerns\ComLixeira` (3 permissões por recurso: `deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete). Exceções append-only (`funcionario_funcao`, `escala_dias`, `escala_funcionario`, `funcionario_eventos`, `horas_extras`) **não** têm `deleted_at` — ver coluna "lixeira?" de cada bloco.
-- **Enums backed** (ADR-0010) — `packages/modulo-rh/src/Enums/`; coluna `VARCHAR` + **CHECK constraint** Postgres + cast no model. Lista canônica em [01 §4](01-modelo-de-dominio.md).
+- **Enums backed** (ADR-0010) — `packages/extensao-rh/src/Enums/`; coluna `VARCHAR` + **CHECK constraint** Postgres + cast no model. Lista canônica em [01 §4](01-modelo-de-dominio.md).
 - **Permissões** — a **lista canônica é [01 §10](01-modelo-de-dominio.md)** (fonte de verdade; este doc referencia-a, não a redefine). Padrão `rh.<recurso_snake_plural>.<acao>` (prefixo `rh.` obrigatório — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Ações CRUD padrão: `listar`, `criar`, `editar`, `deletar`, `restaurar`, `excluir_permanente`. Permissões especiais (ex.: `rh.funcionarios.ver_todos`, `rh.funcionarios.ver_dados_sensiveis`, `rh.afastamentos.ver_cid`, `rh.horas_extras.{aprovar,ver_valores}`) são adicionadas à mão em `config/rh.php`. Recursos com verbo próprio (`horas_extras`: `lancar/aprovar/estornar/marcar_paga/ver_valores`; `eventos`: `registrar`) seguem **exatamente** os slugs de [01 §10](01-modelo-de-dominio.md).
-- **Qualidade (gate de cada bloco)** — `./vendor/bin/pint`, `npx prettier --write packages/modulo-rh/`, `./vendor/bin/phpstan analyse` (level 6, sem warnings), `php artisan test` (verde). Após migrar/instalar: `php artisan migrate && php artisan access:sync && php artisan cache:clear`.
+- **Qualidade (gate de cada bloco)** — `./vendor/bin/pint`, `npx prettier --write packages/extensao-rh/`, `./vendor/bin/phpstan analyse` (level 6, sem warnings), `php artisan test` (verde). Após migrar/instalar: `php artisan migrate && php artisan access:sync && php artisan cache:clear`.
 - **DoD comum a todo recurso** (além do específico de cada bloco): migration idempotente com índices/FKs/CHECKs do [01](01-modelo-de-dominio.md); factory realista; model com traits/casts/relações/`atributosNaoAuditados()`; Policy mapeando as `rh.*`; lixeira onde aplicável; telas Index/Form/Table funcionais (sem `<select>` nativo — usar `x-shared.select-search`); testes Pest (CRUD + tenant scope + policy + regras de negócio); Pint/Prettier/PHPStan/test verdes.
 
 ---
@@ -40,7 +40,7 @@ Aplicáveis a **todos** os blocos (herdadas do core e do [01 §0](01-modelo-de-d
 
 ### 1.1 Status de implementação (B1–B7)
 
-Estado **real** do pacote `packages/modulo-rh` nesta data — verificado no repositório próprio do pacote (3 commits: base do módulo, lixeira, select de cargo). Legenda: ✅ existe · 🟡 parcial · ❌ não iniciado. Serve para o dev saber o que **expandir** vs **criar do zero**; **não** substitui o DoD de cada bloco (que continua sendo o critério de pronto).
+Estado **real** do pacote `packages/extensao-rh` nesta data — verificado no repositório próprio do pacote (3 commits: base do módulo, lixeira, select de cargo). Legenda: ✅ existe · 🟡 parcial · ❌ não iniciado. Serve para o dev saber o que **expandir** vs **criar do zero**; **não** substitui o DoD de cada bloco (que continua sendo o critério de pronto).
 
 | Bloco  | Item                                                                                           | Status | Observação                                                                                                                   |
 | ------ | ---------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -120,13 +120,13 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 
 ### B1 — Fundação do pacote + catálogos `[G]`
 
-**Objetivo.** Erguer a casca do pacote `ht2erp/modulo-rh` integrada ao core de forma **aditiva** (zero edição do boilerplate — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)) e entregar os **6 catálogos tenant** que destravam o cadastro de pessoa (B2) e a folha (B5/B7), com **provisionamento idempotente por empresa**.
+**Objetivo.** Erguer a casca do pacote `ht2ml/extensao-rh` integrada ao core de forma **aditiva** (zero edição do boilerplate — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)) e entregar os **6 catálogos tenant** que destravam o cadastro de pessoa (B2) e a folha (B5/B7), com **provisionamento idempotente por empresa**.
 
 **Entregas.**
 
-1. **Bootstrap do pacote** — `php artisan make:modulo-pacote Rh` cria `packages/modulo-rh/` (src, database, resources, routes, tests, `config/rh.php`, `RhServiceProvider`) e registra o path repository. `composer require "ht2erp/modulo-rh:@dev"` (symlink) para desenvolver dentro do boilerplate.
+1. **Bootstrap do pacote** — `php artisan make:extensao Rh` cria `packages/extensao-rh/` (src, database, resources, routes, tests, `config/rh.php`, `RhServiceProvider`) e registra o path repository. `composer require "ht2ml/extensao-rh:@dev"` (symlink) para desenvolver dentro do boilerplate.
 2. **Wiring ao core** (no `RhServiceProvider`, gerado pelo stub — apenas se completa):
-    - **Rotas** — `register()` chama `App\Support\Modules\ModuleRegistry::routes(...)` que dá `require` em `packages/modulo-rh/routes/admin.php` **dentro** do grupo autenticado `/admin` (herda prefixo `/admin`, name `admin.` e middleware tenant/2FA/inatividade).
+    - **Rotas** — `register()` chama `App\Support\Modules\ModuleRegistry::routes(...)` que dá `require` em `packages/extensao-rh/routes/admin.php` **dentro** do grupo autenticado `/admin` (herda prefixo `/admin`, name `admin.` e middleware tenant/2FA/inatividade).
     - **Permissões** — `boot()` faz merge de `config('rh.permissoes')` em `config('access.modules')['negocio']`, para que `access:sync`, a matriz de acesso e o `RolePermissionSeeder` enxerguem as `rh.*`.
     - **Menu** — `boot()` faz merge de `config('rh.menu')` nos itens da seção `negocio` de `config('admin-menu')` (keys estáveis → personalização do cliente no banco sobrevive ao update).
     - **Livewire/Policy** — registrados explicitamente no `boot()` do provider (`Livewire::component(...)`, `Gate::policy(...)`) conforme cada recurso é gerado.
@@ -151,7 +151,7 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 
 **Critérios de pronto (DoD).**
 
-- [ ] `make:modulo-pacote Rh` rodado; pacote instalado via path repository (symlink) e carregando (`/admin` responde com rotas do módulo).
+- [ ] `make:extensao Rh` rodado; pacote instalado via path repository (symlink) e carregando (`/admin` responde com rotas do módulo).
 - [ ] `RhServiceProvider`: rotas via `ModuleRegistry`; permissões mescladas em `config('access.modules')`; menu mesclado na seção `negocio`; Livewire/Policies registradas.
 - [ ] 6 migrations dos catálogos (com índices/uniques parciais/CHECKs do [01](01-modelo-de-dominio.md)) + factories.
 - [ ] Models com `BelongsToEmpresa` + `SoftDeletes`/`UsaSoftDeletes` + `Auditavel` + casts; `Departamento` com self-relation; `TipoDocumentoRh` nomeado para não colidir com o core.

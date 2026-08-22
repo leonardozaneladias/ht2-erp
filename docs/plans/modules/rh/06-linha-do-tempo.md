@@ -2,7 +2,7 @@
 
 > A **história funcional** do colaborador — admissão, promoções, reajustes, transferências, mudanças de cargo, afastamentos e desligamento — modelada como **eventos imutáveis append-only** (`funcionario_eventos`, sem `deleted_at`, com snapshot JSONB), mais a gestão de **afastamentos** (`funcionario_afastamentos`). O **schema é definido em [01](01-modelo-de-dominio.md)** (fonte de verdade); aqui só consumimos os nomes de tabelas/colunas/enums/permissões de lá e descrevemos o comportamento, as Actions, a UI e as regras de integridade.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`.
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`.
 
 Relacionados: [01](01-modelo-de-dominio.md) · [03](03-cadastro-pessoa-documentos.md) · [05](05-organograma-acl-hierarquica.md) · [adrs/ADR-RH-005](adrs/ADR-RH-005-historico-eventos-imutaveis.md)
 
@@ -82,7 +82,7 @@ O mesmo padrão (trocando o conjunto de `tipo_evento` por `afetaLotacao()` / car
 
 Toda mudança funcional é uma **Action** (`execute()`, padrão do core — CLAUDE §6) que faz **duas escritas numa única transação** `DB::transaction`: (a) **insere o evento** em `funcionario_eventos` com seus snapshots; (b) **atualiza a(s) coluna(s) "atual(is)"** correspondente(s) em `funcionarios`. Ou as duas acontecem, ou nenhuma — o cache **nunca** diverge da timeline.
 
-Actions previstas (em `packages/modulo-rh/src/Actions/Eventos/`), todas recebendo um **DTO readonly** (nunca `Request` — CLAUDE §5.6) e retornando o evento criado / um DTO:
+Actions previstas (em `packages/extensao-rh/src/Actions/Eventos/`), todas recebendo um **DTO readonly** (nunca `Request` — CLAUDE §5.6) e retornando o evento criado / um DTO:
 
 | Action                         | Evento gravado                     | Coluna(s) de `funcionarios` atualizada(s) na mesma transação                                              |
 | ------------------------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -146,7 +146,7 @@ CHECK `data_fim_efetiva IS NULL OR data_fim_efetiva >= data_inicio` ([01 §3 C2]
 
 ### 5.2 Ciclo de vida e reflexo no status do funcionário
 
-O afastamento tem **duas Actions** (em `packages/modulo-rh/src/Actions/Afastamentos/`), cada uma fechando o ciclo evento↔status numa transação:
+O afastamento tem **duas Actions** (em `packages/extensao-rh/src/Actions/Afastamentos/`), cada uma fechando o ciclo evento↔status numa transação:
 
 - **`RegistrarAfastamentoAction`** — cria a linha de `funcionario_afastamentos` (`data_fim_efetiva = null`), grava o evento `inicio_afastamento` na timeline e **concilia o `status`** do funcionário para `afastado` (ou `ferias` quando o `tipo_afastamento` for férias). Se `tipos_afastamento.exige_atestado`, exige o anexo (binário via `anexos`, polimórfico — [01 §3 C2](01-modelo-de-dominio.md)); o `cid` é capturado quando informado (§5.3).
 - **`EncerrarAfastamentoAction`** — preenche `data_fim_efetiva`, recalcula `dias` (cache), grava o evento `fim_afastamento` e **devolve o `status`** do funcionário a `ativo` (ou ao estado anterior coerente). Encerrar é a operação **"encerrar/retornar"** — não é editar nem excluir o período.

@@ -2,7 +2,7 @@
 
 > O **mapa de controle** da suíte: liga cada funcionalidade ao(s) documento(s), regra, fluxo, permissão, entidades, bloco/fase e critério de conclusão (DoD); consolida as **pendências e decisões em aberto**; e dá o **checklist final por etapa** + a **sequência de desenvolvimento**, o **catálogo de regras de negócio** (§5 — RN-xx) e o mapa de **relatórios e consultas** (§6). Serve para o time não esquecer regra/fluxo/dependência durante a implementação ponto a ponto.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · banco **PostgreSQL 16**. Fonte de verdade de schema/permissões: [01](01-modelo-de-dominio.md) (§3 dicionário, §10 permissões). Blocos e DoD: [02](02-fase-1-blueprint.md); guia técnico/DoD do módulo: [08 §10](08-arquitetura-tecnica.md); roadmap de fases: [09](09-roadmap-fases.md).
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · banco **PostgreSQL 16**. Fonte de verdade de schema/permissões: [01](01-modelo-de-dominio.md) (§3 dicionário, §10 permissões). Blocos e DoD: [02](02-fase-1-blueprint.md); guia técnico/DoD do módulo: [08 §10](08-arquitetura-tecnica.md); roadmap de fases: [09](09-roadmap-fases.md).
 
 Relacionados: [README](README.md) · [00](00-prd.md) · [01](01-modelo-de-dominio.md) · [02](02-fase-1-blueprint.md) · [09](09-roadmap-fases.md)
 

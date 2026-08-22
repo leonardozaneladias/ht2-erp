@@ -11,7 +11,7 @@
 Campo de PIS/PASEP: máscara `999.99999.99-9` e conferência do dígito verificador no cliente.
 
 Existe porque o PIS era **a única violação do §15.4** do catálogo — a máscara estava colada
-direto na view do cadastro de funcionário (`packages/modulo-rh/.../form-funcionario.blade.php`),
+direto na view do cadastro de funcionário (`packages/extensao-rh/.../form-funcionario.blade.php`),
 como um `data-af-inputmask` inline, justamente por não haver componente nem base genérica.
 
 ---

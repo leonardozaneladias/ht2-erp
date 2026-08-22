@@ -188,12 +188,12 @@ Por padrão o `make:modulo` gera em `app/` (monólito). Para criar um módulo de
 **reutilizável entre clientes** como pacote Composer, gere dentro de um módulo-pacote:
 
 ```bash
-php artisan make:modulo-pacote Rh                  # casca do pacote em packages/modulo-rh
-composer require "ht2erp/modulo-rh:@dev"           # instala (symlink) p/ dev local
+php artisan make:extensao Rh                  # casca do pacote em packages/extensao-rh
+composer require "ht2ml/extensao-rh:@dev"           # instala (symlink) p/ dev local
 php artisan make:modulo Funcionario --module=Rh --fields="..."   # CRUD dentro do pacote
 ```
 
-O CRUD nasce com namespaces do pacote (`HT2ERP\Rh\...`), views namespaced (`rh::`) e se
+O CRUD nasce com namespaces do pacote (`HT2ML\Rh\...`), views namespaced (`rh::`) e se
 integra ao core **sem editá-lo** (rotas via `ModuleRegistry`, permissões/menu via
 `config/rh.php` publicável, Livewire/Policy no provider do pacote). O pacote de RH
 registra a **própria seção** "Recursos Humanos" na sidebar (e o módulo

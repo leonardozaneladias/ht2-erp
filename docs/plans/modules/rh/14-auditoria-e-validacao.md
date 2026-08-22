@@ -2,7 +2,7 @@
 
 > **Registro da auditoria final** da documentação pré-desenvolvimento do módulo de RH (Fase 1). Consolida o que foi analisado, corrigido, complementado e decidido, e atesta que a suíte está **pronta para orientar o desenvolvimento ponto a ponto**. Snapshot de processo — o conteúdo permanente vive nos docs de produto (00–13 + ADRs); aqui ficam o laudo, as decisões e a ordem de uso.
 >
-> **Data:** 2026-06-16 · Pacote `ht2erp/modulo-rh` · banco **PostgreSQL 16** · fontes de verdade: schema/permissões [01](01-modelo-de-dominio.md), LGPD [01 §8.1](01-modelo-de-dominio.md).
+> **Data:** 2026-06-16 · Pacote `ht2ml/extensao-rh` · banco **PostgreSQL 16** · fontes de verdade: schema/permissões [01](01-modelo-de-dominio.md), LGPD [01 §8.1](01-modelo-de-dominio.md).
 
 Relacionados: [README](README.md) · [00](00-prd.md) · [01](01-modelo-de-dominio.md) · [02](02-fase-1-blueprint.md) · [13](13-rastreabilidade-e-pendencias.md)
 
