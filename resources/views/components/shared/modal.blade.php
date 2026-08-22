@@ -32,6 +32,7 @@
     id="{{ $id }}"
     class="{{ $overlayClasses }}"
     role="dialog"
+    aria-modal="true"
     tabindex="-1"
     aria-labelledby="{{ $title ? "{$id}-label" : $id }}"
 >
@@ -53,7 +54,7 @@
                         aria-label="Fechar"
                         data-hs-overlay="#{{ $id }}"
                     >
-                        <i class="iconify tabler--x text-xl"></i>
+                        <i class="iconify tabler--x text-xl" aria-hidden="true"></i>
                     </button>
                 </div>
             @endif

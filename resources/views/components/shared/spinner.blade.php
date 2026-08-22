@@ -32,7 +32,7 @@
 <div
     {{
 $attributes->class([
-        'inline-block shrink-0 animate-spin rounded-full border-t-transparent',
+        'inline-block shrink-0 animate-spin rounded-full border-t-transparent motion-reduce:animate-none',
         $variantClasses[$variant],
         $sizeClasses[$size],
     ])

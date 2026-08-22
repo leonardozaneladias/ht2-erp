@@ -3,6 +3,7 @@
     'title',
     'description' => null,
     'size' => 'md',
+    'titleLevel' => 'h3',
 ])
 
 @php
@@ -33,6 +34,15 @@
     $size = array_key_exists($size, $sizes) ? $size : 'md';
     $config = $sizes[$size];
     $hasBodySlot = trim((string) $slot) !== '';
+
+    // Nível do heading configurável: sob um page-header (<h4>) a listagem deve
+    // descer para <h5>, e não regredir para <h3>. Whitelist h1..h6 protege a
+    // interpolação dinâmica <{{ $titleLevel }}> de injeção de tag arbitrária.
+    $titleLevel = in_array($titleLevel, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'], true) ? $titleLevel : 'h3';
+    $titleClasses = \Illuminate\Support\Arr::toCssClasses([
+        'mb-2 font-semibold text-body-color dark:text-default-100',
+        $config['title'],
+    ]);
 @endphp
 
 <div {{
@@ -47,15 +57,10 @@ $attributes->class([
         $config['circle'],
     ])
     >
-        <i class="iconify {{ $icon }} {{ $config['icon'] }}"></i>
+        <i class="iconify {{ $icon }} {{ $config['icon'] }}" aria-hidden="true"></i>
     </div>
 
-    <h3 @class ([
-        'mb-2 font-semibold text-body-color dark:text-default-100',
-        $config['title'],
-    ])>
-        {{ $title }}
-    </h3>
+    <{{ $titleLevel }} class="{{ $titleClasses }}"> {{ $title }} </{{ $titleLevel }}>
 
     @if ($hasBodySlot)
         <div

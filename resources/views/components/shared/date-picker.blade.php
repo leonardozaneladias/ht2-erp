@@ -36,6 +36,19 @@
         'disable' => filled($disabledDates) ? array_values($disabledDates) : null,
     ], static fn ($value) => ! in_array($value, [null, false, []], true));
     $resolvedPlaceholder = $placeholder ?? ($enableTime ? 'dd/mm/aaaa hh:mm' : 'dd/mm/aaaa');
+
+    // O flatpickr troca o input para type=hidden e insere um altInput — mutações que o
+    // morph do Livewire desfazia, deixando o campo visualmente VAZIO a cada edição de
+    // qualquer outro campo do formulário. Com wire:ignore o morph não toca aqui, e o
+    // valor trafega pelo entangle (mesmo padrão do x-shared.money-input).
+    $wireModelKey = collect($attributes->all())
+        ->keys()
+        ->first(fn (string $k) => str_starts_with($k, 'wire:model'));
+    $livewireProp = $wireModelKey !== null ? $attributes->get($wireModelKey) : null;
+    // `.live` precisa continuar disparando o round-trip (ex.: filtros de período).
+    $entangle = $livewireProp !== null
+        ? "\$wire.entangle('" . e($livewireProp) . "')" . (str_contains((string) $wireModelKey, '.live') ? '.live' : '')
+        : 'null';
 @endphp
 
 <div class="mb-4">
@@ -49,15 +62,19 @@
         </label>
     @endif
 
-    <div class="input-icon-group">
+    <div
+        class="input-icon-group"
+        wire:ignore
+        x-data="afDatePicker({{ $entangle }}, {{ \Illuminate\Support\Js::encode($flatpickrConfig) }})"
+    >
         <i class="iconify tabler--calendar input-icon" aria-hidden="true"></i>
         <input
+            x-ref="campo"
             id="{{ $fieldId }}"
             name="{{ $name }}"
             type="text"
-            data-af-flatpickr="{{ \Illuminate\Support\Js::encode($flatpickrConfig) }}"
             {{
-$attributes->class([
+$attributes->except($wireModelKey !== null ? [$wireModelKey] : [])->class([
                 'form-input',
                 'border-danger!' => $hasError,
             ])

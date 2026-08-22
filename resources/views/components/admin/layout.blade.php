@@ -105,19 +105,36 @@
                 $notificacoesFlash[] = ['variant' => $variante, 'message' => session($chave), 'title' => null];
             }
         }
+
+        // Token por render: o wire:navigate reexecuta os scripts do body tanto em
+        // visitas novas quanto ao restaurar snapshot (botão voltar) — o token
+        // distingue re-execução do MESMO render (bloqueia) de um flash novo (dispara).
+        $flashToken = (string) \Illuminate\Support\Str::uuid();
     @endphp
 
     @if (! empty($notificacoesFlash))
         <script>
-            window.addEventListener(
-                'DOMContentLoaded',
-                () => {
+            (() => {
+                window.__flashToastsExibidos ??= new Set();
+                if (window.__flashToastsExibidos.has(@json ($flashToken))) {
+                    return;
+                }
+                window.__flashToastsExibidos.add(@json ($flashToken));
+
+                const disparar = () => {
                     @foreach ($notificacoesFlash as $notificacao)
                     window.dispatchEvent(new CustomEvent('toast', { detail: @json ($notificacao) }));
                     @endforeach
-                },
-                { once: true },
-            );
+                };
+
+                // Em navegação SPA (wire:navigate) o DOMContentLoaded NÃO dispara de
+                // novo — os scripts do body reexecutam com o DOM já pronto.
+                if (document.readyState === 'loading') {
+                    window.addEventListener('DOMContentLoaded', disparar, { once: true });
+                } else {
+                    disparar();
+                }
+            })();
         </script>
     @endif
 

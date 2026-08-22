@@ -19,6 +19,10 @@
     // Estado de erro de validacao (pinta a borda do gatilho de vermelho).
     'invalid' => false,
     'required' => false,
+    // Acessibilidade (modo form): id do <label> externo e ids de erro/hint, para
+    // que o gatilho (controle real) seja nomeado/descrito pelo leitor de tela.
+    'labelId' => null,
+    'describedBy' => null,
     // clearable: mostra o botao limpar. emptyValue: valor sentinela "sem selecao"
     // no <select> do modo form (ex.: 'all'/'' dos filtros boolean/select).
     'clearable' => true,
@@ -28,6 +32,21 @@
 @php
     $comboboxId = $id ?: ($field !== null ? "combobox-{$tableName}-{$field}" : 'combobox-' . \Illuminate\Support\Str::random(6));
     $panelId = "{$comboboxId}-panel";
+    $triggerId = "{$comboboxId}-trigger";
+    $valueId = "{$comboboxId}-value";
+
+    // Nome acessivel do gatilho. Prioriza um <label> externo associado via labelId
+    // (modo form, ex.: select-search). Na ausencia dele, se houver `label` (ex.:
+    // filtro multi-select pg-filter, que muitas vezes nao tem <label> visivel
+    // quando inline), gera um rotulo sr-only interno para nomear o gatilho ao
+    // leitor de tela (WCAG 4.1.2). Em ambos os casos o id do valor entra no nome,
+    // anunciando rotulo + selecao atual. Sem labelId nem label -> sem nome (legado).
+    $internalLabelId = (! $labelId && filled($label)) ? "{$comboboxId}-label" : null;
+    $labelledBy = match (true) {
+        (bool) $labelId => "{$labelId} {$valueId}",
+        (bool) $internalLabelId => "{$internalLabelId} {$valueId}",
+        default => null,
+    };
 
     $config = [
         'mode' => $mode,
@@ -51,9 +70,16 @@
     {{-- Modo form: o <select> nativo oculto (x-ref="native") chega pelo slot. --}}
     {{ $slot }}
 
+    @if ($internalLabelId)
+        {{-- Rotulo acessivel interno: nomeia o gatilho quando nao ha <label>
+             externo associado via labelId (ex.: filtro multi-select inline). --}}
+        <span id="{{ $internalLabelId }}" class="sr-only">{{ $label }}</span>
+    @endif
+
     {{-- Gatilho compacto: mostra o resumo ("Todos" / label / "N selecionados"). --}}
     <button
         type="button"
+        id="{{ $triggerId }}"
         x-ref="gatilho"
         @click="alternar();"
         @keydown.arrow-down.prevent="abrir();"
@@ -61,6 +87,8 @@
         aria-haspopup="listbox"
         :aria-expanded="open ? 'true' : 'false'"
         aria-controls="{{ $panelId }}"
+        @if ($labelledBy) aria-labelledby="{{ $labelledBy }}" @endif
+        @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
         @if ($required) aria-required="true" @endif
         @if ($invalid) aria-invalid="true" @endif
         data-testid="combobox-trigger"
@@ -77,7 +105,7 @@
             $triggerClass,
         ])
     >
-        <span class="truncate" :class="vazio && 'text-default-400'" x-text="resumo"></span>
+        <span id="{{ $valueId }}" class="truncate" :class="vazio && 'text-default-400'" x-text="resumo"></span>
 
         <span class="flex shrink-0 items-center gap-0.5">
             <span
@@ -91,9 +119,9 @@
                 aria-label="Limpar seleção"
                 class="text-default-400 hover:text-default-700 hover:bg-light flex h-4 w-4 items-center justify-center rounded-full transition-colors"
             >
-                <i class="iconify tabler--x text-[0.8rem]"></i>
+                <i class="iconify tabler--x text-[0.8rem]" aria-hidden="true"></i>
             </span>
-            <i class="iconify tabler--chevron-down text-default-400 text-sm"></i>
+            <i class="iconify tabler--chevron-down text-default-400 text-sm" aria-hidden="true"></i>
         </span>
     </button>
 
@@ -120,6 +148,7 @@
             <div class="border-light relative border-b p-2">
                 <i
                     class="iconify tabler--search text-default-400 pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2"
+                    aria-hidden="true"
                 ></i>
                 <input
                     type="text"
@@ -167,7 +196,11 @@
                                     ? 'bg-primary border-primary text-white'
                                     : 'border-default-400'"
                             >
-                                <i x-show="estaSelecionado(op.value)" class="iconify tabler--check text-[0.7rem]"></i>
+                                <i
+                                    x-show="estaSelecionado(op.value)"
+                                    class="iconify tabler--check text-[0.7rem]"
+                                    aria-hidden="true"
+                                ></i>
                             </span>
                             <span class="truncate" x-text="op.label"></span>
                         @else
@@ -175,6 +208,7 @@
                             <i
                                 x-show="estaSelecionado(op.value)"
                                 class="iconify tabler--check text-primary ms-auto shrink-0 text-sm"
+                                aria-hidden="true"
                             ></i>
                         @endif
                     </div>

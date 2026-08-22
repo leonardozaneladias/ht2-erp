@@ -6,6 +6,9 @@
     'striped' => false,
     'animated' => false,
     'autoColor' => false,
+    // Nome acessível explícito para o role="progressbar" (WCAG 4.1.2). Use quando
+    // a barra não tiver rótulo textual (label/slot) — ex.: só a porcentagem.
+    'ariaLabel' => null,
 ])
 
 @php
@@ -42,17 +45,27 @@
     ];
 
     if ($striped) {
-        $fillClasses[] = 'bg-stripes';
+        $fillClasses[] = 'progress-striped';
     }
 
     if ($animated && $striped) {
-        $fillClasses[] = 'animate-stripes';
+        $fillClasses[] = 'animate-progress-stripes motion-reduce:animate-none';
     }
 
     $hasSlotContent = \Illuminate\Support\Str::of(strip_tags((string) $slot))->squish()->isNotEmpty();
     $labelText = $hasSlotContent
         ? null
         : ($label === true ? round($pct).'%' : (is_string($label) ? $label : null));
+
+    // Nome acessível para o role="progressbar": rótulo explícito > texto do slot >
+    // label textual. Quando só há a porcentagem (label === true) ou nada, fica null
+    // (o valor já é anunciado por aria-valuenow; evita-se um nome redundante/vazio).
+    $accessibleName = match (true) {
+        filled($ariaLabel) => (string) $ariaLabel,
+        $hasSlotContent => (string) \Illuminate\Support\Str::of(strip_tags((string) $slot))->squish(),
+        is_string($label) && trim($label) !== '' => $label,
+        default => null,
+    };
 @endphp
 
 <div
@@ -66,6 +79,9 @@ $attributes->class([
     aria-valuenow="{{ round($pct, 2) }}"
     aria-valuemin="0"
     aria-valuemax="100"
+    @if ($accessibleName !== null && ! $attributes->has('aria-label'))
+        aria-label="{{ $accessibleName }}"
+    @endif
 >
     <div class="{{ implode(' ', $fillClasses) }}" style="width: {{ $pct }}%">
         @if ($hasSlotContent)

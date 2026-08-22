@@ -28,6 +28,15 @@
                 >
                     Drawer inferior
                 </x-shared.button>
+
+                <x-shared.button
+                    variant="secondary"
+                    appearance="outline"
+                    icon="tabler--arrows-horizontal"
+                    data-hs-overlay="#drawer-wide"
+                >
+                    Painel quase tela cheia
+                </x-shared.button>
             </div>
         </x-shared.card>
 
@@ -124,6 +133,43 @@
                 <div class="border-default-300 bg-light/40 rounded-lg border p-4">
                     <p class="text-default-400 text-sm">Receita prevista</p>
                     <p class="text-body-color mt-2 text-xl font-semibold">R$ 92,4 mil</p>
+                </div>
+            </div>
+        </x-admin.drawer>
+
+        {{-- wide + blur + flush: workspace overlay de consulta — o corpo é do
+             slot (dois painéis com scrolls próprios) e o fundo ganha blur. --}}
+        <x-admin.drawer id="drawer-wide" title="Painel quase tela cheia (wide + blur + flush)" size="wide" blur flush>
+            <div class="flex h-full">
+                <nav
+                    class="border-default-200 w-56 shrink-0 space-y-1 overflow-y-auto border-e p-4"
+                    aria-label="Seções"
+                >
+                    @foreach (['Visão geral', 'Detalhes', 'Histórico'] as $indice => $secao)
+                        <button
+                            type="button"
+                            @class ([
+                                'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm font-medium',
+                                'bg-primary/10 text-primary' => $indice === 0,
+                                'text-default-500 hover:bg-light' => $indice !== 0,
+                            ])
+                        >
+                            <i class="iconify tabler--folder size-4" aria-hidden="true"></i>
+                            {{ $secao }}
+                        </button>
+                    @endforeach
+                </nav>
+
+                <div class="grow overflow-y-auto p-5">
+                    <p class="text-default-400 text-sm">O corpo em <code>flush</code> não tem padding nem scroll próprios — este layout de rail + conteúdo gerencia os dois. A largura <code>wide</code> reserva ~94vw (teto de 120rem) e o <code>blur</code> desfoca o pouco do sistema que fica visível atrás.</p>
+                    <div class="mt-4 grid gap-4 md:grid-cols-3">
+                        @foreach (range(1, 6) as $bloco)
+                            <div class="border-default-300 bg-light/40 rounded-lg border p-4">
+                                <p class="text-body-color font-medium">Bloco {{ $bloco }}</p>
+                                <p class="text-default-400 mt-1 text-sm">Conteúdo de exemplo para validar o scroll interno.</p>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </x-admin.drawer>

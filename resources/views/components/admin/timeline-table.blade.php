@@ -202,7 +202,10 @@
                                 @if (! empty($action['href']))
                                     <a href="{{ $action['href'] }}" {{ $actionAttributes->class($actionClasses) }}>
                                         @if (! empty($action['icon']))
-                                            <i class="iconify {{ $action['icon'] }} text-base shrink-0"></i>
+                                            <i
+                                                class="iconify {{ $action['icon'] }} text-base shrink-0"
+                                                aria-hidden="true"
+                                            ></i>
                                         @endif
                                         <span>{{ $action['label'] ?? 'Ação' }}</span>
                                     </a>
@@ -212,7 +215,10 @@
                                         {{ $actionAttributes->class($actionClasses) }}
                                     >
                                         @if (! empty($action['icon']))
-                                            <i class="iconify {{ $action['icon'] }} text-base shrink-0"></i>
+                                            <i
+                                                class="iconify {{ $action['icon'] }} text-base shrink-0"
+                                                aria-hidden="true"
+                                            ></i>
                                         @endif
                                         <span>{{ $action['label'] ?? 'Ação' }}</span>
                                     </button>

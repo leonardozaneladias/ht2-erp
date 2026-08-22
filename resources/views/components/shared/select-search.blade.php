@@ -39,7 +39,13 @@
         ? collect(old($errorKey, $value ?? []))->map(fn ($item) => (string) $item)->all()
         : [(string) old($errorKey, $value)];
     $selectedLookup = array_flip($selectedValues);
-    $normalizedOptions = collect($options ?? [])->map(function ($optionLabel, $optionValue) {
+    // Lista sequencial (['Ativo', 'Inativo']) usa o próprio rótulo como value; mapa
+    // int-keyed NÃO-sequencial ([3731 => 'Presidente Epitácio'], típico de
+    // pluck('nome', 'id')) usa a KEY. Decidir por is_int(key) sozinho quebrava os ids:
+    // o value virava o nome e o valor persistido nunca casava com opção nenhuma.
+    $optionsEhLista = is_array($options) && array_is_list($options);
+
+    $normalizedOptions = collect($options ?? [])->map(function ($optionLabel, $optionValue) use ($optionsEhLista) {
         if (is_array($optionLabel) && array_is_list($optionLabel)) {
             return [
                 'group' => $optionValue,
@@ -62,9 +68,11 @@
         }
 
         if (is_array($optionLabel) && array_key_exists('options', $optionLabel)) {
+            $grupoEhLista = array_is_list($optionLabel['options']);
+
             return [
                 'group' => $optionLabel['label'] ?? $optionValue,
-                'options' => collect($optionLabel['options'])->map(function ($groupOption, $groupValue) {
+                'options' => collect($optionLabel['options'])->map(function ($groupOption, $groupValue) use ($grupoEhLista) {
                     if (is_array($groupOption)) {
                         return [
                             'value' => $groupOption['value'] ?? $groupValue,
@@ -74,7 +82,7 @@
                     }
 
                     return [
-                        'value' => is_int($groupValue) ? $groupOption : $groupValue,
+                        'value' => $grupoEhLista && is_int($groupValue) ? $groupOption : $groupValue,
                         'label' => $groupOption,
                         'disabled' => false,
                     ];
@@ -91,7 +99,7 @@
         }
 
         return [
-            'value' => is_int($optionValue) ? $optionLabel : $optionValue,
+            'value' => $optionsEhLista && is_int($optionValue) ? $optionLabel : $optionValue,
             'label' => $optionLabel,
             'disabled' => false,
         ];
@@ -100,11 +108,11 @@
 
 <div class="mb-4">
     @if ($label)
-        <label class="form-label" for="{{ $fieldId }}">
+        <label class="form-label" id="{{ $fieldId }}-label" for="{{ $fieldId }}-trigger">
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
@@ -117,6 +125,8 @@
         :placeholder="$placeholder"
         :required="$required"
         :invalid="$hasError"
+        :label-id="$label ? $fieldId . '-label' : null"
+        :described-by="$describedBy"
     >
         <select
             id="{{ $fieldId }}"

@@ -33,11 +33,11 @@
 
 <div class="mb-4">
     @if ($label)
-        <label class="form-label" for="{{ $fieldId }}">
+        <label class="form-label" id="{{ $fieldId }}-label" for="{{ $fieldId }}">
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
@@ -46,9 +46,14 @@
         wire:ignore
         data-af-quill
         data-af-quill-config="{{ \Illuminate\Support\Js::encode(['placeholder' => $placeholder]) }}"
+        @if ($label) data-af-quill-labelledby="{{ $fieldId }}-label" @endif
         @class (['af-quill', 'border-danger! rounded' => $hasError])
     >
         <div data-af-quill-editor></div>
+        {{-- O conteúdo do <textarea> é o VALOR do campo, e é whitespace-significativo:
+             quebrar a linha antes de {{ $val }} injeta newline + indentação no valor.
+             Este arquivo está no .prettierignore por isso — o formatador não é
+             idempotente aqui e reintroduzia o bug a cada passada. --}}
         <textarea
             id="{{ $fieldId }}"
             name="{{ $name }}"
@@ -57,10 +62,7 @@
             {{ $attributes }}
             @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
             aria-invalid="{{ $hasError ? 'true' : 'false' }}"
-        >
-
-            {{ $val }}</textarea
-        >
+        >{{ $val }}</textarea>
     </div>
 
     @if ($hasError)

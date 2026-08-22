@@ -24,13 +24,10 @@ it('aplica a máscara de CNPJ no formulário de empresa', function () {
     $page = visit('/admin/empresas/nova');
     $page->assertNoJavaScriptErrors()->wait(1);
 
-    // A máscara foi inicializada no campo (Inputmask marca o elemento).
-    $bound = (int) $page->script(
-        'document.querySelectorAll(\'input[name="cnpj"][data-af-forms-inputmask-bound="true"]\').length',
-    );
-    expect($bound)->toBe(1);
-
-    // Digitar dígitos resulta no valor formatado pela máscara.
+    // Verifica comportamento, não marcação interna: desde o design system a
+    // guarda de idempotência vive em memória (`inicializados.inputMask`), e não
+    // mais num data-attribute no elemento. Digitar dígitos basta como prova de
+    // que a máscara foi inicializada e está formatando.
     $page->type('input[name="cnpj"]', '11222333000181')->wait(1);
     $valor = (string) $page->script('document.querySelector(\'input[name="cnpj"]\').value');
     expect($valor)->toBe('11.222.333/0001-81');

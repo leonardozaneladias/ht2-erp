@@ -10,7 +10,7 @@
     <div class="flex flex-1 flex-wrap items-center gap-3">
         @if ($searchable)
             <div class="input-icon-group w-full sm:w-72">
-                <i class="iconify tabler--search input-icon"></i>
+                <i class="iconify tabler--search input-icon" aria-hidden="true"></i>
                 <input
                     type="search"
                     class="form-input"
@@ -37,6 +37,7 @@
             >
                 <span
                     class="iconify {{ $density === 'compact' ? 'tabler--baseline-density-medium' : 'tabler--baseline-density-small' }} size-4"
+                    aria-hidden="true"
                 ></span>
             </button>
         @endif

@@ -82,7 +82,7 @@ $attributes->class([
 }}
     @if (! $hasLabel) aria-label="Copiar" @endif
 >
-    <i class="iconify {{ $icon }} text-base shrink-0" data-copy-icon></i>
+    <i class="iconify {{ $icon }} text-base shrink-0" data-copy-icon aria-hidden="true"></i>
 
     @if ($hasLabel)
         <span data-copy-label>{{ $label }}</span>

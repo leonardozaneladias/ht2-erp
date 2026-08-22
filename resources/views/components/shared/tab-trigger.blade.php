@@ -9,7 +9,25 @@
     // false = troca via servidor (Livewire): omite data-hs-tab; o estado ativo vem
     // de :active (não das variantes hs-tab-active do Preline). Combine com wire:click.
     'preline' => true,
+    // aria-controls: associa a aba ao painel (WAI-ARIA Tabs Pattern). Valores:
+    //   null   → legado: no modo Preline aponta para "panel-{id}"; no server-driven
+    //            é OMITIDO (use quando não há x-shared.tab-panel no DOM, ex.: conteúdo
+    //            trocado por condicional no servidor — evita referência pendente).
+    //   true   → força aria-controls="panel-{id}" (server-driven COM x-shared.tab-panel).
+    //   string → aria-controls="{controls}" (id de painel customizado).
+    //   false  → nunca emite aria-controls.
+    'controls' => null,
 ])
+
+@php
+    $controlsId = match (true) {
+        $controls === false => null,
+        is_string($controls) && $controls !== '' => $controls,
+        $controls === true => "panel-{$id}",
+        $preline => "panel-{$id}",
+        default => null,
+    };
+@endphp
 
 <button
     type="button"
@@ -17,7 +35,9 @@
     id="tab-{{ $id }}"
     @if ($preline)
         data-hs-tab="#panel-{{ $id }}"
-        aria-controls="panel-{{ $id }}"
+    @endif
+    @if ($controlsId)
+        aria-controls="{{ $controlsId }}"
     @endif
     aria-selected="{{ $active ? 'true' : 'false' }}"
     @disabled ($disabled)
@@ -38,7 +58,7 @@ $attributes->class([
 }}
 >
     @if ($icon)
-        <i class="iconify {{ $icon }} shrink-0 text-base"></i>
+        <i class="iconify {{ $icon }} shrink-0 text-base" aria-hidden="true"></i>
     @endif
 
     <span>{{ $slot }}</span>

@@ -32,6 +32,16 @@
         'defaultDate' => $defaultDate,
         'disable' => filled($disabledDates) ? array_values($disabledDates) : null,
     ], static fn ($value) => ! in_array($value, [null, false, []], true));
+
+    // Mesma razão do x-shared.date-picker: o flatpickr muta o input e o morph desfazia
+    // a mutação, esvaziando o campo na tela. wire:ignore + entangle.
+    $wireModelKey = collect($attributes->all())
+        ->keys()
+        ->first(fn (string $k) => str_starts_with($k, 'wire:model'));
+    $livewireProp = $wireModelKey !== null ? $attributes->get($wireModelKey) : null;
+    $entangle = $livewireProp !== null
+        ? "\$wire.entangle('" . e($livewireProp) . "')" . (str_contains((string) $wireModelKey, '.live') ? '.live' : '')
+        : 'null';
 @endphp
 
 <div class="mb-4">
@@ -45,15 +55,19 @@
         </label>
     @endif
 
-    <div class="input-icon-group">
+    <div
+        class="input-icon-group"
+        wire:ignore
+        x-data="afDatePicker({{ $entangle }}, {{ \Illuminate\Support\Js::encode($flatpickrConfig) }})"
+    >
         <i class="iconify tabler--calendar-event input-icon" aria-hidden="true"></i>
         <input
+            x-ref="campo"
             id="{{ $fieldId }}"
             name="{{ $name }}"
             type="text"
-            data-af-flatpickr="{{ \Illuminate\Support\Js::encode($flatpickrConfig) }}"
             {{
-$attributes->class([
+$attributes->except($wireModelKey !== null ? [$wireModelKey] : [])->class([
                 'form-input',
                 'border-danger!' => $hasError,
             ])

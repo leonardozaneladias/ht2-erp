@@ -35,7 +35,7 @@
                             class="text-default-600 hover:text-primary inline-flex min-w-0 items-center gap-1 font-medium transition"
                         >
                             @if ($icon)
-                                <i class="iconify {{ $icon }} shrink-0 text-sm"></i>
+                                <i class="iconify {{ $icon }} shrink-0 text-sm" aria-hidden="true"></i>
                             @endif
 
                             <span>{{ $label }}</span>
@@ -43,7 +43,7 @@
                     @else
                         <span class="inline-flex min-w-0 items-center gap-1 truncate">
                             @if ($icon)
-                                <i class="iconify {{ $icon }} shrink-0 text-sm"></i>
+                                <i class="iconify {{ $icon }} shrink-0 text-sm" aria-hidden="true"></i>
                             @endif
 
                             <span class="truncate">{{ $label }}</span>
@@ -52,7 +52,10 @@
 
                     @unless ($isLast)
                         @if ($dividerIsIcon)
-                            <i class="iconify {{ $divider }} text-default-400 text-base rtl:rotate-180"></i>
+                            <i
+                                class="iconify {{ $divider }} text-default-400 text-base rtl:rotate-180"
+                                aria-hidden="true"
+                            ></i>
                         @else
                             <span class="text-default-400 px-1" aria-hidden="true">{{ $divider }}</span>
                         @endif

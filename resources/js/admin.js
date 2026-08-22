@@ -13,6 +13,8 @@ import './admin/appearance-preview';
 import './admin/fullscreen';
 import './admin/row-actions';
 import './admin/toast';
+import './admin/validation-errors';
+import './admin/unsaved-guard';
 import './admin/confirm';
 import './admin/combobox';
 import './admin/forms';

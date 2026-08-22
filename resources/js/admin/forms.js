@@ -47,6 +47,38 @@ const passwordMeterStates = [
 let mutationObserverStarted = false;
 let dropzoneConfigured = false;
 
+/**
+ * Guards de idempotência.
+ *
+ * NÃO use `dataset` para marcar "já inicializado": o morph do Livewire reescreve os
+ * atributos do elemento a partir do HTML do servidor, que não contém o `data-*` que
+ * o JS acabou de setar — a marca some, o re-scan seguinte reinicializa o plugin, e:
+ *
+ *   • flatpickr: `destroy()` + recria → o input REAL fica vazio, e o usuário vê um
+ *     campo obrigatório em branco (o valor ainda está no servidor, mas some da tela);
+ *   • Inputmask: `remove()` reescreve o valor cru no input via setter nativo, SEM
+ *     disparar evento → o wire:model dessincroniza;
+ *   • password/CEP/Quill: `addEventListener` cru duplicado → o toggle de senha mostra
+ *     e esconde no mesmo clique, o ViaCEP é chamado duas vezes por blur, e o Quill
+ *     empilha toolbars.
+ *
+ * O WeakSet guarda por REFERÊNCIA do nó: sobrevive ao morph que só atualiza atributos,
+ * e o nó descartado sai sozinho da coleção (não vaza). Quando o morph de fato substitui
+ * o nó, o nó novo não está no set — e a inicialização acontece, que é o correto.
+ *
+ * É o mesmo raciocínio que `sortable.js` (`_afSortable`) e o Dropzone (`_afDropzone`)
+ * já aplicavam com propriedade JS; aqui o WeakSet serve aos casos que não precisam
+ * guardar o handle da instância.
+ */
+const inicializados = {
+  passwordField: new WeakSet(),
+  passwordMeter: new WeakSet(),
+  datePicker: new WeakSet(),
+  inputMask: new WeakSet(),
+  cepField: new WeakSet(),
+  richEditor: new WeakSet(),
+};
+
 function collectElements(root, selector) {
   const elements = [];
 
@@ -114,7 +146,7 @@ function updatePasswordMeter(input, meterBar, meterLabel) {
 
 function initStandalonePasswordMeters(root = document) {
   collectElements(root, '[data-password-meter-standalone]').forEach((meter) => {
-    if (meter.dataset.afFormsStandaloneMeterBound === 'true') {
+    if (inicializados.passwordMeter.has(meter)) {
       return;
     }
 
@@ -127,7 +159,7 @@ function initStandalonePasswordMeters(root = document) {
       return;
     }
 
-    meter.dataset.afFormsStandaloneMeterBound = 'true';
+    inicializados.passwordMeter.add(meter);
 
     input.addEventListener('input', () => {
       updatePasswordMeter(input, meterBar, meterLabel);
@@ -139,7 +171,7 @@ function initStandalonePasswordMeters(root = document) {
 
 function initPasswordFields(root = document) {
   collectElements(root, '[data-password-field]').forEach((field) => {
-    if (field.dataset.afFormsPasswordBound === 'true') {
+    if (inicializados.passwordField.has(field)) {
       return;
     }
 
@@ -153,7 +185,7 @@ function initPasswordFields(root = document) {
       return;
     }
 
-    field.dataset.afFormsPasswordBound = 'true';
+    inicializados.passwordField.add(field);
 
     const syncVisibility = () => {
       const isVisible = input.type === 'text';
@@ -181,35 +213,117 @@ function initPasswordFields(root = document) {
   });
 }
 
-function initDatePickers(root = document) {
-  collectElements(root, '[data-af-flatpickr]').forEach((element) => {
-    if (element.dataset.afFormsDatepickerBound === 'true') {
-      return;
-    }
+/**
+ * Date picker (flatpickr) como Alpine.data — registrado em `alpine:init`.
+ *
+ * Por que Alpine, e não o bootAdminForms como os demais plugins: o flatpickr MUTA o
+ * input original (`type = 'hidden'`) e insere um altInput irmão para exibir d/m/Y. O
+ * morph do Livewire desfaz essas mutações — ele reconcilia o DOM com o HTML do
+ * servidor, onde o input é `type="text"` e não tem `value`. Resultado: a cada morph
+ * (isto é, a cada edição de QUALQUER campo do formulário) o input original reaparecia
+ * VAZIO na frente do altInput, e o usuário via o campo de data em branco, mesmo com o
+ * valor intacto no servidor. Em campos obrigatórios (data de admissão) isso induzia o
+ * operador a digitar tudo de novo.
+ *
+ * `wire:ignore` no container impede o morph de tocar na subárvore, e o `$wire.entangle`
+ * sincroniza nos dois sentidos — o mesmo padrão que o x-shared.money-input já usava.
+ */
+function registrarAlpineDatePicker() {
+  document.addEventListener('alpine:init', () => {
+    window.Alpine?.data('afDatePicker', (valorInicial = null, config = {}) => ({
+      valor: valorInicial,
+      fp: null,
 
-    const config = parseJsonDataset(element, 'afFlatpickr');
+      init() {
+        this.fp = flatpickr(this.$refs.campo, {
+          disableMobile: true,
+          locale: Portuguese,
+          allowInput: true,
+          // O seletor de mês vira <select> (e o ano é um campo digitável): chegar a 1985
+          // deixa de exigir dezenas de cliques na seta de "mês anterior".
+          monthSelectorType: 'dropdown',
+          ...config,
+          onChange: (_datas, texto) => this.aplicar(texto),
+          onClose: (_datas, texto) => this.aplicar(texto),
+        });
 
-    const syncLivewire = () => {
-      element.dispatchEvent(new Event('input', { bubbles: true }));
-      element.dispatchEvent(new Event('change', { bubbles: true }));
-    };
+        // Máscara de digitação no campo VISÍVEL (altInput). Sem ela, `allowInput` aceita
+        // qualquer coisa e só o flatpickr decide se entendeu — digitar a data de
+        // nascimento (o caso em que ninguém quer abrir o calendário) era às cegas.
+        this.mascararAltInput();
 
-    flatpickr(element, {
-      disableMobile: true,
-      locale: Portuguese,
-      allowInput: true,
-      ...config,
-      onChange: [...(config.onChange ?? []), syncLivewire],
-      onClose: [...(config.onClose ?? []), syncLivewire],
-    });
+        // O input não traz `value` no HTML (quem hidrata é o Livewire): o estado
+        // inicial vem do entangle.
+        if (this.valor) {
+          this.fp.setDate(this.valor, false);
+        }
 
-    element.dataset.afFormsDatepickerBound = 'true';
+        // servidor → tela: reset do formulário, autofill, troca de registro.
+        this.$watch('valor', (novo) => {
+          if ((novo ?? '') !== (this.fp?.input?.value ?? '')) {
+            this.fp?.setDate(novo || '', false);
+          }
+        });
+      },
+
+      /**
+       * Máscara de digitação sobre o altInput. O formato vem do próprio flatpickr
+       * (altFormat), então intervalo e data-hora ganham a máscara certa sem configuração
+       * extra. `clearIncomplete` fica DESLIGADO de propósito: apagar o que o operador
+       * digitou pela metade, num campo de data, é hostil — quem julga o valor final é o
+       * flatpickr, no blur.
+       */
+      mascararAltInput() {
+        const alt = this.fp?.altInput;
+        const formato = this.fp?.config?.altFormat ?? '';
+
+        // Sem altInput (altInput: false) ou em modo intervalo/múltiplo, a máscara não se
+        // aplica — o texto ali não é uma data única ("01/01/2026 até 31/01/2026").
+        if (!alt || this.fp?.config?.mode !== 'single') {
+          return;
+        }
+
+        const mascara = formato
+          .replace('d', '99')
+          .replace('m', '99')
+          .replace('Y', '9999')
+          .replace('H', '99')
+          .replace('i', '99');
+
+        new Inputmask({ mask: mascara, clearIncomplete: false, placeholder: '_' }).mask(alt);
+
+        // Digitou a data completa? O calendário aberto acompanha (sem isso ele fica no
+        // mês corrente e o operador acha que a digitação "não pegou").
+        alt.addEventListener('input', () => {
+          const m = alt.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+          if (!m) {
+            return;
+          }
+
+          const data = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+
+          if (!Number.isNaN(data.getTime())) {
+            this.fp?.jumpToDate(data);
+          }
+        });
+      },
+
+      /** tela → servidor (o entangle propaga; sem entangle, o input hidden basta ao POST). */
+      aplicar(texto) {
+        this.valor = texto;
+      },
+
+      destroy() {
+        this.fp?.destroy();
+      },
+    }));
   });
 }
 
 function initInputMasks(root = document) {
   collectElements(root, '[data-af-inputmask]').forEach((element) => {
-    if (element.dataset.afFormsInputmaskBound === 'true') {
+    if (inicializados.inputMask.has(element)) {
       return;
     }
 
@@ -217,7 +331,7 @@ function initInputMasks(root = document) {
     const inputmask = new Inputmask(config);
 
     inputmask.mask(element);
-    element.dataset.afFormsInputmaskBound = 'true';
+    inicializados.inputMask.add(element);
   });
 }
 
@@ -262,7 +376,10 @@ function initChoiceFields(root = document) {
     const config = buildChoicesConfig(element);
     const signature = buildChoicesSignature(element, config);
 
-    if (element.dataset.afFormsChoicesBound === 'true' && element.dataset.afFormsChoicesSignature === signature) {
+    // Assinatura em propriedade JS (não dataset): o morph apagaria o data-*, e o
+    // re-scan destruiria/recriaria o Choices a cada morph — perdendo foco e busca
+    // digitada. Recriar só quando as OPÇÕES realmente mudarem continua valendo.
+    if (element._afChoices && element._afChoicesSignature === signature) {
       return;
     }
 
@@ -276,8 +393,7 @@ function initChoiceFields(root = document) {
       instance.disable();
     }
 
-    element.dataset.afFormsChoicesBound = 'true';
-    element.dataset.afFormsChoicesSignature = signature;
+    element._afChoicesSignature = signature;
     element._afChoices = instance;
   });
 }
@@ -300,14 +416,14 @@ function resolveLivewireComponent(element) {
 
 function initCepFields(root = document) {
   collectElements(root, '[data-af-cep]').forEach((element) => {
-    if (element.dataset.afFormsCepBound === 'true') {
+    if (inicializados.cepField.has(element)) {
       return;
     }
 
     const config = parseJsonDataset(element, 'afCep');
     const loader = element.closest('[data-af-cep-field]')?.querySelector('[data-cep-loading]');
 
-    element.dataset.afFormsCepBound = 'true';
+    inicializados.cepField.add(element);
 
     element.addEventListener('blur', async () => {
       const cleanCep = (element.value || '').replace(/\D/g, '');
@@ -472,7 +588,9 @@ function updateSimpleFilePreview(field, files = []) {
 
 function initSimpleFileUploads(root = document) {
   collectElements(root, "[data-af-file-upload][data-af-file-mode='livewire']").forEach((field) => {
-    if (field.dataset.afFormsFileBound === 'true') {
+    // Flag como propriedade JS (não dataset): o morph do Livewire reescreve os
+    // atributos do wrapper e apagaria um data-*, fazendo o observer re-bindar.
+    if (field._afFileBound) {
       return;
     }
 
@@ -484,7 +602,7 @@ function initSimpleFileUploads(root = document) {
     }
 
     const config = parseJsonDataset(field, 'afFile');
-    field.dataset.afFormsFileBound = 'true';
+    field._afFileBound = true;
 
     trigger.addEventListener('click', () => input.click());
     input.addEventListener('change', () => {
@@ -512,7 +630,10 @@ function initDropzones(root = document) {
   }
 
   collectElements(root, "[data-af-file-upload][data-af-file-mode='dropzone']").forEach((field) => {
-    if (field.dataset.afFormsDropzoneBound === 'true') {
+    // Flag como propriedade JS (não dataset): o morph do Livewire reescreve os
+    // atributos do wrapper e apagaria um data-*, fazendo o observer instanciar
+    // um segundo Dropzone sobre o mesmo nó.
+    if (field._afDropzone) {
       return;
     }
 
@@ -520,11 +641,14 @@ function initDropzones(root = document) {
     const dropzoneElement = field.querySelector('[data-af-dropzone]');
     const previewsContainer = field.querySelector('[data-af-dropzone-previews]');
     const previewTemplate = field.querySelector('[data-af-dropzone-template]');
-    const nativeInput = field.querySelector('[data-af-dropzone-input]');
 
     if (!dropzoneElement || !previewsContainer || !previewTemplate) {
       return;
     }
+
+    // O input fica fora do wire:ignore (o Livewire re-binda o wire:model no
+    // morph); re-consulta a cada uso para nunca segurar um nó substituído.
+    const getNativeInput = () => field.querySelector('[data-af-dropzone-input]');
 
     const instance = new Dropzone(dropzoneElement, {
       url: config.uploadUrl || '/',
@@ -545,6 +669,8 @@ function initDropzones(root = document) {
     });
 
     const syncInputFromDropzone = () => {
+      const nativeInput = getNativeInput();
+
       if (!nativeInput || config.uploadUrl) {
         return;
       }
@@ -555,6 +681,28 @@ function initDropzones(root = document) {
       syncNativeFileInput(nativeInput, acceptedFiles);
     };
 
+    // O handler de upload do Livewire ignora change com FileList vazio — remover
+    // o último chip precisa zerar a propriedade direto no componente.
+    const zerarPropriedadeLivewire = () => {
+      const nativeInput = getNativeInput();
+
+      if (!nativeInput || config.uploadUrl || !window.Livewire) {
+        return;
+      }
+
+      const atributo = nativeInput
+        .getAttributeNames()
+        .find((nome) => nome === 'wire:model' || nome.startsWith('wire:model.'));
+      const model = atributo ? nativeInput.getAttribute(atributo) : null;
+      const componentRoot = nativeInput.closest('[wire\\:id]');
+
+      if (!model || !componentRoot) {
+        return;
+      }
+
+      window.Livewire.find(componentRoot.getAttribute('wire:id'))?.set(model, config.multiple ? [] : null);
+    };
+
     if (!config.multiple) {
       instance.on('maxfilesexceeded', (file) => {
         instance.removeAllFiles();
@@ -563,20 +711,57 @@ function initDropzones(root = document) {
     }
 
     instance.on('addedfile', syncInputFromDropzone);
-    instance.on('removedfile', syncInputFromDropzone);
+
+    instance.on('removedfile', () => {
+      syncInputFromDropzone();
+
+      // Microtask: na troca de arquivo (maxfilesexceeded) o addFile roda no
+      // mesmo tick — só zera o modelo se a lista CONTINUAR vazia depois dele.
+      queueMicrotask(() => {
+        const restantes = instance.files.filter(
+          (file) => file.status !== Dropzone.CANCELED && file.status !== Dropzone.ERROR,
+        );
+
+        if (restantes.length === 0) {
+          zerarPropriedadeLivewire();
+        }
+      });
+    });
+
     instance.on('error', (file, message) => {
+      // Re-sincroniza: o addedfile roda antes de o accept() marcar ERROR — sem
+      // isso um arquivo rejeitado (tipo/tamanho) ficaria na propriedade Livewire.
+      syncInputFromDropzone();
+
       const feedback = typeof message === 'string' ? message : `Falha ao enviar ${file.name}.`;
       notify('danger', feedback);
     });
 
-    field.dataset.afFormsDropzoneBound = 'true';
+    // Não-imagens não têm thumbnail: o chip nasce com a <img> escondida e um
+    // ícone genérico; quando o Dropzone gerar o thumbnail, troca.
+    instance.on('thumbnail', (file, dataUrl) => {
+      if (!dataUrl || !file.previewElement) {
+        return;
+      }
+
+      file.previewElement.querySelector('[data-dz-thumbnail]')?.classList.remove('hidden');
+      file.previewElement.querySelector('[data-af-dz-icon]')?.classList.add('hidden');
+    });
+
+    // Reset programático local (JS da página): limpa os chips sem tocar o modelo.
+    field.addEventListener('af-file-upload:reset', () => {
+      instance.removeAllFiles(true);
+    });
+
     field._afDropzone = instance;
   });
 }
 
 function initRichEditors(root = document) {
   collectElements(root, '[data-af-quill]').forEach((wrapper) => {
-    if (wrapper.dataset.afFormsQuillBound === 'true') {
+    // O wire:ignore do Blade protege os FILHOS do morph, não os atributos do próprio
+    // wrapper — um guard em dataset seria apagado assim mesmo, empilhando toolbars.
+    if (inicializados.richEditor.has(wrapper)) {
       return;
     }
 
@@ -588,7 +773,7 @@ function initRichEditors(root = document) {
     }
 
     const config = parseJsonDataset(wrapper, 'afQuillConfig');
-    wrapper.dataset.afFormsQuillBound = 'true';
+    inicializados.richEditor.add(wrapper);
 
     const quill = new Quill(editorEl, {
       theme: 'snow',
@@ -598,6 +783,21 @@ function initRichEditors(root = document) {
         toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']],
       },
     });
+
+    // Nome acessível: o controle real focável é o .ql-editor (quill.root), não o
+    // <textarea> oculto que carrega o <label for>. Replica o label/erro/hint no
+    // editor visível — aria-labelledby vem do wrapper (gancho do Blade) e
+    // aria-describedby do próprio textarea (já reúne erro+hint).
+    const labelledBy = wrapper.dataset.afQuillLabelledby;
+    const describedBy = input.getAttribute('aria-describedby');
+
+    if (labelledBy) {
+      quill.root.setAttribute('aria-labelledby', labelledBy);
+    }
+
+    if (describedBy) {
+      quill.root.setAttribute('aria-describedby', describedBy);
+    }
 
     // Conteúdo inicial vem do textarea (POST/wire:model/old()).
     if (input.value.trim() !== '') {
@@ -617,7 +817,6 @@ function initRichEditors(root = document) {
 function bootAdminForms(root = document) {
   initPasswordFields(root);
   initStandalonePasswordMeters(root);
-  initDatePickers(root);
   initInputMasks(root);
   initChoiceFields(root);
   initCepFields(root);
@@ -645,7 +844,7 @@ function startMutationObserver() {
 
       if (mutation.target instanceof HTMLElement) {
         const host = mutation.target.closest?.(
-          '[data-password-field], [data-password-meter-standalone], [data-af-flatpickr], [data-af-inputmask], [data-af-choices], [data-af-cep], [data-af-file-upload]',
+          '[data-password-field], [data-password-meter-standalone], [data-af-inputmask], [data-af-choices], [data-af-cep], [data-af-file-upload]',
         );
 
         if (host) {
@@ -661,6 +860,8 @@ function startMutationObserver() {
   });
 }
 
+registrarAlpineDatePicker();
+
 document.addEventListener('DOMContentLoaded', () => {
   bootAdminForms(document);
   startMutationObserver();
@@ -668,6 +869,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('livewire:navigated', () => {
   bootAdminForms(document);
+});
+
+// A11y dos drawers/overlays: o Preline não move o foco ao abrir — sem foco dentro,
+// Esc não fecha e o teclado continua atrás do backdrop. O painel já tem
+// tabindex="-1"; focá-lo resolve os dois.
+document.addEventListener('open.hs.overlay', (evento) => {
+  if (evento.target instanceof HTMLElement) {
+    evento.target.focus({ preventScroll: true });
+  }
+});
+
+// Rede de segurança contra races do MutationObserver: ao FIM de cada morph o
+// componente inteiro é re-escaneado. Os guards (WeakSet/propriedade JS) tornam o
+// re-scan idempotente e barato; elementos que o observer perdeu no meio do morph
+// (ex.: linha nova de repeater que nasceu sem máscara) são apanhados aqui.
+document.addEventListener('livewire:init', () => {
+  window.Livewire?.hook?.('morphed', ({ el, component }) => {
+    bootAdminForms(component?.el ?? el ?? document);
+  });
+});
+
+// Reset dos uploads a partir do servidor: `$this->dispatch('af-file-upload:reset',
+// name: 'arquivo')` limpa os chips do campo com aquele name (sem `name`, limpa
+// todos os campos da página). Só a UI do Dropzone — o modelo é responsabilidade
+// de quem disparou.
+window.addEventListener('af-file-upload:reset', (event) => {
+  const alvo = event.detail?.name;
+
+  document.querySelectorAll('[data-af-file-upload]').forEach((field) => {
+    if (alvo && !field.querySelector(`[name="${alvo}"], [name="${alvo}[]"]`)) {
+      return;
+    }
+
+    field._afDropzone?.removeAllFiles(true);
+  });
+});
+
+// wire:navigate troca o conteúdo da página: destrói as instâncias do Dropzone
+// para não vazar listeners/observers de telas anteriores.
+document.addEventListener('livewire:navigating', () => {
+  document.querySelectorAll('[data-af-file-upload]').forEach((field) => {
+    field._afDropzone?.destroy?.();
+    delete field._afDropzone;
+    delete field._afFileBound;
+  });
 });
 
 window.initAdminForms = bootAdminForms;

@@ -27,7 +27,7 @@
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
@@ -45,10 +45,7 @@ $attributes->class([
         @required ($required)
         @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
         aria-invalid="{{ $hasError ? 'true' : 'false' }}"
-    >
-
-        {{ $textareaValue }}</textarea
-    >
+    >{{ $textareaValue }}</textarea>
 
     @if ($hasError)
         <small class="text-danger mt-1 block text-xs" id="{{ $errorId }}">{{ $viewErrors->first($errorKey) }}</small>

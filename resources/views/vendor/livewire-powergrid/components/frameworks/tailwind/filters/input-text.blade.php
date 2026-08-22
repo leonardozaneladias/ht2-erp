@@ -35,6 +35,14 @@
 
         $inputClasses = theme_style($theme, 'filterInputText.input');
 
+        // Nomes acessiveis (WCAG 4.1.2). Sao DOIS controles focaveis: o <input> do
+        // valor e o combobox de OPERADOR. No modo nao-inline o <label> visivel nomeia
+        // o <input> (via for/id); no modo inline o <input> recebe aria-label. O
+        // operador sempre tem rotulo proprio (distinto do valor) via `label` do
+        // combobox, que gera um rotulo sr-only interno e o referencia no gatilho.
+        $inputId = "filtro-input-text-{$tableName}-{$field}";
+        $operatorLabel = trans('livewire-powergrid::datatable.labels.filter_operator', ['column' => $title]);
+
         $params = array_merge(
             [
                 'showSelectOptions' => $showSelectOptions,
@@ -56,7 +64,7 @@
     @else
         <div @class([theme_style($theme, 'filterInputText.base'), 'space-y-1' => !$inline])>
             @unless ($inline)
-                <label class="text-pg-primary-700 dark:text-pg-primary-300 block text-sm font-semibold">
+                <label for="{{ $inputId }}" class="text-pg-primary-700 dark:text-pg-primary-300 block text-sm font-semibold">
                     {{ $title }}
                 </label>
             @endunless
@@ -70,6 +78,7 @@
                         <x-shared.combobox
                             mode="form"
                             :clearable="false"
+                            label="{{ $operatorLabel }}"
                             id="filtro-operador-{{ $tableName }}-{{ $field }}"
                         >
                             <select
@@ -92,6 +101,8 @@
                 @endif
                 <div @class(['pl-0 w-full sm:w-1/2' => !$inline && $showSelectOptions])>
                     <input
+                        id="{{ $inputId }}"
+                        @if ($inline) aria-label="{{ $title }}" @endif
                         data-cy="input_text_{{ $tableName }}_{{ $field }}"
                         wire:key="input-{{ $field }}"
                         data-id="{{ $field }}"

@@ -33,7 +33,11 @@
         {{ $attributes }}
     />
 
-    <span class="pointer-events-none absolute end-3 top-10 hidden" data-cep-loading>
-        <i class="iconify tabler--loader-2 text-default-400 animate-spin"></i>
+    <span class="pointer-events-none absolute end-3 top-10 hidden" data-cep-loading role="status">
+        <i
+            class="iconify tabler--loader-2 text-default-400 animate-spin motion-reduce:animate-none"
+            aria-hidden="true"
+        ></i>
+        <span class="sr-only">Buscando endereço...</span>
     </span>
 </div>

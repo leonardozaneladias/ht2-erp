@@ -28,14 +28,14 @@
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
     @endif
 
     @if ($icon)
         <div class="input-icon-group">
-            <i class="iconify {{ $icon }} input-icon"></i>
+            <i class="iconify {{ $icon }} input-icon" aria-hidden="true"></i>
             <input
                 id="{{ $fieldId }}"
                 name="{{ $name }}"

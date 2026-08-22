@@ -54,6 +54,14 @@
     $tone = $solid ? 'solid' : 'soft';
     $resolvedIcon = $icon === false ? null : ($icon ?: $variants[$variant]['icon']);
     $wrapperId = $attributes->get('id') ?: 'alert-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(8));
+
+    // role/live-region por severidade (WAI-ARIA APG; mesmo critério do x-shared.toast,
+    // que já usa role="status"/aria-live="polite"): erros e avisos interrompem o leitor
+    // de tela (assertive, via role="alert"); confirmações e mensagens informativas são
+    // anunciadas sem interromper (polite, via role="status"). O dev pode sobrescrever
+    // passando role="..." (o merge preserva atributos explícitos).
+    $defaultRole = in_array($variant, ['danger', 'warning'], true) ? 'alert' : 'status';
+
     $wrapperAttributes = $attributes
         ->class([
             'hs-removing:translate-x-5 hs-removing:opacity-0',
@@ -65,14 +73,14 @@
         ])
         ->merge([
             'id' => $wrapperId,
-            'role' => 'alert',
+            'role' => $defaultRole,
         ]);
 @endphp
 
 <div {{ $wrapperAttributes }}>
     @if ($resolvedIcon)
         <span class="mt-0.5 inline-flex shrink-0 items-center justify-center">
-            <i class="iconify {{ $resolvedIcon }} text-xl"></i>
+            <i class="iconify {{ $resolvedIcon }} text-xl" aria-hidden="true"></i>
         </span>
     @endif
 
@@ -91,7 +99,7 @@
             aria-label="Fechar"
             data-hs-remove-element="#{{ $wrapperId }}"
         >
-            <i class="iconify tabler--x text-lg"></i>
+            <i class="iconify tabler--x text-lg" aria-hidden="true"></i>
         </button>
     @endif
 </div>

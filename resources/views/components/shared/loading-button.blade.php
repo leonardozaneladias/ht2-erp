@@ -42,7 +42,7 @@
         @if ($target) wire:loading.remove wire:target="{{ $target }}" @else wire:loading.remove @endif
     >
         @if ($icon)
-            <i class="iconify {{ $icon }} shrink-0"></i>
+            <i class="iconify {{ $icon }} shrink-0" aria-hidden="true"></i>
         @endif
 
         @if ($hasLabel)
@@ -50,7 +50,7 @@
         @endif
 
         @if ($iconRight && ! $iconOnly)
-            <i class="iconify {{ $iconRight }} shrink-0"></i>
+            <i class="iconify {{ $iconRight }} shrink-0" aria-hidden="true"></i>
         @endif
     </span>
 
@@ -58,7 +58,7 @@
         class="inline-flex items-center gap-x-2"
         @if ($target) wire:loading wire:target="{{ $target }}" @else wire:loading @endif
     >
-        <i class="iconify tabler--loader-2 shrink-0 animate-spin"></i>
+        <i class="iconify tabler--loader-2 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true"></i>
 
         @if ($loadingLabel !== '')
             <span @class (['sr-only' => $iconOnly])>{{ $loadingLabel }}</span>

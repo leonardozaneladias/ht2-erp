@@ -30,6 +30,8 @@
                     accept="image/*,application/pdf"
                     :max-size="4"
                     multiple
+                    title="Arraste os documentos aqui — ou clique para escolher"
+                    description="Textos da zona são personalizáveis via props title/description."
                     hint="Sem upload automático nesta preview; o foco aqui é validar a moldura rica."
                 />
 

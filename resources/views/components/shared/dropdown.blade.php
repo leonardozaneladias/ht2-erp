@@ -26,7 +26,10 @@
             aria-haspopup="menu"
         >
             Ações
-            <i class="iconify tabler--chevron-down hs-dropdown-open:rotate-180 text-base transition-transform"></i>
+            <i
+                class="iconify tabler--chevron-down hs-dropdown-open:rotate-180 text-base transition-transform"
+                aria-hidden="true"
+            ></i>
         </button>
     @endisset
 

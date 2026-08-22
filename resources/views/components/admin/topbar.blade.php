@@ -50,18 +50,24 @@
                 class="sidenav-toggle-button btn bg-primary btn-icon rounded-full text-white"
                 aria-label="Alternar menu lateral"
             >
-                <i class="iconify tabler--menu-4 text-xl"></i>
+                <i class="iconify tabler--menu-4 text-xl" aria-hidden="true"></i>
             </button>
 
             <form action="{{ route('admin.dashboard') }}" class="hidden xl:flex" id="search-box" role="search">
                 <div class="input-icon-group">
-                    <i class="iconify tabler--search input-icon text-lg text-(--topbar-item-color)/50!"></i>
+                    <i
+                        class="iconify tabler--search input-icon text-lg text-(--topbar-item-color)/50!"
+                        aria-hidden="true"
+                    ></i>
+                    {{-- aria-label: o placeholder some ao digitar e não é nome acessível (WCAG 3.3.2/4.1.2); --}}
+                    {{-- espelha o padrão da x-admin.table.toolbar (aria-label = placeholder da busca). --}}
                     <input
                         id="topbar-search"
                         type="search"
                         name="q"
                         class="form-input w-57.5 border-(--topbar-search-border)! bg-(--topbar-search-bg)! text-(--topbar-item-color)! placeholder:opacity-50"
                         placeholder="Buscar..."
+                        aria-label="Buscar..."
                     />
                 </div>
             </form>
@@ -80,9 +86,11 @@
                     >
                         <i
                             class="iconify tabler--moon topbar-link-icon absolute scale-100 rotate-0 transition-all duration-200 dark:scale-0 dark:-rotate-90"
+                            aria-hidden="true"
                         ></i>
                         <i
                             class="iconify tabler--sun topbar-link-icon absolute scale-0 rotate-90 transition-all duration-200 dark:scale-100 dark:rotate-0"
+                            aria-hidden="true"
                         ></i>
                     </button>
                 </div>
@@ -99,9 +107,13 @@
                         aria-label="Alternar tela cheia"
                         aria-pressed="false"
                     >
-                        <i class="iconify tabler--maximize topbar-link-icon group-[.fullscreen-active]:hidden"></i>
+                        <i
+                            class="iconify tabler--maximize topbar-link-icon group-[.fullscreen-active]:hidden"
+                            aria-hidden="true"
+                        ></i>
                         <i
                             class="iconify tabler--minimize topbar-link-icon hidden group-[.fullscreen-active]:inline-block"
+                            aria-hidden="true"
                         ></i>
                     </button>
                 </div>
@@ -119,7 +131,10 @@
                     >
                         <x-shared.avatar :name="$displayUser['nome']" :src="$user?->urlAvatar()" size="size-8" />
 
-                        <i class="iconify tabler--chevron-down hidden align-middle text-sm lg:inline-block"></i>
+                        <i
+                            class="iconify tabler--chevron-down hidden align-middle text-sm lg:inline-block"
+                            aria-hidden="true"
+                        ></i>
                     </button>
                 </x-slot:button>
 
@@ -146,7 +161,7 @@
                     @csrf
 
                     <button type="submit" class="dropdown-item text-danger w-full text-start">
-                        <i class="iconify tabler--logout align-middle text-base"></i>
+                        <i class="iconify tabler--logout align-middle text-base" aria-hidden="true"></i>
                         <span class="align-middle">Sair</span>
                     </button>
                 </form>

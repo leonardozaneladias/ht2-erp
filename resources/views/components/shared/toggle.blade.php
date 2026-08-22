@@ -33,6 +33,7 @@
                     value="1"
                     {{ $attributes->class(['peer sr-only']) }}
                     @checked ($isChecked)
+                    @if ($required) aria-required="true" @endif
                     @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
                     aria-invalid="{{ $hasError ? 'true' : 'false' }}"
                 />
@@ -54,7 +55,13 @@
                 ></span>
             </span>
 
-            <span class="text-body-color text-sm font-medium select-none">{{ $label }}</span>
+            <span class="text-body-color text-sm font-medium select-none">
+                {{ $label }}
+
+                @if ($required)
+                    <x-shared.required-indicator />
+                @endif
+            </span>
         </label>
     @else
         {{-- Modo stacked: rótulo no topo + controle de altura h-9.25, alinhado aos inputs do grid. --}}
@@ -62,7 +69,7 @@
             {{ $label }}
 
             @if ($required)
-                <span class="text-danger">*</span>
+                <x-shared.required-indicator />
             @endif
         </label>
         <label class="flex h-9.25 w-fit cursor-pointer items-center gap-3" for="{{ $fieldId }}">
@@ -73,6 +80,7 @@
                 value="1"
                 {{ $attributes->class(['peer sr-only']) }}
                 @checked ($isChecked)
+                @if ($required) aria-required="true" @endif
                 @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
                 aria-invalid="{{ $hasError ? 'true' : 'false' }}"
             />

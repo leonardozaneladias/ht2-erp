@@ -12,11 +12,17 @@
         ->keys()
         ->first(fn(string $k) => str_starts_with($k, 'wire:model'));
     $livewireProp = $wireModelKey !== null ? $attributes->get($wireModelKey) : null;
+    // O entangle é deferido por padrão (não gasta um round-trip por dígito). Com
+    // `wire:model.live`, o servidor precisa acompanhar a digitação — é o que permite, por
+    // exemplo, a linha do tempo mostrar a variação salarial enquanto o valor é digitado.
+    $entangle = $livewireProp !== null
+        ? "\$wire.entangle('" . e($livewireProp) . "')" . (str_contains((string) $wireModelKey, '.live') ? '.live' : '')
+        : '0';
 @endphp
 
 <div
     x-data="{
-        cents: {{ $livewireProp !== null ? "\$wire.entangle('" . e($livewireProp) . "')" : '0' }},
+        cents: {{ $entangle }},
         get display() {
             const v = typeof this.cents === 'number' ? this.cents : parseInt(this.cents) || 0;
             return new Intl.NumberFormat('pt-BR', {

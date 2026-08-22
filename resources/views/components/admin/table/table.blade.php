@@ -16,7 +16,10 @@
         {!! $loadingAttr !!}
         class="bg-card/60 absolute inset-0 z-20 hidden items-center justify-center rounded-xl backdrop-blur-[1px]"
     >
-        <span class="iconify tabler--loader-2 text-primary size-7 animate-spin"></span>
+        <span
+            class="iconify tabler--loader-2 text-primary size-7 animate-spin motion-reduce:animate-none"
+            aria-hidden="true"
+        ></span>
     </div>
 
     <div class="overflow-x-auto">
