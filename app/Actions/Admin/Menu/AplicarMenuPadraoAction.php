@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
  *   "Segurança" (Controle de acesso, Menus, Configurações); Auditoria e
  *   Comunicados diretos.
  * - Seção Tabelas Auxiliares: grupos "Cadastros" (catálogos de referência) e
- *   "RH" (Departamentos — item contribuído pelo pacote modulo-rh).
+ *   "RH" (Departamentos — item contribuído pelo pacote extensao-rh).
  *
  * Idempotente e não-destrutiva nos dois eixos: vira no-op se JÁ existe algum
  * grupo (instalação organizada/cliente mexeu) e cada linha usa firstOrCreate
@@ -76,7 +76,7 @@ class AplicarMenuPadraoAction
                 'ref-cfops' => ['grupo_key' => 'grupo-tab-cadastros', 'ordem' => 9],
                 'ref-ncms' => ['grupo_key' => 'grupo-tab-cadastros', 'ordem' => 10],
 
-                // Tabelas Auxiliares → RH (itens do pacote modulo-rh, movidos da seção Negócio).
+                // Tabelas Auxiliares → RH (itens do pacote extensao-rh, movidos da seção Negócio).
                 'rh-departamentos' => ['grupo_key' => 'grupo-tab-rh', 'ordem' => 1],
                 'rh-funcionarios' => ['grupo_key' => 'grupo-tab-rh', 'ordem' => 2],
             ];

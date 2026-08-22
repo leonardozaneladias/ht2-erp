@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use HT2ERP\Rh\RhServiceProvider;
+use HT2ML\Rh\RhServiceProvider;
 
 /*
 |--------------------------------------------------------------------------

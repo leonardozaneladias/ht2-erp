@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 
 use App\Support\Generator\CampoModulo;
 use App\Support\Generator\EspecificacaoModulo;
-use App\Support\Generator\ModuloPacote;
+use App\Support\Generator\Extensao;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -60,10 +60,10 @@ final class MakeModuloCommand extends Command
         $pacote = null;
         $module = (string) $this->option('module');
         if ($module !== '') {
-            $pacote = ModuloPacote::paraNome($module);
+            $pacote = Extensao::paraNome($module);
             if (! File::isDirectory(base_path($pacote->dir))) {
                 $this->error("Módulo-pacote {$pacote->pacote} não encontrado em {$pacote->dir}.");
-                $this->line("Crie a casca primeiro:  php artisan make:modulo-pacote {$pacote->studly}");
+                $this->line("Crie a casca primeiro:  php artisan make:extensao {$pacote->studly}");
 
                 return self::FAILURE;
             }

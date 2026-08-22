@@ -49,7 +49,7 @@ class RolePermissionSeeder extends Seeder
 
         // As permissões 'exemplos.*' só existem com o módulo demo habilitado
         // (EXEMPLO_DEMO); evita atribuir uma permissão inexistente no cliente.
-        if (config('modulos.exemplo_demo')) {
+        if (config('extensoes.exemplo_demo')) {
             $permissoesGestor[] = 'exemplos.listar';
         }
 

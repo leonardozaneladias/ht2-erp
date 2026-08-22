@@ -9,7 +9,7 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** calculo, folha, rh
 
-> Pacote `ht2erp/modulo-rh` (namespace `HT2ERP\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md); fórmula e workflow em [07 — Jornada, Horas Extras e Folha](../07-jornada-horas-extras-folha.md).
+> Pacote `ht2ml/extensao-rh` (namespace `HT2ML\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md); fórmula e workflow em [07 — Jornada, Horas Extras e Folha](../07-jornada-horas-extras-folha.md).
 
 ## Contexto e problema
 

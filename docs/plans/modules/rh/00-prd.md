@@ -3,7 +3,7 @@
 Relacionados: [01](01-modelo-de-dominio.md) · [02](02-fase-1-blueprint.md) · [05](05-organograma-acl-hierarquica.md) · [07](07-jornada-horas-extras-folha.md) · [09](09-roadmap-fases.md)
 
 > **Product Requirements Document** do módulo de **Recursos Humanos / Departamento Pessoal** do HT2 ERP.
-> Pacote Composer `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · views `rh::` · **aditivo ao core** (ADR-0015), nunca o edita.
+> Pacote Composer `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · views `rh::` · **aditivo ao core** (ADR-0015), nunca o edita.
 > A **fonte de verdade de schema** (tabelas, colunas, enums, permissões) é o [01 — Modelo de Domínio](01-modelo-de-dominio.md). Este documento define o _porquê_, o _para quem_ e o _o quê_ (escopo); o _como_ mora nos blueprints técnicos.
 
 ---
@@ -36,11 +36,11 @@ Os dados de pessoas são fortemente acoplados: o **funcionário** é o agregado-
 
 ### 1.4 Ambição de produto: o RH como **família de módulos**
 
-O objetivo de longo prazo é um RH **muito completo**. Mas "completo" não significa um único pacote monolítico: significa um **núcleo coeso** (`ht2erp/modulo-rh` — o agregado-raiz funcionário, Departamento Pessoal, jornada/HE, fundação de folha, eSocial e ponto, nas fases de [09](09-roadmap-fases.md)) **cercado por módulos-pacote satélites** que cobrem os demais eixos estratégicos de RH, cada um aditivo ao core pelo mesmo padrão do [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md):
+O objetivo de longo prazo é um RH **muito completo**. Mas "completo" não significa um único pacote monolítico: significa um **núcleo coeso** (`ht2ml/extensao-rh` — o agregado-raiz funcionário, Departamento Pessoal, jornada/HE, fundação de folha, eSocial e ponto, nas fases de [09](09-roadmap-fases.md)) **cercado por módulos-pacote satélites** que cobrem os demais eixos estratégicos de RH, cada um aditivo ao core pelo mesmo padrão do [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md):
 
-- **SST — Saúde e Segurança do Trabalho** (`ht2erp/modulo-sst`): ASO/PCMSO, EPI, CAT, PGR; eSocial **S-2210/S-2220/S-2240** (obrigação acessória que conversa com a Fase 4 deste módulo).
+- **SST — Saúde e Segurança do Trabalho** (`ht2ml/modulo-sst`): ASO/PCMSO, EPI, CAT, PGR; eSocial **S-2210/S-2220/S-2240** (obrigação acessória que conversa com a Fase 4 deste módulo).
 - **Benefícios**: VT/VR/VA, plano de saúde/odontológico, coparticipação (estende `rubricas`).
-- **Recrutamento & Seleção (ATS)** (`ht2erp/modulo-ats`): vagas, candidatos, pipeline, banco de talentos.
+- **Recrutamento & Seleção (ATS)** (`ht2ml/modulo-ats`): vagas, candidatos, pipeline, banco de talentos.
 - **Treinamento & Desenvolvimento**: cursos, trilhas, certificações, matriz de competências.
 - **Avaliação de Desempenho**: ciclos, metas/OKR, 9-box, feedback; Onboarding/Offboarding e Clima.
 
@@ -222,7 +222,7 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 | RNF-06 | **i18n pt-BR**                         | UI, mensagens, validação e labels de enum em Português; código/tabelas/colunas em inglês técnico (convenção do core)                                                                                                                                                                                                                                                  |
 | RNF-07 | **Desktop-first**                      | Painel backoffice (mín. 1366×768), Inspinia + Livewire 4 + Tailwind 4; componentes do catálogo Inspinia (sem `<select>` nativo, sem CSS custom)                                                                                                                                                                                                                       |
 | RNF-08 | **Lixeira**                            | `deleted_at` (SoftDeletes) + trait `App\Livewire\Concerns\ComLixeira` com 3 níveis por módulo (`deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete); models implementam `App\Models\Contracts\UsaSoftDeletes`                                                                                                                                           |
-| RNF-09 | **Empacotamento aditivo (ADR-0015)**   | `ht2erp/modulo-rh`: migrations via `loadMigrationsFrom`; permissões e menu mesclados em runtime no `boot()` (`ModuleRegistry`/config); **nunca edita o core**                                                                                                                                                                                                         |
+| RNF-09 | **Empacotamento aditivo (ADR-0015)**   | `ht2ml/extensao-rh`: migrations via `loadMigrationsFrom`; permissões e menu mesclados em runtime no `boot()` (`ModuleRegistry`/config); **nunca edita o core**                                                                                                                                                                                                         |
 
 ---
 
@@ -254,7 +254,7 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 - `App\Models\Concerns\BelongsToEmpresa` + `App\Support\Tenancy\TenantContext`.
 - `App\Livewire\Concerns\ComLixeira` + `App\Models\Contracts\UsaSoftDeletes`.
 - `App\Models\Concerns\Auditavel` (spatie/activitylog).
-- Gerador `make:modulo` com flag de pacote (`--module=Rh`) e `make:modulo-pacote` (casca do pacote).
+- Gerador `make:modulo` com flag de pacote (`--module=Rh`) e `make:extensao` (casca do pacote).
 - ADRs aplicáveis: [0004](../../../architecture/adrs/ADR-0004-ulid-publico-bigint-interno.md) (ULID aspiracional — RH usa `id`/`slug`/`matricula`), [0009](../../../architecture/adrs/ADR-0009-snapshots-jsonb-imutaveis.md) (snapshots JSONB), [0010](../../../architecture/adrs/ADR-0010-enums-php-backed.md) (enums backed), [0014](../../../architecture/adrs/ADR-0014-money-integer-centavos.md) (dinheiro em centavos), [0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) (módulos-pacote).
 
 ---

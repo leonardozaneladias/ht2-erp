@@ -332,7 +332,7 @@ Guia completo (tipos de campo, flags, customização dos stubs):
 `stubs/modulo/`.
 
 **Módulos reutilizáveis entre clientes** (produto HT2 ERP) viram pacotes Composer:
-`php artisan make:modulo-pacote Rh` cria a casca e `make:modulo --module=Rh` gera o CRUD
+`php artisan make:extensao Rh` cria a casca e `make:modulo --module=Rh` gera o CRUD
 dentro do pacote, sem editar o core. Ver [`ADR-0015`](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
 e o guia de [`distribuição e manutenção`](docs/distribuicao-manutencao.md).
 

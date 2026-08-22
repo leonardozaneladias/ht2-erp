@@ -2,7 +2,7 @@
 
 > Como entram e saem funcionários **em lote** via planilha Excel — para carga inicial (migração de outro sistema), edição em massa e relatório. Reaproveita a infra de import/export **já existente no core** (`App\Imports\BaseImport`, `App\Exports\TabelaExport`, fila `exports`, PowerGrid `Exportable`) e estende para o **agregado multi-aba** (funcionário + filhas). O **schema é definido em [01](01-modelo-de-dominio.md)** (fonte de verdade); o log opcional de importação é `importacoes` ([01 §F](01-modelo-de-dominio.md)).
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · views `rh::` · **PostgreSQL 16** · multi-tenant por `empresa_id`. **Faseamento:** pós-Fase 1 (depende de B2 — cadastro + filhas, [02](02-fase-1-blueprint.md)); o export simples da listagem já vem com B2 (PowerGrid).
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · views `rh::` · **PostgreSQL 16** · multi-tenant por `empresa_id`. **Faseamento:** pós-Fase 1 (depende de B2 — cadastro + filhas, [02](02-fase-1-blueprint.md)); o export simples da listagem já vem com B2 (PowerGrid).
 
 Relacionados: [01](01-modelo-de-dominio.md) · [03](03-cadastro-pessoa-documentos.md) · [10](10-campos-personalizados.md) · [04](04-catalogos-configuraveis.md)
 
@@ -62,7 +62,7 @@ A importação é **idempotente por chave de negócio** — reimportar a mesma p
 
 ## 4. Validação e integridade de relacionamentos
 
-Cada aba é uma sub-import estendendo `App\Imports\BaseImport` — validação **por linha** com `regrasPorColuna()` (reaproveita as `Rules` do cadastro: `App\Rules\Cpf`, `HT2ERP\Rh\Rules\PisPasep`, PIX por tipo — [03 §3/§5](03-cadastro-pessoa-documentos.md)).
+Cada aba é uma sub-import estendendo `App\Imports\BaseImport` — validação **por linha** com `regrasPorColuna()` (reaproveita as `Rules` do cadastro: `App\Rules\Cpf`, `HT2ML\Rh\Rules\PisPasep`, PIX por tipo — [03 §3/§5](03-cadastro-pessoa-documentos.md)).
 
 **Catálogos e referências são citados por código/nome, não por id:**
 

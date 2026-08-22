@@ -56,7 +56,7 @@ super-admin sem hard-code de papel. As policies mapeiam `restore` →
 | Filial                        | lixeira gerida **dentro de Empresas** (no `FormEmpresa`), reusando `empresas.*`; a Matriz não é excluível                                                                                                    |
 | AdminUser                     | login do excluído bloqueado pelo `SoftDeletingScope`; anti-self-delete + hierarquia; e-mail liberado enquanto na lixeira (índice unique **parcial** `WHERE deleted_at IS NULL`); a restauração checa colisão |
 | Anexo                         | soft-delete **técnico** (retenção/auditoria): mantém o arquivo físico; o binário só some no force-delete (evento `forceDeleted`)                                                                             |
-| RH: Departamento, Funcionario | no pacote `ht2erp/modulo-rh`                                                                                                                                                                                 |
+| RH: Departamento, Funcionario | no pacote `ht2ml/extensao-rh`                                                                                                                                                                                 |
 
 **Fora da lixeira:** ACL (papéis/permissões) e Menu.
 
@@ -67,5 +67,5 @@ Todo módulo novo nasce com a lixeira quando o soft-delete está ativo (padrão)
 [`criar-modulo.md`](criar-modulo.md).
 
 > **Models de pacote:** o resolver de factory do Laravel assume `App\`; um model
-> em `HT2ERP\…\Models` precisa de `protected static function newFactory()`
-> apontando a factory do pacote (ver os models do `modulo-rh`).
+> em `HT2ML\…\Models` precisa de `protected static function newFactory()`
+> apontando a factory do pacote (ver os models do `extensao-rh`).

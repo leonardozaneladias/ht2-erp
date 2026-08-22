@@ -240,7 +240,7 @@ return [
         | mova suas permissões para a chave correspondente.
         */
         ModuloAcesso::Negocio->value => [
-            // Permissões do Exemplo (demo) — opcionais (ver EXEMPLO_DEMO em config/modulos.php).
+            // Permissões do Exemplo (demo) — opcionais (ver EXEMPLO_DEMO em config/extensoes.php).
             ...(env('EXEMPLO_DEMO', true) ? [
                 'exemplos.listar' => [
                     'label' => 'Listar exemplos',

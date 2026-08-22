@@ -25,7 +25,7 @@ Repo **multi-context** (a presença de `CONTEXT-MAP.md` na raiz é o sinal):
 ├── app/
 │   └── CONTEXT.md                     ← contexto core (monólito modular)
 └── packages/
-    └── modulo-rh/
+    └── extensao-rh/
         ├── CONTEXT.md                 ← contexto do módulo de RH
         └── docs/adr/                  ← decisões do próprio módulo
 ```

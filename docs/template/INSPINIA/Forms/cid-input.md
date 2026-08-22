@@ -53,4 +53,4 @@ A máscara é conveniência; a garantia é do servidor:
 'cid' => ['nullable', 'string', 'regex:/^[A-Z]\d{2}(\.\d)?$/'],
 ```
 
-(em `packages/modulo-rh/src/Http/Requests/Afastamentos/AfastamentoRules.php`)
+(em `packages/extensao-rh/src/Http/Requests/Afastamentos/AfastamentoRules.php`)

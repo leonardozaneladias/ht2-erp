@@ -9,7 +9,7 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** modelagem, configurabilidade, rh
 
-> Pacote `ht2erp/modulo-rh` (namespace `HT2ERP\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md); detalhe de catálogos em [04 — Catálogos Configuráveis](../04-catalogos-configuraveis.md).
+> Pacote `ht2ml/extensao-rh` (namespace `HT2ML\Rh\`), aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Schema canônico em [01 — Modelo de Domínio](../01-modelo-de-dominio.md); detalhe de catálogos em [04 — Catálogos Configuráveis](../04-catalogos-configuraveis.md).
 
 ## Contexto e problema
 
@@ -59,7 +59,7 @@ Três categorias, com uma regra de fronteira explícita.
 
 **Regra mnemônica:** _tem `if`/cálculo no valor → ENUM · o cliente adiciona linhas → CATÁLOGO · é lista oficial BR/ISO → REFERÊNCIA._
 
-**ENUM backed** ([ADR-0010](../../../../architecture/adrs/ADR-0010-enums-php-backed.md)) — coluna `VARCHAR` + CHECK + cast no model, em `packages/modulo-rh/src/Enums/`: `StatusFuncionario`, `Sexo`, `EstadoCivil`, `Escolaridade`, `RacaCor`, `TipoVinculo` (`geraFgts()`, `temCarteira()`), `RegimeTrabalho` (`baseCalculoHoraExtra()`), `GrauParentesco`, `TipoContaBancaria`, `Titularidade`, `TipoChavePix`, `TipoContato`, `TipoTelefone`, `TipoEndereco`, `TipoEscala`, `DiaSemana` (int, ISO), `TipoEventoFuncional`, `TipoHoraExtra` (`fatorPadraoBps()`, `adicionalNoturno()`), `StatusHoraExtra` (`isFinal()`), `NaturezaRubrica`. São domínios fixos do eSocial ou valores com lógica/badge/cálculo.
+**ENUM backed** ([ADR-0010](../../../../architecture/adrs/ADR-0010-enums-php-backed.md)) — coluna `VARCHAR` + CHECK + cast no model, em `packages/extensao-rh/src/Enums/`: `StatusFuncionario`, `Sexo`, `EstadoCivil`, `Escolaridade`, `RacaCor`, `TipoVinculo` (`geraFgts()`, `temCarteira()`), `RegimeTrabalho` (`baseCalculoHoraExtra()`), `GrauParentesco`, `TipoContaBancaria`, `Titularidade`, `TipoChavePix`, `TipoContato`, `TipoTelefone`, `TipoEndereco`, `TipoEscala`, `DiaSemana` (int, ISO), `TipoEventoFuncional`, `TipoHoraExtra` (`fatorPadraoBps()`, `adicionalNoturno()`), `StatusHoraExtra` (`isFinal()`), `NaturezaRubrica`. São domínios fixos do eSocial ou valores com lógica/badge/cálculo.
 
 **CATÁLOGO tenant** — CRUD por empresa (`BelongsToEmpresa` + `SoftDeletes` + `ComLixeira`), semeado por `ProvisionarCatalogosRh` (idempotente), com **colunas-flag de comportamento** quando preciso: `departamentos` (árvore), `funcoes` (+ pivot `funcionario_funcao`), `tipos_documento` (flags `exige_numero/validade/orgao_emissor/arquivo`, `sensivel_lgpd`), `tipos_afastamento` (flags eSocial `remunerado/conta_como_falta/suspende_contrato/exige_atestado` + `codigo_esocial`), `escalas` (+ `escala_dias`, `escala_funcionario`), `rubricas` (`natureza` embutida + `incide_inss/fgts/irrf`). A **linha** é do cliente; as **colunas-flag** dão comportamento sem promover o valor a enum.
 

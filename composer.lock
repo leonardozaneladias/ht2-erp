@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33efd72460139a5cc585003fdc0e4460",
+    "content-hash": "6ecb88711b5d90b21a9d7b027d9a8c14",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1713,12 +1713,12 @@
             "time": "2026-06-12T21:33:43+00:00"
         },
         {
-            "name": "ht2erp/modulo-rh",
-            "version": "dev-main",
+            "name": "ht2ml/extensao-rh",
+            "version": "dev-refactor/identidade-e-vocabulario-de-extensao",
             "dist": {
                 "type": "path",
-                "url": "packages/modulo-rh",
-                "reference": "5cbe16aa4f6dfac2ec7b321783211ba40cf2311e"
+                "url": "packages/extensao-rh",
+                "reference": "ef03d7f35aea47e2365c52310257ac6c279bba54"
             },
             "require": {
                 "php": "^8.4"
@@ -1727,19 +1727,19 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "HT2ERP\\Rh\\RhServiceProvider"
+                        "HT2ML\\Rh\\RhServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "HT2ERP\\Rh\\": "src/",
-                    "HT2ERP\\Rh\\Database\\Factories\\": "database/factories/"
+                    "HT2ML\\Rh\\": "src/",
+                    "HT2ML\\Rh\\Database\\Factories\\": "database/factories/"
                 }
             },
             "autoload-dev": {
                 "psr-4": {
-                    "HT2ERP\\Rh\\Tests\\": "tests/"
+                    "HT2ML\\Rh\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -14444,7 +14444,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "ht2erp/modulo-rh": 20
+        "ht2ml/extensao-rh": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

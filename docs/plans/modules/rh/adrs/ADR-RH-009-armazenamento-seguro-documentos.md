@@ -9,7 +9,7 @@ status: proposed
 
 **Status:** Proposed | **Data:** 2026-06-16 | **Decisores:** HT2 ERP / GDF Sistemas | **Tags:** segurança, lgpd, rh, armazenamento
 
-> Pacote `ht2erp/modulo-rh`, aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Reaproveita o `App\Models\Anexo` (upload polimórfico) do core. Spec de UI/fluxo em [03 §8.3/§10](../03-cadastro-pessoa-documentos.md); LGPD em [01 §8](../01-modelo-de-dominio.md). **Esta decisão é de estratégia/definição — registra a política de armazenamento seguro local, não a implementação.**
+> Pacote `ht2ml/extensao-rh`, aditivo ao core ([ADR-0015](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Reaproveita o `App\Models\Anexo` (upload polimórfico) do core. Spec de UI/fluxo em [03 §8.3/§10](../03-cadastro-pessoa-documentos.md); LGPD em [01 §8](../01-modelo-de-dominio.md). **Esta decisão é de estratégia/definição — registra a política de armazenamento seguro local, não a implementação.**
 
 ## Contexto e problema
 

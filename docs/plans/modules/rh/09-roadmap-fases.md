@@ -1,8 +1,8 @@
 # 09 — Roadmap de Fases
 
-> Visão de longo prazo do **módulo de RH** (`ht2erp/modulo-rh`). O cliente pediu um super módulo de RH entregue **em fases**, com a **marcação de ponto integrada no dispositivo como a ÚLTIMA fase**. Este documento posiciona o que a Fase 1 entrega (detalhada no blueprint) dentro do todo e descreve as fases seguintes — objetivo, entregas, dependências e critérios de entrada — para que cada decisão de modelagem feita agora habilite o futuro sem retrabalho.
+> Visão de longo prazo do **módulo de RH** (`ht2ml/extensao-rh`). O cliente pediu um super módulo de RH entregue **em fases**, com a **marcação de ponto integrada no dispositivo como a ÚLTIMA fase**. Este documento posiciona o que a Fase 1 entrega (detalhada no blueprint) dentro do todo e descreve as fases seguintes — objetivo, entregas, dependências e critérios de entrada — para que cada decisão de modelagem feita agora habilite o futuro sem retrabalho.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · multi-tenant lógico por `empresa_id` · banco **PostgreSQL 16**. Schema é definido em [01](01-modelo-de-dominio.md) (fonte de verdade); este roadmap não introduz schema novo.
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · multi-tenant lógico por `empresa_id` · banco **PostgreSQL 16**. Schema é definido em [01](01-modelo-de-dominio.md) (fonte de verdade); este roadmap não introduz schema novo.
 
 Relacionados: [00](00-prd.md) · [02](02-fase-1-blueprint.md) · [07](07-jornada-horas-extras-folha.md)
 
@@ -157,17 +157,17 @@ O valor entregue: empresa cadastrada e operando com pessoas, organograma, docume
 
 ## 8. Eixos estratégicos vizinhos (módulos-pacote satélites)
 
-As 6 fases acima são o **eixo Departamento Pessoal → Folha → eSocial → Ponto** do `ht2erp/modulo-rh`. Um RH "muito completo" abrange mais eixos — mas eles **não** incham o `modulo-rh`: entram como **módulos-pacote satélites**, cada um aditivo ao core pelo mesmo padrão do [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md), tendo o `modulo-rh` como dependência quando precisam do cadastro de pessoa. A fronteira: **`modulo-rh` = pessoa + DP + jornada/HE + folha + eSocial + ponto**; os satélites cobrem o resto.
+As 6 fases acima são o **eixo Departamento Pessoal → Folha → eSocial → Ponto** do `ht2ml/extensao-rh`. Um RH "muito completo" abrange mais eixos — mas eles **não** incham o `extensao-rh`: entram como **módulos-pacote satélites**, cada um aditivo ao core pelo mesmo padrão do [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md), tendo o `extensao-rh` como dependência quando precisam do cadastro de pessoa. A fronteira: **`extensao-rh` = pessoa + DP + jornada/HE + folha + eSocial + ponto**; os satélites cobrem o resto.
 
 | Eixo / módulo candidato                                | Escopo                                                                            | Conversa com                                                                                                            | Prioridade                             |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **SST — Saúde e Segurança** (`ht2erp/modulo-sst`)      | ASO/PCMSO, exames ocupacionais, **EPI**, **CAT**, PGR, treinamentos de NR         | eSocial **S-2210** (CAT), **S-2220** (monitoramento da saúde/ASO), **S-2240** (agentes nocivos) — casa com a **Fase 4** | **Alta** (obrigação acessória eSocial) |
+| **SST — Saúde e Segurança** (`ht2ml/modulo-sst`)      | ASO/PCMSO, exames ocupacionais, **EPI**, **CAT**, PGR, treinamentos de NR         | eSocial **S-2210** (CAT), **S-2220** (monitoramento da saúde/ASO), **S-2240** (agentes nocivos) — casa com a **Fase 4** | **Alta** (obrigação acessória eSocial) |
 | **Benefícios**                                         | VT/VR/VA, plano de saúde/odontológico, coparticipação                             | estende `rubricas`/folha (Fase 3) e `funcionario_dependentes`                                                           | Média                                  |
-| **Recrutamento & Seleção (ATS)** (`ht2erp/modulo-ats`) | vagas, candidatos, pipeline/funil, banco de talentos                              | alimenta a **admissão** (Fase 1: cria `funcionarios` a partir do candidato aprovado)                                    | Média                                  |
+| **Recrutamento & Seleção (ATS)** (`ht2ml/modulo-ats`) | vagas, candidatos, pipeline/funil, banco de talentos                              | alimenta a **admissão** (Fase 1: cria `funcionarios` a partir do candidato aprovado)                                    | Média                                  |
 | **Treinamento & Desenvolvimento**                      | cursos, trilhas, certificações, matriz de competências, validade de treinamentos  | cruza com SST (treinamentos de NR) e com Desempenho                                                                     | Média                                  |
 | **Avaliação de Desempenho**                            | ciclos, metas/OKR, 9-box, feedback 360; Onboarding/Offboarding; pesquisa de Clima | usa o organograma ([05](05-organograma-acl-hierarquica.md)) para o fluxo gestor↔subordinado                            | Média                                  |
 
-> **Por que satélites e não fases do `modulo-rh`:** cada eixo tem domínio, telas e cadência próprios; empacotá-los à parte ([ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)) mantém o núcleo coeso, permite ativar/vender por cliente e evita um monólito. A estratégia "RH como família de módulos-pacote" está no [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md). **Nada disso é Fase 1** — é visão de produto; a Fase 1 entrega o **núcleo** (cadastro + organograma + jornada/HE + fundação de folha).
+> **Por que satélites e não fases do `extensao-rh`:** cada eixo tem domínio, telas e cadência próprios; empacotá-los à parte ([ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)) mantém o núcleo coeso, permite ativar/vender por cliente e evita um monólito. A estratégia "RH como família de módulos-pacote" está no [ADR-RH-007](adrs/ADR-RH-007-rh-familia-modulos-pacote.md). **Nada disso é Fase 1** — é visão de produto; a Fase 1 entrega o **núcleo** (cadastro + organograma + jornada/HE + fundação de folha).
 
 ---
 
@@ -180,4 +180,4 @@ As fases podem ser **fatiadas em incrementos** (`1.x`, `2.x`, …) e priorizadas
 - **Jornada/escalas** definem a "jornada esperada" contra a qual o espelho de ponto (Fase 5) e o dispositivo (Fase 6) apuram a realizada.
 - **Cadastro eSocial-ready** (enums de domínio, `codigo_esocial`, PII completa) evita migração de dados quando a transmissão entrar na Fase 4.
 
-Por isso a evolução é **aditiva** (ver [01 §6](01-modelo-de-dominio.md)): cada fase adiciona tabelas e colunas `NULL`/com `default` sobre o pacote `ht2erp/modulo-rh`, sem reescrever a fundação nem tocar o core. Decisões estruturais de fronteira (ENUM × CATÁLOGO × REFERÊNCIA, vínculo `funcionario↔admin_user`) ficam registradas em ADRs do módulo (`adrs/`).
+Por isso a evolução é **aditiva** (ver [01 §6](01-modelo-de-dominio.md)): cada fase adiciona tabelas e colunas `NULL`/com `default` sobre o pacote `ht2ml/extensao-rh`, sem reescrever a fundação nem tocar o core. Decisões estruturais de fronteira (ENUM × CATÁLOGO × REFERÊNCIA, vínculo `funcionario↔admin_user`) ficam registradas em ADRs do módulo (`adrs/`).

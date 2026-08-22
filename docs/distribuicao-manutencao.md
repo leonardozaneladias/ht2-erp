@@ -39,7 +39,7 @@ O repositório do cliente é **aditivo**; nunca edita arquivos da base. É isso 
 > Para instanciar um cliente, use **`new-client.sh`**. O `init-project.sh` apaga o vínculo
 > `upstream` e impede `git merge upstream` — serve só para nascer um produto independente.
 
-A marca de pacotes é configurável em [`config/modulos.php`](../config/modulos.php) (`vendor`,
+A marca de pacotes é configurável em [`config/extensoes.php`](../config/extensoes.php) (`vendor`,
 `namespace`, `org`, `path`, `prefixo_pacote`).
 
 ---
@@ -47,27 +47,27 @@ A marca de pacotes é configurável em [`config/modulos.php`](../config/modulos.
 ## 1. Criar um módulo-pacote e gerar o CRUD
 
 ```bash
-# 1. Cria a casca do pacote em packages/modulo-rh e registra o path repository
-php artisan make:modulo-pacote Rh
+# 1. Cria a casca do pacote em packages/extensao-rh e registra o path repository
+php artisan make:extensao Rh
 
 # 2. Instala o pacote local (symlink) para desenvolvê-lo dentro do monorepo
-composer require "ht2erp/modulo-rh:@dev"
+composer require "ht2ml/extensao-rh:@dev"
 
-# 3. Gera um recurso CRUD DENTRO do pacote (namespaces HT2ERP\Rh\..., views rh::)
+# 3. Gera um recurso CRUD DENTRO do pacote (namespaces HT2ML\Rh\..., views rh::)
 php artisan make:modulo Funcionario --module=Rh \
   --fields="nome:string, cargo:string, salario:money, status:enum(ativo|inativo)" --tenant
 
 # 4. Formata, migra, publica permissões e limpa caches
-./vendor/bin/pint && npx prettier --write packages/modulo-rh/
+./vendor/bin/pint && npx prettier --write packages/extensao-rh/
 php artisan migrate && php artisan access:sync && php artisan cache:clear
 ```
 
-O CRUD nasce em `packages/modulo-rh/src|database|resources|routes|tests`. A integração
+O CRUD nasce em `packages/extensao-rh/src|database|resources|routes|tests`. A integração
 ao core é automática e **sem editar o core**:
 
-- **Rotas** → `packages/modulo-rh/routes/admin.php`, carregado dentro do grupo `/admin`
+- **Rotas** → `packages/extensao-rh/routes/admin.php`, carregado dentro do grupo `/admin`
   via `App\Support\Modules\ModuleRegistry` (herda o middleware admin).
-- **Permissões + menu** → `packages/modulo-rh/config/rh.php` (publicável), agregados em
+- **Permissões + menu** → `packages/extensao-rh/config/rh.php` (publicável), agregados em
   runtime a `config('access.modules')` e `config('admin-menu')` pelo ServiceProvider do
   pacote. `access:sync`, a matriz de acesso e a sidebar enxergam automaticamente.
 - **Livewire + Policy** → registrados no ServiceProvider do pacote (`Livewire::component`,
@@ -82,7 +82,7 @@ ao core é automática e **sem editar o core**:
 
 O pacote vive em `packages/` **versionado no monorepo da base** (core + `packages/modulo-*`,
 ver ADR-0016), instalado via **path repository** com `symlink: true` — editar
-`packages/modulo-rh/src/...` reflete na hora, igual a editar `app/`. O `make:modulo-pacote`
+`packages/extensao-rh/src/...` reflete na hora, igual a editar `app/`. O `make:extensao`
 adiciona o repository ao `composer.json` raiz:
 
 ```json
@@ -100,7 +100,7 @@ Só invista em testbench isolado quando o módulo precisar de CI próprio.
 
 Quando o módulo estabiliza, extraia a pasta para um repositório Git próprio e versione por tag.
 O `bin/release-module.sh` automatiza o `git subtree split` + push + tag, lendo
-`vendor`/`prefixo`/`org` de `config/modulos.php`:
+`vendor`/`prefixo`/`org` de `config/extensoes.php`:
 
 ```bash
 # cria o repo do módulo 1x (privado)
@@ -118,7 +118,7 @@ Convenção semver para módulos:
 - **major** (`v2.0.0`) — breaking: migração incompatível, rename de permissão/rota.
 
 O release deixa o `erp-module-rh` populado e versionado. O **consumo por Composer** (trocar o
-`path` por um `vcs` repository e `composer require "ht2erp/modulo-rh:^1.0"`) fica **latente**
+`path` por um `vcs` repository e `composer require "ht2ml/extensao-rh:^1.0"`) fica **latente**
 até o gatilho da seção 9.
 
 ---
@@ -182,7 +182,7 @@ instrui. Mantenha o `CHANGELOG.md` da base com as **ações pós-merge** de cada
 
     ```bash
     # em cada cliente que consome o módulo via Composer:
-    composer update ht2erp/modulo-rh
+    composer update ht2ml/extensao-rh
     php artisan migrate --force && php artisan access:sync && php artisan cache:clear
     ```
 
@@ -228,7 +228,7 @@ quando houver gatilho real:
   `composer.json`/`composer.lock` (evita que `git merge upstream` sobrescreva as versões
   contratadas do cliente). Passo-a-passo no [ADR-0016](architecture/adrs/ADR-0016-instancias-por-cliente.md).
 - `git merge upstream` virar custoso (muitos clientes/conflitos) → extrair o core como pacote
-  `ht2erp/erp-core` e o cliente vira um `create-project` fino.
+  `ht2ml/erp-core` e o cliente vira um `create-project` fino.
 - gerenciar `repositories` VCS em cada cliente ficar tedioso → **Satis** (estático, custo ~zero)
   ou **Private Packagist** (pago) centraliza a descoberta de pacotes.
 
@@ -238,7 +238,7 @@ quando houver gatilho real:
 
 | Tarefa                         | Comando                                                                             |
 | ------------------------------ | ----------------------------------------------------------------------------------- |
-| Criar casca de pacote          | `php artisan make:modulo-pacote Rh`                                                 |
+| Criar casca de pacote          | `php artisan make:extensao Rh`                                                 |
 | Gerar CRUD no pacote           | `php artisan make:modulo Funcionario --module=Rh --fields="..."`                    |
 | Cortar release de módulo       | `make release-modulo slug=rh versao=v0.1.0`                                         |
 | Novo cliente (clone+re-origin) | `make new-client` (após clone + re-origin)                                          |

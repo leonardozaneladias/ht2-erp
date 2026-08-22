@@ -1,8 +1,8 @@
 # Módulo de RH — Suíte de Documentação (Fase 1)
 
-Documentação de produto e técnica do **super módulo de RH** do HT2 ERP. Cobre da gestão completa da pessoa (cadastro, documentos, histórico) à jornada, horas extras e organograma com ACL hierárquica — entregue como **pacote Composer** `ht2erp/modulo-rh` (`HT2ERP\Rh\`), aditivo ao core (ver [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
+Documentação de produto e técnica do **super módulo de RH** do HT2 ERP. Cobre da gestão completa da pessoa (cadastro, documentos, histórico) à jornada, horas extras e organograma com ACL hierárquica — entregue como **pacote Composer** `ht2ml/extensao-rh` (`HT2ML\Rh\`), aditivo ao core (ver [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
 
-> **Status:** em desenvolvimento (fundação parcial). O pacote `packages/modulo-rh` **existe** e está instalado por path repository (symlink): a casca (`RhServiceProvider`, wiring de rotas/menu/permissões) está erguida e há **duas tabelas iniciais** — o catálogo `departamentos` (1 dos 6 catálogos de B1) e a base `funcionarios` (B2 inicial), ambas já com lixeira e enum de status (`StatusDepartamento`, `StatusFuncionario`) + select de cargo. Os testes de intenção em `tests/Feature/Rh/` (`FuncionarioCargoTest`, `RhLixeiraTest`) fixam essas âncoras. **Todo o resto** (5 catálogos + provisionamento, 5 filhas do funcionário, grupo PCD, campos personalizados, organograma/ACL, jornada/HE e fundação de folha — B3–B7) é **planejamento**. Esta suíte é o blueprint que orienta o desenvolvimento ponto a ponto; o **status real por bloco** está em [02 §1.1](02-fase-1-blueprint.md). **Os documentos aqui são especificação, não código de produção.**
+> **Status:** em desenvolvimento (fundação parcial). O pacote `packages/extensao-rh` **existe** e está instalado por path repository (symlink): a casca (`RhServiceProvider`, wiring de rotas/menu/permissões) está erguida e há **duas tabelas iniciais** — o catálogo `departamentos` (1 dos 6 catálogos de B1) e a base `funcionarios` (B2 inicial), ambas já com lixeira e enum de status (`StatusDepartamento`, `StatusFuncionario`) + select de cargo. Os testes de intenção em `tests/Feature/Rh/` (`FuncionarioCargoTest`, `RhLixeiraTest`) fixam essas âncoras. **Todo o resto** (5 catálogos + provisionamento, 5 filhas do funcionário, grupo PCD, campos personalizados, organograma/ACL, jornada/HE e fundação de folha — B3–B7) é **planejamento**. Esta suíte é o blueprint que orienta o desenvolvimento ponto a ponto; o **status real por bloco** está em [02 §1.1](02-fase-1-blueprint.md). **Os documentos aqui são especificação, não código de produção.**
 
 ---
 
@@ -90,7 +90,7 @@ As 7 necessidades novas trazidas pelo cliente nesta revisão e onde cada uma é 
 | 5     | Controle de ponto — espelho/folha de ponto                                                 | futura                     |
 | 6     | **Marcação de ponto integrada em dispositivo** (REP/biometria/app)                         | futura (objetivo final)    |
 
-As 6 fases acima são o **eixo Departamento Pessoal → Folha → eSocial → Ponto** do `modulo-rh`. Para um RH "muito completo", os **eixos estratégicos** vizinhos entram como **módulos-pacote satélites** (mesma estratégia aditiva do ADR-0015 — ex.: `ht2erp/modulo-sst`, `ht2erp/modulo-ats`), não como inchaço do `modulo-rh`:
+As 6 fases acima são o **eixo Departamento Pessoal → Folha → eSocial → Ponto** do `extensao-rh`. Para um RH "muito completo", os **eixos estratégicos** vizinhos entram como **módulos-pacote satélites** (mesma estratégia aditiva do ADR-0015 — ex.: `ht2ml/modulo-sst`, `ht2ml/modulo-ats`), não como inchaço do `extensao-rh`:
 
 - **SST — Saúde e Segurança** (ASO/PCMSO, EPI, CAT, PGR; eSocial **S-2210/S-2220/S-2240**) · **Benefícios** (VT/VR/VA, plano de saúde) · **Recrutamento & Seleção (ATS)** · **Treinamento & Desenvolvimento** · **Avaliação de Desempenho** (ciclos, OKR, 9-box).
 
@@ -146,7 +146,7 @@ Prefixo `rh.` obrigatório (anti-colisão, ADR-0015). Convivem com o RBAC de doi
 
 Pontos onde a documentação encontra o código existente — decididos aqui para o time não tropeçar:
 
-- **Departamento vs Setor** — adotado `Departamento` (`HT2ERP\Rh\Models\Departamento`, tabela `departamentos`), alinhado ao teste `tests/Feature/Rh/RhLixeiraTest.php` e ao item de menu `rh-departamentos`. "Setor" é sinônimo de UI.
+- **Departamento vs Setor** — adotado `Departamento` (`HT2ML\Rh\Models\Departamento`, tabela `departamentos`), alinhado ao teste `tests/Feature/Rh/RhLixeiraTest.php` e ao item de menu `rh-departamentos`. "Setor" é sinônimo de UI.
 - **Menu** — os itens do RH ficam no grupo **RH** da seção **Tabelas Auxiliares** (ver `AplicarMenuPadraoAction`), não na seção "Negócio" do stub padrão.
 - **Cargo** — reaproveita a referência global `cargos` (CBO), satisfazendo `tests/Feature/Rh/FuncionarioCargoTest.php` (`cargosDisponiveis`); cargos próprios por empresa ficam como evolução ([ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md)).
 - **Upload seguro** — o `GerenciadorAnexos` do core hoje grava no disco `public`; para documentos de RH (PII) deve-se parametrizar o disco para **privado** (`rh_privado`) + URL assinada + download por Policy ([03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)). O multi-upload/ZIP e a detecção por tag reusam o mesmo `Anexo`/Dropzone ([03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)).

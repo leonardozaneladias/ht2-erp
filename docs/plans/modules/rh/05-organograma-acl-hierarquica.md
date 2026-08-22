@@ -2,7 +2,7 @@
 
 > Como o módulo de RH decide **quem enxerga quais funcionários**. A resposta não é uma permissão só: é a **interseção de três eixos ortogonais** — tenant (empresa), RBAC (a ação) e organograma (a subárvore de subordinados). Este documento descreve o princípio, o vínculo `Funcionario↔AdminUser`, a hierarquia por `gestor_id`, a subárvore recursiva (WITH RECURSIVE), o empacotamento em trait + serviço, a matriz de casos, os edge cases, o self-service do colaborador e a tela de organograma.
 >
-> Pacote: `ht2erp/modulo-rh` · namespace `HT2ERP\Rh\` · `packages/modulo-rh/` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`. O **schema é definido em [01](01-modelo-de-dominio.md)** (fonte de verdade); aqui só consumimos os nomes de tabelas/colunas/permissões de lá e descrevemos a mecânica de acesso.
+> Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · `packages/extensao-rh/` · views `rh::` · banco **PostgreSQL 16** · multi-tenant lógico por `empresa_id`. O **schema é definido em [01](01-modelo-de-dominio.md)** (fonte de verdade); aqui só consumimos os nomes de tabelas/colunas/permissões de lá e descrevemos a mecânica de acesso.
 
 Relacionados: [01](01-modelo-de-dominio.md) · [03](03-cadastro-pessoa-documentos.md) · [07](07-jornada-horas-extras-folha.md) · [adrs/ADR-RH-003](adrs/ADR-RH-003-acl-hierarquica-organograma.md)
 
@@ -23,7 +23,7 @@ Cada eixo responde a uma pergunta diferente, e os três são **ortogonais** — 
 | --------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | **Tenant**      | "Este registro é da empresa em que estou?"                     | Global scope `empresa` do trait `App\Models\Concerns\BelongsToEmpresa`, alimentado por `App\Support\Tenancy\TenantContext` | **Quais linhas** (por `empresa_id`)       |
 | **RBAC**        | "Eu posso executar **esta ação** (listar/ver/editar/aprovar)?" | `Gate` → `App\Services\Admin\AccessResolver` (super-admin bypass · deny > grant > role)                                    | **O verbo** (a ação inteira, não a linha) |
-| **Organograma** | "Esta pessoa está **na minha subárvore** de subordinados?"     | Trait `HT2ERP\Rh\Models\Concerns\VisivelNaHierarquia` + serviço `EscopoOrganograma` (CTE recursiva sobre `gestor_id`)      | **Quais linhas** (por posição na árvore)  |
+| **Organograma** | "Esta pessoa está **na minha subárvore** de subordinados?"     | Trait `HT2ML\Rh\Models\Concerns\VisivelNaHierarquia` + serviço `EscopoOrganograma` (CTE recursiva sobre `gestor_id`)      | **Quais linhas** (por posição na árvore)  |
 
 A distinção mais importante de toda a ACL deste módulo:
 
@@ -63,7 +63,7 @@ funcionarios.admin_user_id   BIGINT  NULL   FK→admin_users  nullOnDelete
 UNIQUE (empresa_id, admin_user_id)  WHERE deleted_at IS NULL   -- índice parcial
 ```
 
-A FK e o índice nascem numa migration **dentro do pacote** (`packages/modulo-rh/database/migrations`), carregada via `loadMigrationsFrom` — o core não recebe nenhuma coluna nova. A relação inversa `AdminUser::funcionario(): HasOne` é declarada num model do pacote (ou via macro/extensão), sem migration no core. Esse é o padrão aditivo do [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md): tudo do RH se acopla por fora.
+A FK e o índice nascem numa migration **dentro do pacote** (`packages/extensao-rh/database/migrations`), carregada via `loadMigrationsFrom` — o core não recebe nenhuma coluna nova. A relação inversa `AdminUser::funcionario(): HasOne` é declarada num model do pacote (ou via macro/extensão), sem migration no core. Esse é o padrão aditivo do [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md): tudo do RH se acopla por fora.
 
 ### 2.2 As duas direções são opcionais (0..1 ↔ 0..1)
 
@@ -76,7 +76,7 @@ A unicidade `(empresa_id, admin_user_id)` garante que, **dentro de uma empresa**
 
 ### 2.3 O serviço `FuncionarioAtual` — "qual funcionário sou eu nesta empresa?"
 
-A resolução é encapsulada no serviço `HT2ERP\Rh\Support\Organograma\FuncionarioAtual`. Ele recebe o usuário logado e a empresa ativa e devolve o `Funcionario` correspondente (ou `null`).
+A resolução é encapsulada no serviço `HT2ML\Rh\Support\Organograma\FuncionarioAtual`. Ele recebe o usuário logado e a empresa ativa e devolve o `Funcionario` correspondente (ou `null`).
 
 Como o mesmo login pode ser funcionário em empresas diferentes, **o cache é por request e chaveado por `(admin_user_id, empresa_id)`** — espelhando a disciplina de cache do `AccessResolver`/`AccessCache` do core, que também memoiza por usuário e, quando preciso, por empresa.
 
@@ -85,11 +85,11 @@ Como o mesmo login pode ser funcionário em empresas diferentes, **o cache é po
 
 declare(strict_types=1);
 
-namespace HT2ERP\Rh\Support\Organograma;
+namespace HT2ML\Rh\Support\Organograma;
 
 use App\Models\AdminUser;
 use App\Support\Tenancy\TenantContext;
-use HT2ERP\Rh\Models\Funcionario;
+use HT2ML\Rh\Models\Funcionario;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -273,9 +273,9 @@ A mecânica é embrulhada do mesmo jeito que o core embrulha o tenant: **um trai
 
 declare(strict_types=1);
 
-namespace HT2ERP\Rh\Models\Concerns;
+namespace HT2ML\Rh\Models\Concerns;
 
-use HT2ERP\Rh\Support\Organograma\EscopoOrganograma;
+use HT2ML\Rh\Support\Organograma\EscopoOrganograma;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -317,7 +317,7 @@ O serviço encapsula toda a árvore de decisão. A ordem dos curto-circuitos imp
 
 declare(strict_types=1);
 
-namespace HT2ERP\Rh\Support\Organograma;
+namespace HT2ML\Rh\Support\Organograma;
 
 use App\Models\AdminUser;
 use Illuminate\Database\Eloquent\Builder;

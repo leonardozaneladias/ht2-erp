@@ -34,7 +34,7 @@ final class EspecificacaoModulo
         string $nome,
         array $todosCampos,
         public readonly bool $tenant = false,
-        public readonly ?ModuloPacote $pacote = null,
+        public readonly ?Extensao $pacote = null,
         public readonly bool $softDelete = false,
     ) {
         $this->studly = Str::studly(Str::singular($nome));
@@ -932,7 +932,7 @@ final class EspecificacaoModulo
 
     // ---- Destino: namespaces, views e rotas (app vs pacote) ---------------
     // Quando $pacote é null o módulo nasce em app/ (App\...); quando é um
-    // ModuloPacote, nasce no pacote (HT2ERP\{Modulo}\...). Ver ADR-0015.
+    // Extensao, nasce no pacote (HT2ML\{Modulo}\...). Ver ADR-0015.
 
     private function nsBase(): string
     {
