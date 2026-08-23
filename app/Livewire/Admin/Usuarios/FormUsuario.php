@@ -10,6 +10,7 @@ use App\Actions\Admin\RevogarAcessoDiretoAction;
 use App\Actions\Admin\Security\DefinirEmailDoisFatoresAction;
 use App\Actions\Admin\SyncAcessoEmpresaAction;
 use App\Actions\Admin\UpdateAdminUserAction;
+use App\Contracts\Referencia\FonteDeCargos;
 use App\DTOs\Admin\AdminUserDTO;
 use App\DTOs\Admin\ConcessaoAcessoDTO;
 use App\Enums\ModuloAcesso;
@@ -19,7 +20,6 @@ use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Models\Empresa;
 use App\Models\PermissionGrant;
-use App\Models\Referencia\Cargo;
 use App\Services\Admin\HierarchyResolver;
 use App\Settings\SegurancaSettings;
 use Illuminate\Contracts\View\View;
@@ -289,7 +289,9 @@ class FormUsuario extends Component
     #[Computed]
     public function cargosDisponiveis(): array
     {
-        $cargos = Cargo::query()->where('ativo', true)->orderBy('descricao')->pluck('descricao')->all();
+        $cargos = app()->bound(FonteDeCargos::class)
+            ? app(FonteDeCargos::class)->ativos()
+            : [];
 
         if ($this->cargo !== '' && ! in_array($this->cargo, $cargos, true)) {
             array_unshift($cargos, $this->cargo);

@@ -123,22 +123,39 @@
                             wire:model="filial_inscricao_estadual"
                         />
                         <x-shared.phone-input name="filial_telefone" wire:model="filial_telefone" />
-                        <x-shared.select-search
-                            name="filial_estado"
-                            label="UF"
-                            placeholder="Selecione a UF..."
-                            :options="$this->ufsDisponiveis"
-                            wire:model.live="filial_estado"
-                        />
-                        <div wire:key="filial-cidade-{{ $filial_estado }}">
+                        {{-- Sem extensão de localização instalada, UF e cidade viram
+                             texto livre — que é o que a coluna sempre foi no banco
+                             (string, sem FK). Ver App\Contracts\Referencia. --}}
+                        @if ($this->temCatalogoDeLocalidades)
                             <x-shared.select-search
+                                name="filial_estado"
+                                label="UF"
+                                placeholder="Selecione a UF..."
+                                :options="$this->ufsDisponiveis"
+                                wire:model.live="filial_estado"
+                            />
+                            <div wire:key="filial-cidade-{{ $filial_estado }}">
+                                <x-shared.select-search
+                                    name="filial_cidade"
+                                    label="Cidade"
+                                    placeholder="Selecione a cidade..."
+                                    :options="$this->municipiosDaFilial"
+                                    wire:model="filial_cidade"
+                                />
+                            </div>
+                        @else
+                            <x-shared.input
+                                name="filial_estado"
+                                label="UF"
+                                maxlength="2"
+                                wire:model="filial_estado"
+                            />
+                            <x-shared.input
                                 name="filial_cidade"
                                 label="Cidade"
-                                placeholder="Selecione a cidade..."
-                                :options="$this->municipiosDaFilial"
                                 wire:model="filial_cidade"
                             />
-                        </div>
+                        @endif
                         <x-shared.toggle
                             name="filial_ativo"
                             label="Filial ativa"
