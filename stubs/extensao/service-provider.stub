@@ -24,6 +24,12 @@ final class __PROVIDER_CLASS__ extends ServiceProvider
         // Registrado no register() para que o callback exista antes do carregamento
         // de routes/admin.php — o require roda DENTRO do grupo admin do core, então
         // as rotas do módulo herdam o prefixo /admin, o name "admin." e o middleware.
+        // Seeders da extensão, se houver. Use antesDoCore: true quando os
+        // seeders de demo do core dependerem destes dados (catálogos, por
+        // exemplo); do contrário eles rodam depois, já com empresas e perfis
+        // no lugar.
+        // ModuleRegistry::seeder(\__NAMESPACE_BASE__\Database\Seeders\__MODULO_STUDLY__Seeder::class);
+
         ModuleRegistry::routes(function (): void {
             $rotas = __DIR__ . '/../routes/admin.php';
 
