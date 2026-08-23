@@ -74,7 +74,7 @@ cp .env.example .env     # já vem alinhado ao DDEV (DB/Redis/Mailpit)
 ddev start               # sobe containers + hooks (composer install, migrate, npm install)
 make setup               # 1x: APP_KEY, migrate --seed, assets Horizon/Pulse, build de produção
 
-ddev launch              # abre https://gdf-erp.ddev.site no navegador
+ddev launch              # abre https://ht2ml-platform.ddev.site no navegador
 ```
 
 Login admin: **`admin@example.com` / `password`** (e `gestor@example.com` / `password`).
@@ -99,9 +99,9 @@ ddev mailpit                                    # abre a UI de e-mails
 
 | Recurso | URL / Comando                        |
 | ------- | ------------------------------------ |
-| App     | https://gdf-erp.ddev.site            |
-| Horizon | https://gdf-erp.ddev.site/horizon    |
-| Pulse   | https://gdf-erp.ddev.site/pulse      |
+| App     | https://ht2ml-platform.ddev.site            |
+| Horizon | https://ht2ml-platform.ddev.site/horizon    |
+| Pulse   | https://ht2ml-platform.ddev.site/pulse      |
 | Mailpit | `ddev mailpit`                       |
 | Vite    | `make dev` → `…ddev.site:5173` (HMR) |
 | Banco   | `ddev psql`                          |

@@ -16,7 +16,7 @@ final class ThemePresetCatalog
     public function paraEnum(ThemePreset $preset): ThemePresetDTO
     {
         return match ($preset) {
-            ThemePreset::HT2_ERP => new ThemePresetDTO(
+            ThemePreset::SAFIRA => new ThemePresetDTO(
                 cor_primaria: '#1577ce',
                 cor_secundaria: '#2b3a67',
                 cor_sucesso: '#12b886',

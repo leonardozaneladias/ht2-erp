@@ -1,9 +1,9 @@
 # __PKG_NAME__
 
-Módulo **__MODULO_STUDLY__** do HT2 ERP.
+Extensão **__MODULO_STUDLY__**.
 
 Pacote Composer instalável que adiciona o módulo __MODULO_STUDLY__ a qualquer
-instalação do HT2 ERP, sem editar o core (ver ADR-0015).
+instalação de qualquer produto, sem editar o core (ver ADR-0015).
 
 ## Instalar em um cliente
 

@@ -28,7 +28,7 @@ combinação mais rápida nos benchmarks oficiais.
 cp .env.example .env
 ddev start       # sobe containers; hooks rodam composer install, migrate, npm install
 make setup       # 1x: key:generate, migrate --seed, assets Horizon/Pulse, npm build
-ddev launch      # abre https://gdf-erp.ddev.site
+ddev launch      # abre https://ht2ml-platform.ddev.site
 ```
 
 O `ddev start` (project type `laravel`) reescreve as credenciais de banco no `.env`
@@ -42,18 +42,18 @@ sobe junto e fica acessível em `redis:6379`. Horizon roda como daemon persisten
 
 | Serviço           | URL / Comando                                       |
 | ----------------- | --------------------------------------------------- |
-| Aplicação Laravel | https://gdf-erp.ddev.site                           |
-| Laravel Horizon   | https://gdf-erp.ddev.site/horizon                   |
-| Laravel Pulse     | https://gdf-erp.ddev.site/pulse                     |
+| Aplicação Laravel | https://ht2ml-platform.ddev.site                           |
+| Laravel Horizon   | https://ht2ml-platform.ddev.site/horizon                   |
+| Laravel Pulse     | https://ht2ml-platform.ddev.site/pulse                     |
 | Mailpit (UI)      | `ddev mailpit`                                      |
-| Vite dev server   | https://gdf-erp.ddev.site:5173 (`ddev npm run dev`) |
+| Vite dev server   | https://ht2ml-platform.ddev.site:5173 (`ddev npm run dev`) |
 | PostgreSQL        | `ddev psql` · host interno `db:5432`                |
 | Redis             | host interno `redis:6379`                           |
 
 Smoke test das URLs principais:
 
 ```bash
-for u in https://gdf-erp.ddev.site https://gdf-erp.ddev.site/horizon https://gdf-erp.ddev.site/pulse; do
+for u in https://ht2ml-platform.ddev.site https://ht2ml-platform.ddev.site/horizon https://ht2ml-platform.ddev.site/pulse; do
   printf "%-40s " "$u"; curl -sk -o /dev/null -w "%{http_code}\n" "$u"
 done
 ```
@@ -109,7 +109,7 @@ configurado em `vite.config.js` (bloco `server` com `origin` baseado em
 `DDEV_PRIMARY_URL_WITHOUT_PORT` e `cors` para `*.ddev.site`).
 
 ```bash
-ddev npm run dev      # assets em https://gdf-erp.ddev.site:5173, com hot-reload
+ddev npm run dev      # assets em https://ht2ml-platform.ddev.site:5173, com hot-reload
 ddev npm run build    # build de produção
 ```
 

@@ -5,17 +5,20 @@ declare(strict_types=1);
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
 /**
- * Atualiza os defaults de fábrica para a identidade HT2 ERP.
+ * Atualiza a paleta de fábrica da plataforma.
  *
  * Idempotente e não-destrutivo: cada cor só é trocada se ainda estiver no
  * valor antigo (paleta Inspinia). Instalações que já customizaram a marca
- * pela aba de Aparência mantêm os valores escolhidos. Em instalações novas
- * (migrate:fresh), o seed inicial já grava a paleta HT2, então estes updates
- * viram no-op.
+ * pela aba de Aparência mantêm os valores escolhidos.
+ *
+ * Não grava nome de sistema: por decisão do ADR-0019 a plataforma é abstrata,
+ * e o nome vem de APP_NAME em cada produto. Uma migration que carimbasse nome
+ * de produto no banco reintroduziria exatamente o problema que o ADR-0017
+ * resolveu ao aposentar o clone da base.
  */
 return new class extends SettingsMigration
 {
-    /** Mapa cor antiga (Inspinia) → cor nova (HT2 ERP). */
+    /** Mapa cor antiga (Inspinia) → cor nova (paleta da plataforma). */
     private const CORES = [
         'branding.cor_primaria' => ['#1ab394', '#1577ce'],
         'branding.cor_secundaria' => ['#1c84c6', '#2b3a67'],
@@ -33,11 +36,5 @@ return new class extends SettingsMigration
                 fn (string $atual): string => strtolower($atual) === $antiga ? $nova : $atual,
             );
         }
-
-        // Nome do sistema: só renomeia se ainda for o default genérico antigo.
-        $this->migrator->update(
-            'branding.nome_sistema',
-            fn (string $atual): string => in_array($atual, ['Laravel', 'Laravel Admin', 'ERP'], true) ? 'HT2 ERP' : $atual,
-        );
     }
 };

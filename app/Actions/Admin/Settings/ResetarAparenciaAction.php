@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Restaura identidade e aparência ao padrão de fábrica (preset HT2 ERP):
+ * Restaura identidade e aparência ao padrão de fábrica (preset Safira):
  * limpa logos/favicon enviados (volta ao fallback), reaplica a paleta e o
  * layout padrão. Não toca em e-mail, segurança, localização ou empresa.
  */
@@ -23,10 +23,10 @@ final class ResetarAparenciaAction
     public function execute(): void
     {
         DB::transaction(function (): void {
-            $preset = $this->catalog->paraEnum(ThemePreset::HT2_ERP);
+            $preset = $this->catalog->paraEnum(ThemePreset::SAFIRA);
 
             $branding = app(BrandingSettings::class);
-            $branding->nome_sistema = (string) config('app.name', 'HT2 ERP');
+            $branding->nome_sistema = (string) config('app.name', 'Admin');
             $branding->slogan = '';
             $branding->logo_arquivo = '';
             $branding->logo_dark_arquivo = '';
@@ -54,7 +54,7 @@ final class ResetarAparenciaAction
             activity('configuracoes')
                 ->causedBy(Auth::guard('admin')->user())
                 ->event('reset')
-                ->log('Identidade e aparência restauradas ao padrão HT2 ERP');
+                ->log('Identidade e aparência restauradas ao padrão de fábrica');
         });
     }
 }
