@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-use App\Enums\Referencia\TipoCfop;
 use App\Models\Referencia\Banco;
 use App\Models\Referencia\Cargo;
-use App\Models\Referencia\Cfop;
-use App\Models\Referencia\Cnae;
 use App\Models\Referencia\Moeda;
-use App\Models\Referencia\Ncm;
 use App\Models\Referencia\TipoLogradouro;
 use Database\Seeders\Referencia\BancoSeeder;
 use Database\Seeders\Referencia\CargoSeeder;
-use Database\Seeders\Referencia\CfopSeeder;
-use Database\Seeders\Referencia\CnaeSeeder;
 use Database\Seeders\Referencia\MoedaSeeder;
-use Database\Seeders\Referencia\NcmSeeder;
 use Database\Seeders\Referencia\TipoLogradouroSeeder;
+use HT2ML\FiscalBr\Database\Seeders\CfopSeeder;
+use HT2ML\FiscalBr\Database\Seeders\CnaeSeeder;
+use HT2ML\FiscalBr\Database\Seeders\NcmSeeder;
+use HT2ML\FiscalBr\Enums\TipoCfop;
+use HT2ML\FiscalBr\Models\Cfop;
+use HT2ML\FiscalBr\Models\Cnae;
+use HT2ML\FiscalBr\Models\Ncm;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

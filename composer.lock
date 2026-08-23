@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ecb88711b5d90b21a9d7b027d9a8c14",
+    "content-hash": "24eb3649a6ddf5372cc234733260a6f6",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1713,12 +1713,52 @@
             "time": "2026-06-12T21:33:43+00:00"
         },
         {
+            "name": "ht2ml/extensao-fiscal-br",
+            "version": "dev-feat/extrair-extensao-fiscal-br",
+            "dist": {
+                "type": "path",
+                "url": "packages/extensao-fiscal-br",
+                "reference": "731bc4e9ae6d94527bab568d02a9de0f084a8488"
+            },
+            "require": {
+                "php": "^8.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HT2ML\\FiscalBr\\FiscalBrServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HT2ML\\FiscalBr\\": "src/",
+                    "HT2ML\\FiscalBr\\Database\\Factories\\": "database/factories/",
+                    "HT2ML\\FiscalBr\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "HT2ML\\FiscalBr\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Catálogos de classificação fiscal brasileira: CNAE, CFOP e NCM.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-refactor/identidade-e-vocabulario-de-extensao",
+            "version": "dev-feat/extrair-extensao-fiscal-br",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",
-                "reference": "ef03d7f35aea47e2365c52310257ac6c279bba54"
+                "reference": "7be186e04fa6197ee9cdbd83c2995eea745b1225"
             },
             "require": {
                 "php": "^8.4"
@@ -1745,7 +1785,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Módulo Rh do HT2 ERP.",
+            "description": "Extensão Rh.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -14444,6 +14484,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "ht2ml/extensao-fiscal-br": 20,
         "ht2ml/extensao-rh": 20
     },
     "prefer-stable": true,

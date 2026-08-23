@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia;
 
+use App\Support\Modules\ModuleRegistry;
 use Illuminate\Database\Seeder;
 
 /**
@@ -26,13 +27,20 @@ final class DadosReferenciaSeeder extends Seeder
         'bancos' => BancoSeeder::class,
         'cargos' => CargoSeeder::class,
         'tipos_logradouro' => TipoLogradouroSeeder::class,
-        'cnaes' => CnaeSeeder::class,
-        'cfops' => CfopSeeder::class,
-        'ncms' => NcmSeeder::class,
     ];
+
+    /**
+     * Catálogos do core mais os declarados por extensões.
+     *
+     * @return array<string, class-string<Seeder>>
+     */
+    public static function conjuntos(): array
+    {
+        return [...self::CONJUNTOS, ...ModuleRegistry::catalogosDeReferencia()];
+    }
 
     public function run(): void
     {
-        $this->call(array_values(self::CONJUNTOS));
+        $this->call(array_values(self::conjuntos()));
     }
 }

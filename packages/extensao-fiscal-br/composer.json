@@ -1,0 +1,29 @@
+{
+  "name": "ht2ml/extensao-fiscal-br",
+  "description": "Catálogos de classificação fiscal brasileira: CNAE, CFOP e NCM.",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "HT2ML\\FiscalBr\\": "src/",
+      "HT2ML\\FiscalBr\\Database\\Factories\\": "database/factories/",
+      "HT2ML\\FiscalBr\\Database\\Seeders\\": "database/seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HT2ML\\FiscalBr\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "HT2ML\\FiscalBr\\FiscalBrServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable"
+}

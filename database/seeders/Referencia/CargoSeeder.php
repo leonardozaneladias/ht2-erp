@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia;
 
-use Database\Seeders\Referencia\Support\CsvReferenceSeeder;
+use App\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Cargos (CBO). CSV: `codigo_cbo,descricao`. Conjunto inicial curado (a expandir);

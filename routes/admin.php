@@ -217,23 +217,6 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
             Route::get('/{tipo_logradouro}/editar', App\Livewire\Admin\Referencia\FormTipoLogradouro::class)->name('edit');
         });
 
-        Route::prefix('cnaes')->name('cnaes.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexCnae::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormCnae::class)->name('create');
-            Route::get('/{cnae}/editar', App\Livewire\Admin\Referencia\FormCnae::class)->name('edit');
-        });
-
-        Route::prefix('cfops')->name('cfops.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexCfop::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormCfop::class)->name('create');
-            Route::get('/{cfop}/editar', App\Livewire\Admin\Referencia\FormCfop::class)->name('edit');
-        });
-
-        Route::prefix('ncms')->name('ncms.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexNcm::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormNcm::class)->name('create');
-            Route::get('/{ncm}/editar', App\Livewire\Admin\Referencia\FormNcm::class)->name('edit');
-        });
     });
 
     // Rotas contribuídas por módulos-pacote (ADR-0015). Cada pacote registra seu

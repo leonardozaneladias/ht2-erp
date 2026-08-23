@@ -49,6 +49,9 @@ final class ModuleRegistry
     /** @var array<string, list<array<string, mixed>>> */
     private static array $itensDeMenu = [];
 
+    /** @var array<string, class-string<\Illuminate\Database\Seeder>> */
+    private static array $catalogos = [];
+
     /**
      * Registra um callback que define rotas dentro do grupo autenticado /admin.
      * Deve ser chamado no register() do ServiceProvider do pacote.
@@ -203,6 +206,30 @@ final class ModuleRegistry
     }
 
     /**
+     * Declara um catálogo de referência mantido por CSV.
+     *
+     * Diferente de seeder(): além de semear, o catálogo entra na lista do
+     * `referencia:sync`, que é o passo de deploy. Sem este canal, extrair um
+     * catálogo do core o tiraria silenciosamente do comando de sincronização.
+     *
+     * @param  class-string<\Illuminate\Database\Seeder>  $seeder
+     */
+    public static function catalogoDeReferencia(string $slug, string $seeder): void
+    {
+        self::$catalogos[$slug] = $seeder;
+    }
+
+    /**
+     * Catálogos de referência declarados por extensões (slug => seeder).
+     *
+     * @return array<string, class-string<\Illuminate\Database\Seeder>>
+     */
+    public static function catalogosDeReferencia(): array
+    {
+        return self::$catalogos;
+    }
+
+    /**
      * Limpa o estado acumulado. Útil em testes para isolar cenários.
      */
     public static function flush(): void
@@ -211,5 +238,6 @@ final class ModuleRegistry
         self::$seeders = ['antes' => [], 'depois' => []];
         self::$permissoes = [];
         self::$itensDeMenu = [];
+        self::$catalogos = [];
     }
 }

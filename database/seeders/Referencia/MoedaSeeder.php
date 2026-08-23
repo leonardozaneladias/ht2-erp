@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia;
 
-use Database\Seeders\Referencia\Support\CsvReferenceSeeder;
+use App\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Moedas (ISO 4217). CSV: `codigo_iso,numerico,nome,simbolo,casas_decimais`.

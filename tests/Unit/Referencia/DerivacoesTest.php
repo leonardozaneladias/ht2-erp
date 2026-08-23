@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\Referencia\RegiaoBrasil;
-use App\Enums\Referencia\TipoCfop;
+use HT2ML\FiscalBr\Enums\TipoCfop;
 
 it('RegiaoBrasil::peloCodigoIbge deriva a região pelo 1º dígito', function () {
     expect(RegiaoBrasil::peloCodigoIbge('35'))->toBe(RegiaoBrasil::Sudeste)
