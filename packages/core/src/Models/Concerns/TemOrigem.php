@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Concerns;
+namespace HT2ML\Core\Models\Concerns;
 
-use App\Enums\Referencia\OrigemRegistro;
+use HT2ML\Core\Enums\Referencia\OrigemRegistro;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,11 +12,11 @@ use Illuminate\Database\Eloquent\Model;
  * Catálogo cujas linhas têm origem declarada: sincronizada ou cadastrada aqui.
  *
  * A distinção é o que permite ao `referencia:sync` e ao CRUD coexistirem sem
- * disputar a mesma linha — ver App\Enums\Referencia\OrigemRegistro.
+ * disputar a mesma linha — ver HT2ML\Core\Enums\Referencia\OrigemRegistro.
  *
  * @phpstan-require-extends \Illuminate\Database\Eloquent\Model
  *
- * @phpstan-require-implements \App\Models\Contracts\TemOrigemDeclarada
+ * @phpstan-require-implements \HT2ML\Core\Models\Contracts\TemOrigemDeclarada
  */
 trait TemOrigem
 {

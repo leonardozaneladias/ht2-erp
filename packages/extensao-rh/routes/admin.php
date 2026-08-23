@@ -8,7 +8,7 @@ declare(strict_types=1);
 |--------------------------------------------------------------------------
 |
 | Este arquivo é incluído (require) DENTRO do grupo autenticado /admin do core
-| (ver App\Support\Modules\ModuleRegistry e routes/admin.php), portanto as rotas
+| (ver HT2ML\Core\Support\Modules\ModuleRegistry e routes/admin.php), portanto as rotas
 | abaixo já herdam o prefixo /admin, o name "admin." e todo o middleware admin.
 | Use prefixos e names RELATIVOS (ex.: Route::prefix('rh')...).
 |

@@ -66,7 +66,7 @@ O CRUD nasce em `packages/extensao-rh/src|database|resources|routes|tests`. A in
 ao core é automática e **sem editar o core**:
 
 - **Rotas** → `packages/extensao-rh/routes/admin.php`, carregado dentro do grupo `/admin`
-  via `App\Support\Modules\ModuleRegistry` (herda o middleware admin).
+  via `HT2ML\Core\Support\Modules\ModuleRegistry` (herda o middleware admin).
 - **Permissões + menu** → `packages/extensao-rh/config/rh.php` (publicável), agregados em
   runtime a `config('access.modules')` e `config('admin-menu')` pelo ServiceProvider do
   pacote. `access:sync`, a matriz de acesso e a sidebar enxergam automaticamente.

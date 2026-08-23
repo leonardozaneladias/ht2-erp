@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Support\Modules;
+namespace HT2ML\Core\Support\Modules;
 
-use App\Enums\ModuloAcesso;
 use Closure;
+use HT2ML\Core\Enums\ModuloAcesso;
 use InvalidArgumentException;
 
 /**

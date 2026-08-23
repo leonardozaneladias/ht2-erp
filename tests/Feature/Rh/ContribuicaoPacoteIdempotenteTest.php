@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\Modules\ModuleRegistry;
+use HT2ML\Core\Support\Modules\ModuleRegistry;
 use HT2ML\Rh\RhServiceProvider;
 
 /*
@@ -62,7 +62,7 @@ it('recusa módulo de acesso inexistente', function () {
 it('respeita o módulo declarado pela extensão', function () {
     ModuleRegistry::flush();
     ModuleRegistry::permissoes(
-        App\Enums\ModuloAcesso::TabelasAuxiliares,
+        HT2ML\Core\Enums\ModuloAcesso::TabelasAuxiliares,
         ['ref.teste.listar' => ['label' => 'Listar teste', 'descricao' => 'Teste.']],
     );
     ModuleRegistry::aplicarContribuicoes();

@@ -220,9 +220,9 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
     });
 
     // Rotas contribuídas por módulos-pacote (ADR-0015). Cada pacote registra seu
-    // callback em App\Support\Modules\ModuleRegistry no register() do provider;
+    // callback em HT2ML\Core\Support\Modules\ModuleRegistry no register() do provider;
     // aqui elas entram no grupo autenticado, herdando todo o middleware admin.
-    foreach (App\Support\Modules\ModuleRegistry::routeCallbacks() as $registrarRotasDoModulo) {
+    foreach (HT2ML\Core\Support\Modules\ModuleRegistry::routeCallbacks() as $registrarRotasDoModulo) {
         $registrarRotasDoModulo();
     }
 

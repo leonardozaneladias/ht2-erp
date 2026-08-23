@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs\Admin;
 
-use App\Enums\ModuloAcesso;
+use HT2ML\Core\Enums\ModuloAcesso;
 
 final readonly class PermissionDefinitionDTO
 {

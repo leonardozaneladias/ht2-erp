@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Enums\Referencia;
+namespace HT2ML\Core\Enums\Referencia;
 
 /**
  * Origem de uma linha de catálogo de referência.

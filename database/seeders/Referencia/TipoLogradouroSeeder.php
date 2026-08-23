@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia;
 
-use App\Support\Referencia\CsvReferenceSeeder;
+use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Tipos de logradouro. CSV: `nome,codigo,abrev`. Chave natural: nome.

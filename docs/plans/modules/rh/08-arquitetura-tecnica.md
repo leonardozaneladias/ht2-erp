@@ -218,7 +218,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh;
 
-use App\Support\Modules\ModuleRegistry;
+use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Support\ServiceProvider;
 
 final class RhServiceProvider extends ServiceProvider
@@ -263,7 +263,7 @@ final class RhServiceProvider extends ServiceProvider
 
 Pontos de integração (sem tocar o core — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)):
 
-- **Rotas** — `App\Support\Modules\ModuleRegistry::routes(...)` acumula closures; o grupo autenticado de `routes/admin.php` (core) itera `routeCallbacks()` e dá `require` em `packages/extensao-rh/routes/admin.php` **dentro** da stack admin. O arquivo de rotas usa prefixos/names **relativos** (ex.: `Route::prefix('rh/departamentos')->name('rh.departamentos.')`).
+- **Rotas** — `HT2ML\Core\Support\Modules\ModuleRegistry::routes(...)` acumula closures; o grupo autenticado de `routes/admin.php` (core) itera `routeCallbacks()` e dá `require` em `packages/extensao-rh/routes/admin.php` **dentro** da stack admin. O arquivo de rotas usa prefixos/names **relativos** (ex.: `Route::prefix('rh/departamentos')->name('rh.departamentos.')`).
 - **Permissões** — `contribuirPermissoes()` faz `array_merge_recursive` de `config('rh.permissoes')` em `config('access.modules')['negocio']`. Assim `access:sync`, a matriz de acesso e o `RolePermissionSeeder` enxergam as `rh.*`.
 - **Menu** — `contribuirMenu()` mescla `config('rh.menu')` nos `items` da seção `negocio` de `config('admin-menu')`. Keys estáveis → personalização do cliente (`MenuPersonalizacao`) sobrevive a updates. O `AplicarMenuPadraoAction` do core **reposiciona** os itens RH (keys `rh-departamentos`, `rh-funcionarios`) para o grupo "RH" da seção **Tabelas Auxiliares** — use keys de menu coerentes com esse Action.
 - **Livewire/Policy** — registrados **explicitamente** no `boot()` (não há auto-discovery fora de `App\`). O `make:modulo` injeta `Livewire::component('rh.<recurso>.index|form', ...)`, `Livewire::component('<tag-da-table>', ...)` e `Gate::policy(Model::class, Policy::class)` na âncora.

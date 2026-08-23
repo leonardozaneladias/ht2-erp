@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace HT2ML\FiscalBr\Policies;
 
 use App\Models\AdminUser;
-use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
+use HT2ML\Core\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 use HT2ML\FiscalBr\Models\Ncm;
 
 class NcmPolicy

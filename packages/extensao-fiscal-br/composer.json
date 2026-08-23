@@ -5,6 +5,7 @@
   "license": "proprietary",
   "require": {
     "php": "^8.4",
+    "ht2ml/core": "@dev",
     "illuminate/contracts": "^13.0",
     "illuminate/database": "^13.0",
     "illuminate/support": "^13.0",

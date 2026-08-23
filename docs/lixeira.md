@@ -23,7 +23,7 @@ soft-delete do Eloquent; o `ativo` é regra de negócio.
   colidir entre grids. Compõe **por fora** do escopo multi-empresa:
   `aplicarLixeira($this->aplicarEscopoMultiEmpresa(Model::query()))` — os global
   scopes `empresa` e `SoftDeletingScope` são independentes.
-- **Contrato `App\Models\Contracts\UsaSoftDeletes`** — marca um model que usa
+- **Contrato `HT2ML\Core\Models\Contracts\UsaSoftDeletes`** — marca um model que usa
   `SoftDeletes`, expondo `restore()`/`trashed()` ao type-system para a
   manipulação genérica do trait. Todo model soft-deletável o implementa.
 - **`Auditavel`** já loga `deleted`/`restored`/`forceDeleted`.

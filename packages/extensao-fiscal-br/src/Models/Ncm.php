@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace HT2ML\FiscalBr\Models;
 
-use App\Enums\Referencia\OrigemRegistro;
 use App\Models\Concerns\Auditavel;
-use App\Models\Concerns\TemOrigem;
-use App\Models\Contracts\TemOrigemDeclarada;
-use App\Models\Contracts\UsaSoftDeletes;
+use HT2ML\Core\Enums\Referencia\OrigemRegistro;
+use HT2ML\Core\Models\Concerns\TemOrigem;
+use HT2ML\Core\Models\Contracts\TemOrigemDeclarada;
+use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use HT2ML\FiscalBr\Database\Factories\NcmFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

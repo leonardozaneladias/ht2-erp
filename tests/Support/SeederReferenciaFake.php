@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
-use App\Support\Referencia\CsvReferenceSeeder;
+use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Seeder CSV concreto, só para testes: aponta a um fixture e expõe os hooks de

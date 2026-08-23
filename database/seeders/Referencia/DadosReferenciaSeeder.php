@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia;
 
-use App\Support\Modules\ModuleRegistry;
+use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Database\Seeder;
 
 /**

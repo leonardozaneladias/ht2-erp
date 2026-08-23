@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Contracts;
+namespace HT2ML\Core\Models\Contracts;
 
-use App\Enums\Referencia\OrigemRegistro;
+use HT2ML\Core\Enums\Referencia\OrigemRegistro;
 
 /**
- * Contrato que marca um model usando o trait App\Models\Concerns\TemOrigem.
+ * Contrato que marca um model usando o trait HT2ML\Core\Models\Concerns\TemOrigem.
  *
  * Não adiciona comportamento — o trait já implementa estes métodos. A interface
  * só os torna visíveis ao type-system quando o model é manipulado de forma

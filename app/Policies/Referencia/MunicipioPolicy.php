@@ -6,7 +6,7 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Municipio;
-use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
+use HT2ML\Core\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class MunicipioPolicy
 {

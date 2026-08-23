@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\FiscalBr\Database\Seeders;
 
-use App\Support\Referencia\CsvReferenceSeeder;
+use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Base dos seeders do pacote: aponta o CSV para dentro da extensão.

@@ -221,7 +221,7 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 | RNF-05 | **Performance**                        | Organograma via **CTE recursiva no PostgreSQL**; toda FK indexada; compostos quentes (`(empresa_id, gestor_id)`, `(funcionario_id, data)`, `(empresa_id, status)`); colunas "atuais" desnormalizadas em `funcionarios` evitam varrer o histórico; vigências abertas via `IS NULL` indexado                                                                            |
 | RNF-06 | **i18n pt-BR**                         | UI, mensagens, validação e labels de enum em Português; código/tabelas/colunas em inglês técnico (convenção do core)                                                                                                                                                                                                                                                  |
 | RNF-07 | **Desktop-first**                      | Painel backoffice (mín. 1366×768), Inspinia + Livewire 4 + Tailwind 4; componentes do catálogo Inspinia (sem `<select>` nativo, sem CSS custom)                                                                                                                                                                                                                       |
-| RNF-08 | **Lixeira**                            | `deleted_at` (SoftDeletes) + trait `App\Livewire\Concerns\ComLixeira` com 3 níveis por módulo (`deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete); models implementam `App\Models\Contracts\UsaSoftDeletes`                                                                                                                                           |
+| RNF-08 | **Lixeira**                            | `deleted_at` (SoftDeletes) + trait `App\Livewire\Concerns\ComLixeira` com 3 níveis por módulo (`deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete); models implementam `HT2ML\Core\Models\Contracts\UsaSoftDeletes`                                                                                                                                           |
 | RNF-09 | **Empacotamento aditivo (ADR-0015)**   | `ht2ml/extensao-rh`: migrations via `loadMigrationsFrom`; permissões e menu mesclados em runtime no `boot()` (`ModuleRegistry`/config); **nunca edita o core**                                                                                                                                                                                                         |
 
 ---
@@ -249,10 +249,10 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 ### 7.3 Dependências (do core, não recriar)
 
 - `App\Services\Admin\AccessResolver` (precedência: super-admin > deny > grant > role) e comando `access:sync`.
-- `App\Support\Modules\ModuleRegistry` + config de permissões/menu (registro do pacote no `boot()`).
+- `HT2ML\Core\Support\Modules\ModuleRegistry` + config de permissões/menu (registro do pacote no `boot()`).
 - `App\Models\Anexo` (upload polimórfico, disco privado).
 - `App\Models\Concerns\BelongsToEmpresa` + `App\Support\Tenancy\TenantContext`.
-- `App\Livewire\Concerns\ComLixeira` + `App\Models\Contracts\UsaSoftDeletes`.
+- `App\Livewire\Concerns\ComLixeira` + `HT2ML\Core\Models\Contracts\UsaSoftDeletes`.
 - `App\Models\Concerns\Auditavel` (spatie/activitylog).
 - Gerador `make:modulo` com flag de pacote (`--module=Rh`) e `make:extensao` (casca do pacote).
 - ADRs aplicáveis: [0004](../../../architecture/adrs/ADR-0004-ulid-publico-bigint-interno.md) (ULID aspiracional — RH usa `id`/`slug`/`matricula`), [0009](../../../architecture/adrs/ADR-0009-snapshots-jsonb-imutaveis.md) (snapshots JSONB), [0010](../../../architecture/adrs/ADR-0010-enums-php-backed.md) (enums backed), [0014](../../../architecture/adrs/ADR-0014-money-integer-centavos.md) (dinheiro em centavos), [0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) (módulos-pacote).

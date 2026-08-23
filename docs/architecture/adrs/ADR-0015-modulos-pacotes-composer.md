@@ -52,7 +52,7 @@ Módulos de negócio reutilizáveis serão **pacotes Composer puros** (`ht2erp/m
 
 1. **Permissões — zero mudança no core.** O pacote mescla seu catálogo em `config('access.modules')` no `boot()` do seu ServiceProvider. `access:sync`, `RolePermissionSeeder`, matriz de acesso e simulador passam a enxergá-lo automaticamente.
 2. **Menu — zero mudança no core.** Mesma técnica em `config('admin-menu')` (key estável → personalizações do cliente no banco sobrevivem a updates).
-3. **Rotas — única mudança no core.** `App\Support\Modules\ModuleRegistry` (singleton): o grupo autenticado de `routes/admin.php` itera `routeCallbacks()`; o pacote registra um closure (no `register()`) que carrega suas rotas, herdando todo o middleware admin (tenant/2FA/inactivity).
+3. **Rotas — única mudança no core.** `HT2ML\Core\Support\Modules\ModuleRegistry` (singleton): o grupo autenticado de `routes/admin.php` itera `routeCallbacks()`; o pacote registra um closure (no `register()`) que carrega suas rotas, herdando todo o middleware admin (tenant/2FA/inactivity).
 4. **Livewire 4 / Policies — explícitos no pacote** (`Livewire::component()`, `Gate::policy()`).
 
 **Regra de ouro (mantém a base atualizável sem conflitos de merge):** o código do cliente é **aditivo** — nunca edita arquivos do core. Negócio vem de pacotes (merge em runtime); personalização vai para banco (MenuPersonalizacao, settings) ou config publicada do pacote.

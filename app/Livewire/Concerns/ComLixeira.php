@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
-use App\Models\Contracts\TemOrigemDeclarada;
-use App\Models\Contracts\UsaSoftDeletes;
+use HT2ML\Core\Models\Contracts\TemOrigemDeclarada;
+use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;

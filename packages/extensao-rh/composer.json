@@ -4,7 +4,8 @@
   "type": "library",
   "license": "proprietary",
   "require": {
-    "php": "^8.4"
+    "php": "^8.4",
+    "ht2ml/core": "@dev"
   },
   "autoload": {
     "psr-4": {

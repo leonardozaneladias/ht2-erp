@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Enums\ModuloAcesso;
-use App\Support\Modules\ModuleRegistry;
+use HT2ML\Core\Enums\ModuloAcesso;
+use HT2ML\Core\Support\Modules\ModuleRegistry;
 
 /*
 |--------------------------------------------------------------------------
