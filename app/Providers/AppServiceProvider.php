@@ -100,10 +100,9 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Fontes de catálogo de localidades.
      *
-     * Registradas aqui enquanto os catálogos moram no core. Quando saírem para
-     * ht2ml/localizacao-br, o binding vai com eles e o core passa a rodar sem
-     * fonte alguma — os formulários degradam para texto livre, que é o que a
-     * coluna sempre foi no banco.
+     * Incondicional, e é assim de propósito: o ADR-0020 fixou que estes
+     * catálogos ficam no core. Quem consumir os contratos pode resolvê-los
+     * direto, sem checar app()->bound().
      */
     private function registrarCatalogos(): void
     {

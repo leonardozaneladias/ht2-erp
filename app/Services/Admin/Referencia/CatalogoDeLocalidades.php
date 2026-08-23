@@ -14,10 +14,8 @@ use App\Models\Referencia\Municipio;
 /**
  * Implementação das fontes de catálogo sobre os models de referência.
  *
- * Vive no core enquanto os catálogos vivem no core. Quando `estados`,
- * `municipios` e `cargos` saírem para ht2ml/localizacao-br, esta classe e o
- * binding vão junto — e o core passa a funcionar sem nenhuma fonte ligada,
- * degradando para campo de texto.
+ * Vive no core, e fica: o ADR-0020 decidiu que `estados`, `municipios` e
+ * `cargos` são de uso universal e não viram pacote de localização.
  */
 final class CatalogoDeLocalidades implements FonteDeCargos, FonteDeMunicipios, FonteDeUnidadesFederativas
 {

@@ -160,21 +160,7 @@ class FormEmpresa extends Component
     #[Computed]
     public function ufsDisponiveis(): array
     {
-        if (! app()->bound(FonteDeUnidadesFederativas::class)) {
-            return [];
-        }
-
         return app(FonteDeUnidadesFederativas::class)->opcoes();
-    }
-
-    /**
-     * Há catálogo de localidades instalado? Sem ele, UF e cidade viram campo de
-     * texto livre — que é o que a coluna sempre foi no banco (string, sem FK).
-     */
-    #[Computed]
-    public function temCatalogoDeLocalidades(): bool
-    {
-        return app()->bound(FonteDeUnidadesFederativas::class);
     }
 
     /**
@@ -186,7 +172,7 @@ class FormEmpresa extends Component
     #[Computed]
     public function municipiosDaFilial(): array
     {
-        if ($this->filial_estado === '' || ! app()->bound(FonteDeMunicipios::class)) {
+        if ($this->filial_estado === '') {
             return [];
         }
 
