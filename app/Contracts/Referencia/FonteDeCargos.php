@@ -7,7 +7,8 @@ namespace App\Contracts\Referencia;
 /**
  * Fornece o catálogo de cargos para os formulários do core.
  *
- * Ver FonteDeUnidadesFederativas para o desenho e o motivo da indireção.
+ * Ver FonteDeUnidadesFederativas para o desenho, o motivo da indireção e o
+ * aviso sobre app()->bound().
  */
 interface FonteDeCargos
 {

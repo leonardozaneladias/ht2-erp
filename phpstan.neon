@@ -6,9 +6,11 @@ parameters:
     paths:
         - app/
         - packages/extensao-rh/src/
+        - packages/extensao-fiscal-br/src/
     # Larastan infere as colunas dos models a partir das migrations. Inclui as
     # das extensões para que os models delas sejam conhecidos.
     databaseMigrationsPath:
         - database/migrations
         - packages/extensao-rh/database/migrations
+        - packages/extensao-fiscal-br/database/migrations
     treatPhpDocTypesAsCertain: false

@@ -7,13 +7,13 @@ namespace App\Contracts\Referencia;
 /**
  * Fornece as unidades federativas para os formulários do core.
  *
- * O core **não** implementa: quem implementa é a extensão de localização do país
- * (ht2ml/localizacao-br e afins). Sem nenhuma ligada, o formulário degrada para
- * campo de texto livre — que é o que a coluna sempre foi no banco (`size:2`,
- * string, sem FK).
+ * A indireção não é sobre empacotamento — o ADR-0020 fixou que estes catálogos
+ * ficam no core. Ela existe pela convenção da casa: componente Livewire não
+ * conversa com Eloquent direto, conversa com um Service.
  *
- * É esta indireção que permite ao core ficar abstrato sem perder o select: ele
- * pergunta ao container se existe uma fonte, em vez de importar um model.
+ * Ligada em AppServiceProvider::registrarCatalogos(), sem condição: sempre há
+ * uma implementação. Não escreva `app()->bound()` contra este contrato — a
+ * checagem é sempre verdadeira, e o ramo do `else` nunca executa.
  */
 interface FonteDeUnidadesFederativas
 {

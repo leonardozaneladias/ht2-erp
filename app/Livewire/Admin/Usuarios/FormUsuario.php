@@ -289,9 +289,7 @@ class FormUsuario extends Component
     #[Computed]
     public function cargosDisponiveis(): array
     {
-        $cargos = app()->bound(FonteDeCargos::class)
-            ? app(FonteDeCargos::class)->ativos()
-            : [];
+        $cargos = app(FonteDeCargos::class)->ativos();
 
         if ($this->cargo !== '' && ! in_array($this->cargo, $cargos, true)) {
             array_unshift($cargos, $this->cargo);
