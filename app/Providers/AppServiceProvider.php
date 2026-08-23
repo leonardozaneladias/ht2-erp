@@ -15,6 +15,7 @@ use App\Services\Admin\AccessResolver;
 use App\Services\Admin\Settings\SettingsRuntimeApplier;
 use App\Support\Documents\GeradorNumeroDocumento;
 use App\Support\Impersonation\ImpersonationContext;
+use App\Support\Modules\ModuleRegistry;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -36,6 +37,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(! app()->isProduction());
+
+        // Contribuições das extensões (permissões e menu). Roda aqui, e não no
+        // provider de cada extensão, porque os providers de pacote registram
+        // antes deste — então neste ponto todas já declararam.
+        ModuleRegistry::aplicarContribuicoes();
 
         // Aplica as configurações persistidas (idioma, e-mail, sessão) ao config()
         // em runtime. Tolerante a falhas durante a 1ª instalação/migração.
