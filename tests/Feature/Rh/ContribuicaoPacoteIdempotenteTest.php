@@ -2,41 +2,47 @@
 
 declare(strict_types=1);
 
+use App\Support\Modules\ModuleRegistry;
 use HT2ML\Rh\RhServiceProvider;
 
 /*
 |--------------------------------------------------------------------------
-| Contribuição de pacote sob config:cache
+| Contribuição de extensão sob config:cache
 |--------------------------------------------------------------------------
 |
 | Com `config:cache` a configuração é fotografada JÁ mesclada — o comando
-| reinicializa a aplicação com o cache limpo, os providers de pacote rodam e o
-| resultado do merge entra no arquivo serializado. No boot seguinte, o boot()
-| do pacote roda de novo sobre o próprio resultado.
+| reinicializa a aplicação com o cache limpo, os providers rodam e o resultado
+| entra no arquivo serializado. No boot seguinte, a aplicação roda de novo
+| sobre o próprio resultado.
 |
 | Sem idempotência isso duplicava os itens de menu e transformava
 | 'label' => 'X' em 'label' => ['X', 'X'] nas permissões — que a matriz de
 | acesso então tentava renderizar como string.
 |
-| Estes testes simulam a segunda aplicação chamando boot() outra vez.
+| Aqui a segunda aplicação é simulada chamando aplicarContribuicoes() de novo.
 |
 */
 
-it('não duplica os itens de menu ao contribuir duas vezes', function () {
-    $secao = fn (): array => collect(config('admin-menu', []))->firstWhere('key', 'negocio')['items'] ?? [];
+it('não duplica os itens de menu ao aplicar duas vezes', function () {
+    $itens = fn (): array => array_column(
+        collect(config('admin-menu', []))->firstWhere('key', 'negocio')['items'] ?? [],
+        'key',
+    );
 
-    $antes = array_column($secao(), 'key');
+    $antes = $itens();
 
     (new RhServiceProvider($this->app))->boot();
+    ModuleRegistry::aplicarContribuicoes();
 
-    $depois = array_column($secao(), 'key');
+    $depois = $itens();
 
     expect($depois)->toBe($antes)
         ->and($depois)->toEqual(array_unique($depois));
 });
 
-it('não corrompe label e descricao das permissões ao contribuir duas vezes', function () {
+it('não corrompe label e descricao das permissões ao aplicar duas vezes', function () {
     (new RhServiceProvider($this->app))->boot();
+    ModuleRegistry::aplicarContribuicoes();
 
     $permissoes = (array) config('access.modules.negocio', []);
 
@@ -47,4 +53,22 @@ it('não corrompe label e descricao das permissões ao contribuir duas vezes', f
             ->and($permissoes[$chave]['label'])->toBeString()
             ->and($permissoes[$chave]['descricao'])->toBeString();
     }
+});
+
+it('recusa módulo de acesso inexistente', function () {
+    ModuleRegistry::permissoes('modulo-que-nao-existe', ['x' => ['label' => 'X']]);
+})->throws(InvalidArgumentException::class, 'Módulo de acesso desconhecido');
+
+it('respeita o módulo declarado pela extensão', function () {
+    ModuleRegistry::flush();
+    ModuleRegistry::permissoes(
+        App\Enums\ModuloAcesso::TabelasAuxiliares,
+        ['ref.teste.listar' => ['label' => 'Listar teste', 'descricao' => 'Teste.']],
+    );
+    ModuleRegistry::aplicarContribuicoes();
+
+    expect(config('access.modules.tabelas_auxiliares'))->toHaveKey('ref.teste.listar')
+        ->and(config('access.modules.negocio'))->not->toHaveKey('ref.teste.listar');
+
+    ModuleRegistry::flush();
 });

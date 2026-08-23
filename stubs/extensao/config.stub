@@ -15,6 +15,12 @@ declare(strict_types=1);
 */
 
 return [
+    // Onde as contribuições desta extensão entram no core.
+    // 'modulo_acesso' precisa ser um caso de App\Enums\ModuloAcesso; 'secao_menu',
+    // a key de uma seção existente em config/admin-menu.php.
+    'modulo_acesso' => 'negocio',
+    'secao_menu' => 'negocio',
+
     // Permissões do módulo, no formato do catálogo do core (config/access.php).
     'permissoes' => [
         // make:modulo insere as permissões do módulo acima desta linha

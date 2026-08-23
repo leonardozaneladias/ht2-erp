@@ -28,7 +28,7 @@ final class __PROVIDER_CLASS__ extends ServiceProvider
         // seeders de demo do core dependerem destes dados (catálogos, por
         // exemplo); do contrário eles rodam depois, já com empresas e perfis
         // no lugar.
-        // ModuleRegistry::seeder(\__NAMESPACE_BASE__\Database\Seeders\__MODULO_STUDLY__Seeder::class);
+        // ModuleRegistry::seeder(\__PKG_NAMESPACE__\Database\Seeders\__MODULO_STUDLY__Seeder::class);
 
         ModuleRegistry::routes(function (): void {
             $rotas = __DIR__ . '/../routes/admin.php';
@@ -48,65 +48,17 @@ final class __PROVIDER_CLASS__ extends ServiceProvider
             __DIR__ . '/../config/__MODULO_SLUG__.php' => config_path('__MODULO_SLUG__.php'),
         ], '__MODULO_SLUG__-config');
 
-        $this->contribuirPermissoes();
-        $this->contribuirMenu();
+        ModuleRegistry::permissoes(
+            (string) config('__MODULO_SLUG__.modulo_acesso', 'negocio'),
+            (array) config('__MODULO_SLUG__.permissoes', []),
+        );
+        ModuleRegistry::itensDeMenu(
+            (string) config('__MODULO_SLUG__.secao_menu', 'negocio'),
+            (array) config('__MODULO_SLUG__.menu', []),
+        );
 
         // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha
     }
 
-    /**
-     * Agrega as permissões do módulo ao catálogo de acesso para que access:sync,
-     * a matriz de acesso e o seeder as enxerguem.
-     */
-    private function contribuirPermissoes(): void
-    {
-        /** @var array<string, array{label: string, descricao: string}> $permissoes */
-        $permissoes = (array) config('__MODULO_SLUG__.permissoes', []);
 
-        if ($permissoes === []) {
-            return;
-        }
-
-        // array_replace_recursive, e não array_merge_recursive: com `config:cache`
-        // a config é fotografada JÁ mesclada, então este boot roda de novo sobre
-        // o próprio resultado. O merge recursivo funde valores iguais e transforma
-        // 'label' => 'X' em 'label' => ['X', 'X']; o replace é idempotente.
-        config(['access.modules' => array_replace_recursive(
-            (array) config('access.modules', []),
-            ['negocio' => $permissoes],
-        )]);
-    }
-
-    /**
-     * Agrega os itens de menu do módulo à seção "Negócio" da sidebar.
-     */
-    private function contribuirMenu(): void
-    {
-        /** @var list<array<string, mixed>> $itens */
-        $itens = (array) config('__MODULO_SLUG__.menu', []);
-
-        if ($itens === []) {
-            return;
-        }
-
-        /** @var list<array<string, mixed>> $menu */
-        $menu = (array) config('admin-menu', []);
-
-        foreach ($menu as $i => $secao) {
-            if (($secao['key'] ?? null) === 'negocio') {
-                // Ignora o que já está na seção: com `config:cache` os itens do
-                // pacote já foram gravados no cache, e sem este filtro eles
-                // entrariam uma segunda vez a cada boot.
-                $presentes = array_column($secao['items'] ?? [], 'key');
-                $novos = array_values(array_filter(
-                    $itens,
-                    static fn (array $item): bool => ! in_array($item['key'] ?? null, $presentes, true),
-                ));
-
-                $menu[$i]['items'] = [...($secao['items'] ?? []), ...$novos];
-            }
-        }
-
-        config(['admin-menu' => $menu]);
-    }
 }
