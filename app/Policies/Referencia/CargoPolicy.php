@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Cargo;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class CargoPolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('cargos.listar');
@@ -26,12 +29,14 @@ class CargoPolicy
 
     public function update(AdminUser $auth, Cargo $registro): bool
     {
-        return $auth->can('cargos.editar');
+        return $this->editavel($registro)
+            && $auth->can('cargos.editar');
     }
 
     public function delete(AdminUser $auth, Cargo $registro): bool
     {
-        return $auth->can('cargos.deletar');
+        return $this->editavel($registro)
+            && $auth->can('cargos.deletar');
     }
 
     public function restore(AdminUser $auth, Cargo $registro): bool
@@ -41,6 +46,7 @@ class CargoPolicy
 
     public function forceDelete(AdminUser $auth, Cargo $registro): bool
     {
-        return $auth->can('cargos.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('cargos.excluir_permanente');
     }
 }

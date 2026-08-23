@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Municipio;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class MunicipioPolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('municipios.listar');
@@ -26,12 +29,14 @@ class MunicipioPolicy
 
     public function update(AdminUser $auth, Municipio $registro): bool
     {
-        return $auth->can('municipios.editar');
+        return $this->editavel($registro)
+            && $auth->can('municipios.editar');
     }
 
     public function delete(AdminUser $auth, Municipio $registro): bool
     {
-        return $auth->can('municipios.deletar');
+        return $this->editavel($registro)
+            && $auth->can('municipios.deletar');
     }
 
     public function restore(AdminUser $auth, Municipio $registro): bool
@@ -41,6 +46,7 @@ class MunicipioPolicy
 
     public function forceDelete(AdminUser $auth, Municipio $registro): bool
     {
-        return $auth->can('municipios.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('municipios.excluir_permanente');
     }
 }

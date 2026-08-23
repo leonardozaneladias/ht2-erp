@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia\Support;
 
+use App\Enums\Referencia\OrigemRegistro;
 use App\Exceptions\Referencia\ImportacaoReferenciaException;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use SplFileObject;
 
 /**
@@ -34,6 +36,9 @@ abstract class CsvReferenceSeeder extends Seeder
     /** Linhas de dados descartadas por mapearLinha() no último run (inválidas). */
     public int $pulados = 0;
 
+    /** Linhas do CSV ignoradas por colidirem com registro cadastrado nesta instalação. */
+    public int $protegidos = 0;
+
     protected int $chunkSize = 1000;
 
     protected string $separador = ',';
@@ -47,6 +52,7 @@ abstract class CsvReferenceSeeder extends Seeder
         $this->lidas = 0;
         $this->inseridos = 0;
         $this->pulados = 0;
+        $this->protegidos = 0;
 
         $caminho = $this->caminhoArquivo();
 
@@ -64,6 +70,8 @@ abstract class CsvReferenceSeeder extends Seeder
 
         $agora = now();
         $atualiza = [...$this->colunasUpdate(), 'updated_at'];
+        $temOrigem = Schema::hasColumn($this->tabela(), 'origem');
+        $protegidas = $temOrigem ? $this->chavesCadastradasAqui() : [];
         $buffer = [];
         $linhaNum = 0;
 
@@ -96,8 +104,20 @@ abstract class CsvReferenceSeeder extends Seeder
                 continue;
             }
 
+            if (isset($protegidas[$this->assinatura($mapeado)])) {
+                // Linha cadastrada nesta instalação com a mesma chave natural.
+                // O sync nunca sobrescreve o que o cliente criou — previsibilidade
+                // vale mais que deixar o dado oficial vencer em silêncio.
+                $this->protegidos++;
+
+                continue;
+            }
+
             $mapeado['created_at'] = $agora;
             $mapeado['updated_at'] = $agora;
+            if ($temOrigem) {
+                $mapeado['origem'] = OrigemRegistro::Sincronizado->value;
+            }
             $buffer[] = $mapeado;
             $this->inseridos++;
 
@@ -175,6 +195,48 @@ abstract class CsvReferenceSeeder extends Seeder
     abstract protected function mapearLinha(array $linha): ?array;
 
     /**
+     * A coluna `origem` é opcional: esta base também serve tabelas que não
+     * separam as duas populações (fixtures de teste, catálogos de extensão que
+     * não expõem CRUD). Sem a coluna, o comportamento é o de antes.
+     *
+     * Chaves naturais já ocupadas por registros cadastrados nesta instalação,
+     * indexadas para lookup O(1).
+     *
+     * @return array<string, true>
+     */
+    private function chavesCadastradasAqui(): array
+    {
+        $colunas = $this->chaveNatural();
+
+        $linhas = DB::table($this->tabela())
+            ->where('origem', OrigemRegistro::Manual->value)
+            ->get($colunas);
+
+        $mapa = [];
+
+        foreach ($linhas as $linha) {
+            $mapa[$this->assinatura((array) $linha)] = true;
+        }
+
+        return $mapa;
+    }
+
+    /**
+     * Assinatura da chave natural de uma linha, para comparação.
+     *
+     * @param  array<string, mixed>  $linha
+     */
+    private function assinatura(array $linha): string
+    {
+        $partes = array_map(
+            static fn (string $coluna): string => (string) ($linha[$coluna] ?? ''),
+            $this->chaveNatural(),
+        );
+
+        return implode("\0", $partes);
+    }
+
+    /**
      * Confere a 1ª linha contra cabecalhoEsperado() (se declarado) e aborta na
      * divergência. Comparação tolerante a caixa/espaços e a um BOM UTF-8 inicial.
      *
@@ -234,14 +296,17 @@ abstract class CsvReferenceSeeder extends Seeder
     private function logBalanco(): void
     {
         $msg = sprintf(
-            '  %s: lidas %d / inseridas %d / puladas %d.',
+            '  %s: lidas %d / inseridas %d / puladas %d%s.',
             $this->tabela(),
             $this->lidas,
             $this->inseridos,
             $this->pulados,
+            $this->protegidos > 0
+                ? sprintf(' / %d preservadas (cadastro próprio)', $this->protegidos)
+                : '',
         );
 
-        $this->pulados > 0 ? $this->aviso($msg) : $this->info($msg);
+        $this->pulados > 0 || $this->protegidos > 0 ? $this->aviso($msg) : $this->info($msg);
     }
 
     /** Escreve em stdout do comando, se houver um anexado (null-safe p/ testes). */

@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Estado;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class EstadoPolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('estados.listar');
@@ -26,12 +29,14 @@ class EstadoPolicy
 
     public function update(AdminUser $auth, Estado $registro): bool
     {
-        return $auth->can('estados.editar');
+        return $this->editavel($registro)
+            && $auth->can('estados.editar');
     }
 
     public function delete(AdminUser $auth, Estado $registro): bool
     {
-        return $auth->can('estados.deletar');
+        return $this->editavel($registro)
+            && $auth->can('estados.deletar');
     }
 
     public function restore(AdminUser $auth, Estado $registro): bool
@@ -41,6 +46,7 @@ class EstadoPolicy
 
     public function forceDelete(AdminUser $auth, Estado $registro): bool
     {
-        return $auth->can('estados.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('estados.excluir_permanente');
     }
 }

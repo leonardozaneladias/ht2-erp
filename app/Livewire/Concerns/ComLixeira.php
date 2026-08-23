@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
+use App\Models\Contracts\TemOrigemDeclarada;
 use App\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -78,7 +79,8 @@ trait ComLixeira
         $registro = $this->registroAtivo($id);
         $this->authorize('delete', $registro);
 
-        $bloqueio = $this->bloqueioExclusao($registro);
+        $bloqueio = $this->bloqueioPorOrigemSincronizada($registro)
+            ?? $this->bloqueioExclusao($registro);
         if ($bloqueio !== null) {
             $this->notificarErro($bloqueio);
 
@@ -129,7 +131,8 @@ trait ComLixeira
         $registro = $this->registroNaLixeira($id);
         $this->authorize('forceDelete', $registro);
 
-        $bloqueio = $this->bloqueioExclusaoDefinitiva($registro);
+        $bloqueio = $this->bloqueioPorOrigemSincronizada($registro)
+            ?? $this->bloqueioExclusaoDefinitiva($registro);
         if ($bloqueio !== null) {
             $this->notificarErro($bloqueio);
 
@@ -153,7 +156,8 @@ trait ComLixeira
         $registro = $this->registroNaLixeira($id);
         $this->authorize('forceDelete', $registro);
 
-        $bloqueio = $this->bloqueioExclusaoDefinitiva($registro);
+        $bloqueio = $this->bloqueioPorOrigemSincronizada($registro)
+            ?? $this->bloqueioExclusaoDefinitiva($registro);
         if ($bloqueio !== null) {
             $this->notificarErro($bloqueio);
 
@@ -240,6 +244,27 @@ trait ComLixeira
         return $query
             ->withoutGlobalScope(SoftDeletingScope::class)
             ->whereNotNull($query->getModel()->getTable() . '.deleted_at');
+    }
+
+    /**
+     * Guarda de origem: linha mantida pelo `referencia:sync` é somente-leitura.
+     *
+     * Vale antes de qualquer hook e **inclusive para o super-admin**, que bypassa
+     * policies via Gate::before — é a segunda das duas camadas (a primeira é
+     * ProtegeRegistroSincronizado, nas policies).
+     *
+     * Restaurar NÃO é bloqueado de propósito: instalações anteriores a esta
+     * guarda podem ter linhas sincronizadas na lixeira, e restaurá-las é
+     * justamente o conserto.
+     */
+    private function bloqueioPorOrigemSincronizada(Model $registro): ?string
+    {
+        if (! $registro instanceof TemOrigemDeclarada || ! $registro->sincronizado()) {
+            return null;
+        }
+
+        return 'Este registro é mantido pela fonte oficial (referencia:sync) e não pode ser alterado. '
+            . 'Para um valor próprio, cadastre um novo registro.';
     }
 
     // ---- Localização dos registros ---------------------------------------

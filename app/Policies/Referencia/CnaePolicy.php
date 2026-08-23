@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Cnae;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class CnaePolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('cnaes.listar');
@@ -26,12 +29,14 @@ class CnaePolicy
 
     public function update(AdminUser $auth, Cnae $registro): bool
     {
-        return $auth->can('cnaes.editar');
+        return $this->editavel($registro)
+            && $auth->can('cnaes.editar');
     }
 
     public function delete(AdminUser $auth, Cnae $registro): bool
     {
-        return $auth->can('cnaes.deletar');
+        return $this->editavel($registro)
+            && $auth->can('cnaes.deletar');
     }
 
     public function restore(AdminUser $auth, Cnae $registro): bool
@@ -41,6 +46,7 @@ class CnaePolicy
 
     public function forceDelete(AdminUser $auth, Cnae $registro): bool
     {
-        return $auth->can('cnaes.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('cnaes.excluir_permanente');
     }
 }

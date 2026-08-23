@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
+use App\Enums\Referencia\OrigemRegistro;
 use App\Models\Concerns\Auditavel;
+use App\Models\Concerns\TemOrigem;
+use App\Models\Contracts\TemOrigemDeclarada;
 use App\Models\Contracts\UsaSoftDeletes;
 use Database\Factories\Referencia\TipoLogradouroFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,9 +22,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $codigo
  * @property string|null $abrev
  * @property bool $ativo
+ * @property OrigemRegistro $origem
  * @property \Illuminate\Support\Carbon|null $deleted_at
  */
-class TipoLogradouro extends Model implements UsaSoftDeletes
+class TipoLogradouro extends Model implements TemOrigemDeclarada, UsaSoftDeletes
 {
     use Auditavel;
 
@@ -29,6 +33,7 @@ class TipoLogradouro extends Model implements UsaSoftDeletes
     use HasFactory;
 
     use SoftDeletes;
+    use TemOrigem;
 
     protected $table = 'tipos_logradouro';
 
@@ -43,6 +48,6 @@ class TipoLogradouro extends Model implements UsaSoftDeletes
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['ativo' => 'boolean'];
+        return ['ativo' => 'boolean', 'origem' => OrigemRegistro::class];
     }
 }
