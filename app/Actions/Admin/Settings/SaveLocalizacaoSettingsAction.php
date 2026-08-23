@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Settings;
 
-use App\DTOs\Admin\Settings\LocalizacaoSettingsDTO;
-use App\Settings\LocalizacaoSettings;
+use HT2ML\Core\DTOs\Admin\Settings\LocalizacaoSettingsDTO;
+use HT2ML\Core\Settings\LocalizacaoSettings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

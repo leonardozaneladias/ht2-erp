@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Export;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
-use App\Services\Admin\Settings\BrandingService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\DomPDF\PDF as DomPdf;
+use HT2ML\Core\Services\Admin\Settings\BrandingService;
 
 /**
  * Gera o PDF de uma tabela genérica (título + colunas + linhas). API-ready:

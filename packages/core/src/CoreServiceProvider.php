@@ -6,6 +6,7 @@ namespace HT2ML\Core;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -26,10 +27,16 @@ final class CoreServiceProvider extends ServiceProvider
     {
         Blade::anonymousComponentPath(__DIR__ . '/../resources/views/components');
 
-        // Views nomeadas do núcleo, sob o namespace `core::`. Diferente dos
-        // componentes, aqui o prefixo é desejável: view() recebe string e não
-        // há ambiguidade a evitar.
+        // Views nomeadas do núcleo, sob o namespace `core::`, para quem quiser
+        // ser explícito: view('core::livewire.admin.partials.grid-acoes').
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'core');
+
+        // E também SEM prefixo, pelo mesmo motivo do anonymousComponentPath: o
+        // #[Layout('components.admin.layout')] do Livewire resolve por caminho
+        // de view, não por componente — registrar só os componentes deixaria
+        // todo layout de página quebrado. A localização entra DEPOIS da do app,
+        // então uma view homônima em resources/views continua vencendo.
+        View::addLocation(__DIR__ . '/../resources/views');
 
         $this->publishes([
             __DIR__ . '/../resources/views' => resource_path('views/vendor/core'),

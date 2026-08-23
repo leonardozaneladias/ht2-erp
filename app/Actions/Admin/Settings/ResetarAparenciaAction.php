@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Settings;
 
-use App\Enums\Admin\Appearance\ThemePreset;
-use App\Services\Admin\Settings\ThemePresetCatalog;
-use App\Settings\AppearanceSettings;
-use App\Settings\BrandingSettings;
+use HT2ML\Core\Enums\Admin\Appearance\ThemePreset;
+use HT2ML\Core\Services\Admin\Settings\ThemePresetCatalog;
+use HT2ML\Core\Settings\AppearanceSettings;
+use HT2ML\Core\Settings\BrandingSettings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

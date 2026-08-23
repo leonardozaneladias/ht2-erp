@@ -153,7 +153,7 @@ concedida ao `gestor` no seeder, que recebe também `exemplos.listar` e acesso �
 
 ## 4. Branding por empresa ativa
 
-`App\Services\Admin\Settings\BrandingService` resolve, nesta ordem:
+`HT2ML\Core\Services\Admin\Settings\BrandingService` resolve, nesta ordem:
 
 1. Empresa ativa (logo, favicon, cores em `empresas`);
 2. Settings da instância (`BrandingSettings`);

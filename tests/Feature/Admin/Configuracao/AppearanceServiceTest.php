@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Services\Admin\Settings\AppearanceService;
-use App\Settings\AppearanceSettings;
+use HT2ML\Core\Services\Admin\Settings\AppearanceService;
+use HT2ML\Core\Settings\AppearanceSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -102,7 +102,7 @@ function criarRoleAdmin(string $name, int $nivel): Spatie\Permission\Models\Role
  */
 function marcarInstalado(bool $instalado = true): void
 {
-    $settings = app(App\Settings\GeneralSettings::class);
+    $settings = app(HT2ML\Core\Settings\GeneralSettings::class);
     $settings->instalado = $instalado;
     $settings->save();
 }

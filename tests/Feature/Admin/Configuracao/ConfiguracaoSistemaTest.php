@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Configuracao\AbaEmpresa;
-use App\Settings\GeneralSettings;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Activitylog\Models\Activity;

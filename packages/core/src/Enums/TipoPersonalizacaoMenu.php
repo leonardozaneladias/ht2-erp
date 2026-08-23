@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace HT2ML\Core\Enums;
+
+enum TipoPersonalizacaoMenu: string
+{
+    public function label(): string
+    {
+        return match ($this) {
+            self::Item => 'Item de menu',
+            self::Secao => 'Seção de menu',
+            self::Grupo => 'Grupo de menu',
+        };
+    }
+
+    case Item = 'item';
+    case Secao = 'secao';
+    case Grupo = 'grupo';
+}

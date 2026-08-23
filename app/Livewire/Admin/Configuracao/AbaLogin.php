@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveLoginSettingsAction;
-use App\DTOs\Admin\Settings\LoginSettingsDTO;
-use App\Services\Admin\Settings\SettingsFileUploadService;
-use App\Settings\LoginSettings;
+use HT2ML\Core\DTOs\Admin\Settings\LoginSettingsDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Services\Admin\Settings\SettingsFileUploadService;
+use HT2ML\Core\Settings\LoginSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;

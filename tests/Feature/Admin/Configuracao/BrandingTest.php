@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Configuracao\AbaAparencia;
-use App\Services\Admin\Settings\BrandingService;
-use App\Settings\BrandingSettings;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Services\Admin\Settings\BrandingService;
+use HT2ML\Core\Settings\BrandingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;

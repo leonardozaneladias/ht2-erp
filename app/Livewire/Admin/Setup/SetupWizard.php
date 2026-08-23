@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Setup;
 
 use App\Actions\Admin\Settings\ConcluirSetupAction;
-use App\DTOs\Admin\Settings\SetupDTO;
-use App\Settings\BrandingSettings;
-use App\Settings\GeneralSettings;
+use HT2ML\Core\DTOs\Admin\Settings\SetupDTO;
+use HT2ML\Core\Settings\BrandingSettings;
+use HT2ML\Core\Settings\GeneralSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;

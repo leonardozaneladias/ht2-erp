@@ -347,7 +347,7 @@ Decididos no fechamento da fase base. Todo CRUD/tela nova segue estas regras —
 
 ### 4.5 Menu lateral — registry no código + personalizações no banco
 
-O menu do admin tem duas camadas, mescladas pelo `App\Services\Admin\Menu\MenuService` (cache de 10 min, invalidado nas Actions de menu):
+O menu do admin tem duas camadas, mescladas pelo `HT2ML\Core\Services\Admin\Menu\MenuService` (cache de 10 min, invalidado nas Actions de menu):
 
 - **Registro** (`config/admin-menu.php`) — fonte de verdade dos módulos, sempre **FLAT**. Toda seção e item exigem uma **`key` estável** (o serviço lança `LogicException` sem ela); o item declara `label`, `icon` (tabler), `route`, `permission` e `active`. Módulo novo = item novo aqui — ele aparece automaticamente na sidebar e na tela de gestão.
 - **Personalizações** (`menu_personalizacoes`, tela `/admin/menus`, permissão `configuracoes.menus`) — ordem, label, ícone, container e `ativo` por cima do registro, além de **seções custom** e **grupos (submenus)** criados pela tela (`e_custom = true`, keys `secao-*`/`grupo-*` geradas por slug). Valores iguais ao padrão viram `null` (linha 100% padrão é removida); key que sumiu do config vira personalização **órfã** (ignorada na sidebar, listada na gestão para limpeza) — customs nunca são órfãs.

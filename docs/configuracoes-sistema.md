@@ -120,7 +120,7 @@ Cadastros/Segurança; deploy não roda seeders) e então marca `instalado = true
 ## Usando settings no código
 
 ```php
-use App\Settings\GeneralSettings;
+use HT2ML\Core\Settings\GeneralSettings;
 
 $nome = app(GeneralSettings::class)->nome_cliente;
 // ou via injeção de dependência no construtor/método.

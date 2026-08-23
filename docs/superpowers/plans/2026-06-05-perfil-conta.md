@@ -520,7 +520,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Conta;
 
 use HT2ML\Core\Models\AdminUser;
-use App\Services\Admin\Settings\SettingsFileUploadService;
+use HT2ML\Core\Services\Admin\Settings\SettingsFileUploadService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 

@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Configuracao\AbaDangerZone;
-use App\Settings\AppearanceSettings;
-use App\Settings\BrandingSettings;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Settings\AppearanceSettings;
+use HT2ML\Core\Settings\BrandingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

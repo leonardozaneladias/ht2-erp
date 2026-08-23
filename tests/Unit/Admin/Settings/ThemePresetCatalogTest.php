@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Enums\Admin\Appearance\MenuColor;
-use App\Enums\Admin\Appearance\Skin;
-use App\Enums\Admin\Appearance\TemaPadrao;
-use App\Enums\Admin\Appearance\ThemePreset;
-use App\Enums\Admin\Appearance\TopbarColor;
-use App\Services\Admin\Settings\ThemePresetCatalog;
+use HT2ML\Core\Enums\Admin\Appearance\MenuColor;
+use HT2ML\Core\Enums\Admin\Appearance\Skin;
+use HT2ML\Core\Enums\Admin\Appearance\TemaPadrao;
+use HT2ML\Core\Enums\Admin\Appearance\ThemePreset;
+use HT2ML\Core\Enums\Admin\Appearance\TopbarColor;
+use HT2ML\Core\Services\Admin\Settings\ThemePresetCatalog;
 
 it('cada preset retorna um DTO com cores hex válidas e chrome de enum válido', function (ThemePreset $preset) {
     $dto = (new ThemePresetCatalog)->paraEnum($preset);
