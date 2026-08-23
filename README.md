@@ -109,13 +109,13 @@ Arquivos-chave do módulo de referência:
 
 ## URLs locais (DDEV)
 
-| O quê      | URL / Comando                     |
-| ---------- | --------------------------------- |
+| O quê      | URL / Comando                            |
+| ---------- | ---------------------------------------- |
 | Aplicação  | https://ht2ml-platform.ddev.site         |
 | Horizon    | https://ht2ml-platform.ddev.site/horizon |
 | Pulse      | https://ht2ml-platform.ddev.site/pulse   |
-| Mailpit    | `ddev mailpit`                    |
-| PostgreSQL | `ddev psql` (ou `ddev describe`)  |
+| Mailpit    | `ddev mailpit`                           |
+| PostgreSQL | `ddev psql` (ou `ddev describe`)         |
 
 ---
 
