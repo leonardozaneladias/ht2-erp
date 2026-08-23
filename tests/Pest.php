@@ -14,6 +14,13 @@ pest()->extend(TestCase::class)
 pest()->extend(TestCase::class)
     ->in('Unit');
 
+// Extensões: os testes vivem em packages/*/tests, fora da árvore tests/, e por
+// isso não são alcançados pelos ->in('Feature'|'Unit') acima. Sem esta linha
+// eles simplesmente não rodam — foi o que aconteceu com o módulo de RH desde
+// que ele virou pacote.
+pest()->extend(TestCase::class)
+    ->in(__DIR__ . '/../packages');
+
 // Testes de browser (E2E): rodam no host com Playwright (`make test-e2e`).
 // O grupo permite excluí-los nos ambientes sem Chromium (DDEV/CI padrão).
 pest()->extend(TestCase::class)
@@ -31,14 +38,14 @@ pest()->beforeEach(function () {
     } catch (Throwable) {
         // Settings indisponíveis neste teste — nada a fazer.
     }
-})->in('Feature', 'Browser');
+})->in('Feature', 'Browser', __DIR__ . '/../packages');
 
 // Desabilita o Vite nos testes Feature: eles renderizam views mas não dependem
 // de assets buildados (o build real é coberto pelo job de browser). Evita o
 // ViteManifestNotFoundException no CI, que não roda `npm run build` no job PHP.
 pest()->beforeEach(function () {
     $this->withoutVite();
-})->in('Feature');
+})->in('Feature', __DIR__ . '/../packages');
 
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);

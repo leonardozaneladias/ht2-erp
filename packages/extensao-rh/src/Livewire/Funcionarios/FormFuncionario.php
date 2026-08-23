@@ -47,7 +47,8 @@ class FormFuncionario extends Component
             $this->nome = (string) $registro->nome;
             $this->cpf = (string) $registro->cpf;
             $this->cargo = (string) $registro->cargo;
-            $this->salario = (int) $registro->salario;
+            // Money é objeto (ADR-0014): converter com centavos(), não com cast a int.
+            $this->salario = $registro->salario->centavos();
             $this->admissao = $registro->admissao->format('Y-m-d');
             $this->status = $registro->status->value;
 

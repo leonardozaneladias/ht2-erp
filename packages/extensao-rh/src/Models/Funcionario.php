@@ -14,7 +14,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
+ * O Larastan infere os tipos das colunas a partir das migrations e não enxerga
+ * os casts — por isso `salario` precisa ser declarado aqui. Sem esta linha ele
+ * é inferido como int, o que levou a um `(int) $registro->salario` que estourava
+ * em runtime, onde o valor é um objeto Money (ADR-0014).
+ *
  * @property StatusFuncionario $status
+ * @property \App\Support\Money\Money $salario
  * @property \Illuminate\Support\Carbon $admissao
  * @property \Illuminate\Support\Carbon|null $deleted_at
  */
