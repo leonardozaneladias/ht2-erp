@@ -114,8 +114,14 @@ final class MakeExtensaoCommand extends Command
             'description' => "Extensão {$pkg->studly}.",
             'type' => 'library',
             'license' => 'proprietary',
+            // Declarado desde o nascimento: o provider gerado importa
+            // ModuleRegistry, que vem de ht2ml/core. Extensão que não declara o
+            // que usa não instala fora do monorepo — ver
+            // docs/superficie-do-core.md.
             'require' => [
                 'php' => '^8.4',
+                'ht2ml/core' => '@dev',
+                'illuminate/support' => '^13.0',
             ],
             'autoload' => [
                 'psr-4' => [

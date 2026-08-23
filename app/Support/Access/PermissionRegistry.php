@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Access;
 
 use App\DTOs\Admin\PermissionDefinitionDTO;
-use App\Enums\ModuloAcesso;
+use HT2ML\Core\Enums\ModuloAcesso;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Exceptions\Referencia\ImportacaoReferenciaException;
+use HT2ML\Core\Exceptions\Referencia\ImportacaoReferenciaException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;

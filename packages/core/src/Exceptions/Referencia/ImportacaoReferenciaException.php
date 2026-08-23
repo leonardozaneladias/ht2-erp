@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Exceptions\Referencia;
+namespace HT2ML\Core\Exceptions\Referencia;
 
 use RuntimeException;
 

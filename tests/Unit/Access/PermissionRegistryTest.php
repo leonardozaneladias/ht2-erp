@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Enums\ModuloAcesso;
 use App\Support\Access\PermissionRegistry;
+use HT2ML\Core\Enums\ModuloAcesso;
 
 it('lista os nomes das permissões do catálogo', function () {
     $registry = new PermissionRegistry;

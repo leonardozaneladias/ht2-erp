@@ -19,7 +19,7 @@ use App\Services\Admin\Referencia\CatalogoDeLocalidades;
 use App\Services\Admin\Settings\SettingsRuntimeApplier;
 use App\Support\Documents\GeradorNumeroDocumento;
 use App\Support\Impersonation\ImpersonationContext;
-use App\Support\Modules\ModuleRegistry;
+use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;

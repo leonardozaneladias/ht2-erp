@@ -178,7 +178,7 @@ it('com soft-delete, os tokens e blocos de lixeira são preenchidos', function (
         ->and($tokens['__PERMISSAO_BASE__'])->toContain('permissaoBase')
         ->and($tokens['__PERMISSAO_BASE__'])->toContain("return 'exemplos';")
         ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe(", 'verLixeira' => \$this->verLixeira")
-        ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('use App\Models\Contracts\UsaSoftDeletes;')
+        ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('use HT2ML\Core\Models\Contracts\UsaSoftDeletes;')
         ->and($tokens['__MODEL_IMPLEMENTS_LIXEIRA__'])->toBe(' implements UsaSoftDeletes')
         ->and($tokens['__MODEL_DELETED_AT_PROPERTY__'])->toContain('@property \Illuminate\Support\Carbon|null $deleted_at')
         ->and($spec->metodoModelClassLixeira())->toContain('modelClassLixeira')

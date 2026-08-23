@@ -295,7 +295,7 @@ final class EspecificacaoModulo
                     . '    }'
                 : '',
             '__VERLIXEIRA_PARAM__' => $this->softDelete ? ", 'verLixeira' => \$this->verLixeira" : '',
-            '__MODEL_USE_LIXEIRA__' => $this->softDelete ? 'use App\Models\Contracts\UsaSoftDeletes;' : '',
+            '__MODEL_USE_LIXEIRA__' => $this->softDelete ? 'use HT2ML\Core\Models\Contracts\UsaSoftDeletes;' : '',
             '__MODEL_IMPLEMENTS_LIXEIRA__' => $this->softDelete ? ' implements UsaSoftDeletes' : '',
             '__MODEL_DELETED_AT_PROPERTY__' => $this->softDelete ? "\n * @property \Illuminate\Support\Carbon|null \$deleted_at" : '',
         ];

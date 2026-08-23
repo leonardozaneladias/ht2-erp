@@ -5,6 +5,7 @@ parameters:
     level: 6
     paths:
         - app/
+        - packages/core/src/
         - packages/extensao-rh/src/
         - packages/extensao-fiscal-br/src/
     # Larastan infere as colunas dos models a partir das migrations. Inclui as

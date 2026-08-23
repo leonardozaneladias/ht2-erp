@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "24eb3649a6ddf5372cc234733260a6f6",
+    "content-hash": "975c1a3c3e9b9de706454ec840879973",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1713,14 +1713,44 @@
             "time": "2026-06-12T21:33:43+00:00"
         },
         {
+            "name": "ht2ml/core",
+            "version": "dev-feat/nascer-ht2ml-core",
+            "dist": {
+                "type": "path",
+                "url": "packages/core",
+                "reference": "341fac6d30f3be4bbe73e235309d12bab4a2a666"
+            },
+            "require": {
+                "illuminate/contracts": "^13.0",
+                "illuminate/database": "^13.0",
+                "illuminate/support": "^13.0",
+                "php": "^8.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "HT2ML\\Core\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Núcleo da plataforma HT2ML: os pontos de extensão que todo módulo-pacote consome.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-main",
+            "version": "dev-feat/nascer-ht2ml-core",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
-                "reference": "7a7637ff0d640b04b5f3d6086e9c5bb7806fad94"
+                "reference": "e49795cc25bfe51702acf6aa51576964a590762f"
             },
             "require": {
+                "ht2ml/core": "@dev",
                 "illuminate/contracts": "^13.0",
                 "illuminate/database": "^13.0",
                 "illuminate/support": "^13.0",
@@ -1763,13 +1793,14 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-main",
+            "version": "dev-feat/nascer-ht2ml-core",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",
-                "reference": "7be186e04fa6197ee9cdbd83c2995eea745b1225"
+                "reference": "c649b5b228b27abea9017f358b3068b0fa874620"
             },
             "require": {
+                "ht2ml/core": "@dev",
                 "php": "^8.4"
             },
             "type": "library",
@@ -14493,6 +14524,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "ht2ml/core": 20,
         "ht2ml/extensao-fiscal-br": 20,
         "ht2ml/extensao-rh": 20
     },

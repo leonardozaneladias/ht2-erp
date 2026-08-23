@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
-use App\Enums\Referencia\OrigemRegistro;
 use App\Enums\Referencia\RegiaoBrasil;
 use App\Models\Concerns\Auditavel;
-use App\Models\Concerns\TemOrigem;
-use App\Models\Contracts\TemOrigemDeclarada;
-use App\Models\Contracts\UsaSoftDeletes;
 use Database\Factories\Referencia\EstadoFactory;
+use HT2ML\Core\Enums\Referencia\OrigemRegistro;
+use HT2ML\Core\Models\Concerns\TemOrigem;
+use HT2ML\Core\Models\Contracts\TemOrigemDeclarada;
+use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;

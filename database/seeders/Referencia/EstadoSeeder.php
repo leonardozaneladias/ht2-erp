@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders\Referencia;
 
 use App\Enums\Referencia\RegiaoBrasil;
-use App\Support\Referencia\CsvReferenceSeeder;
+use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Estados (27 UF). CSV: `codigo_ibge,sigla,nome`. A região é derivada do 1º

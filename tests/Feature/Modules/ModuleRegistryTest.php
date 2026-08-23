@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Services\Admin\Menu\MenuService;
-use App\Support\Modules\ModuleRegistry;
+use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;

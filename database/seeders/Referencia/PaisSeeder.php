@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia;
 
-use App\Support\Referencia\CsvReferenceSeeder;
+use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Países (ISO 3166-1, fonte IBGE). CSV: `codigo_iso2,codigo_iso3,codigo_numerico,nome`.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Support\Referencia;
+namespace HT2ML\Core\Support\Referencia;
 
-use App\Enums\Referencia\OrigemRegistro;
-use App\Exceptions\Referencia\ImportacaoReferenciaException;
+use HT2ML\Core\Enums\Referencia\OrigemRegistro;
+use HT2ML\Core\Exceptions\Referencia\ImportacaoReferenciaException;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;

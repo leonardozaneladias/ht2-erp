@@ -6,7 +6,7 @@ namespace App\Models;
 
 use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
-use App\Models\Contracts\UsaSoftDeletes;
+use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;

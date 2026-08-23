@@ -6,7 +6,7 @@ namespace HT2ML\Rh\Models;
 
 use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
-use App\Models\Contracts\UsaSoftDeletes;
+use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use HT2ML\Rh\Database\Factories\DepartamentoFactory;
 use HT2ML\Rh\Enums\StatusDepartamento;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

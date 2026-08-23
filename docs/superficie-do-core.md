@@ -7,7 +7,10 @@ exportar para que uma extensão instale **fora do monorepo**.
 
 Enquanto essa superfície viver em `App\...`, nenhuma extensão instala em outro
 projeto — ela depende de classes que o Composer não sabe entregar. É esse o
-conteúdo de `ht2ml/core` (ou `ht2ml/contracts`) previsto na Fase 2 do plano.
+conteúdo de `ht2ml/core` previsto na Fase 2 do plano.
+
+> **Estado:** `ht2ml/core` **existe** e já entrega 9 dos 13 símbolos. As quatro
+> pendências e os 11 componentes Blade estão marcadas na tabela abaixo.
 
 ## Como reproduzir a medição
 
@@ -22,21 +25,25 @@ dependência de vendor.
 
 ## 13 símbolos PHP, todos exigidos em produção
 
-| Símbolo                                                        | Papel para a extensão                                                            |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `App\Support\Modules\ModuleRegistry`                           | **O canal.** Rotas, seeders, permissões, itens de menu e catálogos de referência |
-| `App\Support\Referencia\CsvReferenceSeeder`                    | Base dos seeders de catálogo mantidos por CSV                                    |
-| `App\Enums\Referencia\OrigemRegistro`                          | `sync` \| `manual` — separa linha do sync de linha do cliente                    |
-| `App\Models\Concerns\TemOrigem`                                | Trait que aplica o default de origem                                             |
-| `App\Models\Contracts\TemOrigemDeclarada`                      | Interface que torna a trait visível ao PHPStan                                   |
-| `App\Models\Contracts\UsaSoftDeletes`                          | Mesmo padrão, para soft delete                                                   |
-| `App\Models\Concerns\Auditavel`                                | Registro no activity log                                                         |
-| `App\Models\AdminUser`                                         | Usuário administrativo (autor de auditoria, alvo de policy)                      |
-| `App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado` | Bloqueia escrita em linha `sync`                                                 |
-| `App\Livewire\Concerns\ComAcoesCrud`                           | Ações de linha padronizadas                                                      |
-| `App\Livewire\Concerns\ComFicha`                               | Drawer de visualização                                                           |
-| `App\Livewire\Concerns\ComLixeira`                             | Lixeira, restauração e exclusão definitiva                                       |
-| `App\Livewire\Concerns\EmiteNotificacoes`                      | Toasts padronizados                                                              |
+Nove já vivem em `ht2ml/core`. Os quatro pendentes estão marcados.
+
+| Símbolo                                                    | Onde vive       | Papel para a extensão                                                                                                |
+| ---------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `Support\Modules\ModuleRegistry`                           | ✅ `ht2ml/core` | **O canal.** Rotas, seeders, permissões, itens de menu e catálogos de referência                                     |
+| `Support\Referencia\CsvReferenceSeeder`                    | ✅ `ht2ml/core` | Base dos seeders de catálogo mantidos por CSV                                                                        |
+| `Enums\ModuloAcesso`                                       | ✅ `ht2ml/core` | Os módulos de acesso do core                                                                                         |
+| `Enums\Referencia\OrigemRegistro`                          | ✅ `ht2ml/core` | `sync` \| `manual` — separa linha do sync de linha do cliente                                                        |
+| `Exceptions\Referencia\ImportacaoReferenciaException`      | ✅ `ht2ml/core` | Faz o seed falhar alto em vez de gravar catálogo vazio                                                               |
+| `Models\Concerns\TemOrigem`                                | ✅ `ht2ml/core` | Trait que aplica o default de origem                                                                                 |
+| `Models\Contracts\TemOrigemDeclarada`                      | ✅ `ht2ml/core` | Torna a trait visível ao PHPStan                                                                                     |
+| `Models\Contracts\UsaSoftDeletes`                          | ✅ `ht2ml/core` | Mesmo padrão, para soft delete                                                                                       |
+| `Policies\Referencia\Concerns\ProtegeRegistroSincronizado` | ✅ `ht2ml/core` | Bloqueia escrita em linha `sync`                                                                                     |
+| `Models\Concerns\Auditavel`                                | ⏳ `app/`       | Registro no activity log                                                                                             |
+| `Models\AdminUser`                                         | ⏳ `app/`       | Usuário administrativo. **168 arquivos** o referenciam; arrasta `Empresa`, `Filial`, a config de auth e as factories |
+| `Livewire\Concerns\ComAcoesCrud`                           | ⏳ `app/`       | Ações de linha padronizadas                                                                                          |
+| `Livewire\Concerns\ComFicha`                               | ⏳ `app/`       | Drawer de visualização                                                                                               |
+| `Livewire\Concerns\ComLixeira`                             | ⏳ `app/`       | Lixeira, restauração e exclusão definitiva                                                                           |
+| `Livewire\Concerns\EmiteNotificacoes`                      | ⏳ `app/`       | Toasts padronizados                                                                                                  |
 
 Só em teste: `Database\Seeders\RolePermissionSeeder`.
 

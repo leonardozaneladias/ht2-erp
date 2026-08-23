@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Policies\Referencia\Concerns;
+namespace HT2ML\Core\Policies\Referencia\Concerns;
 
-use App\Models\Contracts\TemOrigemDeclarada;
+use HT2ML\Core\Models\Contracts\TemOrigemDeclarada;
 use Illuminate\Database\Eloquent\Model;
 
 /**

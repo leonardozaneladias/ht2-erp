@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Contracts;
+namespace HT2ML\Core\Models\Contracts;
 
 /**
  * Contrato que marca um model usando o trait Illuminate\Database\Eloquent\SoftDeletes.
