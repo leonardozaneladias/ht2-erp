@@ -14,10 +14,15 @@
         <testsuite name="Browser">
             <directory>tests/Browser</directory>
         </testsuite>
+        <!-- Testes que vivem dentro de cada extensão (packages/*/tests). -->
+        <testsuite name="Extensoes">
+            <directory>packages/*/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
             <directory>app</directory>
+            <directory>packages/*/src</directory>
         </include>
     </source>
     <php>

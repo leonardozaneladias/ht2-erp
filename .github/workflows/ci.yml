@@ -89,7 +89,7 @@ jobs:
               run: php artisan key:generate
 
             - name: Rodar testes
-              run: php artisan test --compact --testsuite=Unit,Feature
+              run: php artisan test --compact --testsuite=Unit,Feature,Extensoes
               env:
                   APP_ENV: testing
                   DB_CONNECTION: sqlite
