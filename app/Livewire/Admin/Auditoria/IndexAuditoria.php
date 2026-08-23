@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Auditoria;
 
 use App\Actions\Admin\Lgpd\ExpurgarLogsAction;
-use App\Models\Activity;
-use App\Models\AdminUser;
 use App\Support\Audit\FormatadorDiff;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;

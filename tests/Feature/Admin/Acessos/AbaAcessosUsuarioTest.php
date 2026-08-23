@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Usuarios\FormUsuario;
-use App\Models\PermissionGrant;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -59,7 +59,7 @@ it('exige motivo e permissão ao conceder', function () {
 });
 
 it('revoga acesso extra existente', function () {
-    $grant = concederAcessoDireto($this->alvo, 'usuarios.criar', App\Enums\TipoConcessao::Grant);
+    $grant = concederAcessoDireto($this->alvo, 'usuarios.criar', HT2ML\Core\Enums\TipoConcessao::Grant);
 
     Livewire::actingAs($this->admin, 'admin')
         ->test(FormUsuario::class, ['usuario' => $this->alvo->id])

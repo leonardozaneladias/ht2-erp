@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Convites;
 
 use App\Exceptions\AccessException;
-use App\Models\AdminUser;
-use App\Models\AdminUserConvite;
 use App\Services\Admin\AuditoriaSeguranca;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\AdminUserConvite;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

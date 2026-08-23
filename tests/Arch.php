@@ -27,11 +27,11 @@ arch('actions não retornam respostas HTTP')
 // abaixo COM justificativa. Ver docs/devops/conventions.md §7.2.
 arch('models usam Auditavel ou estão na whitelist consciente')
     ->expect('App\Models')
-    ->toUseTrait(App\Models\Concerns\Auditavel::class)
+    ->toUseTrait(HT2ML\Core\Models\Concerns\Auditavel::class)
     ->ignoring([
         'App\Models\Concerns',                    // os próprios traits
-        App\Models\Activity::class,               // o log em si (append-only)
-        App\Models\LoginHistory::class,           // histórico append-only (já é trilha)
+        HT2ML\Core\Models\Activity::class,               // o log em si (append-only)
+        HT2ML\Core\Models\LoginHistory::class,           // histórico append-only (já é trilha)
         App\Models\User::class,                   // scaffold do guard web (portal futuro decidirá)
         App\Models\DocumentSequence::class,       // contador técnico de infra, não entidade de negócio
     ]);

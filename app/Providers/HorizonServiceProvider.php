@@ -34,7 +34,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
         Gate::define('viewHorizon', function ($user = null): bool {
             $admin = auth('admin')->user();
 
-            return $admin instanceof \App\Models\AdminUser && $admin->can('sistema.horizon');
+            return $admin instanceof \HT2ML\Core\Models\AdminUser && $admin->can('sistema.horizon');
         });
     }
 }

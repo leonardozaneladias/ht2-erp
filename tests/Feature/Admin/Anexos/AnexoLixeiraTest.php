@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Models\Anexo;
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 

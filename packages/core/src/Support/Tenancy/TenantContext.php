@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Support\Tenancy;
+namespace HT2ML\Core\Support\Tenancy;
 
 /**
  * Contexto de tenancy lógico: empresa e filial ativas na sessão.

@@ -44,7 +44,7 @@ controle total sobre as cinco decisões acima.
 
 ### Estado (sessão)
 
-- **`App\Support\Impersonation\ImpersonationContext`** — espelha `TenantContext`.
+- **`HT2ML\Core\Support\Impersonation\ImpersonationContext`** — espelha `TenantContext`.
   Chaves de sessão: `impersonate.original_id`, `impersonate.started_at`,
   `impersonate.motivo`.
   Métodos: `iniciar(int $originalId, string $motivo)`, `ativo(): bool`,

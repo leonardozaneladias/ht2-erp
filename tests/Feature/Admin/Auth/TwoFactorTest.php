@@ -8,8 +8,8 @@ use App\Livewire\Admin\Auth\TwoFactorChallenge;
 use App\Livewire\Admin\Configuracao\AbaSeguranca;
 use App\Livewire\Admin\Conta\SegurancaConta;
 use App\Notifications\AlertaSegurancaNotification;
-use App\Settings\SegurancaSettings;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -30,7 +30,7 @@ beforeEach(function () {
 /**
  * Ativa o 2FA diretamente no model (atalho para os testes de login/desafio).
  */
-function ativar2fa(App\Models\AdminUser $admin, string $secret, array $recoveryHashes = []): void
+function ativar2fa(HT2ML\Core\Models\AdminUser $admin, string $secret, array $recoveryHashes = []): void
 {
     $admin->forceFill([
         'two_factor_secret' => $secret,

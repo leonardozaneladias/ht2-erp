@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Notifications\AlertaSegurancaNotification;
 use App\Services\Admin\Security\AlertaSeguranca;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;

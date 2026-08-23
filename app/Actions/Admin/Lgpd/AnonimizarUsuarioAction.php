@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Lgpd;
 
 use App\Exceptions\AccessException;
-use App\Models\AdminUser;
 use App\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

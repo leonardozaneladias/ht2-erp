@@ -6,7 +6,7 @@ namespace App\Actions\Admin\Conta;
 
 use App\Actions\Admin\AtualizarAvatarAction;
 use App\DTOs\Admin\PerfilContaDTO;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Http\UploadedFile;
 
 /**

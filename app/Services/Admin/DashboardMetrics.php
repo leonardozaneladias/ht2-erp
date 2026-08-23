@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\DTOs\Admin\DashboardMetricsDTO;
-use App\Models\AdminUser;
-use App\Models\Empresa;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\Models\Activity;
 

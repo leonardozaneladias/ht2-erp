@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Usuarios\FormUsuario;
-use App\Models\AdminUser;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;

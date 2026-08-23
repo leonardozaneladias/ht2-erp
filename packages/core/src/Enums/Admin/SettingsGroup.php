@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Enums\Admin;
+namespace HT2ML\Core\Enums\Admin;
 
 use Illuminate\Support\Str;
 

@@ -7,9 +7,9 @@ use App\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
 use App\Actions\Admin\ToggleAdminUserStatusAction;
 use App\Actions\Admin\UpdateAdminUserAction;
 use App\DTOs\Admin\AdminUserDTO;
-use App\Models\Activity;
-use App\Models\AdminUser;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 

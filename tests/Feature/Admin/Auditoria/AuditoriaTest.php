@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use App\Actions\Admin\Lgpd\ExpurgarLogsAction;
 use App\Livewire\Admin\Auditoria\IndexAuditoria;
-use App\Models\Activity;
-use App\Models\AdminUser;
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;

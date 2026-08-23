@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\AdminUser;
 use App\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Models\AdminUser;
 use Spatie\Permission\Models\Role;
 
 class RolePolicy

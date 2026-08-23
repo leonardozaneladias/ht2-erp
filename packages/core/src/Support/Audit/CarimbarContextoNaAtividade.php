@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Support\Audit;
+namespace HT2ML\Core\Support\Audit;
 
-use App\Models\Activity;
-use App\Models\AdminUser;
-use App\Models\Empresa;
-use App\Models\Filial;
-use App\Support\Impersonation\ImpersonationContext;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Models\Filial;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;

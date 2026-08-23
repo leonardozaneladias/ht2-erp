@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Exemplos\ExemploTable;
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace __NS_MODELS__;
 
 use __NS_ENUMS__\__STATUS_ENUM__;
-use App\Models\Concerns\Auditavel;__MODEL_USE_SOFT_DELETE__
+use HT2ML\Core\Models\Concerns\Auditavel;__MODEL_USE_SOFT_DELETE__
 __MODEL_USE_LIXEIRA__
 __MODEL_USE_TENANT__
 use Illuminate\Database\Eloquent\Factories\HasFactory;

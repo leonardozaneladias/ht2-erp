@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoConcessao;
 use App\Livewire\Admin\Acesso\ControleAcesso;
 use App\Livewire\Admin\Acesso\PainelPessoa;
-use App\Models\Empresa;
-use App\Models\PermissionGrant;
-use App\Support\Tenancy\TenantContext;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Models\PermissionGrant;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Support\Tenancy;
 
-use App\Models\AdminUser;
-use App\Models\Empresa;
-use App\Models\Filial;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Models\Filial;
 use Illuminate\Support\Collection;
 
 /**

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace HT2ML\Core\Models;
 
-use App\Models\Concerns\Auditavel;
-use App\Settings\SegurancaSettings;
+use Database\Factories\AdminUserFactory;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -70,7 +71,7 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(new \App\Notifications\ResetSenhaNotification($token));
+        $this->notify(new \HT2ML\Core\Notifications\ResetSenhaNotification($token));
     }
 
     /**
@@ -265,6 +266,17 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
     public function perfilExibicao(): ?string
     {
         return $this->getRoleNames()->first();
+    }
+
+    /**
+     * O model saiu de App\ para o pacote, e o resolvedor padrão do Laravel monta
+     * o nome da factory a partir do namespace da aplicação — para uma classe
+     * fora dele, erra o alvo. Declarar explicitamente é o mesmo padrão que os
+     * models de referência já usam.
+     */
+    protected static function newFactory(): AdminUserFactory
+    {
+        return AdminUserFactory::new();
     }
 
     /**

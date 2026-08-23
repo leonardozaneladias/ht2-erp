@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Support\Access;
 
-use App\Enums\TipoConcessao;
-use App\Models\AdminUser;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Permission;

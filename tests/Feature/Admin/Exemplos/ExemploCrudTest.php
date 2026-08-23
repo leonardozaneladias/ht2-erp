@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\Livewire\Admin\Exemplos\FormExemplo;
 use App\Livewire\Admin\Exemplos\IndexExemplo;
-use App\Models\AdminUser;
 use App\Models\Exemplo;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -24,8 +24,8 @@ beforeEach(function () {
     ]);
     $this->admin->assignRole('super-admin');
 
-    $empresa = App\Models\Empresa::factory()->create();
-    app(App\Support\Tenancy\TenantContext::class)->definirEmpresa($empresa->id);
+    $empresa = HT2ML\Core\Models\Empresa::factory()->create();
+    app(HT2ML\Core\Support\Tenancy\TenantContext::class)->definirEmpresa($empresa->id);
 });
 
 it('renderiza a listagem de Exemplos', function () {

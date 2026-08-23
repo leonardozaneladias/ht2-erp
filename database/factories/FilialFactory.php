@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Empresa;
-use App\Models\Filial;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Models\Filial;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

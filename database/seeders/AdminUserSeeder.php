@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\AdminUser;
-use App\Models\Empresa;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 

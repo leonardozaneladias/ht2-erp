@@ -6,7 +6,7 @@ namespace App\Actions\Admin;
 
 use App\DTOs\Admin\FilialDTO;
 use App\Exceptions\FilialException;
-use App\Models\Filial;
+use HT2ML\Core\Models\Filial;
 use Illuminate\Support\Facades\DB;
 
 class AtualizarFilialAction

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs\Admin;
 
-use App\Enums\TipoConcessao;
+use HT2ML\Core\Enums\TipoConcessao;
 
 final readonly class ConcessaoAcessoDTO
 {

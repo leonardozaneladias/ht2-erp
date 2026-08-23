@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoConcessao;
 use App\Services\Admin\AccessResolver;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoConcessao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

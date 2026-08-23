@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Models\AdminUser;
-use App\Support\Tenancy\TenantContext;
 use App\Support\Tenancy\TenantResolver;
 use Closure;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Auth\Access\AuthorizationException;
 
 it('guarda, expõe, expira e limpa o estado da personificação', function (): void {

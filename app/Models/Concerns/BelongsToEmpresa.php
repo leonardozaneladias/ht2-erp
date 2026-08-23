@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

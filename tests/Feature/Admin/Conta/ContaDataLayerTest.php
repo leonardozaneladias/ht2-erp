@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\LoginHistory;
+use HT2ML\Core\Models\LoginHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 

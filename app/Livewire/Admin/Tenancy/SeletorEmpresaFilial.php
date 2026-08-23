@@ -6,9 +6,9 @@ namespace App\Livewire\Admin\Tenancy;
 
 use App\Actions\Admin\DefinirEmpresaAtivaAction;
 use App\Actions\Admin\DefinirFilialAtivaAction;
-use App\Models\AdminUser;
-use App\Support\Tenancy\TenantContext;
 use App\Support\Tenancy\TenantResolver;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;

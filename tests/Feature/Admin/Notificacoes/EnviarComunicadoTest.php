@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Notificacoes\EnviarComunicado;
-use App\Models\Activity;
+use HT2ML\Core\Models\Activity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
@@ -16,7 +16,7 @@ beforeEach(function (): void {
     criarRoleAdmin('gestor', 50);
 });
 
-function superAdminLogado(): App\Models\AdminUser
+function superAdminLogado(): HT2ML\Core\Models\AdminUser
 {
     $super = criarAdminUser('super@teste.com');
     $super->assignRole('super-admin');

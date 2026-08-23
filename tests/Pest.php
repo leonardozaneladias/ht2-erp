@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoConcessao;
-use App\Models\AdminUser;
-use App\Models\PermissionGrant;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\PermissionGrant;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Admin;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 

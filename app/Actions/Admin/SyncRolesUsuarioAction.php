@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Actions\Admin;
 
 use App\DTOs\Admin\SyncRolesDTO;
-use App\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
 use App\Support\Access\AccessGuard;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;

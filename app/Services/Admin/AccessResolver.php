@@ -6,11 +6,11 @@ namespace App\Services\Admin;
 
 use App\DTOs\Admin\AcessoEfetivoDTO;
 use App\Enums\OrigemAcesso;
-use App\Enums\TipoConcessao;
-use App\Models\AdminUser;
-use App\Models\PermissionGrant;
 use App\Support\Access\AccessCache;
 use App\Support\Access\PermissionRegistry;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;

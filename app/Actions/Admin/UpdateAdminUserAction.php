@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin;
 
 use App\DTOs\Admin\AdminUserDTO;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

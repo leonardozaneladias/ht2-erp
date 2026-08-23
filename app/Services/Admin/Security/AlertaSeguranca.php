@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Admin\Security;
 
 use App\Enums\TipoAlertaSeguranca;
-use App\Models\AdminUser;
 use App\Notifications\AlertaSegurancaNotification;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\Notification;
 
 /**

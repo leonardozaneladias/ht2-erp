@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace HT2ML\Core\Models;
 
-use App\Models\Concerns\Auditavel;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

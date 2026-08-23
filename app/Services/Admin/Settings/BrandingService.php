@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Settings;
 
-use App\Models\Empresa;
 use App\Settings\BrandingSettings;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Support\Facades\Storage;
 
 /**

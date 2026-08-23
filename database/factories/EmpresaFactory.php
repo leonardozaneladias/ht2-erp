@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Empresa;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

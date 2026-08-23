@@ -3,7 +3,7 @@
 > **Status:** design aprovado (brainstorming), aguardando plano de implementação.
 > **Data:** 2026-06-05
 > **Contexto:** starter kit Laravel 13 + Livewire 4 + Inspinia, guard `admin`,
-> multi-tenant lógico (empresa/filial via `App\Support\Tenancy\TenantContext`),
+> multi-tenant lógico (empresa/filial via `HT2ML\Core\Support\Tenancy\TenantContext`),
 > `spatie/laravel-activitylog` v5. Fase A (2FA etc.) e Fase B (impersonation) já
 > mescladas na `main`. Este é o 1º subsistema da Fase C; LGPD e endurecimento
 > adicional são specs próprios.
@@ -31,7 +31,7 @@ segurança**:
 
 | #   | Decisão                                   | Escolha                                                                                                                          |
 | --- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Armazenamento de empresa_id/filial_id** | **Colunas reais** em `activity_log` + model custom `App\Models\Activity` (config `activity_model`).                              |
+| 1   | **Armazenamento de empresa_id/filial_id** | **Colunas reais** em `activity_log` + model custom `HT2ML\Core\Models\Activity` (config `activity_model`).                              |
 | 2   | **Isolamento da tela**                    | Coluna + filtro de empresa **sempre presentes**; **isolamento** por empresa ativa como padrão.                                   |
 | 3   | **Quem vê cross-empresa**                 | super-admin **ou** nova permissão `auditoria.todas-empresas`. Demais ficam isolados à empresa ativa.                             |
 | 4   | **Cobertura de eventos**                  | Ciclo de autenticação completo: login (sucesso/falha), bloqueio, logout, falha de 2FA, reset de senha (solicitação + aplicação). |
@@ -54,15 +54,15 @@ padrão do projeto (Actions logam via `activity()`) e é imune a esse ruído.
 - **Migration `add_tenant_to_activity_log`**: adiciona `empresa_id` e `filial_id`
   (`unsignedBigInteger`, **nullable, indexados, SEM FK** — o log é append-only e deve
   sobreviver à exclusão da empresa).
-- **`App\Models\Activity extends Spatie\Activitylog\Models\Activity`**: `$fillable`
+- **`HT2ML\Core\Models\Activity extends Spatie\Activitylog\Models\Activity`**: `$fillable`
   com `empresa_id`/`filial_id`; casts `integer`; relações `empresa()` e `filial()`
   (`belongsTo`, sem global scope — `Empresa`/`Filial` são raiz do tenant).
-- **`config/activitylog.php`**: `'activity_model' => App\Models\Activity::class`.
+- **`config/activitylog.php`**: `'activity_model' => HT2ML\Core\Models\Activity::class`.
 
 ### Carimbo de contexto (refatorar o listener)
 
 - Extrair o closure inline `Activity::creating` do `AppServiceProvider` para
-  **`App\Support\Audit\CarimbarContextoNaAtividade`** (invokable, testável). Ela:
+  **`HT2ML\Core\Support\Audit\CarimbarContextoNaAtividade`** (invokable, testável). Ela:
     1. **sempre** preenche `empresa_id`/`filial_id` a partir do `TenantContext`
        (via `??=`, respeitando valor já setado);
     2. quando personificando, injeta `properties.impersonado_por` (lógica de
@@ -92,7 +92,7 @@ padrão do projeto (Actions logam via `activity()`) e é imune a esse ruído.
 
 - Nova permissão **`auditoria.todas-empresas`** no catálogo (`config/access.php`,
   módulo `ModuloAcesso::Auditoria`), publicada via `access:sync`.
-- **`AuditoriaTable`** (usar `App\Models\Activity`):
+- **`AuditoriaTable`** (usar `HT2ML\Core\Models\Activity`):
     - `datasource()`: privilegiado (super-admin **ou** `can('auditoria.todas-empresas')`)
       → sem filtro de tenant; senão → `where('empresa_id', $empresaAtivaId)`, e se
       `$empresaAtivaId === null` → `whereRaw('1 = 0')` (não vaza eventos sem empresa).
@@ -131,7 +131,7 @@ retroativo não é inferível com confiança).
 - **Isolado sem empresa ativa**: `whereRaw('1 = 0')` evita que `where('empresa_id', null)`
   (→ `IS NULL`) vaze os eventos de autenticação. Filtro sempre por id concreto, nunca casa null.
 - **Privilégio reavaliado por request**: perder a permissão volta a isolar na hora.
-- **Model custom**: `activity()` passa a instanciar `App\Models\Activity`; consultas via
+- **Model custom**: `activity()` passa a instanciar `HT2ML\Core\Models\Activity`; consultas via
   a classe do spatie continuam na mesma tabela; `AuditoriaTable` usa a classe custom para
   ter `empresa`. Testes de auditoria da impersonation seguem válidos (model estende o do spatie).
 - **Refator do listener** preserva exatamente o comportamento de impersonation

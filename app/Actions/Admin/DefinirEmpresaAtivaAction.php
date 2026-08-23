@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin;
 
-use App\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
-use App\Support\Tenancy\TenantContext;
 use App\Support\Tenancy\TenantResolver;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**

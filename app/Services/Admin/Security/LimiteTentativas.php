@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Security;
 
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\RateLimiter;
 
 /**

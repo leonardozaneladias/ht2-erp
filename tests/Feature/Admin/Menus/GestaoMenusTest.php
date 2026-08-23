@@ -149,7 +149,7 @@ it('registra o resumo de domínio da reordenação na auditoria', function () {
             'secao:administracao' => ['usuarios', 'empresas', 'acesso', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
         ]);
 
-    $log = App\Models\Activity::query()
+    $log = HT2ML\Core\Models\Activity::query()
         ->where('log_name', 'menus')
         ->where('event', 'menu_reordenado')
         ->latest('id')

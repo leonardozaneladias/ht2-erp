@@ -5,9 +5,9 @@ declare(strict_types=1);
 use App\Actions\Admin\DefinirEmpresaAtivaAction;
 use App\Actions\Admin\DefinirFilialAtivaAction;
 use App\Http\Middleware\DefinirContextoTenant;
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
 use App\Support\Tenancy\TenantResolver;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -20,7 +20,7 @@ function empresaAtiva(string $nome): Empresa
     return Empresa::create(['nome' => $nome, 'ativo' => true]);
 }
 
-function adminComEmpresa(Empresa $empresa, bool $todasFiliais = true): App\Models\AdminUser
+function adminComEmpresa(Empresa $empresa, bool $todasFiliais = true): HT2ML\Core\Models\AdminUser
 {
     $user = criarAdminUser('ctx@teste.com');
     $user->empresasAcessiveis()->attach($empresa->id, ['todas_filiais' => $todasFiliais]);

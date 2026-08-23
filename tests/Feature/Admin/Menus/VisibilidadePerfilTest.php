@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Menus\GestaoMenus;
-use App\Models\Activity;
 use App\Services\Admin\Menu\MenuService;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\Activity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;

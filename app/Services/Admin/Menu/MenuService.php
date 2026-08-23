@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Admin\Menu;
 
 use App\Enums\TipoPersonalizacaoMenu;
-use App\Models\AdminUser;
 use App\Models\MenuPersonalizacao;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;

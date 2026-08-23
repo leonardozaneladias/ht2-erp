@@ -21,7 +21,7 @@ Cada eixo responde a uma pergunta diferente, e os três são **ortogonais** — 
 
 | Eixo            | Pergunta que responde                                          | Mecanismo real (core)                                                                                                      | O que filtra                              |
 | --------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| **Tenant**      | "Este registro é da empresa em que estou?"                     | Global scope `empresa` do trait `App\Models\Concerns\BelongsToEmpresa`, alimentado por `App\Support\Tenancy\TenantContext` | **Quais linhas** (por `empresa_id`)       |
+| **Tenant**      | "Este registro é da empresa em que estou?"                     | Global scope `empresa` do trait `App\Models\Concerns\BelongsToEmpresa`, alimentado por `HT2ML\Core\Support\Tenancy\TenantContext` | **Quais linhas** (por `empresa_id`)       |
 | **RBAC**        | "Eu posso executar **esta ação** (listar/ver/editar/aprovar)?" | `Gate` → `App\Services\Admin\AccessResolver` (super-admin bypass · deny > grant > role)                                    | **O verbo** (a ação inteira, não a linha) |
 | **Organograma** | "Esta pessoa está **na minha subárvore** de subordinados?"     | Trait `HT2ML\Rh\Models\Concerns\VisivelNaHierarquia` + serviço `EscopoOrganograma` (CTE recursiva sobre `gestor_id`)      | **Quais linhas** (por posição na árvore)  |
 
@@ -87,8 +87,8 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Support\Organograma;
 
-use App\Models\AdminUser;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use HT2ML\Rh\Models\Funcionario;
 use Illuminate\Support\Facades\Auth;
 
@@ -319,7 +319,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Support\Organograma;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 

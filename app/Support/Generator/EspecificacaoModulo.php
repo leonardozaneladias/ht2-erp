@@ -553,7 +553,7 @@ final class EspecificacaoModulo
             // Usa o tenant ativo quando há contexto (testes/CLI com empresa
             // definida); senão cria uma empresa própria. Evita divergência com
             // o global scope BelongsToEmpresa.
-            $linhas[] = "'empresa_id' => app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \App\Models\Empresa::factory(),";
+            $linhas[] = "'empresa_id' => app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \HT2ML\Core\Models\Empresa::factory(),";
         }
 
         foreach ($this->campos as $campo) {
@@ -809,8 +809,8 @@ final class EspecificacaoModulo
         }
 
         $linhas = [
-            '$empresa = \App\Models\Empresa::factory()->create();',
-            'app(\App\Support\Tenancy\TenantContext::class)->definirEmpresa($empresa->id);',
+            '$empresa = \HT2ML\Core\Models\Empresa::factory()->create();',
+            'app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->definirEmpresa($empresa->id);',
         ];
 
         return "\n" . $this->bloco($linhas, $espacos) . "\n";

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Audit;
 
-use App\Models\Activity;
+use HT2ML\Core\Models\Activity;
 
 /**
  * Converte o attribute_changes de uma Activity (attributes/old) em linhas

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoConcessao;
-use App\Models\PermissionGrant;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;
 

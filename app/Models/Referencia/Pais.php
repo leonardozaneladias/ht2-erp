@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
-use App\Models\Concerns\Auditavel;
 use Database\Factories\Referencia\PaisFactory;
 use HT2ML\Core\Enums\Referencia\OrigemRegistro;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Concerns\TemOrigem;
 use HT2ML\Core\Models\Contracts\TemOrigemDeclarada;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;

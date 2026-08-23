@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Settings;
 
 use App\DTOs\Admin\Settings\SegurancaSettingsDTO;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

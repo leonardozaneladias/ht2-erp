@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;

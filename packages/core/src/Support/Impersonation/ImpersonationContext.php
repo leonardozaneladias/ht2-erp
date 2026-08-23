@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Support\Impersonation;
+namespace HT2ML\Core\Support\Impersonation;
 
 use Illuminate\Auth\Access\AuthorizationException;
 

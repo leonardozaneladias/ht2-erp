@@ -5,10 +5,10 @@ declare(strict_types=1);
 use App\Actions\Admin\SyncRolesEmpresaAction;
 use App\DTOs\Admin\SyncRolesEmpresaDTO;
 use App\Exceptions\AccessException;
-use App\Models\AdminUser;
-use App\Models\Empresa;
 use App\Services\Admin\HierarchyResolver;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Enums;
+namespace HT2ML\Core\Enums;
 
 enum TipoConcessao: string
 {

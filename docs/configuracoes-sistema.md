@@ -101,7 +101,7 @@ Cadastros/Segurança; deploy não roda seeders) e então marca `instalado = true
 
 1. **Settings class** em `app/Settings/FooSettings.php` (estende `Settings`,
    define `group()` e, se houver segredos, `encrypted()`).
-2. **Enum**: adicione um case em `App\Enums\Admin\SettingsGroup` (rótulo, ícone,
+2. **Enum**: adicione um case em `HT2ML\Core\Enums\Admin\SettingsGroup` (rótulo, ícone,
    descrição), inclua-o em `abas()` (ordem na navegação) e em `palavrasChave()`
    (termos para a busca).
 3. **Defaults**: crie uma settings migration em `database/settings/` semeando

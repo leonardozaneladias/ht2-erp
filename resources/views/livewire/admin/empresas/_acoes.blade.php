@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\Empresa $row */
+    /** @var \HT2ML\Core\Models\Empresa $row */
     $ator = auth('admin')->user();
 @endphp
 

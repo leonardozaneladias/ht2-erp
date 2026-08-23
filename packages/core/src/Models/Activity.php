@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace HT2ML\Core\Models;
 
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Models\Activity as SpatieActivity;

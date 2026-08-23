@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use HT2ML\Rh\Livewire\Departamentos\DepartamentoTable;
 use HT2ML\Rh\Livewire\Funcionarios\FuncionarioTable;
 use HT2ML\Rh\Models\Departamento;

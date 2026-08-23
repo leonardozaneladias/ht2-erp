@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin;
 
-use App\Models\AdminUser;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**

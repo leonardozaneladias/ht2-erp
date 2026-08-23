@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\AdminUser $row */
+    /** @var \HT2ML\Core\Models\AdminUser $row */
     $ator = auth('admin')->user();
     $ehDesativar = (bool) $row->ativo;
 @endphp

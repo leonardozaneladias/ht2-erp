@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 

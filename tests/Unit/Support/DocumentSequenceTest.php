@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Enums\TipoDocumento;
 use App\Models\DocumentSequence;
-use App\Models\Empresa;
 use App\Support\Documents\GeradorNumeroDocumento;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Policies;
+namespace HT2ML\Core\Policies;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 
 class EmpresaPolicy
 {

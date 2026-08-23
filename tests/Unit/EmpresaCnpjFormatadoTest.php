@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\Empresa;
+use HT2ML\Core\Models\Empresa;
 
 it('formata CNPJ de 14 dígitos com máscara', function () {
     $empresa = new Empresa(['cnpj' => '15156249000168']);

@@ -304,7 +304,7 @@ diff <(jq '.' /tmp/permissions-202603.json) \
 
 ```bash
 php artisan tinker --execute '
-    \App\Models\AdminUser::find($id)->revokePermissionTo("admin.relatorios.manage");
+    \HT2ML\Core\Models\AdminUser::find($id)->revokePermissionTo("admin.relatorios.manage");
 '
 ```
 
@@ -539,12 +539,12 @@ Sinais:
 ```bash
 # Forçar logout (revogar sessões) de um usuário
 php artisan tinker --execute '
-    \App\Models\AdminUser::find($id)->update(["remember_token" => null]);
+    \HT2ML\Core\Models\AdminUser::find($id)->update(["remember_token" => null]);
 '
 
 # Revogar role crítica
 php artisan tinker --execute '
-    \App\Models\AdminUser::find($id)->removeRole("super-admin");
+    \HT2ML\Core\Models\AdminUser::find($id)->removeRole("super-admin");
 '
 ```
 

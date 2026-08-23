@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace HT2ML\Core\Models;
 
-use App\Models\Concerns\Auditavel;
+use Database\Factories\FilialFactory;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,6 +48,17 @@ class Filial extends Model implements UsaSoftDeletes
     public function empresa(): BelongsTo
     {
         return $this->belongsTo(Empresa::class);
+    }
+
+    /**
+     * O model saiu de App\ para o pacote, e o resolvedor padrão do Laravel monta
+     * o nome da factory a partir do namespace da aplicação — para uma classe
+     * fora dele, erra o alvo. Declarar explicitamente é o mesmo padrão que os
+     * models de referência já usam.
+     */
+    protected static function newFactory(): FilialFactory
+    {
+        return FilialFactory::new();
     }
 
     protected function casts(): array

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin;
 
-use App\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 

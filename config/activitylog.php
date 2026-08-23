@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\Activity;
+use HT2ML\Core\Models\Activity;
 use Spatie\Activitylog\Actions\CleanActivityLogAction;
 use Spatie\Activitylog\Actions\LogActivityAction;
 

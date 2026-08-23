@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Security;
 
-use App\Models\AdminUser;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoConcessao;
 use App\Livewire\Admin\Exemplos\IndexExemplo;
-use App\Models\AdminUser;
-use App\Models\Empresa;
 use App\Models\Exemplo;
-use App\Support\Tenancy\TenantContext;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;

@@ -20,7 +20,7 @@
 
 > Convenções obrigatórias (CLAUDE.md): `declare(strict_types=1)` em todo PHP; type hints e return types sempre; Actions nunca recebem `Request`; mensagens de usuário em PT-BR. Todas as roles/permissions usam o guard `admin`.
 >
-> Nota de testes: os snippets usam o helper `criarAdminUser()` (de `tests/Pest.php`). O hook de pre-commit (lint-staged) roda `pint --dirty`, que remove imports não usados automaticamente — não se preocupe se um `use App\Models\AdminUser;` ficar redundante em algum teste. O dashboard (`admin.dashboard`) é aberto a qualquer admin autenticado (sem permissão), por isso é usado como rota-alvo nos testes de middleware/banner.
+> Nota de testes: os snippets usam o helper `criarAdminUser()` (de `tests/Pest.php`). O hook de pre-commit (lint-staged) roda `pint --dirty`, que remove imports não usados automaticamente — não se preocupe se um `use HT2ML\Core\Models\AdminUser;` ficar redundante em algum teste. O dashboard (`admin.dashboard`) é aberto a qualquer admin autenticado (sem permissão), por isso é usado como rota-alvo nos testes de middleware/banner.
 
 ---
 
@@ -127,7 +127,7 @@ git commit -m "feat(admin): permissão usuarios.impersonar no catálogo"
 
 declare(strict_types=1);
 
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -197,7 +197,7 @@ git commit -m "feat(admin): setting de teto de tempo da personificação"
 
 declare(strict_types=1);
 
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Auth\Access\AuthorizationException;
 
 it('guarda, expõe, expira e limpa o estado da personificação', function (): void {
@@ -329,7 +329,7 @@ final class ImpersonationContext
 Em `app/Providers/AppServiceProvider.php`, dentro de `register()`, após o singleton do `TenantContext`:
 
 ```php
-        $this->app->singleton(\App\Support\Impersonation\ImpersonationContext::class);
+        $this->app->singleton(\HT2ML\Core\Support\Impersonation\ImpersonationContext::class);
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
@@ -378,7 +378,7 @@ function criarRoleAdmin(string $name, int $nivel): Spatie\Permission\Models\Role
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Gate;
@@ -468,8 +468,8 @@ declare(strict_types=1);
 
 use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
 use App\Exceptions\AccessException;
-use App\Models\Empresa;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -554,10 +554,10 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Impersonation;
 
 use App\Exceptions\AccessException;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
 use App\Services\Admin\HierarchyResolver;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -663,8 +663,8 @@ git commit -m "feat(admin): action de iniciar personificação"
 declare(strict_types=1);
 
 use App\Actions\Admin\Impersonation\EncerrarImpersonationAction;
-use App\Models\AdminUser;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 
@@ -723,9 +723,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Impersonation;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -801,8 +801,8 @@ git commit -m "feat(admin): action de encerrar personificação"
 declare(strict_types=1);
 
 use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
-use App\Models\AdminUser;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -862,7 +862,7 @@ Expected: FAIL — `impersonado_por` ausente nas ações durante a personificaç
 Em `app/Providers/AppServiceProvider.php`, adicionar o import no topo:
 
 ```php
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Spatie\Activitylog\Models\Activity;
 ```
 
@@ -920,8 +920,8 @@ git commit -m "feat(admin): auditoria marca ações de personificação (imperso
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 
@@ -1014,9 +1014,9 @@ git commit -m "feat(admin): rota de saída da personificação"
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
-use App\Settings\SegurancaSettings;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Settings\SegurancaSettings;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -1076,8 +1076,8 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Actions\Admin\Impersonation\EncerrarImpersonationAction;
-use App\Settings\SegurancaSettings;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Settings\SegurancaSettings;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -1143,8 +1143,8 @@ git commit -m "feat(admin): expiração automática da personificação"
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -1179,7 +1179,7 @@ Expected: FAIL — responde 302 (redirect para `admin.conta.seguranca`), não 20
 Em `app/Http/Middleware/EnsureTwoFactorEnabled.php`, adicionar o import e a condição de bypass:
 
 ```php
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 ```
 
 E na cláusula `if`, adicionar `&& ! app(ImpersonationContext::class)->ativo()`:
@@ -1222,7 +1222,7 @@ git commit -m "feat(admin): não exigir 2FA do alvo durante personificação"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Conta\SegurancaConta;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -1254,7 +1254,7 @@ Expected: FAIL — `ativar` executa normalmente.
 Em `app/Livewire/Admin/Conta/SegurancaConta.php`, adicionar o import:
 
 ```php
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 ```
 
 E como primeira linha de cada método sensível (`ativar`, `confirmar`, `regenerar`, `desativar`):
@@ -1306,8 +1306,8 @@ git commit -m "feat(admin): trava 2FA da conta durante personificação"
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Models\Activity;
@@ -1350,8 +1350,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminUser;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1410,7 +1410,7 @@ git commit -m "feat(admin): logout audita encerramento da personificação"
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -1457,13 +1457,13 @@ Expected: FAIL — banner não existe.
 
 ```blade
 @php
-    $impersonation = app(\App\Support\Impersonation\ImpersonationContext::class);
+    $impersonation = app(\HT2ML\Core\Support\Impersonation\ImpersonationContext::class);
 @endphp
 
 @if ($impersonation->ativo())
     @php
         $alvo = auth('admin')->user();
-        $timeout = app(\App\Settings\SegurancaSettings::class)->impersonation_timeout_minutos;
+        $timeout = app(\HT2ML\Core\Settings\SegurancaSettings::class)->impersonation_timeout_minutos;
         $expiraEm = ($impersonation->iniciadoEm() ?? time()) + $timeout * 60;
     @endphp
     <div
@@ -1543,8 +1543,8 @@ git commit -m "feat(admin): banner global de personificação"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Impersonation\IniciarImpersonation;
-use App\Models\AdminUser;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
@@ -1611,7 +1611,7 @@ namespace App\Livewire\Admin\Impersonation;
 use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
 use App\Exceptions\AccessException;
 use App\Livewire\Concerns\ConfirmsPassword;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;

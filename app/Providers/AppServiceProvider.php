@@ -8,17 +8,15 @@ use App\Contracts\Referencia\FonteDeCargos;
 use App\Contracts\Referencia\FonteDeMunicipios;
 use App\Contracts\Referencia\FonteDeUnidadesFederativas;
 use App\Http\Middleware\AdminAuthenticate;
-use App\Models\Activity;
-use App\Models\AdminUser;
-use App\Models\PermissionGrant;
-use App\Policies\AdminUserPolicy;
-use App\Policies\PermissionGrantPolicy;
 use App\Policies\RolePolicy;
 use App\Services\Admin\AccessResolver;
 use App\Services\Admin\Referencia\CatalogoDeLocalidades;
 use App\Services\Admin\Settings\SettingsRuntimeApplier;
 use App\Support\Documents\GeradorNumeroDocumento;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\PermissionGrant;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(AccessResolver::class);
-        $this->app->singleton(\App\Support\Tenancy\TenantContext::class);
+        $this->app->singleton(\HT2ML\Core\Support\Tenancy\TenantContext::class);
         $this->app->singleton(ImpersonationContext::class);
         $this->app->singleton(GeradorNumeroDocumento::class);
     }
@@ -56,9 +54,9 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultView('vendor.pagination.inspinia');
         Paginator::defaultSimpleView('vendor.pagination.simple-inspinia');
 
-        Gate::policy(AdminUser::class, AdminUserPolicy::class);
+        // AdminUser, Empresa e PermissionGrant são registrados pelo
+        // CoreServiceProvider: policy de model do core viaja com o model.
         Gate::policy(Role::class, RolePolicy::class);
-        Gate::policy(PermissionGrant::class, PermissionGrantPolicy::class);
 
         // Reaplica o guard admin nas requisições de update do Livewire (AJAX).
         // Sem isto, $this->authorize() em métodos de ação resolve o guard padrão
@@ -86,7 +84,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Carimba empresa/filial do tenant ativo e, durante personificação, quem
         // está por trás (impersonado_por). Ponto único de "contexto → activity_log".
-        Activity::creating(app(\App\Support\Audit\CarimbarContextoNaAtividade::class));
+        Activity::creating(app(\HT2ML\Core\Support\Audit\CarimbarContextoNaAtividade::class));
 
         // A notificação padrão de reset de senha monta a URL com route('password.reset'),
         // que não existe aqui (a rota é admin.password.reset). Redireciona a construção

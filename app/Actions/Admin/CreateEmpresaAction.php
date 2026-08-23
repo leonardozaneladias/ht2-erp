@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin;
 
 use App\DTOs\Admin\EmpresaDTO;
-use App\Models\Empresa;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Support\Facades\DB;
 
 /**

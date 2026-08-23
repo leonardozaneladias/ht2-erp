@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Concerns;
+namespace HT2ML\Core\Models\Concerns;
 
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -13,7 +13,7 @@ use Spatie\Activitylog\Support\LogOptions;
  * Captura created/updated/deleted/restored com o diff completo de atributos
  * (properties.attributes / properties.old) no activity_log. O contexto de
  * tenant, causer, IP e rótulo do registro é carimbado de forma central em
- * App\Support\Audit\CarimbarContextoNaAtividade.
+ * HT2ML\Core\Support\Audit\CarimbarContextoNaAtividade.
  *
  * Regra do projeto: o trait é a verdade crua de atributos; Actions só logam
  * eventos de DOMÍNIO que o diff não expressa (sync de pivôs/roles, settings,

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin;
 
-use App\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
 use App\Support\Access\AccessGuard;
 use App\Support\Access\PermissionRegistry;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;

@@ -40,8 +40,8 @@
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
-use App\Models\LoginHistory;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\LoginHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 
@@ -323,8 +323,8 @@ git commit -m "feat(admin): componente x-shared.avatar com fallback de iniciais"
 
 declare(strict_types=1);
 
-use App\Models\LoginHistory;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\LoginHistory;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -368,9 +368,9 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Models\AdminUser;
-use App\Models\LoginHistory;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\LoginHistory;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 
@@ -519,7 +519,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Conta;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use App\Services\Admin\Settings\SettingsFileUploadService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -565,7 +565,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Conta;
 
 use App\Actions\Admin\Conta\AtualizarPerfilAction;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -711,7 +711,7 @@ git commit -m "feat(admin): aba de perfil com avatar e nome"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Conta\TrocarSenha;
-use App\Models\Activity;
+use HT2ML\Core\Models\Activity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -771,7 +771,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use App\Support\Settings\PasswordPolicy;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -892,7 +892,7 @@ git commit -m "feat(admin): troca de senha na conta"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Conta\HistoricoLogins;
-use App\Models\LoginHistory;
+use HT2ML\Core\Models\LoginHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -929,7 +929,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -1068,7 +1068,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -1248,7 +1248,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;

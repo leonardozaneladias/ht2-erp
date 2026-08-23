@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Configuracao;
 
-use App\Enums\Admin\SettingsGroup;
+use HT2ML\Core\Enums\Admin\SettingsGroup;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;

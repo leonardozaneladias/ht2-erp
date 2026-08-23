@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
-use App\Models\AdminUser;
-use App\Models\Empresa;
-use App\Models\Filial;
 use App\Services\Admin\AccessResolver;
 use App\Support\Tenancy\TenantResolver;
 use Closure;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Models\Filial;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -289,7 +289,7 @@ trait FiltraPorMultiEmpresa
      */
     private function empresaAtivaComoEscopo(): array
     {
-        $id = app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId();
+        $id = app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->empresaAtivaId();
 
         return $id === null ? [] : [$id];
     }
