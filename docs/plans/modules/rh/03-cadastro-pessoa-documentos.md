@@ -110,14 +110,14 @@ Campos de `funcionarios` que identificam a pessoa (CPF/RG/PIS). Documentos digit
 
 | Campo (`funcionarios`) | Componente                                      | Validação (resumo)                                                                    |
 | ---------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `cpf`                  | `x-shared.cpf-input` (máscara `999.999.999-99`) | `required`, `App\Rules\Cpf`, **unique `(empresa_id, cpf)`** · **PII**                 |
+| `cpf`                  | `x-shared.cpf-input` (máscara `999.999.999-99`) | `required`, `HT2ML\Core\Rules\Cpf`, **unique `(empresa_id, cpf)`** · **PII**                 |
 | `rg`                   | `x-shared.input`                                | `nullable`, `max:20` · **PII**                                                        |
 | `rg_orgao_emissor`     | `x-shared.input`                                | `nullable`, `max:20`                                                                  |
 | `rg_uf`                | `x-shared.select-search` (UFs de `estados`)     | `nullable`, `size:2`                                                                  |
 | `pis_pasep`            | `x-shared.input` (máscara `999.99999.99-9`)     | `nullable`, dígito verificador (regra `PisPasep`) · **PII eSocial**                   |
 | `matricula`            | `x-shared.input`                                | `required`, `max:30`, **unique `(empresa_id, matricula)`** (auto-sugerida — ver §3.1) |
 
-- **CPF** reutiliza a `Rule` do core `App\Rules\Cpf` (valida 11 dígitos, rejeita sequências repetidas e confere os 2 dígitos verificadores). A máscara é só visual; a Rule normaliza para dígitos antes de validar, e a coluna grava 11 dígitos.
+- **CPF** reutiliza a `Rule` do core `HT2ML\Core\Rules\Cpf` (valida 11 dígitos, rejeita sequências repetidas e confere os 2 dígitos verificadores). A máscara é só visual; a Rule normaliza para dígitos antes de validar, e a coluna grava 11 dígitos.
 - **PIS/PASEP** ganha uma `Rule` nova no pacote (`HT2ML\Rh\Rules\PisPasep`): 11 dígitos + cálculo do dígito verificador (pesos 3,2,9,8,7,6,5,4,3,2). Máscara `999.99999.99-9`; grava só dígitos.
 - `pis_pasep` e `raca_cor`/`escolaridade`/nacionalidade (aba 1) são os campos que tornam o cadastro **eSocial-ready** — sinalizados na UI com um selo discreto "eSocial" no rótulo (`x-shared.tooltip`), nunca como `<select>` ou texto livre.
 
@@ -183,7 +183,7 @@ Coleção 1:N (`funcionario_dados_bancarios`, 01 §3 B4) com `principal` (defaul
 
 | `pix_tipo`  | Formato esperado                               |
 | ----------- | ---------------------------------------------- |
-| `cpf`       | 11 dígitos + DV válido (reusa `App\Rules\Cpf`) |
+| `cpf`       | 11 dígitos + DV válido (reusa `HT2ML\Core\Rules\Cpf`) |
 | `cnpj`      | 14 dígitos + DV válido                         |
 | `email`     | `email:rfc`                                    |
 | `celular`   | `+55` + DDD + 9 dígitos (E.164)                |
@@ -201,7 +201,7 @@ Coleção 1:N (`funcionario_dependentes`, 01 §3 B5). Flags governam folha/IR (f
 | ---------------------------- | ------------------------------------------- | ------------------------------------------------------------------ |
 | `nome`                       | `x-shared.input`                            | `required`, `max:150`                                              |
 | `grau_parentesco`            | `x-shared.select-search` (`GrauParentesco`) | `required`, `Rule::enum`                                           |
-| `cpf`                        | `x-shared.cpf-input`                        | `nullable`, `App\Rules\Cpf` · **PII**                              |
+| `cpf`                        | `x-shared.cpf-input`                        | `nullable`, `HT2ML\Core\Rules\Cpf` · **PII**                              |
 | `data_nascimento`            | `x-shared.date-picker`                      | `nullable`, `date`, `before_or_equal:today`                        |
 | `sexo`                       | `x-shared.select-search` (`Sexo`)           | `nullable`, `Rule::enum`                                           |
 | `dependente_ir`              | `x-shared.toggle`                           | `boolean` (pré-marcado se `GrauParentesco::eDependenteIrPadrao()`) |
@@ -380,7 +380,7 @@ FormFuncionario (mount / salvar)
 ### Peças
 
 - **`FuncionarioRules`** (classe estática, `HT2ML\Rh\Http\Requests\FuncionarioRules::regras(?int $ignorarId)`) — única fonte de validação, consumida tanto pelo `FormFuncionario` quanto por `Store/UpdateFuncionarioRequest` (API-ready). Inclui:
-    - `cpf` → `App\Rules\Cpf` + `Rule::unique('funcionarios','cpf')->where('empresa_id', app(TenantContext::class)->empresaAtivaId())->ignore($ignorarId)` (**unique por empresa**; índice parcial `WHERE deleted_at IS NULL` no banco libera CPF da lixeira).
+    - `cpf` → `HT2ML\Core\Rules\Cpf` + `Rule::unique('funcionarios','cpf')->where('empresa_id', app(TenantContext::class)->empresaAtivaId())->ignore($ignorarId)` (**unique por empresa**; índice parcial `WHERE deleted_at IS NULL` no banco libera CPF da lixeira).
     - `matricula` → `Rule::unique('funcionarios','matricula')->where('empresa_id', ...)->ignore($ignorarId)`.
     - enums via `Rule::enum(...)`; `data_demissao` → `after_or_equal:data_admissao`; coleções via `array` + regras por item (contatos/enderecos/bancarios/dependentes/documentos), incl. PIX por `pix_tipo` e campos de documento por flags do tipo.
 - **`FuncionarioDTO`** (`readonly`) — transporta o agregado entre camadas (nunca array solto): escalares de `funcionarios` + listas de DTOs-filhos (`ContatoDTO`, `EnderecoDTO`, `DadosBancariosDTO`, `DependenteDTO`, `DocumentoDTO`). `fromArray()` monta tudo a partir dos dados validados.

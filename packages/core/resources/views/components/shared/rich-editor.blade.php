@@ -6,7 +6,7 @@
     wire:ignore protege a árvore do Quill dos morphs do Livewire; o wire:model
     segue funcionando porque o JS dispara o evento `input` no textarea.
 
-    Segurança: o HTML deve ser sanitizado no servidor (App\Support\Html\HtmlSanitizer)
+    Segurança: o HTML deve ser sanitizado no servidor (HT2ML\Core\Support\Html\HtmlSanitizer)
     antes de persistir e ao exibir — a toolbar restrita não substitui isso.
 --}}
 

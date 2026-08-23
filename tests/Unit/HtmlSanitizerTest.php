@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\Html\HtmlSanitizer;
+use HT2ML\Core\Support\Html\HtmlSanitizer;
 
 it('mantém formatação permitida e remove conteúdo perigoso', function (): void {
     $sujo = '<p>Olá <strong>time</strong> <em>já</em></p>'

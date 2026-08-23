@@ -7,11 +7,20 @@
     "php": "^8.4",
     "illuminate/contracts": "^13.0",
     "illuminate/database": "^13.0",
-    "illuminate/support": "^13.0"
+    "illuminate/support": "^13.0",
+    "illuminate/view": "^13.0",
+    "livewire/livewire": "^4.2"
   },
   "autoload": {
     "psr-4": {
       "HT2ML\\Core\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "HT2ML\\Core\\CoreServiceProvider"
+      ]
     }
   },
   "minimum-stability": "stable"

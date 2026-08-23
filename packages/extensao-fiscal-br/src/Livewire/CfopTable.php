@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace HT2ML\FiscalBr\Livewire;
 
-use App\Livewire\Concerns\ComAcoesCrud;
-use App\Livewire\Concerns\ComLixeira;
+use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
+use HT2ML\Core\Livewire\Concerns\ComLixeira;
 use HT2ML\FiscalBr\Enums\TipoCfop;
 use HT2ML\FiscalBr\Models\Cfop;
 use Illuminate\Database\Eloquent\Builder;

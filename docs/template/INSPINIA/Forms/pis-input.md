@@ -43,6 +43,6 @@ como um `data-af-inputmask` inline, justamente por não haver componente nem bas
 O componente marca `data-af-validate="pis"`, e o `validation-errors.js` faz o **pré-flight** no
 `salvar`: um PIS com dígito verificador impossível é barrado **sem gastar um round-trip**.
 
-`App\Rules\Pis` continua sendo a autoridade no servidor — o cliente só antecipa o veredito. O
+`HT2ML\Core\Rules\Pis` continua sendo a autoridade no servidor — o cliente só antecipa o veredito. O
 fixture `tests/Fixtures/documentos-dv.json` é rodado contra as duas implementações (PHP e JS);
 se elas divergirem, um dos dois testes fica vermelho.

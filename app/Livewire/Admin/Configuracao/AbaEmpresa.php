@@ -6,8 +6,8 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveGeneralSettingsAction;
 use App\DTOs\Admin\Settings\GeneralSettingsDTO;
-use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Settings\GeneralSettings;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 

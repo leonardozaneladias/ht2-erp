@@ -21,7 +21,7 @@ final class FuncionarioRules
     {
         return [
             'nome' => ['required', 'string', 'max:255'],
-            'cpf' => ['required', new \App\Rules\Cpf],
+            'cpf' => ['required', new \HT2ML\Core\Rules\Cpf],
             'cargo' => ['required', 'string', 'max:255'],
             'salario' => ['required', 'integer', 'min:0'],
             'admissao' => ['required', 'date'],

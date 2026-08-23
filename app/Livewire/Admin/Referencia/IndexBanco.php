@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Livewire\Concerns\ComFicha;
 use App\Models\Referencia\Banco;
+use HT2ML\Core\Livewire\Concerns\ComFicha;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Livewire\Departamentos;
 
-use App\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Rh\Actions\CreateDepartamentoAction;
 use HT2ML\Rh\Actions\UpdateDepartamentoAction;
 use HT2ML\Rh\DTOs\DepartamentoDTO;

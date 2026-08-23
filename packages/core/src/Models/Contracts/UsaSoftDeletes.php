@@ -9,7 +9,7 @@ namespace HT2ML\Core\Models\Contracts;
  *
  * Não adiciona comportamento — o trait já implementa estes métodos. A interface
  * só os torna visíveis ao type-system (PHPStan) quando o model é manipulado de
- * forma genérica, via class-string<Model&UsaSoftDeletes> (ver App\Livewire\Concerns\ComLixeira).
+ * forma genérica, via class-string<Model&UsaSoftDeletes> (ver HT2ML\Core\Livewire\Concerns\ComLixeira).
  * Assinaturas sem tipo de retorno para casar com o trait do framework.
  */
 interface UsaSoftDeletes

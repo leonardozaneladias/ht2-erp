@@ -279,7 +279,7 @@ final class EspecificacaoModulo
             '__PDF_LINHA_MULTI_EMPRESA__' => $this->tenant ? '...$this->linhaMultiEmpresa($registro),' : '',
             '__PDF_CABECALHOS_MULTI_EMPRESA__' => $this->tenant ? '...$this->cabecalhosMultiEmpresa(), ' : '',
             // Lixeira (soft-delete): vazios quando !softDelete → saída idêntica à antiga.
-            '__USE_COM_LIXEIRA__' => $this->softDelete ? 'use App\Livewire\Concerns\ComLixeira;' : '',
+            '__USE_COM_LIXEIRA__' => $this->softDelete ? 'use HT2ML\Core\Livewire\Concerns\ComLixeira;' : '',
             '__TRAIT_COM_LIXEIRA__' => $this->softDelete ? 'use ComLixeira;' : '',
             '__DS_LIXEIRA_OPEN__' => $this->softDelete ? '$this->aplicarLixeira(' : '',
             '__DS_LIXEIRA_CLOSE__' => $this->softDelete ? ')' : '',
@@ -1049,7 +1049,7 @@ final class EspecificacaoModulo
             'multiselect' => "{$prop}: (array) (\$data['{$chave}'] ?? []),",
             'richtext' => $campo->nullable
                 ? "{$prop}: \$html('{$chave}'),"
-                : "{$prop}: \App\Support\Html\HtmlSanitizer::clean((string) (\$data['{$chave}'] ?? '')),",
+                : "{$prop}: \HT2ML\Core\Support\Html\HtmlSanitizer::clean((string) (\$data['{$chave}'] ?? '')),",
             default => $campo->nullable
                 ? "{$prop}: \$texto('{$chave}'),"
                 : "{$prop}: (string) (\$data['{$chave}'] ?? ''),",

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\FiscalBr\Livewire;
 
-use App\Livewire\Concerns\ComFicha;
+use HT2ML\Core\Livewire\Concerns\ComFicha;
 use HT2ML\FiscalBr\Models\Cnae;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;

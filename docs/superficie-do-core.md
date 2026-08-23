@@ -25,7 +25,7 @@ dependência de vendor.
 
 ## 13 símbolos PHP, todos exigidos em produção
 
-Nove já vivem em `ht2ml/core`. Os quatro pendentes estão marcados.
+Treze dos quinze já vivem em `ht2ml/core`. Faltam `Auditavel` e `AdminUser`.
 
 | Símbolo                                                    | Onde vive       | Papel para a extensão                                                                                                |
 | ---------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -40,23 +40,54 @@ Nove já vivem em `ht2ml/core`. Os quatro pendentes estão marcados.
 | `Policies\Referencia\Concerns\ProtegeRegistroSincronizado` | ✅ `ht2ml/core` | Bloqueia escrita em linha `sync`                                                                                     |
 | `Models\Concerns\Auditavel`                                | ⏳ `app/`       | Registro no activity log                                                                                             |
 | `Models\AdminUser`                                         | ⏳ `app/`       | Usuário administrativo. **168 arquivos** o referenciam; arrasta `Empresa`, `Filial`, a config de auth e as factories |
-| `Livewire\Concerns\ComAcoesCrud`                           | ⏳ `app/`       | Ações de linha padronizadas                                                                                          |
-| `Livewire\Concerns\ComFicha`                               | ⏳ `app/`       | Drawer de visualização                                                                                               |
-| `Livewire\Concerns\ComLixeira`                             | ⏳ `app/`       | Lixeira, restauração e exclusão definitiva                                                                           |
-| `Livewire\Concerns\EmiteNotificacoes`                      | ⏳ `app/`       | Toasts padronizados                                                                                                  |
+| `Livewire\Concerns\ComAcoesCrud`                           | ✅ `ht2ml/core` | Ações de linha padronizadas                                                                                          |
+| `Livewire\Concerns\ComFicha`                               | ✅ `ht2ml/core` | Drawer de visualização                                                                                               |
+| `Livewire\Concerns\ComLixeira`                             | ✅ `ht2ml/core` | Lixeira, restauração e exclusão definitiva                                                                           |
+| `Livewire\Concerns\EmiteNotificacoes`                      | ✅ `ht2ml/core` | Toasts padronizados                                                                                                  |
 
 Só em teste: `Database\Seeders\RolePermissionSeeder`.
 
-## 11 componentes Blade do design system
+## Design system Blade — resolvido, e não era o que parecia
 
-`x-admin.page-header` · `x-admin.ficha-drawer` · `x-admin.ficha-section` ·
-`x-admin.form-footer` · `x-shared.button` · `x-shared.card` ·
-`x-shared.field-display` · `x-shared.input` · `x-shared.select-search` ·
-`x-shared.textarea` · `x-slot`
+Esta seção dizia que os componentes eram "a parte da superfície que mais resiste
+ao empacotamento", porque não viajam pelo Composer como classes. **Estava
+errado**, e o teste é de duas linhas:
 
-Estes não viajam pelo Composer como classes: dependem de o app hospedeiro
-registrar o mesmo namespace de componentes. É a parte da superfície que mais
-resiste ao empacotamento.
+```php
+Blade::anonymousComponentPath(__DIR__ . '/../resources/views/components');
+// e um `<x-shared.button />` escrito no app resolve para o blade do pacote
+```
+
+Sem prefixo, o componente do pacote atende o nome que o consumidor já escreve.
+Nenhum dos ~200 blades consumidores muda uma linha, e o app hospedeiro continua
+vencendo: um componente em `resources/views/components` sobrescreve o do pacote,
+então dá para customizar um por vez.
+
+**68 componentes `shared/` e o `admin/row-actions` já estão em `ht2ml/core`.** Os
+30 `admin/` restantes ficam para a fatia de branding/menu/settings, porque
+dependem de `BrandingService`, `AppearanceService`, `MenuService`,
+`LoginSettings`, `SegurancaSettings`, `NotificacaoService` e
+`ImpersonationContext`.
+
+## A metade que o Composer não carrega — e essa é real
+
+O design system tem um lado PHP/Blade e um lado de assets. O Composer entrega o
+primeiro; o segundo continua no app:
+
+|                 | Volume              |
+| --------------- | ------------------- |
+| `resources/js`  | 18 arquivos, 118 KB |
+| `resources/css` | 37 arquivos, 134 KB |
+
+O acoplamento é menor do que parece: só **três** componentes Alpine são nomeados
+e definidos em JS (`afRowActions`, `afDatePicker`, `comboBox`); todo o resto usa
+`x-data` inline, que viaja no próprio blade. O resto do lado de assets é Tailwind
+e o tema Inspinia.
+
+O caminho conhecido é `publishes()` no pacote mais, no app consumidor, um
+`@source` do Tailwind 4 apontando para `vendor/ht2ml/core/resources`. Isso mexe
+em `vite.config.js` e na configuração do Tailwind — é fatia própria, e é o que
+separa "o pacote tem os blades" de "o pacote renderiza sozinho".
 
 ## Dependências de vendor
 

@@ -1714,19 +1714,28 @@
         },
         {
             "name": "ht2ml/core",
-            "version": "dev-feat/nascer-ht2ml-core",
+            "version": "dev-feat/core-design-system-e-concerns",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
-                "reference": "341fac6d30f3be4bbe73e235309d12bab4a2a666"
+                "reference": "324e2e83df41e1c6166a1f64fa8cb57cc4a69eb5"
             },
             "require": {
                 "illuminate/contracts": "^13.0",
                 "illuminate/database": "^13.0",
                 "illuminate/support": "^13.0",
+                "illuminate/view": "^13.0",
+                "livewire/livewire": "^4.2",
                 "php": "^8.4"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HT2ML\\Core\\CoreServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "HT2ML\\Core\\": "src/"
@@ -1743,7 +1752,7 @@
         },
         {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-feat/nascer-ht2ml-core",
+            "version": "dev-feat/core-design-system-e-concerns",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
@@ -1793,7 +1802,7 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-feat/nascer-ht2ml-core",
+            "version": "dev-feat/core-design-system-e-concerns",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",

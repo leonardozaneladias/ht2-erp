@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Soft-delete (lixeira) para os módulos do RH: departamentos e funcionarios.
- * Ver App\Livewire\Concerns\ComLixeira.
+ * Ver HT2ML\Core\Livewire\Concerns\ComLixeira.
  */
 return new class extends Migration
 {

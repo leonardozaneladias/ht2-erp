@@ -18,7 +18,7 @@ listagem já vê os dados dela). O item "Ver" do kebab é gated por
 
 ## Arquitetura
 
-- **Trait `App\Livewire\Concerns\ComFicha`** (no **Index**, não na Table): estado
+- **Trait `HT2ML\Core\Livewire\Concerns\ComFicha`** (no **Index**, não na Table): estado
   `#[Locked] $fichaId`, `abrirFicha()` (localiza → toast se sumiu → `authorize('view')`
   → dispara o evento browser `ficha-abrir`), computeds `ficha`/`fichaTitulo`/`fichaUrlEditar`
   (re-autorizam a cada render). Com `SoftDeletes`, a ficha abre também para

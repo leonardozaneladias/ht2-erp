@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Rules\Pis;
+use HT2ML\Core\Rules\Pis;
 use Illuminate\Support\Facades\Validator;
 
 describe('Pis Rule', function (): void {

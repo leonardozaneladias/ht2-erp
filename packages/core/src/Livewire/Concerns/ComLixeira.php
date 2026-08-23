@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Concerns;
+namespace HT2ML\Core\Livewire\Concerns;
 
 use HT2ML\Core\Models\Contracts\TemOrigemDeclarada;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;

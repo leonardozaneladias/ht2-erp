@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Rules\Cnpj;
-use App\Rules\Cpf;
-use App\Rules\Pis;
 use App\Rules\TituloEleitor;
+use HT2ML\Core\Rules\Cpf;
+use HT2ML\Core\Rules\Pis;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 /*

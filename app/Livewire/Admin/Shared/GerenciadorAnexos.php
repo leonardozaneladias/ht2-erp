@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Shared;
 
-use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Anexo;
 use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithFileUploads;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Usuarios;
 
-use App\Livewire\Concerns\ComFicha;
 use App\Models\AdminUser;
+use HT2ML\Core\Livewire\Concerns\ComFicha;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;

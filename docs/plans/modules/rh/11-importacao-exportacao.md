@@ -62,7 +62,7 @@ A importação é **idempotente por chave de negócio** — reimportar a mesma p
 
 ## 4. Validação e integridade de relacionamentos
 
-Cada aba é uma sub-import estendendo `App\Imports\BaseImport` — validação **por linha** com `regrasPorColuna()` (reaproveita as `Rules` do cadastro: `App\Rules\Cpf`, `HT2ML\Rh\Rules\PisPasep`, PIX por tipo — [03 §3/§5](03-cadastro-pessoa-documentos.md)).
+Cada aba é uma sub-import estendendo `App\Imports\BaseImport` — validação **por linha** com `regrasPorColuna()` (reaproveita as `Rules` do cadastro: `HT2ML\Core\Rules\Cpf`, `HT2ML\Rh\Rules\PisPasep`, PIX por tipo — [03 §3/§5](03-cadastro-pessoa-documentos.md)).
 
 **Catálogos e referências são citados por código/nome, não por id:**
 

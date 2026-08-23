@@ -7,7 +7,7 @@
 
 {{-- O PIS era o único `data-af-inputmask` fora de `components/shared/` — a máscara estava
      colada direto na view do cadastro de funcionário, contra o §15.4 do catálogo. O dígito
-     verificador é conferido no cliente; App\Rules\Pis segue valendo no servidor. --}}
+     verificador é conferido no cliente; HT2ML\Core\Rules\Pis segue valendo no servidor. --}}
 <x-shared.masked-input
     :name="$name"
     :label="$label"

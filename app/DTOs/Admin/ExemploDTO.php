@@ -38,7 +38,7 @@ final readonly class ExemploDTO
     public static function fromArray(array $data): self
     {
         $html = static fn (string $chave): ?string => isset($data[$chave]) && trim((string) $data[$chave]) !== ''
-            ? \App\Support\Html\HtmlSanitizer::clean((string) $data[$chave])
+            ? \HT2ML\Core\Support\Html\HtmlSanitizer::clean((string) $data[$chave])
             : null;
 
         $texto = static fn (string $chave): ?string => isset($data[$chave]) && $data[$chave] !== ''

@@ -7,7 +7,7 @@
 //
 //   • APARÊNCIA (markup/classes) ........ resources/views/components/shared/toast-container.blade.php
 //   • OPÇÕES p/ o admin ................. /admin/configuracoes?aba=notificacoes
-//   • DISPARO no backend ............... App\Livewire\Concerns\EmiteNotificacoes
+//   • DISPARO no backend ............... HT2ML\Core\Livewire\Concerns\EmiteNotificacoes
 //
 // Disparo no frontend:  notify('success', 'Mensagem')  — ou  window.notify(...)
 // Preview ao vivo (aba Configurações):  window.notifyConfigure({ position, durationKey, style, max })

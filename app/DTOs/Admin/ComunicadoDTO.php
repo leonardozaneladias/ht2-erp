@@ -6,7 +6,7 @@ namespace App\DTOs\Admin;
 
 use App\Enums\PublicoComunicado;
 use App\Enums\TipoNotificacao;
-use App\Support\Html\HtmlSanitizer;
+use HT2ML\Core\Support\Html\HtmlSanitizer;
 
 final readonly class ComunicadoDTO
 {

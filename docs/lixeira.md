@@ -15,7 +15,7 @@ soft-delete do Eloquent; o `ativo` é regra de negócio.
 
 ## Arquitetura genérica
 
-- **Trait `App\Livewire\Concerns\ComLixeira`** — dá a qualquer tabela PowerGrid de
+- **Trait `HT2ML\Core\Livewire\Concerns\ComLixeira`** — dá a qualquer tabela PowerGrid de
   um model com `SoftDeletes` o fluxo completo: alternar ativos/lixeira
   (`verLixeira` + `alternarLixeira`), e os handlers `excluir` / `restaurar` /
   `excluirDefinitivo` (com `solicitar*` montando o bridge `confirm` do

@@ -6,7 +6,7 @@ namespace __NS_LIVEWIRE__;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
 use __NS_ENUMS__\__STATUS_ENUM__;
-use App\Livewire\Concerns\ComAcoesCrud;
+use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
 __USE_COM_LIXEIRA__
 use App\Livewire\Concerns\ExportaPdf;
 __USE_MULTI_EMPRESA__

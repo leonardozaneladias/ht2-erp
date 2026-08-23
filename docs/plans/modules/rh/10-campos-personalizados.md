@@ -192,7 +192,7 @@ Cada um entra como **novo `case`** do enum (com `componente()`/`regraValidacao()
 | `hora`             | `x-shared.input` (mask `HH:MM`)                   | `date_format:H:i`                               | não       | Evolução            |
 | `email`            | `x-shared.input`                                  | `email:rfc`                                     | não       | Evolução            |
 | `telefone`         | `x-shared.phone-input`                            | regra de telefone BR                            | não       | Evolução            |
-| `cpf`              | `x-shared.cpf-input`                              | `new \App\Rules\Cpf()`                          | não       | Evolução            |
+| `cpf`              | `x-shared.cpf-input`                              | `new \HT2ML\Core\Rules\Cpf()`                          | não       | Evolução            |
 | `cnpj`             | `x-shared.input` (mask CNPJ)                      | regra de CNPJ                                   | não       | Evolução            |
 | `cep`              | `x-shared.cep-input`                              | regra de CEP                                    | não       | Evolução            |
 | `url`              | `x-shared.input`                                  | `url`                                           | não       | Evolução            |

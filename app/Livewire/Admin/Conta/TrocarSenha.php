@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
-use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\AdminUser;
 use App\Support\Settings\PasswordPolicy;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
