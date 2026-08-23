@@ -9,9 +9,9 @@ use App\Actions\Admin\CreateEmpresaAction;
 use App\Actions\Admin\Menu\AplicarMenuPadraoAction;
 use App\DTOs\Admin\AdminUserDTO;
 use App\DTOs\Admin\EmpresaDTO;
-use App\DTOs\Admin\Settings\SetupDTO;
-use App\Settings\BrandingSettings;
-use App\Settings\GeneralSettings;
+use HT2ML\Core\DTOs\Admin\Settings\SetupDTO;
+use HT2ML\Core\Settings\BrandingSettings;
+use HT2ML\Core\Settings\GeneralSettings;
 use Illuminate\Support\Facades\DB;
 
 /**

@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Actions\Admin\Menu\AplicarMenuPadraoAction;
-use App\Enums\TipoPersonalizacaoMenu;
-use App\Models\MenuPersonalizacao;
-use App\Services\Admin\Menu\MenuService;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoPersonalizacaoMenu;
+use HT2ML\Core\Models\MenuPersonalizacao;
+use HT2ML\Core\Services\Admin\Menu\MenuService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

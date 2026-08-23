@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveEmailSettingsAction;
-use App\DTOs\Admin\Settings\EmailSettingsDTO;
-use App\Services\Admin\Settings\SmtpTester;
-use App\Settings\EmailSettings;
+use HT2ML\Core\DTOs\Admin\Settings\EmailSettingsDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Services\Admin\Settings\SmtpTester;
+use HT2ML\Core\Settings\EmailSettings;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Throwable;

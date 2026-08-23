@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Enums\TipoPersonalizacaoMenu;
-use App\Models\MenuPersonalizacao;
+use HT2ML\Core\Enums\TipoPersonalizacaoMenu;
+use HT2ML\Core\Models\MenuPersonalizacao;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

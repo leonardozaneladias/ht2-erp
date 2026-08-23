@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Configuracao\AbaNotificacoes;
-use App\Services\Admin\Settings\NotificacaoService;
-use App\Settings\NotificacaoSettings;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Services\Admin\Settings\NotificacaoService;
+use HT2ML\Core\Settings\NotificacaoSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

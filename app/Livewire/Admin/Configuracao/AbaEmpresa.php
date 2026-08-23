@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveGeneralSettingsAction;
-use App\DTOs\Admin\Settings\GeneralSettingsDTO;
-use App\Settings\GeneralSettings;
+use HT2ML\Core\DTOs\Admin\Settings\GeneralSettingsDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Settings\GeneralSettings;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 

@@ -3,7 +3,7 @@
 //
 // As preferências (posição, duração, estilo, máximo) vêm das Configurações do
 // sistema, injetadas em window.__notificacaoConfig pelo partial
-// x-admin.partials.notification-config (origem: App\Settings\NotificacaoSettings).
+// x-admin.partials.notification-config (origem: HT2ML\Core\Settings\NotificacaoSettings).
 //
 //   • APARÊNCIA (markup/classes) ........ resources/views/components/shared/toast-container.blade.php
 //   • OPÇÕES p/ o admin ................. /admin/configuracoes?aba=notificacoes
@@ -26,7 +26,7 @@ const DANGER_EXTRA = 1500;
 const ENTER_DURATION = 300;
 const LEAVE_DURATION = 200;
 
-// Espelha App\Enums\Admin\Notificacao\ToastDuracao::ms() — usado só no preview,
+// Espelha HT2ML\Core\Enums\Admin\Notificacao\ToastDuracao::ms() — usado só no preview,
 // onde o JS recebe a chave (curta|media|longa) e não os milissegundos.
 const DURATION_MS = { curta: 3000, media: 4500, longa: 7000 };
 

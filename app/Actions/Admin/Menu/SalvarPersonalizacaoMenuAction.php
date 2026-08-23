@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Menu;
 
 use App\DTOs\Admin\MenuPersonalizacaoDTO;
-use App\Enums\TipoPersonalizacaoMenu;
-use App\Models\MenuPersonalizacao;
-use App\Services\Admin\Menu\MenuService;
 use App\Support\Menu\IconesMenu;
+use HT2ML\Core\Enums\TipoPersonalizacaoMenu;
+use HT2ML\Core\Models\MenuPersonalizacao;
+use HT2ML\Core\Services\Admin\Menu\MenuService;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 

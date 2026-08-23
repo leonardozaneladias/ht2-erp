@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveLocalizacaoSettingsAction;
-use App\DTOs\Admin\Settings\LocalizacaoSettingsDTO;
-use App\Settings\LocalizacaoSettings;
+use HT2ML\Core\DTOs\Admin\Settings\LocalizacaoSettingsDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Settings\LocalizacaoSettings;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 

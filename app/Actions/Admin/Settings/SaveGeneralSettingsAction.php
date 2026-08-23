@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Settings;
 
-use App\DTOs\Admin\Settings\GeneralSettingsDTO;
-use App\Settings\GeneralSettings;
+use HT2ML\Core\DTOs\Admin\Settings\GeneralSettingsDTO;
+use HT2ML\Core\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

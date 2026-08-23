@@ -1,4 +1,4 @@
-@inject ('loginSettings', 'App\Settings\LoginSettings')
+@inject ('loginSettings', 'HT2ML\Core\Settings\LoginSettings')
 
 <x-admin.auth-form-card>
     <h4 class="text-default-900 mb-2 text-center text-lg font-bold">{{ $loginSettings->titulo }}</h4>

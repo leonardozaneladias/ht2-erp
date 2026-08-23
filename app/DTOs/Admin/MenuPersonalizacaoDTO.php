@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs\Admin;
 
-use App\Enums\TipoPersonalizacaoMenu;
+use HT2ML\Core\Enums\TipoPersonalizacaoMenu;
 
 final readonly class MenuPersonalizacaoDTO
 {

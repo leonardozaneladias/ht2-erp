@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ModuleRegistry::seeders());
 
         // O ambiente semeado representa um sistema já configurado: pula o Setup Wizard.
-        $general = app(\App\Settings\GeneralSettings::class);
+        $general = app(\HT2ML\Core\Settings\GeneralSettings::class);
         $general->instalado = true;
 
         if ($general->nome_cliente === '') {

@@ -14,7 +14,7 @@ it('aplica dias_retencao_logs ao config do activitylog', function (): void {
     $s->dias_retencao_logs = 30;
     $s->save();
 
-    app(App\Services\Admin\Settings\SettingsRuntimeApplier::class)->apply();
+    app(HT2ML\Core\Services\Admin\Settings\SettingsRuntimeApplier::class)->apply();
 
     expect(config('activitylog.clean_after_days'))->toBe(30);
 });

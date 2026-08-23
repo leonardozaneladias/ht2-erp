@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Settings;
 
-use App\DTOs\Admin\Settings\EmailSettingsDTO;
-use App\Settings\EmailSettings;
+use HT2ML\Core\DTOs\Admin\Settings\EmailSettingsDTO;
+use HT2ML\Core\Settings\EmailSettings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 

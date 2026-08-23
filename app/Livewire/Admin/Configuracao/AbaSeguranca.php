@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveSegurancaSettingsAction;
-use App\DTOs\Admin\Settings\SegurancaSettingsDTO;
 use App\Livewire\Concerns\ConfirmaSegundoFator;
+use HT2ML\Core\DTOs\Admin\Settings\SegurancaSettingsDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Contracts\View\View;

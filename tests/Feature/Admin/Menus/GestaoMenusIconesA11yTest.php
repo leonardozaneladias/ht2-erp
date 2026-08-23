@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Menus\GestaoMenus;
-use App\Models\MenuPersonalizacao;
-use App\Services\Admin\Menu\MenuService;
 use App\Support\Menu\IconesMenu;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\MenuPersonalizacao;
+use HT2ML\Core\Services\Admin\Menu\MenuService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
