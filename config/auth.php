@@ -72,7 +72,7 @@ return [
         ],
         'admins' => [
             'driver' => 'eloquent',
-            'model' => App\Models\AdminUser::class,
+            'model' => HT2ML\Core\Models\AdminUser::class,
         ],
 
         // 'users' => [

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace HT2ML\Core\Models;
 
-use App\Models\Concerns\Auditavel;
+use Database\Factories\EmpresaFactory;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -79,6 +80,17 @@ class Empresa extends Model implements UsaSoftDeletes
     public function scopeAtivas(Builder $query): Builder
     {
         return $query->where('ativo', true);
+    }
+
+    /**
+     * O model saiu de App\ para o pacote, e o resolvedor padrão do Laravel monta
+     * o nome da factory a partir do namespace da aplicação — para uma classe
+     * fora dele, erra o alvo. Declarar explicitamente é o mesmo padrão que os
+     * models de referência já usam.
+     */
+    protected static function newFactory(): EmpresaFactory
+    {
+        return EmpresaFactory::new();
     }
 
     protected function casts(): array

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use App\Livewire\Admin\Empresas\FormEmpresa;
 use App\Livewire\Admin\Usuarios\FormUsuario;
-use App\Models\Empresa;
 use Database\Seeders\Referencia\CargoSeeder;
 use Database\Seeders\Referencia\EstadoSeeder;
 use Database\Seeders\Referencia\MunicipioSeeder;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

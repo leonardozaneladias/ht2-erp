@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
 use App\Exceptions\AccessException;
-use App\Models\Activity;
 use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Models\Activity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin;
 
 use App\Enums\StatusExemplo;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Validation\Rule;
 
 /**

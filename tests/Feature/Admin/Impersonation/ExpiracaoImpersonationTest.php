@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Settings\SegurancaSettings;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Settings\SegurancaSettings;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;

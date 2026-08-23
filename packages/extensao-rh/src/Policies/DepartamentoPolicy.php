@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Policies;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use HT2ML\Rh\Models\Departamento;
 
 class DepartamentoPolicy

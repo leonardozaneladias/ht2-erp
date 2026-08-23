@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Security;
 
-use App\Models\AdminUser;
 use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Models\AdminUser;
 
 /**
  * Inicia a ativação do 2FA: gera um segredo pendente (ainda não confirmado).

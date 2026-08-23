@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auditoria\IndexAuditoria;
-use App\Models\Activity;
+use HT2ML\Core\Models\Activity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;

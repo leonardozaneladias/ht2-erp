@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Models\AdminUser;
-use App\Settings\SegurancaSettings;
-use App\Support\Impersonation\ImpersonationContext;
 use Closure;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Settings\SegurancaSettings;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;

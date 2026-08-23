@@ -212,7 +212,7 @@
                     @forelse ($this->acessosDiretos as $grant)
                         <tr wire:key="grant-{{ $grant->id }}">
                             <td>
-                                @if ($grant->type === \App\Enums\TipoConcessao::Deny)
+                                @if ($grant->type === \HT2ML\Core\Enums\TipoConcessao::Deny)
                                     <x-shared.badge variant="danger" icon="tabler--ban">Nega</x-shared.badge>
                                 @else
                                     <x-shared.badge variant="success" icon="tabler--plus"> Concede</x-shared.badge>

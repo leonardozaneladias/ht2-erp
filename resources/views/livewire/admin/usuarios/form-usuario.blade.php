@@ -283,7 +283,7 @@
                     @forelse ($this->acessosExtras as $grant)
                         <tr wire:key="grant-{{ $grant->id }}">
                             <td>
-                                @if ($grant->type === \App\Enums\TipoConcessao::Deny)
+                                @if ($grant->type === \HT2ML\Core\Enums\TipoConcessao::Deny)
                                     <x-shared.badge variant="danger" icon="tabler--ban">Nega</x-shared.badge>
                                 @else
                                     <x-shared.badge variant="success" icon="tabler--plus"> Concede</x-shared.badge>
@@ -363,7 +363,7 @@
         @if ($modo === 'editar' && $this->podeVerHistorico)
             <x-shared.tab-panel id="aba-historico">
                 <livewire:admin.auditoria.historico-registro
-                    :subject-type="\App\Models\AdminUser::class"
+                    :subject-type="\HT2ML\Core\Models\AdminUser::class"
                     :subject-id="$usuarioId"
                     bare
                     :key="'historico-usuario-' . $usuarioId"

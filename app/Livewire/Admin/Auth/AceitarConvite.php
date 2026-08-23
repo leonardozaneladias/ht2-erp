@@ -6,9 +6,9 @@ namespace App\Livewire\Admin\Auth;
 
 use App\Actions\Admin\Convites\AceitarConviteAction;
 use App\Exceptions\AccessException;
-use App\Models\AdminUserConvite;
 use App\Services\Admin\Security\LimiteTentativas;
 use App\Support\Settings\PasswordPolicy;
+use HT2ML\Core\Models\AdminUserConvite;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Notifications\ResetSenhaNotification as ResetPasswordNotification;
+use HT2ML\Core\Notifications\ResetSenhaNotification as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Password;
 

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Security;
 
-use App\Models\AdminUser;
 use App\Notifications\CodigoVerificacaoEmailNotification;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;

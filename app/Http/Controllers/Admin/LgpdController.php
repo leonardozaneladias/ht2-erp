@@ -6,8 +6,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Admin\Lgpd\ExportarDadosUsuarioAction;
 use App\Http\Controllers\Controller;
-use App\Models\AdminUser;
 use Barryvdh\DomPDF\Facade\Pdf;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;

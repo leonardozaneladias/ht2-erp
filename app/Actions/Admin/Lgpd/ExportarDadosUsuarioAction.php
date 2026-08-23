@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Lgpd;
 
-use App\Models\Activity;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
 
 /**
  * Monta os dados pessoais de um usuário admin para export LGPD (acesso/

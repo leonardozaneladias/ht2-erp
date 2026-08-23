@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Models\Activity;
-use App\Models\AdminUserConvite;
-use App\Models\Empresa;
-use App\Models\PermissionGrant;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUserConvite;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 

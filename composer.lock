@@ -1714,19 +1714,25 @@
         },
         {
             "name": "ht2ml/core",
-            "version": "dev-feat/core-design-system-e-concerns",
+            "version": "dev-feat/core-auth-tenancy-auditoria",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
-                "reference": "324e2e83df41e1c6166a1f64fa8cb57cc4a69eb5"
+                "reference": "f099a7cba92dd5bed2893cf1c7f32311d4099f8a"
             },
             "require": {
+                "illuminate/auth": "^13.0",
+                "illuminate/bus": "^13.0",
                 "illuminate/contracts": "^13.0",
                 "illuminate/database": "^13.0",
+                "illuminate/notifications": "^13.0",
                 "illuminate/support": "^13.0",
                 "illuminate/view": "^13.0",
                 "livewire/livewire": "^4.2",
-                "php": "^8.4"
+                "php": "^8.4",
+                "spatie/laravel-activitylog": "^5.0",
+                "spatie/laravel-permission": "^8.0",
+                "spatie/laravel-settings": "^3.9"
             },
             "type": "library",
             "extra": {
@@ -1752,7 +1758,7 @@
         },
         {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-feat/core-design-system-e-concerns",
+            "version": "dev-feat/core-auth-tenancy-auditoria",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
@@ -1802,7 +1808,7 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-feat/core-design-system-e-concerns",
+            "version": "dev-feat/core-auth-tenancy-auditoria",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",

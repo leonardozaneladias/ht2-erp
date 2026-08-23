@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Admin;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 
 /**
  * Centraliza o registro de eventos de segurança/autenticação na trilha de

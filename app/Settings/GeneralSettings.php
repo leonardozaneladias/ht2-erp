@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Settings;
 
-use App\Enums\Admin\SettingsGroup;
+use HT2ML\Core\Enums\Admin\SettingsGroup;
 use Spatie\LaravelSettings\Settings;
 
 /**

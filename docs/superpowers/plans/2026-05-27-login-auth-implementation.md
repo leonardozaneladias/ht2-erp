@@ -188,7 +188,7 @@ mkdir -p tests/Feature/Admin/Auth
 // tests/Feature/Admin/Auth/LogoutTest.php
 declare(strict_types=1);
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 
@@ -285,7 +285,7 @@ mkdir -p resources/views/livewire/admin/auth
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\Login;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -518,7 +518,7 @@ git commit -m "feat(auth): Livewire Login full-page com testes"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\ForgotPassword;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -702,7 +702,7 @@ git commit -m "feat(auth): Livewire ForgotPassword full-page com testes"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\ResetPassword;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;

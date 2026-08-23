@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Models\LoginHistory;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\LoginHistory;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

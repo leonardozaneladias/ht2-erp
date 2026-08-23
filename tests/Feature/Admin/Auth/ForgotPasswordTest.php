@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\ForgotPassword;
-use App\Models\AdminUser;
-use App\Notifications\ResetSenhaNotification as ResetPasswordNotification;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Notifications\ResetSenhaNotification as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;

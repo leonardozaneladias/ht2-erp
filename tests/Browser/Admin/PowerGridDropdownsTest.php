@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\Hash;
 
 /**

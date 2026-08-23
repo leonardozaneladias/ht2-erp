@@ -1,11 +1,11 @@
 @php
-    $impersonation = app(\App\Support\Impersonation\ImpersonationContext::class);
+    $impersonation = app(\HT2ML\Core\Support\Impersonation\ImpersonationContext::class);
 @endphp
 
 @if ($impersonation->ativo())
     @php
         $alvo = auth('admin')->user();
-        $timeout = app(\App\Settings\SegurancaSettings::class)->impersonation_timeout_minutos;
+        $timeout = app(\HT2ML\Core\Settings\SegurancaSettings::class)->impersonation_timeout_minutos;
         $expiraEm = ($impersonation->iniciadoEm() ?? time()) + $timeout * 60;
     @endphp
     <div

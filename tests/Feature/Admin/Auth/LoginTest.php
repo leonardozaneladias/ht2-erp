@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\Login;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;

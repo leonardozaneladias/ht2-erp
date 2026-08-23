@@ -134,13 +134,13 @@ class FormExemplo extends Component
      */
     protected function filiaisDaEmpresaAtiva(): array
     {
-        $empresaId = app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId();
+        $empresaId = app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->empresaAtivaId();
 
         if ($empresaId === null) {
             return [];
         }
 
-        return \App\Models\Filial::query()
+        return \HT2ML\Core\Models\Filial::query()
             ->where('empresa_id', $empresaId)
             ->where('ativo', true)
             ->orderBy('nome')

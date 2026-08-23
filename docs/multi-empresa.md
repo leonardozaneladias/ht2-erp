@@ -10,10 +10,10 @@
 
 | Conceito          | Onde vive                                                                                                                                           |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Empresa (tenant)  | tabela `empresas` (`App\Models\Empresa`)                                                                                                            |
-| Filial            | tabela `filiais` (`App\Models\Filial`), `belongsTo` empresa; toda empresa nasce com a **Matriz**                                                    |
+| Empresa (tenant)  | tabela `empresas` (`HT2ML\Core\Models\Empresa`)                                                                                                            |
+| Filial            | tabela `filiais` (`HT2ML\Core\Models\Filial`), `belongsTo` empresa; toda empresa nasce com a **Matriz**                                                    |
 | Acesso do usuário | pivots `admin_user_empresa` (com `todas_filiais`) e `admin_user_filial`                                                                             |
-| Contexto ativo    | `App\Support\Tenancy\TenantContext` (sessão: `tenant.empresa_id` / `tenant.filial_id`) + colunas `admin_users.empresa_ativa_id` / `filial_ativa_id` |
+| Contexto ativo    | `HT2ML\Core\Support\Tenancy\TenantContext` (sessão: `tenant.empresa_id` / `tenant.filial_id`) + colunas `admin_users.empresa_ativa_id` / `filial_ativa_id` |
 
 O contexto ativo é hidratado a cada requisição admin autenticada pelo middleware
 `App\Http\Middleware\DefinirContextoTenant`, que revalida o acesso e cai para a
@@ -37,7 +37,7 @@ $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
 $table->index('empresa_id');
 
 // model
-use App\Models\Concerns\Auditavel;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
 
 class Cliente extends Model

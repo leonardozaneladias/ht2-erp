@@ -14,7 +14,7 @@ Verificadas no código real (`app/Models/Exemplo.php`, `app/Models/Concerns/*`, 
 
 - **Tenancy** — trait `App\Models\Concerns\BelongsToEmpresa`: toda tabela de negócio tem `empresa_id BIGINT NOT NULL`, global scope `empresa` automático e auto-fill no `creating`. `filial_id BIGINT NULL` onde a lotação física importa.
 - **Soft delete** — contrato `HT2ML\Core\Models\Contracts\UsaSoftDeletes` + trait `SoftDeletes`: `deleted_at` em toda tabela de negócio e nos catálogos tenant. Lixeira via `HT2ML\Core\Livewire\Concerns\ComLixeira` (3 permissões: `deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete).
-- **Auditoria** — trait `App\Models\Concerns\Auditavel` (spatie/activitylog). PII vai para `atributosNaoAuditados()` por model (ver §8 LGPD).
+- **Auditoria** — trait `HT2ML\Core\Models\Concerns\Auditavel` (spatie/activitylog). PII vai para `atributosNaoAuditados()` por model (ver §8 LGPD).
 - **Dinheiro** — INTEGER em centavos (ADR-0014). Coluna `*_centavos`. Nunca `float`/`decimal` para dinheiro. Operações via helper de Money do core.
 - **Tempo/duração** — minutos inteiros (`*_minutos`) para evitar float de horas. Horários do dia em `TIME`.
 - **Enums** — PHP backed (ADR-0010): coluna `VARCHAR` + **CHECK constraint** Postgres com a lista de valores + cast `EnumClass::class` no model.

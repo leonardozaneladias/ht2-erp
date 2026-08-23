@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Notifications\AlertaSegurancaNotification;
 use App\Notifications\ComunicadoNotification;
-use App\Notifications\ResetSenhaNotification;
+use HT2ML\Core\Notifications\ResetSenhaNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;

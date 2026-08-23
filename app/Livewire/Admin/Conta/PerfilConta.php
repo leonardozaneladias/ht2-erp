@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Conta;
 
 use App\Actions\Admin\Conta\AtualizarPerfilAction;
-use App\Models\AdminUser;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;

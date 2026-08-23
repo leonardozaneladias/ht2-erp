@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
-use App\Models\AdminUser;
 use App\Services\Admin\AuditoriaSeguranca;
 use App\Services\Admin\Security\AlertaSeguranca;
 use App\Services\Admin\Security\LimiteTentativas;
 use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;

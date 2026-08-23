@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auditoria;
 
-use App\Models\Activity;
-use App\Models\AdminUser;
-use App\Models\Empresa;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;

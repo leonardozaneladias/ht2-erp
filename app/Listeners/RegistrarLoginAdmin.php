@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Models\AdminUser;
-use App\Models\LoginHistory;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\LoginHistory;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 

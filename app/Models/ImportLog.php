@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\StatusImport;
-use App\Models\Concerns\Auditavel;
 use App\Models\Concerns\BelongsToEmpresa;
+use HT2ML\Core\Models\Concerns\Auditavel;
 use Illuminate\Database\Eloquent\Model;
 
 class ImportLog extends Model

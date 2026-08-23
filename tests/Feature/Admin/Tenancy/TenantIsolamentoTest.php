@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Models\Concerns\BelongsToEmpresa;
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Exemplos\ExemploTable;
-use App\Models\AdminUser;
-use App\Models\Empresa;
 use App\Models\Exemplo;
-use App\Models\Filial;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Models\Filial;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;

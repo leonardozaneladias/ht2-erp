@@ -6,7 +6,7 @@ namespace App\Services\Admin\Settings;
 
 use App\Settings\EmailSettings;
 use App\Settings\LocalizacaoSettings;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Log;

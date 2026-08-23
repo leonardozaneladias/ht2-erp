@@ -437,7 +437,7 @@ Usar `Log::channel()` com canais separados:
 
 ### 7.2 Auditoria (activity_log no banco)
 
-**Regra central:** o trait `App\Models\Concerns\Auditavel` é a **verdade crua de
+**Regra central:** o trait `HT2ML\Core\Models\Concerns\Auditavel` é a **verdade crua de
 atributos** (created/updated/deleted/restored com diff em `attribute_changes`);
 Actions só logam **eventos de domínio** que o diff não expressa (sync de
 pivôs/roles, settings, auth, resumos de operação em massa).

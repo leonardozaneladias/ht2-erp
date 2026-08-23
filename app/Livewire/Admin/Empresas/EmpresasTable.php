@@ -6,9 +6,9 @@ namespace App\Livewire\Admin\Empresas;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Livewire\Concerns\ExportaPdf;
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
 use HT2ML\Core\Livewire\Concerns\ComLixeira;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

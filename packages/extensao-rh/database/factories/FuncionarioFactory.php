@@ -21,7 +21,7 @@ final class FuncionarioFactory extends Factory
     public function definition(): array
     {
         return [
-            'empresa_id' => app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \App\Models\Empresa::factory(),
+            'empresa_id' => app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \HT2ML\Core\Models\Empresa::factory(),
             'nome' => fake()->words(2, true),
             'cpf' => fake()->numerify('###.###.###-##'),
             'cargo' => fake()->words(2, true),

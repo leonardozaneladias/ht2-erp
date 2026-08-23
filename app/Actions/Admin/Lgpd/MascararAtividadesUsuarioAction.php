@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Lgpd;
 
-use App\Models\Activity;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 

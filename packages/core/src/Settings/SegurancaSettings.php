@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Settings;
+namespace HT2ML\Core\Settings;
 
-use App\Enums\Admin\SettingsGroup;
+use HT2ML\Core\Enums\Admin\SettingsGroup;
 use Spatie\LaravelSettings\Settings;
 
 /**

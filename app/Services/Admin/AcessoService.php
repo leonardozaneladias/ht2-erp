@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Admin;
 
 use App\DTOs\Admin\AcessoEfetivoDTO;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 

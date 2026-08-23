@@ -83,7 +83,7 @@ usuário opera somente sobre a própria conta.
   `admin_user_id` (FK `cascadeOnDelete`), `ip_address` (string 45, nullable), `user_agent`
   (string, nullable), `created_at` (index em `admin_user_id` + `created_at`). **Sem
   `empresa_id`** — histórico pessoal/global (o login ocorre antes do contexto de empresa).
-- Model **`App\Models\LoginHistory`** (`belongsTo` AdminUser). `AdminUser`: `$fillable`
+- Model **`HT2ML\Core\Models\LoginHistory`** (`belongsTo` AdminUser). `AdminUser`: `$fillable`
   ganha `locale`/`timezone`; relação `loginHistory(): HasMany`.
 
 ---

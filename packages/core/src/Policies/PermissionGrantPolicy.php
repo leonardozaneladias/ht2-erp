@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Policies;
+namespace HT2ML\Core\Policies;
 
-use App\Models\AdminUser;
-use App\Models\PermissionGrant;
 use App\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\PermissionGrant;
 
 class PermissionGrantPolicy
 {

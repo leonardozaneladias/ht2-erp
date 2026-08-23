@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use App\Actions\Admin\ConcederAcessoDiretoAction;
 use App\DTOs\Admin\ConcessaoAcessoDTO;
-use App\Enums\TipoConcessao;
 use App\Livewire\Admin\Acesso\ControleAcesso;
 use App\Livewire\Admin\Acesso\PainelHistorico;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoConcessao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;

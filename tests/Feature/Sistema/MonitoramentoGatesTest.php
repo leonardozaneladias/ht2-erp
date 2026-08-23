@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoConcessao;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoConcessao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 

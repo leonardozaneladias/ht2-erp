@@ -273,7 +273,7 @@ A série é alimentada via `Pulse::record('registro_criado', 1)` dentro da Actio
 `app/Providers/PulseServiceProvider.php`:
 
 ```php
-Gate::define('viewPulse', function (\App\Models\AdminUser $user) {
+Gate::define('viewPulse', function (\HT2ML\Core\Models\AdminUser $user) {
     return $user->hasPermissionTo('admin.observability.view');
 });
 ```
@@ -286,7 +286,7 @@ Gate::define('viewPulse', function (\App\Models\AdminUser $user) {
 
 ```php
 // App\Providers\AuthServiceProvider
-Gate::define('viewHorizon', fn (\App\Models\AdminUser $user) =>
+Gate::define('viewHorizon', fn (\HT2ML\Core\Models\AdminUser $user) =>
     $user->hasPermissionTo('admin.horizon.view')
 );
 ```

@@ -71,7 +71,7 @@ por empresa ativa. Regras essenciais:
 
 - Todo registro de negócio tem `empresa_id`; use o trait `App\Models\Concerns\BelongsToEmpresa`
   (global scope por empresa ativa + auto-preenche no `creating`). `filial_id` é opcional.
-- Tenant ativo: `App\Support\Tenancy\TenantContext` (sessão), hidratado pelo middleware
+- Tenant ativo: `HT2ML\Core\Support\Tenancy\TenantContext` (sessão), hidratado pelo middleware
   `DefinirContextoTenant`. `unique` sempre por empresa. Escape consciente: `withoutGlobalScope('empresa')`.
 - RBAC de **dois níveis**: papéis globais (spatie, todas as empresas) + papéis por empresa
   (`admin_user_empresa_role`, geridos no hub no escopo da empresa ativa). super-admin é sempre global.

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace __NS_POLICIES__;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use __NS_MODELS__\__MODULO_STUDLY__;
 
 class __MODULO_STUDLY__Policy

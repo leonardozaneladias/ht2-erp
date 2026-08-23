@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Actions\Admin;
 
 use App\DTOs\Admin\ConcessaoAcessoDTO;
-use App\Enums\TipoConcessao;
-use App\Models\AdminUser;
-use App\Models\PermissionGrant;
 use App\Services\Admin\AccessResolver;
 use App\Support\Access\AccessGuard;
 use App\Support\Access\PermissionRegistry;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;

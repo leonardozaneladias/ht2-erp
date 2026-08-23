@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoConcessao;
-use App\Models\Empresa;
 use App\Services\Admin\AccessResolver;
+use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;

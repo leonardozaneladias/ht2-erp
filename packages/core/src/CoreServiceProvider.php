@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HT2ML\Core;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -33,5 +34,27 @@ final class CoreServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/views' => resource_path('views/vendor/core'),
         ], 'core-views');
+
+        $this->registrarPolicies();
+    }
+
+    /**
+     * Registro EXPLÍCITO, e é o ponto todo.
+     *
+     * A descoberta por convenção do Laravel mapeia App\Models\X para
+     * App\Policies\XPolicy. Quando Empresa saiu de App\Models para o pacote, a
+     * convenção passou a procurar HT2ML\Core\Policies\EmpresaPolicy — que não
+     * existia — e a EmpresaPolicy simplesmente deixou de ser aplicada, sem erro
+     * nenhum. Um controle de autorização desligado em silêncio, que um único
+     * teste pegou.
+     *
+     * Policy de model do core se declara aqui. Ver
+     * tests/Feature/Core/PoliciesDoCoreTest.php, que falha se alguma sumir.
+     */
+    private function registrarPolicies(): void
+    {
+        Gate::policy(Models\AdminUser::class, Policies\AdminUserPolicy::class);
+        Gate::policy(Models\Empresa::class, Policies\EmpresaPolicy::class);
+        Gate::policy(Models\PermissionGrant::class, Policies\PermissionGrantPolicy::class);
     }
 }

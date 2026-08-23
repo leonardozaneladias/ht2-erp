@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Support\Access;
 
 use App\Exceptions\AccessException;
-use App\Models\AdminUser;
 use App\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Models\Role;
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Policies\Referencia;
 
-use App\Models\AdminUser;
 use App\Models\Referencia\Moeda;
+use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class MoedaPolicy

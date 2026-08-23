@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
-use App\Models\Empresa;
 use Database\Seeders\DatabaseSeeder;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('admin_user_id')->constrained('admin_users')->cascadeOnDelete();
             $table->foreignId('permission_id')->constrained('permissions')->cascadeOnDelete();
 
-            $table->string('type'); // App\Enums\TipoConcessao: grant | deny
+            $table->string('type'); // HT2ML\Core\Enums\TipoConcessao: grant | deny
             $table->timestamp('expires_at')->nullable()->index();
 
             $table->foreignId('granted_by')->nullable()->constrained('admin_users')->nullOnDelete();

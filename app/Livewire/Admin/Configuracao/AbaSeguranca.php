@@ -7,8 +7,8 @@ namespace App\Livewire\Admin\Configuracao;
 use App\Actions\Admin\Settings\SaveSegurancaSettingsAction;
 use App\DTOs\Admin\Settings\SegurancaSettingsDTO;
 use App\Livewire\Concerns\ConfirmaSegundoFator;
-use App\Settings\SegurancaSettings;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 

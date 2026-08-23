@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\Empresa;
 use App\Services\Admin\AccessResolver;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;

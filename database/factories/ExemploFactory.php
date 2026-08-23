@@ -21,7 +21,7 @@ final class ExemploFactory extends Factory
     public function definition(): array
     {
         return [
-            'empresa_id' => app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \App\Models\Empresa::factory(),
+            'empresa_id' => app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \HT2ML\Core\Models\Empresa::factory(),
             // Filial é opcional; os testes que exercitam a dimensão filial a definem
             // explicitamente (deve pertencer à mesma empresa do registro).
             'filial_id' => null,

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Services\Admin\Security\LimiteTentativas;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

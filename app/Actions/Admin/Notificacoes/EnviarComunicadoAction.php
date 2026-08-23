@@ -6,8 +6,8 @@ namespace App\Actions\Admin\Notificacoes;
 
 use App\DTOs\Admin\ComunicadoDTO;
 use App\Enums\PublicoComunicado;
-use App\Models\AdminUser;
 use App\Notifications\ComunicadoNotification;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Models\Empresa;
 use App\Services\Admin\Settings\BrandingService;
 use App\Settings\BrandingSettings;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Actions\Admin\Lgpd\ExpurgarLogsAction;
-use App\Models\Activity;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

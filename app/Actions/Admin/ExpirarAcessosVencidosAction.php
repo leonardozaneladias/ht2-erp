@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin;
 
-use App\Models\AdminUser;
-use App\Models\PermissionGrant;
 use App\Services\Admin\AccessResolver;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Support\Facades\DB;
 
 class ExpirarAcessosVencidosAction

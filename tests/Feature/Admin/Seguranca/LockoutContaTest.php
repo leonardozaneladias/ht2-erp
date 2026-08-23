@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
 use App\Notifications\AlertaSegurancaNotification;
 use App\Services\Admin\Security\ControleLockout;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;

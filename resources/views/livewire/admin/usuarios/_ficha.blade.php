@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\AdminUser $registro */
+    /** @var \HT2ML\Core\Models\AdminUser $registro */
 @endphp
 
 {{-- Ficha de visualização ("Ver") — corpo do x-admin.ficha-drawer. --}}

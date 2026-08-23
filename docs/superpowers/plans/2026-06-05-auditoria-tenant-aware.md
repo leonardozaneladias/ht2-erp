@@ -4,7 +4,7 @@
 
 **Goal:** Tornar o `activity_log` ciente de tenant (grava `empresa_id`/`filial_id`), cobrir os eventos de autenticação hoje não logados, e isolar a tela de auditoria por empresa (com visão cross-empresa para super-admin / `auditoria.todas-empresas`).
 
-**Architecture:** Colunas reais em `activity_log` + model custom `App\Models\Activity`. Um invokable `CarimbarContextoNaAtividade` (registrado em `Activity::creating`) carimba o tenant em toda atividade e mantém o `impersonado_por` da impersonation. Um serviço `AuditoriaSeguranca` centraliza os eventos de autenticação, chamado explicitamente nos pontos genuínos (login/2FA/logout/reset). A `AuditoriaTable` isola por empresa no `datasource` conforme privilégio.
+**Architecture:** Colunas reais em `activity_log` + model custom `HT2ML\Core\Models\Activity`. Um invokable `CarimbarContextoNaAtividade` (registrado em `Activity::creating`) carimba o tenant em toda atividade e mantém o `impersonado_por` da impersonation. Um serviço `AuditoriaSeguranca` centraliza os eventos de autenticação, chamado explicitamente nos pontos genuínos (login/2FA/logout/reset). A `AuditoriaTable` isola por empresa no `datasource` conforme privilégio.
 
 **Tech Stack:** Laravel 13, PHP 8.4, Livewire 4, PowerGrid, spatie/laravel-activitylog v5, Pest 4, Pint, PHPStan nível 6.
 
@@ -61,8 +61,8 @@
 
 declare(strict_types=1);
 
-use App\Models\Activity;
-use App\Models\Empresa;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\Empresa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -165,10 +165,10 @@ class Activity extends SpatieActivity
 Em `config/activitylog.php`, trocar o import da linha 7:
 
 ```php
-use App\Models\Activity;
+use HT2ML\Core\Models\Activity;
 ```
 
-(A linha 45 `'activity_model' => Activity::class,` passa a resolver `App\Models\Activity`. As linhas 5-6, que importam `CleanActivityLogAction`/`LogActivityAction` do spatie, permanecem.)
+(A linha 45 `'activity_model' => Activity::class,` passa a resolver `HT2ML\Core\Models\Activity`. As linhas 5-6, que importam `CleanActivityLogAction`/`LogActivityAction` do spatie, permanecem.)
 
 - [ ] **Step 6: Run test to verify it passes**
 
@@ -199,7 +199,7 @@ Adicionar estes casos ao final de `tests/Feature/Admin/Auditoria/CarimboContexto
 ```php
 it('carimba empresa_id/filial_id do contexto ativo em toda atividade', function (): void {
     $empresa = Empresa::create(['nome' => 'Acme', 'ativo' => true]);
-    app(\App\Support\Tenancy\TenantContext::class)->definirEmpresa($empresa->id);
+    app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->definirEmpresa($empresa->id);
 
     activity('test')->log('com contexto');
 
@@ -208,7 +208,7 @@ it('carimba empresa_id/filial_id do contexto ativo em toda atividade', function 
 });
 
 it('deixa empresa_id nulo quando não há contexto ativo', function (): void {
-    app(\App\Support\Tenancy\TenantContext::class)->limpar();
+    app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->limpar();
 
     activity('test')->log('sem contexto');
 
@@ -219,9 +219,9 @@ it('deixa empresa_id nulo quando não há contexto ativo', function (): void {
 it('preserva empresa_id já setado explicitamente (não sobrescreve)', function (): void {
     $a = Empresa::create(['nome' => 'A', 'ativo' => true]);
     $b = Empresa::create(['nome' => 'B', 'ativo' => true]);
-    app(\App\Support\Tenancy\TenantContext::class)->definirEmpresa($a->id);
+    app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->definirEmpresa($a->id);
 
-    activity('test')->tap(function (\App\Models\Activity $activity) use ($b): void {
+    activity('test')->tap(function (\HT2ML\Core\Models\Activity $activity) use ($b): void {
         $activity->empresa_id = $b->id;
     })->log('explícito');
 
@@ -246,10 +246,10 @@ declare(strict_types=1);
 
 namespace App\Support\Audit;
 
-use App\Models\Activity;
-use App\Models\AdminUser;
-use App\Support\Impersonation\ImpersonationContext;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 
 /**
  * Carimba o contexto ambiente da requisição em cada atividade no momento do
@@ -291,8 +291,8 @@ final class CarimbarContextoNaAtividade
 
 Em `app/Providers/AppServiceProvider.php`:
 
-1. Remover os imports `use App\Support\Impersonation\ImpersonationContext;` e `use App\Models\AdminUser;` **se** ficarem sem uso após a remoção do closure (o Pint cuidará disso; confira que `AdminUser` ainda é usado pelo `Gate::policy`/`Gate::before` — provavelmente sim, então mantenha-o).
-2. Adicionar o import `use App\Support\Audit\CarimbarContextoNaAtividade;` e manter `use Spatie\Activitylog\Models\Activity;` (o `Activity::creating` aceita o model base; o invokable tipa `App\Models\Activity`, que é o instanciado em runtime).
+1. Remover os imports `use HT2ML\Core\Support\Impersonation\ImpersonationContext;` e `use HT2ML\Core\Models\AdminUser;` **se** ficarem sem uso após a remoção do closure (o Pint cuidará disso; confira que `AdminUser` ainda é usado pelo `Gate::policy`/`Gate::before` — provavelmente sim, então mantenha-o).
+2. Adicionar o import `use HT2ML\Core\Support\Audit\CarimbarContextoNaAtividade;` e manter `use Spatie\Activitylog\Models\Activity;` (o `Activity::creating` aceita o model base; o invokable tipa `HT2ML\Core\Models\Activity`, que é o instanciado em runtime).
 3. Substituir TODO o bloco `Activity::creating(function (Activity $activity): void { ... impersonado_por ... });` por:
 
 ```php
@@ -446,7 +446,7 @@ declare(strict_types=1);
 
 namespace App\Services\Admin;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 
 /**
  * Centraliza o registro de eventos de segurança/autenticação na trilha de
@@ -827,7 +827,7 @@ c) `app/Livewire/Admin/Auth/ResetPassword.php` — adicionar import `use App\Ser
 
 ```php
         if ($status === Password::PASSWORD_RESET) {
-            $usuario = \App\Models\AdminUser::where('email', $this->email)->first();
+            $usuario = \HT2ML\Core\Models\AdminUser::where('email', $this->email)->first();
 
             if ($usuario !== null) {
                 app(AuditoriaSeguranca::class)->senhaResetAplicada($usuario);
@@ -866,8 +866,8 @@ git commit -m "feat(admin): audita logout e reset de senha"
 
 ```php
 use App\Livewire\Admin\Auditoria\AuditoriaTable;
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Livewire\Livewire;
 
 /** Cria 3 atividades-âncora: empresa A, empresa B e sem empresa. */
@@ -972,7 +972,7 @@ Em `app/Livewire/Admin/Auditoria/AuditoriaTable.php`:
 a) Trocar o import do model para o custom:
 
 ```php
-use App\Models\Activity;
+use HT2ML\Core\Models\Activity;
 ```
 
 (remover `use Spatie\Activitylog\Models\Activity;`)
@@ -980,8 +980,8 @@ use App\Models\Activity;
 b) Adicionar imports:
 
 ```php
-use App\Models\Empresa;
-use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Support\Facades\Auth;
 ```
 

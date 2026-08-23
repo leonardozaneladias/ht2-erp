@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\FiscalBr\Policies;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 use HT2ML\FiscalBr\Models\Cfop;
 

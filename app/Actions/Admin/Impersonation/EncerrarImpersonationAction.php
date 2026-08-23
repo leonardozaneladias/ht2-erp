@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Impersonation;
 
-use App\Models\AdminUser;
 use App\Services\Admin\AccessResolver;
-use App\Support\Impersonation\ImpersonationContext;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Support\Facades\Auth;
 
 /**

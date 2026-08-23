@@ -37,7 +37,7 @@
 
 declare(strict_types=1);
 
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -331,7 +331,7 @@ declare(strict_types=1);
 
 use App\Notifications\AlertaSegurancaNotification;
 use App\Services\Admin\Security\AlertaSeguranca;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
@@ -384,9 +384,9 @@ declare(strict_types=1);
 namespace App\Services\Admin\Security;
 
 use App\Enums\TipoAlertaSeguranca;
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use App\Notifications\AlertaSegurancaNotification;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\Notification;
 
 /**
@@ -466,7 +466,7 @@ git commit -m "feat(admin): serviço de alertas de segurança"
 declare(strict_types=1);
 
 use App\Services\Admin\Security\LimiteTentativas;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -500,7 +500,7 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Security;
 
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\RateLimiter;
 
 /**
@@ -564,10 +564,10 @@ git commit -m "feat(admin): helper de rate-limit configurável"
 
 declare(strict_types=1);
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use App\Notifications\AlertaSegurancaNotification;
 use App\Services\Admin\Security\ControleLockout;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
@@ -633,8 +633,8 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Security;
 
-use App\Models\AdminUser;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
@@ -722,7 +722,7 @@ declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\Login;
 use App\Notifications\AlertaSegurancaNotification;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
@@ -900,7 +900,7 @@ declare(strict_types=1);
 use App\Livewire\Admin\Auth\TwoFactorChallenge;
 use App\Notifications\AlertaSegurancaNotification;
 use App\Services\Admin\Security\TwoFactorService;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
@@ -1010,7 +1010,7 @@ git commit -m "feat(admin): 2FA com throttle configurável e alerta de super-adm
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\ForgotPassword;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
@@ -1115,7 +1115,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Models\AdminUser;
+use HT2ML\Core\Models\AdminUser;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1333,7 +1333,7 @@ git commit -m "feat(admin): desbloqueio manual de conta na tabela de usuários"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Configuracao\AbaSeguranca;
-use App\Settings\SegurancaSettings;
+use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

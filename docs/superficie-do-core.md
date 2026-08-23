@@ -25,7 +25,7 @@ dependência de vendor.
 
 ## 13 símbolos PHP, todos exigidos em produção
 
-Treze dos quinze já vivem em `ht2ml/core`. Faltam `Auditavel` e `AdminUser`.
+**Os quinze vivem em `ht2ml/core`.** A medição original está satisfeita.
 
 | Símbolo                                                    | Onde vive       | Papel para a extensão                                                                                                |
 | ---------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -38,8 +38,8 @@ Treze dos quinze já vivem em `ht2ml/core`. Faltam `Auditavel` e `AdminUser`.
 | `Models\Contracts\TemOrigemDeclarada`                      | ✅ `ht2ml/core` | Torna a trait visível ao PHPStan                                                                                     |
 | `Models\Contracts\UsaSoftDeletes`                          | ✅ `ht2ml/core` | Mesmo padrão, para soft delete                                                                                       |
 | `Policies\Referencia\Concerns\ProtegeRegistroSincronizado` | ✅ `ht2ml/core` | Bloqueia escrita em linha `sync`                                                                                     |
-| `Models\Concerns\Auditavel`                                | ⏳ `app/`       | Registro no activity log                                                                                             |
-| `Models\AdminUser`                                         | ⏳ `app/`       | Usuário administrativo. **168 arquivos** o referenciam; arrasta `Empresa`, `Filial`, a config de auth e as factories |
+| `Models\Concerns\Auditavel`                                | ✅ `ht2ml/core` | Registro no activity log                                                                                             |
+| `Models\AdminUser`                                         | ✅ `ht2ml/core` | Usuário administrativo. **168 arquivos** o referenciam; arrasta `Empresa`, `Filial`, a config de auth e as factories |
 | `Livewire\Concerns\ComAcoesCrud`                           | ✅ `ht2ml/core` | Ações de linha padronizadas                                                                                          |
 | `Livewire\Concerns\ComFicha`                               | ✅ `ht2ml/core` | Drawer de visualização                                                                                               |
 | `Livewire\Concerns\ComLixeira`                             | ✅ `ht2ml/core` | Lixeira, restauração e exclusão definitiva                                                                           |

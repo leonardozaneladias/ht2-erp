@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Security;
 
-use App\Models\AdminUser;
 use App\Services\Admin\Security\AlertaSeguranca;
 use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Models\AdminUser;
 use Illuminate\Support\Facades\Auth;
 
 /**

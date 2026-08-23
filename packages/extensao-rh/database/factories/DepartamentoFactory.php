@@ -21,7 +21,7 @@ final class DepartamentoFactory extends Factory
     public function definition(): array
     {
         return [
-            'empresa_id' => app(\App\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \App\Models\Empresa::factory(),
+            'empresa_id' => app(\HT2ML\Core\Support\Tenancy\TenantContext::class)->empresaAtivaId() ?? \HT2ML\Core\Models\Empresa::factory(),
             'nome' => fake()->words(2, true),
             'sigla' => fake()->words(2, true),
             'status' => fake()->randomElement(StatusDepartamento::cases()),
