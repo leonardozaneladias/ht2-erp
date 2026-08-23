@@ -1714,14 +1714,23 @@
         },
         {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-feat/extrair-extensao-fiscal-br",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
-                "reference": "731bc4e9ae6d94527bab568d02a9de0f084a8488"
+                "reference": "7a7637ff0d640b04b5f3d6086e9c5bb7806fad94"
             },
             "require": {
-                "php": "^8.4"
+                "illuminate/contracts": "^13.0",
+                "illuminate/database": "^13.0",
+                "illuminate/support": "^13.0",
+                "illuminate/validation": "^13.0",
+                "livewire/livewire": "^4.2",
+                "php": "^8.4",
+                "power-components/livewire-powergrid": "^6.10"
+            },
+            "require-dev": {
+                "laravel/framework": "^13.0"
             },
             "type": "library",
             "extra": {
@@ -1754,7 +1763,7 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-feat/extrair-extensao-fiscal-br",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",
