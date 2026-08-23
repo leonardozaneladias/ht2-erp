@@ -8,14 +8,14 @@ use App\Actions\Admin\AtualizarFilialAction;
 use App\Actions\Admin\CreateEmpresaAction;
 use App\Actions\Admin\CriarFilialAction;
 use App\Actions\Admin\UpdateEmpresaAction;
+use App\Contracts\Referencia\FonteDeMunicipios;
+use App\Contracts\Referencia\FonteDeUnidadesFederativas;
 use App\DTOs\Admin\EmpresaDTO;
 use App\DTOs\Admin\FilialDTO;
 use App\Exceptions\FilialException;
 use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Models\Empresa;
 use App\Models\Filial;
-use App\Models\Referencia\Estado;
-use App\Models\Referencia\Municipio;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
@@ -160,7 +160,21 @@ class FormEmpresa extends Component
     #[Computed]
     public function ufsDisponiveis(): array
     {
-        return Estado::query()->orderBy('nome')->pluck('nome', 'sigla')->all();
+        if (! app()->bound(FonteDeUnidadesFederativas::class)) {
+            return [];
+        }
+
+        return app(FonteDeUnidadesFederativas::class)->opcoes();
+    }
+
+    /**
+     * Há catálogo de localidades instalado? Sem ele, UF e cidade viram campo de
+     * texto livre — que é o que a coluna sempre foi no banco (string, sem FK).
+     */
+    #[Computed]
+    public function temCatalogoDeLocalidades(): bool
+    {
+        return app()->bound(FonteDeUnidadesFederativas::class);
     }
 
     /**
@@ -172,25 +186,17 @@ class FormEmpresa extends Component
     #[Computed]
     public function municipiosDaFilial(): array
     {
-        if ($this->filial_estado === '') {
+        if ($this->filial_estado === '' || ! app()->bound(FonteDeMunicipios::class)) {
             return [];
         }
 
-        $nomes = Municipio::query()
-            ->whereHas('estado', function ($q) {
-                $q->where('sigla', $this->filial_estado);
-            })
-            ->orderBy('nome')
-            ->pluck('nome')
-            ->all();
+        $nomes = app(FonteDeMunicipios::class)->daUnidadeFederativa($this->filial_estado);
 
-        $mapa = array_combine($nomes, $nomes);
-
-        if ($this->filial_cidade !== '' && ! array_key_exists($this->filial_cidade, $mapa)) {
-            $mapa = [$this->filial_cidade => $this->filial_cidade] + $mapa;
+        if ($this->filial_cidade !== '' && ! in_array($this->filial_cidade, $nomes, true)) {
+            array_unshift($nomes, $this->filial_cidade);
         }
 
-        return $mapa;
+        return array_combine($nomes, $nomes);
     }
 
     /** Ao trocar a UF, limpa a cidade (ficaria de outra UF) e o cache de municípios. */

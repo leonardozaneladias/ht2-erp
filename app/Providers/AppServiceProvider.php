@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\Referencia\FonteDeCargos;
+use App\Contracts\Referencia\FonteDeMunicipios;
+use App\Contracts\Referencia\FonteDeUnidadesFederativas;
 use App\Http\Middleware\AdminAuthenticate;
 use App\Models\Activity;
 use App\Models\AdminUser;
@@ -12,6 +15,7 @@ use App\Policies\AdminUserPolicy;
 use App\Policies\PermissionGrantPolicy;
 use App\Policies\RolePolicy;
 use App\Services\Admin\AccessResolver;
+use App\Services\Admin\Referencia\CatalogoDeLocalidades;
 use App\Services\Admin\Settings\SettingsRuntimeApplier;
 use App\Support\Documents\GeradorNumeroDocumento;
 use App\Support\Impersonation\ImpersonationContext;
@@ -36,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registrarCatalogos();
+
         Model::preventLazyLoading(! app()->isProduction());
 
         // Contribuições das extensões (permissões e menu). Roda aqui, e não no
@@ -89,5 +95,20 @@ class AppServiceProvider extends ServiceProvider
             'admin.password.reset',
             ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()],
         ));
+    }
+
+    /**
+     * Fontes de catálogo de localidades.
+     *
+     * Registradas aqui enquanto os catálogos moram no core. Quando saírem para
+     * ht2ml/localizacao-br, o binding vai com eles e o core passa a rodar sem
+     * fonte alguma — os formulários degradam para texto livre, que é o que a
+     * coluna sempre foi no banco.
+     */
+    private function registrarCatalogos(): void
+    {
+        $this->app->singleton(FonteDeUnidadesFederativas::class, CatalogoDeLocalidades::class);
+        $this->app->singleton(FonteDeMunicipios::class, CatalogoDeLocalidades::class);
+        $this->app->singleton(FonteDeCargos::class, CatalogoDeLocalidades::class);
     }
 }
