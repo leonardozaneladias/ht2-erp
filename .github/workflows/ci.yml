@@ -1,10 +1,26 @@
 name: CI
 
 on:
+    # Sem globs de branch de trabalho aqui: o gatilho de pull_request já cobre
+    # toda branch com PR aberto, e listá-la nos dois faria a mesma commit rodar
+    # duas vezes. (Os globs anteriores — feature/** e bugfix/** — não casavam
+    # com a convenção do projeto, que é feat/, fix/, chore/, docs/, refactor/,
+    # então a execução dupla não chegou a acontecer. Foi sorte, não desenho.)
     push:
-        branches: [main, develop, 'feature/**', 'bugfix/**']
+        branches: [main, develop]
     pull_request:
         branches: [main, develop]
+
+# Um push novo torna o run anterior da mesma branch inútil — ninguém lê o
+# resultado de um commit que já foi substituído. Sem isto, o Dependabot (que
+# rebaseia e força push) chegou a deixar 4 execuções vivas do mesmo PR.
+#
+# A main é a exceção: com required_status_checks.strict = false, a branch não
+# precisa estar atualizada antes do merge, então o run pós-merge é a única coisa
+# que testa a combinação real de dois PRs. Esse não se cancela.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+    cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
     quality:
