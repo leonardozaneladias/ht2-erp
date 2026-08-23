@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
+use App\Enums\Referencia\OrigemRegistro;
 use App\Models\Concerns\Auditavel;
+use App\Models\Concerns\TemOrigem;
+use App\Models\Contracts\TemOrigemDeclarada;
 use App\Models\Contracts\UsaSoftDeletes;
 use Database\Factories\Referencia\PaisFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,9 +23,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $codigo_numerico
  * @property string $nome
  * @property bool $ativo
+ * @property OrigemRegistro $origem
  * @property \Illuminate\Support\Carbon|null $deleted_at
  */
-class Pais extends Model implements UsaSoftDeletes
+class Pais extends Model implements TemOrigemDeclarada, UsaSoftDeletes
 {
     use Auditavel;
 
@@ -30,6 +34,7 @@ class Pais extends Model implements UsaSoftDeletes
     use HasFactory;
 
     use SoftDeletes;
+    use TemOrigem;
 
     protected $table = 'paises';
 
@@ -44,6 +49,6 @@ class Pais extends Model implements UsaSoftDeletes
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['ativo' => 'boolean'];
+        return ['ativo' => 'boolean', 'origem' => OrigemRegistro::class];
     }
 }

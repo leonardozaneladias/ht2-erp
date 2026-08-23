@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Cfop;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class CfopPolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('cfops.listar');
@@ -26,12 +29,14 @@ class CfopPolicy
 
     public function update(AdminUser $auth, Cfop $registro): bool
     {
-        return $auth->can('cfops.editar');
+        return $this->editavel($registro)
+            && $auth->can('cfops.editar');
     }
 
     public function delete(AdminUser $auth, Cfop $registro): bool
     {
-        return $auth->can('cfops.deletar');
+        return $this->editavel($registro)
+            && $auth->can('cfops.deletar');
     }
 
     public function restore(AdminUser $auth, Cfop $registro): bool
@@ -41,6 +46,7 @@ class CfopPolicy
 
     public function forceDelete(AdminUser $auth, Cfop $registro): bool
     {
-        return $auth->can('cfops.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('cfops.excluir_permanente');
     }
 }

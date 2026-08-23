@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\TipoLogradouro;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class TipoLogradouroPolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('tipos_logradouro.listar');
@@ -26,12 +29,14 @@ class TipoLogradouroPolicy
 
     public function update(AdminUser $auth, TipoLogradouro $registro): bool
     {
-        return $auth->can('tipos_logradouro.editar');
+        return $this->editavel($registro)
+            && $auth->can('tipos_logradouro.editar');
     }
 
     public function delete(AdminUser $auth, TipoLogradouro $registro): bool
     {
-        return $auth->can('tipos_logradouro.deletar');
+        return $this->editavel($registro)
+            && $auth->can('tipos_logradouro.deletar');
     }
 
     public function restore(AdminUser $auth, TipoLogradouro $registro): bool
@@ -41,6 +46,7 @@ class TipoLogradouroPolicy
 
     public function forceDelete(AdminUser $auth, TipoLogradouro $registro): bool
     {
-        return $auth->can('tipos_logradouro.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('tipos_logradouro.excluir_permanente');
     }
 }

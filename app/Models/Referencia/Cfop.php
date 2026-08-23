@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
+use App\Enums\Referencia\OrigemRegistro;
 use App\Enums\Referencia\TipoCfop;
 use App\Models\Concerns\Auditavel;
+use App\Models\Concerns\TemOrigem;
+use App\Models\Contracts\TemOrigemDeclarada;
 use App\Models\Contracts\UsaSoftDeletes;
 use Database\Factories\Referencia\CfopFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,8 +25,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property TipoCfop $tipo
  * @property string|null $aplicacao
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property OrigemRegistro $origem
  */
-class Cfop extends Model implements UsaSoftDeletes
+class Cfop extends Model implements TemOrigemDeclarada, UsaSoftDeletes
 {
     use Auditavel;
 
@@ -31,6 +35,7 @@ class Cfop extends Model implements UsaSoftDeletes
     use HasFactory;
 
     use SoftDeletes;
+    use TemOrigem;
 
     protected $table = 'cfops';
 
@@ -45,6 +50,6 @@ class Cfop extends Model implements UsaSoftDeletes
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['tipo' => TipoCfop::class];
+        return ['tipo' => TipoCfop::class, 'origem' => OrigemRegistro::class];
     }
 }

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
+use App\Enums\Referencia\OrigemRegistro;
 use App\Models\Concerns\Auditavel;
+use App\Models\Concerns\TemOrigem;
+use App\Models\Contracts\TemOrigemDeclarada;
 use App\Models\Contracts\UsaSoftDeletes;
 use Database\Factories\Referencia\NcmFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,8 +21,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $codigo
  * @property string $descricao
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property OrigemRegistro $origem
  */
-class Ncm extends Model implements UsaSoftDeletes
+class Ncm extends Model implements TemOrigemDeclarada, UsaSoftDeletes
 {
     use Auditavel;
 
@@ -27,6 +31,7 @@ class Ncm extends Model implements UsaSoftDeletes
     use HasFactory;
 
     use SoftDeletes;
+    use TemOrigem;
 
     protected $table = 'ncms';
 
@@ -36,5 +41,11 @@ class Ncm extends Model implements UsaSoftDeletes
     protected static function newFactory(): NcmFactory
     {
         return NcmFactory::new();
+    }
+
+    /** @return array<string, string> */
+    protected function casts(): array
+    {
+        return ['origem' => OrigemRegistro::class];
     }
 }

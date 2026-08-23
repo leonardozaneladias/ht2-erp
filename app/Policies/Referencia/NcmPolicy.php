@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Ncm;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class NcmPolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('ncms.listar');
@@ -26,12 +29,14 @@ class NcmPolicy
 
     public function update(AdminUser $auth, Ncm $registro): bool
     {
-        return $auth->can('ncms.editar');
+        return $this->editavel($registro)
+            && $auth->can('ncms.editar');
     }
 
     public function delete(AdminUser $auth, Ncm $registro): bool
     {
-        return $auth->can('ncms.deletar');
+        return $this->editavel($registro)
+            && $auth->can('ncms.deletar');
     }
 
     public function restore(AdminUser $auth, Ncm $registro): bool
@@ -41,6 +46,7 @@ class NcmPolicy
 
     public function forceDelete(AdminUser $auth, Ncm $registro): bool
     {
-        return $auth->can('ncms.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('ncms.excluir_permanente');
     }
 }

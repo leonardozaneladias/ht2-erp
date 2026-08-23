@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\Referencia;
 
+use App\Enums\Referencia\OrigemRegistro;
 use App\Models\Concerns\Auditavel;
+use App\Models\Concerns\TemOrigem;
+use App\Models\Contracts\TemOrigemDeclarada;
 use App\Models\Contracts\UsaSoftDeletes;
 use Database\Factories\Referencia\CnaeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,8 +25,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $grupo
  * @property string|null $classe
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property OrigemRegistro $origem
  */
-class Cnae extends Model implements UsaSoftDeletes
+class Cnae extends Model implements TemOrigemDeclarada, UsaSoftDeletes
 {
     use Auditavel;
 
@@ -31,6 +35,7 @@ class Cnae extends Model implements UsaSoftDeletes
     use HasFactory;
 
     use SoftDeletes;
+    use TemOrigem;
 
     protected $table = 'cnaes';
 
@@ -40,5 +45,11 @@ class Cnae extends Model implements UsaSoftDeletes
     protected static function newFactory(): CnaeFactory
     {
         return CnaeFactory::new();
+    }
+
+    /** @return array<string, string> */
+    protected function casts(): array
+    {
+        return ['origem' => OrigemRegistro::class];
     }
 }

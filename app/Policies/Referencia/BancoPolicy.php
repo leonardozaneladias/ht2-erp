@@ -6,9 +6,12 @@ namespace App\Policies\Referencia;
 
 use App\Models\AdminUser;
 use App\Models\Referencia\Banco;
+use App\Policies\Referencia\Concerns\ProtegeRegistroSincronizado;
 
 class BancoPolicy
 {
+    use ProtegeRegistroSincronizado;
+
     public function viewAny(AdminUser $auth): bool
     {
         return $auth->can('bancos.listar');
@@ -26,12 +29,14 @@ class BancoPolicy
 
     public function update(AdminUser $auth, Banco $registro): bool
     {
-        return $auth->can('bancos.editar');
+        return $this->editavel($registro)
+            && $auth->can('bancos.editar');
     }
 
     public function delete(AdminUser $auth, Banco $registro): bool
     {
-        return $auth->can('bancos.deletar');
+        return $this->editavel($registro)
+            && $auth->can('bancos.deletar');
     }
 
     public function restore(AdminUser $auth, Banco $registro): bool
@@ -41,6 +46,7 @@ class BancoPolicy
 
     public function forceDelete(AdminUser $auth, Banco $registro): bool
     {
-        return $auth->can('bancos.excluir_permanente');
+        return $this->editavel($registro)
+            && $auth->can('bancos.excluir_permanente');
     }
 }
