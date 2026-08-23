@@ -29,6 +29,11 @@ return new class extends Migration
     public function up(): void
     {
         foreach (self::TABELAS as $tabela) {
+            // Catálogos extraídos para extensão podem não estar instalados.
+            if (! Schema::hasTable($tabela)) {
+                continue;
+            }
+
             Schema::table($tabela, function (Blueprint $table): void {
                 $table->string('origem', 10)
                     ->default('sync')
@@ -41,6 +46,10 @@ return new class extends Migration
     public function down(): void
     {
         foreach (self::TABELAS as $tabela) {
+            if (! Schema::hasTable($tabela)) {
+                continue;
+            }
+
             Schema::table($tabela, function (Blueprint $table): void {
                 $table->dropColumn('origem');
             });

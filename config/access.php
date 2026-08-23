@@ -353,27 +353,6 @@ return [
             'tipos_logradouro.deletar' => ['label' => 'Excluir tipos de logradouro', 'descricao' => 'Mover tipos de logradouro para a lixeira.'],
             'tipos_logradouro.restaurar' => ['label' => 'Restaurar tipos de logradouro', 'descricao' => 'Restaurar tipos de logradouro da lixeira.'],
             'tipos_logradouro.excluir_permanente' => ['label' => 'Excluir tipos de logradouro permanentemente', 'descricao' => 'Remover tipos de logradouro definitivamente (irreversível).'],
-
-            'cnaes.listar' => ['label' => 'Listar CNAEs', 'descricao' => 'Ver o catálogo de CNAEs.'],
-            'cnaes.criar' => ['label' => 'Criar CNAEs', 'descricao' => 'Cadastrar novos CNAEs.'],
-            'cnaes.editar' => ['label' => 'Editar CNAEs', 'descricao' => 'Alterar dados de CNAEs.'],
-            'cnaes.deletar' => ['label' => 'Excluir CNAEs', 'descricao' => 'Mover CNAEs para a lixeira.'],
-            'cnaes.restaurar' => ['label' => 'Restaurar CNAEs', 'descricao' => 'Restaurar CNAEs da lixeira.'],
-            'cnaes.excluir_permanente' => ['label' => 'Excluir CNAEs permanentemente', 'descricao' => 'Remover CNAEs definitivamente (irreversível).'],
-
-            'cfops.listar' => ['label' => 'Listar CFOPs', 'descricao' => 'Ver o catálogo de CFOPs.'],
-            'cfops.criar' => ['label' => 'Criar CFOPs', 'descricao' => 'Cadastrar novos CFOPs.'],
-            'cfops.editar' => ['label' => 'Editar CFOPs', 'descricao' => 'Alterar dados de CFOPs.'],
-            'cfops.deletar' => ['label' => 'Excluir CFOPs', 'descricao' => 'Mover CFOPs para a lixeira.'],
-            'cfops.restaurar' => ['label' => 'Restaurar CFOPs', 'descricao' => 'Restaurar CFOPs da lixeira.'],
-            'cfops.excluir_permanente' => ['label' => 'Excluir CFOPs permanentemente', 'descricao' => 'Remover CFOPs definitivamente (irreversível).'],
-
-            'ncms.listar' => ['label' => 'Listar NCMs', 'descricao' => 'Ver o catálogo de NCMs.'],
-            'ncms.criar' => ['label' => 'Criar NCMs', 'descricao' => 'Cadastrar novos NCMs.'],
-            'ncms.editar' => ['label' => 'Editar NCMs', 'descricao' => 'Alterar dados de NCMs.'],
-            'ncms.deletar' => ['label' => 'Excluir NCMs', 'descricao' => 'Mover NCMs para a lixeira.'],
-            'ncms.restaurar' => ['label' => 'Restaurar NCMs', 'descricao' => 'Restaurar NCMs da lixeira.'],
-            'ncms.excluir_permanente' => ['label' => 'Excluir NCMs permanentemente', 'descricao' => 'Remover NCMs definitivamente (irreversível).'],
             // catálogos de referência adicionais entram acima desta linha
         ],
 

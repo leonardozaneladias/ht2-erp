@@ -30,7 +30,7 @@ final class ReferenciaSyncCommand extends Command
         $conjuntos = $this->conjuntosSelecionados();
 
         if ($conjuntos === []) {
-            $this->error('Nenhum conjunto reconhecido. Disponíveis: ' . implode(', ', array_keys(DadosReferenciaSeeder::CONJUNTOS)));
+            $this->error('Nenhum conjunto reconhecido. Disponíveis: ' . implode(', ', array_keys(DadosReferenciaSeeder::conjuntos())));
 
             return self::FAILURE;
         }
@@ -81,9 +81,9 @@ final class ReferenciaSyncCommand extends Command
         $filtro = array_map('strtolower', (array) $this->argument('conjunto'));
 
         if ($filtro === []) {
-            return DadosReferenciaSeeder::CONJUNTOS;
+            return DadosReferenciaSeeder::conjuntos();
         }
 
-        return array_intersect_key(DadosReferenciaSeeder::CONJUNTOS, array_flip($filtro));
+        return array_intersect_key(DadosReferenciaSeeder::conjuntos(), array_flip($filtro));
     }
 }

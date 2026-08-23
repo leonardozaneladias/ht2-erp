@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Referencia;
 
-use Database\Seeders\Referencia\Support\CsvReferenceSeeder;
+use App\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Países (ISO 3166-1, fonte IBGE). CSV: `codigo_iso2,codigo_iso3,codigo_numerico,nome`.
