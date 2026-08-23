@@ -11,7 +11,10 @@
         @yield ('titulo')
         | {{ config('app.name') }}
     </title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}" />
+    {{-- Estático de propósito: página de erro não deve depender de settings do
+         banco para renderizar. `public/favicon.ico` nunca existiu — o arquivo
+         real é `public/images/favicon.ico`, e isto respondia 404 desde sempre. --}}
+    <link rel="icon" href="{{ asset('images/favicon.ico') }}" />
 
     <x-admin.partials.theme-bootstrap />
 
