@@ -168,7 +168,7 @@ it('com soft-delete, os tokens e blocos de lixeira são preenchidos', function (
     $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], softDelete: true);
     $tokens = $spec->tokens();
 
-    expect($tokens['__USE_COM_LIXEIRA__'])->toBe('use App\Livewire\Concerns\ComLixeira;')
+    expect($tokens['__USE_COM_LIXEIRA__'])->toBe('use HT2ML\Core\Livewire\Concerns\ComLixeira;')
         ->and($tokens['__TRAIT_COM_LIXEIRA__'])->toBe('use ComLixeira;')
         ->and($tokens['__DS_LIXEIRA_OPEN__'])->toBe('$this->aplicarLixeira(')
         ->and($tokens['__DS_LIXEIRA_CLOSE__'])->toBe(')')

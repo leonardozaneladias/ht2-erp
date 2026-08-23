@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Rules\Cpf;
+use HT2ML\Core\Rules\Cpf;
 use Illuminate\Support\Facades\Validator;
 
 describe('Cpf Rule', function (): void {

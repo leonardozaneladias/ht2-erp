@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Empresas;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
-use App\Livewire\Concerns\ComLixeira;
 use App\Livewire\Concerns\ExportaPdf;
 use App\Models\Empresa;
 use App\Support\Tenancy\TenantContext;
+use HT2ML\Core\Livewire\Concerns\ComLixeira;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

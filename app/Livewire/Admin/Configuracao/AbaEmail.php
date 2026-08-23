@@ -6,9 +6,9 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveEmailSettingsAction;
 use App\DTOs\Admin\Settings\EmailSettingsDTO;
-use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Services\Admin\Settings\SmtpTester;
 use App\Settings\EmailSettings;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Throwable;

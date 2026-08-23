@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Concerns;
+namespace HT2ML\Core\Livewire\Concerns;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * uma vez normalizados, revelaram-se O MESMO ARQUIVO: variavam em três tokens — o docblock
  * do $row, o nome do evento que abre a ficha, e a rota de edição. Nada mais.
  *
- * Aqui a view é uma só (`livewire.admin.partials.grid-acoes`) e os três tokens viram dois
+ * Aqui a view é uma só (`core::livewire.admin.partials.grid-acoes`) e os três tokens viram dois
  * métodos declarados pelo componente. Não são deriváveis do `tableName`: o nome do
  * componente, o do evento e o da rota divergem com frequência (mais ainda em módulos-pacote,
  * onde o componente é prefixado pelo namespace do pacote e a rota não).
@@ -35,7 +35,7 @@ trait ComAcoesCrud
             return null;
         }
 
-        return view('livewire.admin.partials.grid-acoes', [
+        return view('core::livewire.admin.partials.grid-acoes', [
             'row' => $row,
             'verLixeira' => $this->verLixeira,
             'eventoVer' => $this->eventoVer(),

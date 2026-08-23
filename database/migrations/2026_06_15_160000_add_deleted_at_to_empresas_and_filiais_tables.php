@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Schema;
  * `ativo`: `ativo` liga/desliga o operacional (segue visível), `deleted_at` move
  * para a lixeira (some, restaurável). Empresa: guardas impedem excluir a ativa
  * ou a última; a cascata física só ocorre no force-delete. Filial: lixeira gerida
- * dentro de Empresas. Ver App\Livewire\Concerns\ComLixeira.
+ * dentro de Empresas. Ver HT2ML\Core\Livewire\Concerns\ComLixeira.
  */
 return new class extends Migration
 {

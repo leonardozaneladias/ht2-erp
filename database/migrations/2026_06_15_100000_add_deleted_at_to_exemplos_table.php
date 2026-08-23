@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Soft-delete (lixeira) para o módulo Exemplo. `deleted_at` é independente do
  * status operacional do registro: move para a lixeira (some da listagem, mas é
- * restaurável), sem se confundir com liga/desliga. Ver App\Livewire\Concerns\ComLixeira.
+ * restaurável), sem se confundir com liga/desliga. Ver HT2ML\Core\Livewire\Concerns\ComLixeira.
  */
 return new class extends Migration
 {

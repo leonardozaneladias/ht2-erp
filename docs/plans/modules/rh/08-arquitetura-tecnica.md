@@ -122,7 +122,7 @@ Tokens: `nome:tipo:modificador1:modificador2`. Vírgula separa campos; `enum(a|b
 | `date` / `datetime`                        | `date` / `timestamp`              | `'date'`                                     |
 | `email`                                    | `string`                          | `'email:rfc','max:191'`                      |
 | `url`                                      | `string`                          | `'url','max:255'`                            |
-| `cnpj` / `cpf` / `cep` / `phone` / `color` | `string(18/14/9/20/9)`            | regra dedicada (`new \App\Rules\Cpf()` etc.) |
+| `cnpj` / `cpf` / `cep` / `phone` / `color` | `string(18/14/9/20/9)`            | regra dedicada (`new \HT2ML\Core\Rules\Cpf()` etc.) |
 | `enum(a\|b\|c)`                            | `string` (+ CHECK — ajuste à mão) | enum cast (se `status`: enum de status)      |
 | `multiselect(a\|b\|c)`                     | `json`                            | `'array'`                                    |
 
@@ -279,7 +279,7 @@ Mesma stack do módulo **Exemplo** (`app/Models/Exemplo.php`, `app/Livewire/Admi
 | **Model**                      | Eloquent + traits `Auditavel` + `BelongsToEmpresa` + `SoftDeletes` (impl. `UsaSoftDeletes`), `casts()`, relações, `atributosNaoAuditados()` (PII) | `HT2ML\Rh\Models\Funcionario` (casts de enums/datas/`MoneyCast`; PII fora de auditoria)                          |
 | **Enum (backed)**              | Domínio finito + `label()`/`options()`/`variant()` + lógica; coluna `VARCHAR` + CHECK + cast no model                                             | `StatusFuncionario` (`isAtivo()`), `TipoHoraExtra` (`fatorPadraoBps(): int`)                                      |
 | **DTO (readonly)**             | Transporte entre camadas; `fromArray()` + `paraModel()`; nunca array genérico                                                                     | `FuncionarioDTO`, `HoraExtraDTO`                                                                                  |
-| **FormRequest + Rules**        | Validação de input (nunca no controller/componente); `unique` por tenant                                                                          | `StoreFuncionarioRequest` + `FuncionarioRules` (`Rule::unique()->where('empresa_id', …)`, `new \App\Rules\Cpf()`) |
+| **FormRequest + Rules**        | Validação de input (nunca no controller/componente); `unique` por tenant                                                                          | `StoreFuncionarioRequest` + `FuncionarioRules` (`Rule::unique()->where('empresa_id', …)`, `new \HT2ML\Core\Rules\Cpf()`) |
 | **Action (`execute()`)**       | Operação atômica, transacional; recebe DTO; retorna model/DTO                                                                                     | `CreateFuncionarioAction`, `RegistrarEventoFuncionalAction` (à mão), `AprovarHoraExtraAction` (à mão)             |
 | **Service (API-ready)**        | Regra reutilizável; **nunca** recebe `Request`; **nunca** retorna view/redirect/json                                                              | `EscopoOrganograma` (subárvore), `CalculoHoraExtraService` (snapshot)                                             |
 | **Policy**                     | Autorização por recurso, mapeando `rh.*`                                                                                                          | `FuncionarioPolicy` (`viewAny`→`rh.funcionarios.listar`, `delete`→`rh.funcionarios.deletar`, …)                   |

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\FiscalBr\Livewire;
 
-use App\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\FiscalBr\Actions\CreateCfopAction;
 use HT2ML\FiscalBr\Actions\UpdateCfopAction;
 use HT2ML\FiscalBr\DTOs\CfopDTO;

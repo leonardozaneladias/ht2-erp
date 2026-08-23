@@ -6,9 +6,9 @@ namespace App\Livewire\Admin\Configuracao;
 
 use App\Actions\Admin\Settings\SaveLoginSettingsAction;
 use App\DTOs\Admin\Settings\LoginSettingsDTO;
-use App\Livewire\Concerns\EmiteNotificacoes;
 use App\Services\Admin\Settings\SettingsFileUploadService;
 use App\Settings\LoginSettings;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;

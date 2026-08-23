@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Livewire\Concerns\ComLixeira;
 use App\Models\Referencia\TipoLogradouro;
+use HT2ML\Core\Livewire\Concerns\ComLixeira;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Column;

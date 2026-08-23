@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Referencia;
 
 use App\Enums\Referencia\RegiaoBrasil;
-use App\Livewire\Concerns\ComAcoesCrud;
-use App\Livewire\Concerns\ComLixeira;
 use App\Models\Referencia\Estado;
+use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
+use HT2ML\Core\Livewire\Concerns\ComLixeira;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use PowerComponents\LivewirePowerGrid\Column;

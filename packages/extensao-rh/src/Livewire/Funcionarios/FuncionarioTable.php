@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace HT2ML\Rh\Livewire\Funcionarios;
 
 use App\DTOs\Admin\Export\ExportavelDTO;
-use App\Livewire\Concerns\ComLixeira;
 use App\Livewire\Concerns\ExportaPdf;
 use App\Livewire\Concerns\FiltraPorMultiEmpresa;
+use HT2ML\Core\Livewire\Concerns\ComLixeira;
 use HT2ML\Rh\Enums\StatusFuncionario;
 use HT2ML\Rh\Models\Funcionario;
 use Illuminate\Contracts\View\View;

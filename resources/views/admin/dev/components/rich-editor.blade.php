@@ -10,7 +10,7 @@
                 name="exemplo"
                 label="Mensagem"
                 :value="'<p>Olá, <strong>time</strong>! Este é um <em>comunicado</em> de exemplo.</p><ul><li>Item um</li><li>Item dois</li></ul>'"
-                hint="O conteúdo é sanitizado no servidor (App\Support\Html\HtmlSanitizer) antes de persistir e exibir."
+                hint="O conteúdo é sanitizado no servidor (HT2ML\Core\Support\Html\HtmlSanitizer) antes de persistir e exibir."
             />
         </x-shared.card>
 

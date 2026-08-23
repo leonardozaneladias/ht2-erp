@@ -80,7 +80,7 @@
 
     {{--
         Notificações que sobrevivem a um redirect (sessão flash). Fonte canônica:
-        a chave `notify` (App\Livewire\Concerns\EmiteNotificacoes::notificarAposRedirect).
+        a chave `notify` (HT2ML\Core\Livewire\Concerns\EmiteNotificacoes::notificarAposRedirect).
         As chaves soltas success/error/warning/info/status cobrem fluxos legados/externos
         (auth, middleware) e não levam título. Componentes que permanecem na página
         devem usar $this->notificarSucesso()/notificarErro() (evento `toast`).

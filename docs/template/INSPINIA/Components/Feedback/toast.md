@@ -37,7 +37,7 @@ Configurações — sem tocar em código.
 Em qualquer componente Livewire, use o trait:
 
 ```php
-use App\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 
 class FormPedido extends Component
 {

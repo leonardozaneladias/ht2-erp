@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Support\Html;
+namespace HT2ML\Core\Support\Html;
 
 use HTMLPurifier;
 use HTMLPurifier_Config;

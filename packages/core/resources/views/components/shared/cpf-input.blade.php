@@ -6,7 +6,7 @@
 ])
 
 {{-- Além da máscara, o dígito verificador é conferido no cliente (admin/validators.js):
-     um CPF impossível (111.111.111-11) deixa de custar um round-trip. O App\Rules\Cpf
+     um CPF impossível (111.111.111-11) deixa de custar um round-trip. O HT2ML\Core\Rules\Cpf
      segue sendo a autoridade no servidor — o cliente só antecipa o veredito. --}}
 <x-shared.masked-input
     :name="$name"

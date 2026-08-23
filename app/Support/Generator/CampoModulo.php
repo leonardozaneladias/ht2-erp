@@ -270,7 +270,7 @@ final class CampoModulo
     public function usaRuleNaValidacao(): bool
     {
         // Rule::unique / Rule::enum / Rule::in (enum não-status também usa Rule::in).
-        // App\Rules\Cpf / Cnpj / Pis também são objetos, não strings.
+        // HT2ML\Core\Rules\Cpf / Cnpj / Pis também são objetos, não strings.
         return $this->unique || $this->ehEnum() || in_array($this->tipo, ['cpf', 'cnpj', 'pis'], true);
     }
 

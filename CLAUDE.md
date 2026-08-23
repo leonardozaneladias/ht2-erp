@@ -217,7 +217,7 @@ resources/views/livewire/admin/  ← Views dos componentes
 - Valores monetários: colunas `INTEGER` (centavos)
 - Índices em FKs, campos de filtro, status, datas
 - Status operacional via campo `ativo` (liga/desliga; o registro segue visível)
-- **Lixeira** via `deleted_at` (`SoftDeletes`), independente de `ativo`: excluir manda para a lixeira (some da listagem, restaurável). Trait genérico `App\Livewire\Concerns\ComLixeira`; 3 níveis de permissão por módulo (`deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete). Models implementam `HT2ML\Core\Models\Contracts\UsaSoftDeletes`. Ver [`docs/lixeira.md`](docs/lixeira.md).
+- **Lixeira** via `deleted_at` (`SoftDeletes`), independente de `ativo`: excluir manda para a lixeira (some da listagem, restaurável). Trait genérico `HT2ML\Core\Livewire\Concerns\ComLixeira`; 3 níveis de permissão por módulo (`deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete). Models implementam `HT2ML\Core\Models\Contracts\UsaSoftDeletes`. Ver [`docs/lixeira.md`](docs/lixeira.md).
 - `activity_log`: append-only (spatie/laravel-activitylog)
 
 ### Migrations de infra disponíveis (não alterar)

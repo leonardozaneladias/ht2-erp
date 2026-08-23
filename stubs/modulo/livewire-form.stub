@@ -8,7 +8,7 @@ use __NS_ACTIONS__\Create__MODULO_STUDLY__Action;
 use __NS_ACTIONS__\Update__MODULO_STUDLY__Action;
 use __NS_DTOS__\__MODULO_STUDLY__DTO;
 use __NS_REQUESTS__\__MODULO_STUDLY__Rules;
-use App\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;

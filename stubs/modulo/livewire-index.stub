@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace __NS_LIVEWIRE__;
 
-use App\Livewire\Concerns\ComFicha;
+use HT2ML\Core\Livewire\Concerns\ComFicha;
 use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;

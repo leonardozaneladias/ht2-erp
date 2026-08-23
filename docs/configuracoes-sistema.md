@@ -79,7 +79,7 @@ e aplicado no frontend por `NotificacaoService::paraJsConfig()` (injetado pelo p
 `x-admin.partials.notification-config` em `window.__notificacaoConfig`), lido por
 `resources/js/admin/toast.js` e `confirm.js`. A aba tem **preview ao vivo** (botões
 "Testar"). O disparo de toasts no backend é centralizado no trait
-`App\Livewire\Concerns\EmiteNotificacoes` (`notificarSucesso/Erro/Aviso/Info` e
+`HT2ML\Core\Livewire\Concerns\EmiteNotificacoes` (`notificarSucesso/Erro/Aviso/Info` e
 `notificarAposRedirect` para fluxos com redirect).
 
 ---
