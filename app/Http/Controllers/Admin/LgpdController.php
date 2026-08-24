@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\Admin\Lgpd\ExportarDadosUsuarioAction;
 use App\Http\Controllers\Controller;
 use Barryvdh\DomPDF\Facade\Pdf;
+use HT2ML\Core\Actions\Admin\Lgpd\ExportarDadosUsuarioAction;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;

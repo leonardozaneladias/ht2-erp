@@ -56,7 +56,7 @@
                 @foreach ($notificacoes as $notificacao)
                     @php
                         $dados = $notificacao->data;
-                        $tipo = \App\Enums\TipoNotificacao::tryFrom($dados['tipo'] ?? 'info') ?? \App\Enums\TipoNotificacao::Info;
+                        $tipo = \HT2ML\Core\Enums\TipoNotificacao::tryFrom($dados['tipo'] ?? 'info') ?? \HT2ML\Core\Enums\TipoNotificacao::Info;
                         $tone = $toneClasses[$tipo->variant()] ?? $toneClasses['info'];
                         $naoLida = $notificacao->read_at === null;
                     @endphp

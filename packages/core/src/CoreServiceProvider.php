@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace HT2ML\Core;
 
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -43,6 +45,48 @@ final class CoreServiceProvider extends ServiceProvider
         ], 'core-views');
 
         $this->registrarPolicies();
+        $this->registrarComandos();
+        $this->registrarListeners();
+    }
+
+    /**
+     * Registro EXPLÍCITO, mesma história das policies e dos comandos.
+     *
+     * O Laravel descobre listeners sozinho em app/Listeners. Dentro de um
+     * pacote não há descoberta: sem esta chamada o histórico de login
+     * simplesmente para de ser gravado, sem erro nenhum — e um relatório de
+     * segurança fica vazio sem que ninguém perceba.
+     *
+     * Ver tests/Feature/Core/ListenersDoCoreTest.php.
+     */
+    private function registrarListeners(): void
+    {
+        Event::listen(Login::class, Listeners\RegistrarLoginAdmin::class);
+    }
+
+    /**
+     * Registro EXPLÍCITO, pelo mesmo motivo das policies.
+     *
+     * O Laravel descobre comandos sozinho em app/Console/Commands. Dentro de um
+     * pacote não há descoberta: sem esta chamada os cinco comandos do núcleo
+     * — access:sync, access:expirar, referencia:sync, make:modulo e
+     * make:extensao — simplesmente somem do artisan, sem erro nenhum.
+     *
+     * Ver tests/Feature/Core/ComandosDoCoreTest.php, que falha se algum sumir.
+     */
+    private function registrarComandos(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->commands([
+            Console\Commands\AccessExpirarCommand::class,
+            Console\Commands\AccessSyncCommand::class,
+            Console\Commands\MakeExtensaoCommand::class,
+            Console\Commands\MakeModuloCommand::class,
+            Console\Commands\ReferenciaSyncCommand::class,
+        ]);
     }
 
     /**
@@ -63,5 +107,6 @@ final class CoreServiceProvider extends ServiceProvider
         Gate::policy(Models\AdminUser::class, Policies\AdminUserPolicy::class);
         Gate::policy(Models\Empresa::class, Policies\EmpresaPolicy::class);
         Gate::policy(Models\PermissionGrant::class, Policies\PermissionGrantPolicy::class);
+        Gate::policy(\Spatie\Permission\Models\Role::class, Policies\RolePolicy::class);
     }
 }

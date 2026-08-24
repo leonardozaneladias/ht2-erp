@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\Generator\Extensao;
+use HT2ML\Core\Support\Generator\Extensao;
 
 const CONFIG_FAKE = [
     'vendor' => 'ht2ml',

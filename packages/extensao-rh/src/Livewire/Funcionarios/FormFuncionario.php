@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Livewire\Funcionarios;
 
-use App\Models\Referencia\Cargo;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\Cargo;
 use HT2ML\Rh\Actions\CreateFuncionarioAction;
 use HT2ML\Rh\Actions\UpdateFuncionarioAction;
 use HT2ML\Rh\DTOs\FuncionarioDTO;

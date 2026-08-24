@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\TwoFactorChallenge;
-use App\Notifications\AlertaSegurancaNotification;
-use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;

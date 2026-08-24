@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auditoria;
 
-use App\Support\Audit\FormatadorDiff;
 use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Support\Audit\FormatadorDiff;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;

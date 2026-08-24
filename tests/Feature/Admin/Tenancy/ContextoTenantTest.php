@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\DefinirEmpresaAtivaAction;
-use App\Actions\Admin\DefinirFilialAtivaAction;
 use App\Http\Middleware\DefinirContextoTenant;
-use App\Support\Tenancy\TenantResolver;
+use HT2ML\Core\Actions\Admin\DefinirEmpresaAtivaAction;
+use HT2ML\Core\Actions\Admin\DefinirFilialAtivaAction;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
+use HT2ML\Core\Support\Tenancy\TenantResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

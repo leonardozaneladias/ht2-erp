@@ -28,7 +28,7 @@
 
     <x-admin.ficha-section title="Valores e vigência">
         <x-shared.field-display label="Preço">
-            {{ $registro->preco !== null ? \App\Support\Money\Money::fromCentavos((int) $registro->preco)->formatado() : '—' }}
+            {{ $registro->preco !== null ? \HT2ML\Core\Support\Money\Money::fromCentavos((int) $registro->preco)->formatado() : '—' }}
         </x-shared.field-display>
         <x-shared.field-display label="Custo">
             {{ $registro->custo !== null ? 'R$ ' . number_format((float) $registro->custo, 2, ',', '.') : '—' }}

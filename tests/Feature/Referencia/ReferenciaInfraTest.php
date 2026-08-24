@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Enums\Referencia\RegiaoBrasil;
-use App\Models\Referencia\Estado;
-use App\Models\Referencia\Municipio;
 use Database\Seeders\Referencia\EstadoSeeder;
+use HT2ML\Core\Enums\Referencia\RegiaoBrasil;
+use HT2ML\Core\Models\Referencia\Estado;
+use HT2ML\Core\Models\Referencia\Municipio;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;
 
@@ -59,4 +59,4 @@ it('referencia:sync com conjunto inexistente falha (FAILURE)', function () {
 
 arch('models de Referência não são tenant-scoped (sem BelongsToEmpresa)')
     ->expect('App\Models\Referencia')
-    ->not->toUse('App\Models\Concerns\BelongsToEmpresa');
+    ->not->toUse('HT2ML\Core\Models\Concerns\BelongsToEmpresa');

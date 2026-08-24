@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Support\Generator\CampoModulo;
-use App\Support\Generator\EspecificacaoModulo;
+use HT2ML\Core\Support\Generator\CampoModulo;
+use HT2ML\Core\Support\Generator\EspecificacaoModulo;
 
 /**
  * @param  list<string>  $tokens

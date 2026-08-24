@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Impersonation;
 
-use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
-use App\Exceptions\AccessException;
 use App\Livewire\Concerns\ConfirmsPassword;
+use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;

@@ -113,7 +113,7 @@ Núcleo `funcionarios` (dados pessoais + contratação, eSocial-ready) e filhas 
 
 ### RF-02 — Documentos com upload seguro → [03](03-cadastro-pessoa-documentos.md)
 
-`funcionario_documentos` (metadados) com binário no `Anexo` do core (`App\Models\Anexo`, relação polimórfica `anexavel`, disco privado por `disco`). Flags do tipo (`exige_numero/validade/orgao_emissor/arquivo/sensivel_lgpd`) dirigem o formulário. Relatório de "documentos a vencer" (índice em `data_validade`).
+`funcionario_documentos` (metadados) com binário no `Anexo` do core (`HT2ML\Core\Models\Anexo`, relação polimórfica `anexavel`, disco privado por `disco`). Flags do tipo (`exige_numero/validade/orgao_emissor/arquivo/sensivel_lgpd`) dirigem o formulário. Relatório de "documentos a vencer" (índice em `data_validade`).
 
 ### RF-03 — Catálogos configuráveis com seeds → [02](02-fase-1-blueprint.md)
 
@@ -214,8 +214,8 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 
 | #      | RNF                                    | Como é atendido                                                                                                                                                                                                                                                                                                                                                       |
 | ------ | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| RNF-01 | **Isolamento multi-tenant**            | Toda tabela de negócio tem `empresa_id` + trait `App\Models\Concerns\BelongsToEmpresa` (global scope `empresa`, auto-fill no `creating`); tenant ativo via `HT2ML\Core\Support\Tenancy\TenantContext` (sessão); `unique` sempre por empresa (índice parcial composto `WHERE deleted_at IS NULL`)                                                                             |
-| RNF-02 | **RBAC de 2 níveis + ACL hierárquica** | Papéis globais (spatie) **+** papéis por empresa (`admin_user_empresa_role`), resolvidos por `App\Services\Admin\AccessResolver` (super-admin faz bypass) **somados** à nova ACL de visibilidade por organograma (subárvore recursiva). A ACL **complementa**, não substitui, o RBAC                                                                                  |
+| RNF-01 | **Isolamento multi-tenant**            | Toda tabela de negócio tem `empresa_id` + trait `HT2ML\Core\Models\Concerns\BelongsToEmpresa` (global scope `empresa`, auto-fill no `creating`); tenant ativo via `HT2ML\Core\Support\Tenancy\TenantContext` (sessão); `unique` sempre por empresa (índice parcial composto `WHERE deleted_at IS NULL`)                                                                             |
+| RNF-02 | **RBAC de 2 níveis + ACL hierárquica** | Papéis globais (spatie) **+** papéis por empresa (`admin_user_empresa_role`), resolvidos por `HT2ML\Core\Services\Admin\AccessResolver` (super-admin faz bypass) **somados** à nova ACL de visibilidade por organograma (subárvore recursiva). A ACL **complementa**, não substitui, o RBAC                                                                                  |
 | RNF-03 | **LGPD**                               | PII fora do diff de auditoria (`atributosNaoAuditados()`); CID = dado de saúde (art. 11) com `encrypted` + permissão dedicada `rh.afastamentos.ver_cid`; financeiro (`conta`, `pix_chave`) e foto em disco privado/URL assinada; retenção trabalhista via soft-delete + eventos append-only; anonimização alinhada ao fluxo do core (`anonimizado_em` no `AdminUser`) |
 | RNF-04 | **Auditoria automática**               | Trait `HT2ML\Core\Models\Concerns\Auditavel` (spatie/activitylog) em todas as tabelas; `activity_log` append-only; PII nunca registrada                                                                                                                                                                                                                                      |
 | RNF-05 | **Performance**                        | Organograma via **CTE recursiva no PostgreSQL**; toda FK indexada; compostos quentes (`(empresa_id, gestor_id)`, `(funcionario_id, data)`, `(empresa_id, status)`); colunas "atuais" desnormalizadas em `funcionarios` evitam varrer o histórico; vigências abertas via `IS NULL` indexado                                                                            |
@@ -230,7 +230,7 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 
 ### 7.1 Premissas
 
-- O **core já provê**: tenancy (`BelongsToEmpresa`/`TenantContext`), RBAC de 2 níveis (`AccessResolver` + `admin_user_empresa_role`), auditoria (`Auditavel`), upload polimórfico (`App\Models\Anexo`), lixeira (`ComLixeira`/`UsaSoftDeletes`), registro de módulos-pacote (`ModuleRegistry`, ADR-0015) e o gerador `make:modulo --module=Rh`.
+- O **core já provê**: tenancy (`BelongsToEmpresa`/`TenantContext`), RBAC de 2 níveis (`AccessResolver` + `admin_user_empresa_role`), auditoria (`Auditavel`), upload polimórfico (`HT2ML\Core\Models\Anexo`), lixeira (`ComLixeira`/`UsaSoftDeletes`), registro de módulos-pacote (`ModuleRegistry`, ADR-0015) e o gerador `make:modulo --module=Rh`.
 - Referências globais já semeadas no core: `cargos` (CBO), `bancos`, `paises`, `estados`, `municipios`, `tipos_logradouro`.
 - `AdminUser` (guard `admin`) já tem `encrypted` cast (padrão `two_factor_secret`) e coluna LGPD `anonimizado_em` — reaproveitados pelo RH.
 - Greenfield: a Fase 1 cria as tabelas já completas; evoluções futuras seguem migrations aditivas (`add_<coluna>_to_<tabela>`).
@@ -248,10 +248,10 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 
 ### 7.3 Dependências (do core, não recriar)
 
-- `App\Services\Admin\AccessResolver` (precedência: super-admin > deny > grant > role) e comando `access:sync`.
+- `HT2ML\Core\Services\Admin\AccessResolver` (precedência: super-admin > deny > grant > role) e comando `access:sync`.
 - `HT2ML\Core\Support\Modules\ModuleRegistry` + config de permissões/menu (registro do pacote no `boot()`).
-- `App\Models\Anexo` (upload polimórfico, disco privado).
-- `App\Models\Concerns\BelongsToEmpresa` + `HT2ML\Core\Support\Tenancy\TenantContext`.
+- `HT2ML\Core\Models\Anexo` (upload polimórfico, disco privado).
+- `HT2ML\Core\Models\Concerns\BelongsToEmpresa` + `HT2ML\Core\Support\Tenancy\TenantContext`.
 - `HT2ML\Core\Livewire\Concerns\ComLixeira` + `HT2ML\Core\Models\Contracts\UsaSoftDeletes`.
 - `HT2ML\Core\Models\Concerns\Auditavel` (spatie/activitylog).
 - Gerador `make:modulo` com flag de pacote (`--module=Rh`) e `make:extensao` (casca do pacote).

@@ -17,7 +17,7 @@
 
 O contexto ativo é hidratado a cada requisição admin autenticada pelo middleware
 `App\Http\Middleware\DefinirContextoTenant`, que revalida o acesso e cai para a
-empresa padrão quando necessário. `App\Support\Tenancy\TenantResolver` decide as
+empresa padrão quando necessário. `HT2ML\Core\Support\Tenancy\TenantResolver` decide as
 empresas/filiais acessíveis (super-admin enxerga todas as ativas).
 
 A troca de empresa/filial acontece pelo seletor da topbar
@@ -38,7 +38,7 @@ $table->index('empresa_id');
 
 // model
 use HT2ML\Core\Models\Concerns\Auditavel;
-use App\Models\Concerns\BelongsToEmpresa;
+use HT2ML\Core\Models\Concerns\BelongsToEmpresa;
 
 class Cliente extends Model
 {

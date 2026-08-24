@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Models\Referencia\Estado;
-use App\Models\Referencia\Municipio;
 use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
 use HT2ML\Core\Livewire\Concerns\ComLixeira;
+use HT2ML\Core\Models\Referencia\Estado;
+use HT2ML\Core\Models\Referencia\Municipio;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use PowerComponents\LivewirePowerGrid\Column;

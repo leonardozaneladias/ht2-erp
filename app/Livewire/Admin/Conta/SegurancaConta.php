@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
-use App\Actions\Admin\Security\ConfirmEmailTwoFactorAction;
-use App\Actions\Admin\Security\ConfirmTwoFactorAction;
-use App\Actions\Admin\Security\DisableEmailTwoFactorAction;
-use App\Actions\Admin\Security\DisableTwoFactorAction;
-use App\Actions\Admin\Security\EnableTwoFactorAction;
-use App\Actions\Admin\Security\RegenerateRecoveryCodesAction;
 use App\Livewire\Concerns\ConfirmaSegundoFator;
-use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Actions\Admin\Security\ConfirmEmailTwoFactorAction;
+use HT2ML\Core\Actions\Admin\Security\ConfirmTwoFactorAction;
+use HT2ML\Core\Actions\Admin\Security\DisableEmailTwoFactorAction;
+use HT2ML\Core\Actions\Admin\Security\DisableTwoFactorAction;
+use HT2ML\Core\Actions\Admin\Security\EnableTwoFactorAction;
+use HT2ML\Core\Actions\Admin\Security\RegenerateRecoveryCodesAction;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 use HT2ML\Core\Settings\SegurancaSettings;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Contracts\View\View;
@@ -195,7 +195,7 @@ class SegurancaConta extends Component
         assert($guard instanceof \Illuminate\Auth\SessionGuard);
         $guard->logoutOtherDevices($this->senhaDesconectar);
 
-        app(\App\Services\Admin\AuditoriaSeguranca::class)->outrosDispositivosDesconectados($this->usuario());
+        app(\HT2ML\Core\Services\Admin\AuditoriaSeguranca::class)->outrosDispositivosDesconectados($this->usuario());
 
         $this->reset('senhaDesconectar');
         $this->notificarSucesso('Sessões em outros dispositivos foram encerradas.');

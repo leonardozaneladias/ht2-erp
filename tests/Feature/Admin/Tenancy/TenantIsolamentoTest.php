@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\Concerns\BelongsToEmpresa;
+use HT2ML\Core\Models\Concerns\BelongsToEmpresa;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Model;

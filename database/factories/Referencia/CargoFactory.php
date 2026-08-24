@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories\Referencia;
 
-use App\Models\Referencia\Cargo;
+use HT2ML\Core\Models\Referencia\Cargo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

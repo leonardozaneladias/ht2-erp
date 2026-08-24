@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
-use App\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;

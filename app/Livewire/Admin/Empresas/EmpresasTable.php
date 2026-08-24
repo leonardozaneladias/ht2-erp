@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Empresas;
 
-use App\DTOs\Admin\Export\ExportavelDTO;
 use App\Livewire\Concerns\ExportaPdf;
+use HT2ML\Core\DTOs\Admin\Export\ExportavelDTO;
 use HT2ML\Core\Livewire\Concerns\ComLixeira;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;

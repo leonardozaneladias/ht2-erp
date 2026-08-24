@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
-use App\Actions\Admin\Conta\AtualizarPerfilAction;
+use HT2ML\Core\Actions\Admin\Conta\AtualizarPerfilAction;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
@@ -51,7 +51,7 @@ class PerfilConta extends Component
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:min_width=128,min_height=128'],
         ]);
 
-        $action->execute($this->usuario(), \App\DTOs\Admin\PerfilContaDTO::fromArray($dados), $this->avatar);
+        $action->execute($this->usuario(), \HT2ML\Core\DTOs\Admin\PerfilContaDTO::fromArray($dados), $this->avatar);
         $this->reset('avatar');
 
         // Redirect com navigate re-renderiza o layout — a nova foto aparece

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\DTOs\Admin\Export\ExportavelDTO;
-use App\Exports\TabelaExport;
+use HT2ML\Core\DTOs\Admin\Export\ExportavelDTO;
+use HT2ML\Core\Exports\TabelaExport;
 
 test('TabelaExport retorna headings corretos', function () {
     $dto = new ExportavelDTO('Clientes', ['Nome', 'Email'], [['João', 'joao@ex.com']]);

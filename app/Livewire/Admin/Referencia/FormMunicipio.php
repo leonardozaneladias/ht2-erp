@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Actions\Admin\Referencia\CreateMunicipioAction;
-use App\Actions\Admin\Referencia\UpdateMunicipioAction;
-use App\DTOs\Admin\Referencia\MunicipioDTO;
 use App\Http\Requests\Admin\Referencia\MunicipioRules;
-use App\Models\Referencia\Estado;
-use App\Models\Referencia\Municipio;
+use HT2ML\Core\Actions\Admin\Referencia\CreateMunicipioAction;
+use HT2ML\Core\Actions\Admin\Referencia\UpdateMunicipioAction;
+use HT2ML\Core\DTOs\Admin\Referencia\MunicipioDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\Estado;
+use HT2ML\Core\Models\Referencia\Municipio;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

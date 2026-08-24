@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
-use App\Exceptions\AccessException;
+use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;

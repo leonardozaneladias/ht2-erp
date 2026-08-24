@@ -1,5 +1,5 @@
 @php
-    /** @var \App\DTOs\Admin\Export\ExportavelDTO $dados */
+    /** @var \HT2ML\Core\DTOs\Admin\Export\ExportavelDTO $dados */
     $geradoEm = now()->format('d/m/Y H:i');
 @endphp
 <!DOCTYPE html>

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Services\Admin\AuditoriaSeguranca;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Services\Admin\AuditoriaSeguranca;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

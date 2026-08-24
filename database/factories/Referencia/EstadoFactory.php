@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories\Referencia;
 
-use App\Enums\Referencia\RegiaoBrasil;
-use App\Models\Referencia\Estado;
+use HT2ML\Core\Enums\Referencia\RegiaoBrasil;
+use HT2ML\Core\Models\Referencia\Estado;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

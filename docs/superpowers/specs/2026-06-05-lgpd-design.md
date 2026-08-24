@@ -41,7 +41,7 @@ agendado e manual).
 
 ### Export (Action + controller + rotas)
 
-- **`App\Actions\Admin\Lgpd\ExportarDadosUsuarioAction::execute(AdminUser): array`** —
+- **`HT2ML\Core\Actions\Admin\Lgpd\ExportarDadosUsuarioAction::execute(AdminUser): array`** —
   monta a PII estruturada:
     - **perfil**: nome, email, avatar_url, last_login_at/ip, status do 2FA (booleano,
       **nunca** o secret), ativo, anonimizado_em, datas;
@@ -59,7 +59,7 @@ agendado e manual).
 
 ### Anonimização
 
-- **`App\Actions\Admin\Lgpd\AnonimizarUsuarioAction::execute(AdminUser $ator, AdminUser $alvo): void`**:
+- **`HT2ML\Core\Actions\Admin\Lgpd\AnonimizarUsuarioAction::execute(AdminUser $ator, AdminUser $alvo): void`**:
   guardas (não-self · não-super-admin · `HierarchyResolver::podeGerir` · não-já-anonimizado),
   em `DB::transaction`: `forceFill` com PII neutra (`nome`="Usuário anonimizado",
   `email`="anonimizado-{id}@removido.local", senha `Hash::make(Str::random(40))`,
@@ -83,7 +83,7 @@ agendado e manual).
   `config('activitylog.clean_after_days')`.
 - `routes/console.php`: `Schedule::command('activitylog:clean')->daily();` (requer
   `schedule:run` no cron — documentado).
-- **`App\Actions\Admin\Lgpd\ExpurgarLogsAction::execute(): void`** — roda o
+- **`HT2ML\Core\Actions\Admin\Lgpd\ExpurgarLogsAction::execute(): void`** — roda o
   `activitylog:clean` (`Artisan::call`) e loga `activity('lgpd')->event('logs-expurgados')`.
 - Botão "Expurgar logs antigos" em `IndexAuditoria`, visível só a super-admin → a Action.
 

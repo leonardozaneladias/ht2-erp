@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Lgpd\ExpurgarLogsAction;
 use App\Livewire\Admin\Auditoria\IndexAuditoria;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\Lgpd\ExpurgarLogsAction;
 use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;

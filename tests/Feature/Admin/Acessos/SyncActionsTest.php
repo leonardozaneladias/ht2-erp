@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\SyncPermissoesPerfilAction;
-use App\Actions\Admin\SyncRolesUsuarioAction;
-use App\DTOs\Admin\SyncPermissoesPerfilDTO;
-use App\DTOs\Admin\SyncRolesDTO;
-use App\Exceptions\AccessException;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\SyncPermissoesPerfilAction;
+use HT2ML\Core\Actions\Admin\SyncRolesUsuarioAction;
+use HT2ML\Core\DTOs\Admin\SyncPermissoesPerfilDTO;
+use HT2ML\Core\DTOs\Admin\SyncRolesDTO;
+use HT2ML\Core\Exceptions\AccessException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Configuracao;
 
-use App\Actions\Admin\Settings\SaveAppearanceSettingsAction;
-use App\Actions\Admin\Settings\SaveBrandingSettingsAction;
+use HT2ML\Core\Actions\Admin\Settings\SaveAppearanceSettingsAction;
+use HT2ML\Core\Actions\Admin\Settings\SaveBrandingSettingsAction;
 use HT2ML\Core\DTOs\Admin\Settings\AppearanceSettingsDTO;
 use HT2ML\Core\DTOs\Admin\Settings\BrandingSettingsDTO;
 use HT2ML\Core\Enums\Admin\Appearance\LayoutWidth;

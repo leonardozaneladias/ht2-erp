@@ -418,7 +418,7 @@ final class RegistrarLoginAdmin
 Imports:
 
 ```php
-use App\Listeners\RegistrarLoginAdmin;
+use HT2ML\Core\Listeners\RegistrarLoginAdmin;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
 ```
@@ -564,7 +564,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Conta;
 
-use App\Actions\Admin\Conta\AtualizarPerfilAction;
+use HT2ML\Core\Actions\Admin\Conta\AtualizarPerfilAction;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -772,7 +772,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Conta;
 
 use HT2ML\Core\Models\AdminUser;
-use App\Support\Settings\PasswordPolicy;
+use HT2ML\Core\Support\Settings\PasswordPolicy;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;

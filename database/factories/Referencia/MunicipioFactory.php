@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories\Referencia;
 
-use App\Models\Referencia\Estado;
-use App\Models\Referencia\Municipio;
+use HT2ML\Core\Models\Referencia\Estado;
+use HT2ML\Core\Models\Referencia\Municipio;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

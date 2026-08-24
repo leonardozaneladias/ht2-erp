@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\Referencia\TipoLogradouro $row */
+    /** @var \HT2ML\Core\Models\Referencia\TipoLogradouro $row */
     $ator = auth('admin')->user();
 @endphp
 

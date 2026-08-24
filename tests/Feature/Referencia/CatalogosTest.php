@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Models\Referencia\Banco;
-use App\Models\Referencia\Cargo;
-use App\Models\Referencia\Moeda;
-use App\Models\Referencia\TipoLogradouro;
 use Database\Seeders\Referencia\BancoSeeder;
 use Database\Seeders\Referencia\CargoSeeder;
 use Database\Seeders\Referencia\MoedaSeeder;
 use Database\Seeders\Referencia\TipoLogradouroSeeder;
+use HT2ML\Core\Models\Referencia\Banco;
+use HT2ML\Core\Models\Referencia\Cargo;
+use HT2ML\Core\Models\Referencia\Moeda;
+use HT2ML\Core\Models\Referencia\TipoLogradouro;
 use HT2ML\FiscalBr\Database\Seeders\CfopSeeder;
 use HT2ML\FiscalBr\Database\Seeders\CnaeSeeder;
 use HT2ML\FiscalBr\Database\Seeders\NcmSeeder;

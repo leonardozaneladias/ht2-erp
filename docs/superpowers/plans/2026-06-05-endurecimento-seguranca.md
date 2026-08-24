@@ -197,8 +197,8 @@ git commit -m "feat(admin): coluna bloqueado_ate e estaBloqueada no AdminUser"
 
 declare(strict_types=1);
 
-use App\Enums\TipoAlertaSeguranca;
-use App\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Enums\TipoAlertaSeguranca;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -260,7 +260,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
-use App\Enums\TipoAlertaSeguranca;
+use HT2ML\Core\Enums\TipoAlertaSeguranca;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -329,8 +329,8 @@ git commit -m "feat(admin): notification de alerta de segurança"
 
 declare(strict_types=1);
 
-use App\Notifications\AlertaSegurancaNotification;
-use App\Services\Admin\Security\AlertaSeguranca;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Services\Admin\Security\AlertaSeguranca;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -383,9 +383,9 @@ declare(strict_types=1);
 
 namespace App\Services\Admin\Security;
 
-use App\Enums\TipoAlertaSeguranca;
+use HT2ML\Core\Enums\TipoAlertaSeguranca;
 use HT2ML\Core\Models\AdminUser;
-use App\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Support\Facades\Notification;
 
@@ -465,7 +465,7 @@ git commit -m "feat(admin): serviço de alertas de segurança"
 
 declare(strict_types=1);
 
-use App\Services\Admin\Security\LimiteTentativas;
+use HT2ML\Core\Services\Admin\Security\LimiteTentativas;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -565,8 +565,8 @@ git commit -m "feat(admin): helper de rate-limit configurável"
 declare(strict_types=1);
 
 use HT2ML\Core\Models\AdminUser;
-use App\Notifications\AlertaSegurancaNotification;
-use App\Services\Admin\Security\ControleLockout;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Services\Admin\Security\ControleLockout;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -721,7 +721,7 @@ git commit -m "feat(admin): serviço de lockout de conta"
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\Login;
-use App\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -787,9 +787,9 @@ it('alerta no login de super-admin quando habilitado', function (): void {
 a) Adicionar imports (junto aos `use`, com seus usos abaixo):
 
 ```php
-use App\Services\Admin\Security\AlertaSeguranca;
-use App\Services\Admin\Security\ControleLockout;
-use App\Services\Admin\Security\LimiteTentativas;
+use HT2ML\Core\Services\Admin\Security\AlertaSeguranca;
+use HT2ML\Core\Services\Admin\Security\ControleLockout;
+use HT2ML\Core\Services\Admin\Security\LimiteTentativas;
 ```
 
 b) Substituir o corpo de `authenticate()` por (mantém a lógica de 2FA; troca o RateLimiter inline pelos serviços e adiciona as checagens):
@@ -898,8 +898,8 @@ git commit -m "feat(admin): login com lockout, status ativo e alerta de super-ad
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\TwoFactorChallenge;
-use App\Notifications\AlertaSegurancaNotification;
-use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -944,8 +944,8 @@ it('alerta no login com 2FA de super-admin quando habilitado', function (): void
 a) Adicionar imports:
 
 ```php
-use App\Services\Admin\Security\AlertaSeguranca;
-use App\Services\Admin\Security\LimiteTentativas;
+use HT2ML\Core\Services\Admin\Security\AlertaSeguranca;
+use HT2ML\Core\Services\Admin\Security\LimiteTentativas;
 ```
 
 b) No `verificar()`, trocar o bloco de rate-limit por `LimiteTentativas`:
@@ -1041,7 +1041,7 @@ it('throttla solicitações de reset após o limite', function (): void {
 - [ ] **Step 3: Instrumentar** — em `app/Livewire/Admin/Auth/ForgotPassword.php`, adicionar imports e o throttle no início de `sendLink()`:
 
 ```php
-use App\Services\Admin\Security\LimiteTentativas;
+use HT2ML\Core\Services\Admin\Security\LimiteTentativas;
 use Illuminate\Support\Str;
 ```
 
@@ -1172,8 +1172,8 @@ git commit -m "feat(admin): middleware derruba sessão de conta desativada"
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
-use App\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -1205,7 +1205,7 @@ it('alerta os super-admins ao iniciar uma personificação', function (): void {
 
 - [ ] **Step 3: Instrumentar** — em `app/Actions/Admin/Impersonation/IniciarImpersonationAction.php`:
 
-a) Adicionar `use App\Services\Admin\Security\AlertaSeguranca;` e injetar no construtor:
+a) Adicionar `use HT2ML\Core\Services\Admin\Security\AlertaSeguranca;` e injetar no construtor:
 
 ```php
     public function __construct(
@@ -1279,7 +1279,7 @@ it('super-admin desbloqueia uma conta', function (): void {
 a) Adicionar imports:
 
 ```php
-use App\Services\Admin\Security\ControleLockout;
+use HT2ML\Core\Services\Admin\Security\ControleLockout;
 use Livewire\Attributes\On;
 ```
 

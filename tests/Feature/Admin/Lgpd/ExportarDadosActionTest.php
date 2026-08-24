@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Lgpd\ExportarDadosUsuarioAction;
-use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Actions\Admin\Lgpd\ExportarDadosUsuarioAction;
+use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 

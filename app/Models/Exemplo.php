@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\StatusExemplo;
-use App\Models\Concerns\BelongsToEmpresa;
 use HT2ML\Core\Models\Concerns\Auditavel;
+use HT2ML\Core\Models\Concerns\BelongsToEmpresa;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use HT2ML\Core\Models\Filial;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -40,7 +40,7 @@
                         required
                     />
 
-                    @if ($publico === \App\Enums\PublicoComunicado::Papel->value)
+                    @if ($publico === \HT2ML\Core\Enums\PublicoComunicado::Papel->value)
                         <x-shared.select-search
                             name="papel"
                             label="Papel"

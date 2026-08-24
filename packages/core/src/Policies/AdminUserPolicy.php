@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Policies;
 
-use App\Services\Admin\HierarchyResolver;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Services\Admin\HierarchyResolver;
 
 class AdminUserPolicy
 {

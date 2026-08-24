@@ -21,8 +21,8 @@ Cada eixo responde a uma pergunta diferente, e os três são **ortogonais** — 
 
 | Eixo            | Pergunta que responde                                          | Mecanismo real (core)                                                                                                      | O que filtra                              |
 | --------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| **Tenant**      | "Este registro é da empresa em que estou?"                     | Global scope `empresa` do trait `App\Models\Concerns\BelongsToEmpresa`, alimentado por `HT2ML\Core\Support\Tenancy\TenantContext` | **Quais linhas** (por `empresa_id`)       |
-| **RBAC**        | "Eu posso executar **esta ação** (listar/ver/editar/aprovar)?" | `Gate` → `App\Services\Admin\AccessResolver` (super-admin bypass · deny > grant > role)                                    | **O verbo** (a ação inteira, não a linha) |
+| **Tenant**      | "Este registro é da empresa em que estou?"                     | Global scope `empresa` do trait `HT2ML\Core\Models\Concerns\BelongsToEmpresa`, alimentado por `HT2ML\Core\Support\Tenancy\TenantContext` | **Quais linhas** (por `empresa_id`)       |
+| **RBAC**        | "Eu posso executar **esta ação** (listar/ver/editar/aprovar)?" | `Gate` → `HT2ML\Core\Services\Admin\AccessResolver` (super-admin bypass · deny > grant > role)                                    | **O verbo** (a ação inteira, não a linha) |
 | **Organograma** | "Esta pessoa está **na minha subárvore** de subordinados?"     | Trait `HT2ML\Rh\Models\Concerns\VisivelNaHierarquia` + serviço `EscopoOrganograma` (CTE recursiva sobre `gestor_id`)      | **Quais linhas** (por posição na árvore)  |
 
 A distinção mais importante de toda a ACL deste módulo:
@@ -301,7 +301,7 @@ O `Funcionario` passa a compor os dois traits:
 ```php
 final class Funcionario extends Model
 {
-    use \App\Models\Concerns\BelongsToEmpresa;   // scope 'empresa'  (tenant)
+    use \HT2ML\Core\Models\Concerns\BelongsToEmpresa;   // scope 'empresa'  (tenant)
     use VisivelNaHierarquia;                       // scope 'organograma' (subárvore)
     use \Illuminate\Database\Eloquent\SoftDeletes; // scope 'SoftDeletingScope'
     // ... Auditavel, contratos, etc.

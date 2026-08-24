@@ -358,7 +358,7 @@ Regras:
 
 - **Visibilidade por usuário é o ACL**, nunca uma segunda flag: o item é exibido se o usuário `can(permission)`. Os toggles "Visível/Oculto" por perfil na tela de gestão concedem/revogam a permissão no perfil (via `AlternarPermissaoPerfilAction`, mesmos guards do hub) — afetam menu **e** páginas.
 - `ativo = false` é decisão global (some para todos, inclusive no preview dev/components); o acesso às rotas continua regido pelo ACL.
-- Ícones de menu são **build-time** (iconify/tailwind escaneia literais): a tela só aceita a lista curada `App\Support\Menu\IconesMenu` — para oferecer um ícone novo, adicione-o lá (o grid de sugestões o renderiza literalmente, garantindo o CSS no bundle).
+- Ícones de menu são **build-time** (iconify/tailwind escaneia literais): a tela só aceita a lista curada `HT2ML\Core\Support\Menu\IconesMenu` — para oferecer um ícone novo, adicione-o lá (o grid de sugestões o renderiza literalmente, garantindo o CSS no bundle).
 - Nunca renomeie uma `key` do config sem migrar a personalização correspondente.
 
 ---

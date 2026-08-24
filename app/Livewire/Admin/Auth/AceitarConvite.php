@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
-use App\Actions\Admin\Convites\AceitarConviteAction;
-use App\Exceptions\AccessException;
-use App\Services\Admin\Security\LimiteTentativas;
-use App\Support\Settings\PasswordPolicy;
+use HT2ML\Core\Actions\Admin\Convites\AceitarConviteAction;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\AdminUserConvite;
+use HT2ML\Core\Services\Admin\Security\LimiteTentativas;
+use HT2ML\Core\Support\Settings\PasswordPolicy;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

@@ -56,7 +56,7 @@ usuário opera somente sobre a própria conta.
       caminho em `avatar_url`. Remoção volta ao fallback de iniciais.
     - **Nome** editável; **e-mail** somente leitura; resumo (read-only) de papéis globais/
       empresas e do último login.
-    - Salva via **`App\Actions\Admin\Conta\AtualizarPerfilAction`** (nome + avatar).
+    - Salva via **`HT2ML\Core\Actions\Admin\Conta\AtualizarPerfilAction`** (nome + avatar).
 - **Segurança** → painel que monta três blocos:
     - **`App\Livewire\Admin\Conta\TrocarSenha`** (novo): senha atual + nova + confirmação;
       valida a atual contra o hash + regras `Password::defaults()`; ao salvar atualiza o hash,
@@ -90,7 +90,7 @@ usuário opera somente sobre a própria conta.
 
 ## 4. Fluxo de dados
 
-**① Registro de login.** Listener **`App\Listeners\RegistrarLoginAdmin`** no evento
+**① Registro de login.** Listener **`HT2ML\Core\Listeners\RegistrarLoginAdmin`** no evento
 `Illuminate\Auth\Events\Login` (filtrando o guard `admin`): atualiza `last_login_at`/
 `last_login_ip` **e** insere uma linha em `admin_login_history` (IP + user-agent da request).
 **Personificação é ignorada** (o `IniciarImpersonationAction` faz `Auth::login` do alvo →

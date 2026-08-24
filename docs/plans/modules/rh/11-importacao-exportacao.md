@@ -1,6 +1,6 @@
 # 11 — Importação e Exportação (Excel)
 
-> Como entram e saem funcionários **em lote** via planilha Excel — para carga inicial (migração de outro sistema), edição em massa e relatório. Reaproveita a infra de import/export **já existente no core** (`App\Imports\BaseImport`, `App\Exports\TabelaExport`, fila `exports`, PowerGrid `Exportable`) e estende para o **agregado multi-aba** (funcionário + filhas). O **schema é definido em [01](01-modelo-de-dominio.md)** (fonte de verdade); o log opcional de importação é `importacoes` ([01 §F](01-modelo-de-dominio.md)).
+> Como entram e saem funcionários **em lote** via planilha Excel — para carga inicial (migração de outro sistema), edição em massa e relatório. Reaproveita a infra de import/export **já existente no core** (`HT2ML\Core\Imports\BaseImport`, `HT2ML\Core\Exports\TabelaExport`, fila `exports`, PowerGrid `Exportable`) e estende para o **agregado multi-aba** (funcionário + filhas). O **schema é definido em [01](01-modelo-de-dominio.md)** (fonte de verdade); o log opcional de importação é `importacoes` ([01 §F](01-modelo-de-dominio.md)).
 >
 > Pacote: `ht2ml/extensao-rh` · namespace `HT2ML\Rh\` · views `rh::` · **PostgreSQL 16** · multi-tenant por `empresa_id`. **Faseamento:** pós-Fase 1 (depende de B2 — cadastro + filhas, [02](02-fase-1-blueprint.md)); o export simples da listagem já vem com B2 (PowerGrid).
 
@@ -14,9 +14,9 @@ A base de import/export **já existe** no boilerplate e é reaproveitada — o R
 
 | Peça do core                                                                                | O que faz                                                                                                                                                                                                       | Uso no RH                                                                           |
 | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `App\Imports\BaseImport`                                                                    | base de importação Excel: `SkipsOnFailure` + `WithValidation` + `WithHeadingRow` + `ToCollection`; valida por linha, acumula falhas, expõe `getErros(): list<{linha,campo,mensagem}>` e `getLinhasImportadas()` | base das sub-importações de cada aba (§4)                                           |
-| `App\Exports\TabelaExport` + `App\DTOs\Admin\Export\ExportavelDTO`                          | export tabular **mono-aba** (colunas + linhas, `WithTitle`) para Excel/CSV                                                                                                                                      | export simples/da listagem (§6.1); o round-trip multi-aba usa export própria (§6.2) |
-| `App\Livewire\Concerns\ExportaExcel` · `App\Actions\Admin\Export\ExportarTabelaExcelAction` | concern + Action que geram o arquivo                                                                                                                                                                            | reaproveitados pela tela de RH                                                      |
+| `HT2ML\Core\Imports\BaseImport`                                                                    | base de importação Excel: `SkipsOnFailure` + `WithValidation` + `WithHeadingRow` + `ToCollection`; valida por linha, acumula falhas, expõe `getErros(): list<{linha,campo,mensagem}>` e `getLinhasImportadas()` | base das sub-importações de cada aba (§4)                                           |
+| `HT2ML\Core\Exports\TabelaExport` + `HT2ML\Core\DTOs\Admin\Export\ExportavelDTO`                          | export tabular **mono-aba** (colunas + linhas, `WithTitle`) para Excel/CSV                                                                                                                                      | export simples/da listagem (§6.1); o round-trip multi-aba usa export própria (§6.2) |
+| `App\Livewire\Concerns\ExportaExcel` · `HT2ML\Core\Actions\Admin\Export\ExportarTabelaExcelAction` | concern + Action que geram o arquivo                                                                                                                                                                            | reaproveitados pela tela de RH                                                      |
 | PowerGrid `Exportable` (`TYPE_XLS`, `TYPE_CSV`)                                             | export da **listagem filtrada** direto da grade (já usado em `UsuariosTable`/`EmpresasTable`)                                                                                                                   | `FuncionarioTable` exporta a listagem corrente (§6.1)                               |
 | Fila **`exports`** (Horizon)                                                                | processamento assíncrono de relatórios pesados                                                                                                                                                                  | importação/exportação em lote rodam aqui (§7)                                       |
 | `maatwebsite/excel` (`^3.1`)                                                                | leitura/escrita de `.xlsx`/`.csv`                                                                                                                                                                               | `WithMultipleSheets` para o layout multi-aba (§4)                                   |
@@ -62,7 +62,7 @@ A importação é **idempotente por chave de negócio** — reimportar a mesma p
 
 ## 4. Validação e integridade de relacionamentos
 
-Cada aba é uma sub-import estendendo `App\Imports\BaseImport` — validação **por linha** com `regrasPorColuna()` (reaproveita as `Rules` do cadastro: `HT2ML\Core\Rules\Cpf`, `HT2ML\Rh\Rules\PisPasep`, PIX por tipo — [03 §3/§5](03-cadastro-pessoa-documentos.md)).
+Cada aba é uma sub-import estendendo `HT2ML\Core\Imports\BaseImport` — validação **por linha** com `regrasPorColuna()` (reaproveita as `Rules` do cadastro: `HT2ML\Core\Rules\Cpf`, `HT2ML\Rh\Rules\PisPasep`, PIX por tipo — [03 §3/§5](03-cadastro-pessoa-documentos.md)).
 
 **Catálogos e referências são citados por código/nome, não por id:**
 
@@ -161,7 +161,7 @@ Ambas são **add-ons de `rh.funcionarios.*`** (recorte do recurso `funcionarios`
 
 ## 11. Checklist de implementação (incremento pós-Fase 1)
 
-- [ ] `FuncionarioImport` (`WithMultipleSheets`) + uma sub-import por aba estendendo `App\Imports\BaseImport` (`regrasPorColuna()`/`mensagensValidacao()`/`importarLinha()`); agregação de `getErros()`.
+- [ ] `FuncionarioImport` (`WithMultipleSheets`) + uma sub-import por aba estendendo `HT2ML\Core\Imports\BaseImport` (`regrasPorColuna()`/`mensagensValidacao()`/`importarLinha()`); agregação de `getErros()`.
 - [ ] Resolução de chave (matrícula→CPF→gera, §3) e de referências por código/nome → id (§4); transação por funcionário; `empresa_id` por auto-fill (nunca da planilha).
 - [ ] Colunas `cp_*` → `dados_personalizados` reusando `regrasPersonalizadas()` ([10](10-campos-personalizados.md)).
 - [ ] Export round-trip multi-aba via export própria `WithMultipleSheets` (não `TabelaExport`, que é mono-aba) com os filtros do `FuncionarioTable`; export da listagem (PowerGrid) já cobre §6.1.

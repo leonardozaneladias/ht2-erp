@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Actions\Admin\Referencia\CreateMoedaAction;
-use App\Actions\Admin\Referencia\UpdateMoedaAction;
-use App\DTOs\Admin\Referencia\MoedaDTO;
 use App\Http\Requests\Admin\Referencia\MoedaRules;
-use App\Models\Referencia\Moeda;
+use HT2ML\Core\Actions\Admin\Referencia\CreateMoedaAction;
+use HT2ML\Core\Actions\Admin\Referencia\UpdateMoedaAction;
+use HT2ML\Core\DTOs\Admin\Referencia\MoedaDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\Moeda;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

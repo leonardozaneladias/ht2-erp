@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Configuracao;
 
-use App\Actions\Admin\Settings\SaveSegurancaSettingsAction;
 use App\Livewire\Concerns\ConfirmaSegundoFator;
+use HT2ML\Core\Actions\Admin\Settings\SaveSegurancaSettingsAction;
 use HT2ML\Core\DTOs\Admin\Settings\SegurancaSettingsDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Settings\SegurancaSettings;
@@ -15,7 +15,7 @@ use Livewire\Component;
 /**
  * Aba "Segurança": política de senha, tempo de sessão e retenção de logs.
  *
- * A política de senha é consumida por App\Support\Settings\PasswordPolicy; o
+ * A política de senha é consumida por HT2ML\Core\Support\Settings\PasswordPolicy; o
  * timeout de sessão é aplicado pelo SettingsRuntimeApplier. A flag
  * exigir_2fa_admin é imposta pelo middleware EnsureTwoFactorEnabled (opcional,
  * desligada por padrão). Salvar esta aba exige step-up de segundo fator.

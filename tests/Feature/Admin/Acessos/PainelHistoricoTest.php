@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\ConcederAcessoDiretoAction;
-use App\DTOs\Admin\ConcessaoAcessoDTO;
 use App\Livewire\Admin\Acesso\ControleAcesso;
 use App\Livewire\Admin\Acesso\PainelHistorico;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\ConcederAcessoDiretoAction;
+use HT2ML\Core\DTOs\Admin\ConcessaoAcessoDTO;
 use HT2ML\Core\Enums\TipoConcessao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Actions\Admin\Referencia\CreateEstadoAction;
-use App\Actions\Admin\Referencia\UpdateEstadoAction;
-use App\DTOs\Admin\Referencia\EstadoDTO;
-use App\Enums\Referencia\RegiaoBrasil;
 use App\Http\Requests\Admin\Referencia\EstadoRules;
-use App\Models\Referencia\Estado;
+use HT2ML\Core\Actions\Admin\Referencia\CreateEstadoAction;
+use HT2ML\Core\Actions\Admin\Referencia\UpdateEstadoAction;
+use HT2ML\Core\DTOs\Admin\Referencia\EstadoDTO;
+use HT2ML\Core\Enums\Referencia\RegiaoBrasil;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\Estado;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

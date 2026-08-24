@@ -478,7 +478,7 @@
                             <ul class="divide-default-200 mt-2 divide-y">
                                 @foreach ($this->perfis as $perfil)
                                     @php ($protegida = in_array($perfil->name, (array) config('access.protected_roles', []), true))
-                                    @php ($podeEditarPerfil = ! $protegida && app(\App\Policies\RolePolicy::class)->update(auth('admin')->user(), $perfil))
+                                    @php ($podeEditarPerfil = ! $protegida && app(\HT2ML\Core\Policies\RolePolicy::class)->update(auth('admin')->user(), $perfil))
                                     @php ($temPermissao = $perfil->hasPermissionTo($permissaoItem))
                                     <li
                                         wire:key="menu-perfil-{{ $perfil->id }}"

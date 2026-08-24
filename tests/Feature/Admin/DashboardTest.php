@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Services\Admin\DashboardMetrics;
 use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Services\Admin\DashboardMetrics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 

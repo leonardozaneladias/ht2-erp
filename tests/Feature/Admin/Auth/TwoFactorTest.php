@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoAlertaSeguranca;
 use App\Livewire\Admin\Auth\Login;
 use App\Livewire\Admin\Auth\TwoFactorChallenge;
 use App\Livewire\Admin\Configuracao\AbaSeguranca;
 use App\Livewire\Admin\Conta\SegurancaConta;
-use App\Notifications\AlertaSegurancaNotification;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Enums\TipoAlertaSeguranca;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;

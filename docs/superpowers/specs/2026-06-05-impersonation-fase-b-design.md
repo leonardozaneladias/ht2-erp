@@ -54,11 +54,11 @@ controle total sobre as cinco decisões acima.
 
 ### Operações (Actions API-ready — recebem models, nunca `Request`)
 
-- **`App\Actions\Admin\Impersonation\IniciarImpersonationAction`**
+- **`HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction`**
   `execute(AdminUser $ator, AdminUser $alvo, string $motivo): void` — revalida
   elegibilidade (defense-in-depth), grava o contexto, `Auth::guard('admin')->login($alvo)`,
   invalida o cache de acesso, loga o evento de início.
-- **`App\Actions\Admin\Impersonation\EncerrarImpersonationAction`**
+- **`HT2ML\Core\Actions\Admin\Impersonation\EncerrarImpersonationAction`**
   `execute(): void` — reloga o original (ou logout se inválido), loga o evento de
   fim, limpa o contexto, invalida o cache de acesso.
 

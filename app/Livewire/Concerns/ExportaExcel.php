@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
-use App\Actions\Admin\Export\ExportarTabelaExcelAction;
-use App\DTOs\Admin\Export\ExportavelDTO;
+use HT2ML\Core\Actions\Admin\Export\ExportarTabelaExcelAction;
+use HT2ML\Core\DTOs\Admin\Export\ExportavelDTO;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**

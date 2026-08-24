@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
-use App\Exceptions\AccessException;
-use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\Activity;
+use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;

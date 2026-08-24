@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\Referencia\Banco $registro */
+    /** @var \HT2ML\Core\Models\Referencia\Banco $registro */
 @endphp
 
 {{-- Ficha de visualização ("Ver") — corpo do x-admin.ficha-drawer. --}}

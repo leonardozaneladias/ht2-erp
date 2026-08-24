@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Empresas;
 
-use App\Actions\Admin\AtualizarFilialAction;
-use App\Actions\Admin\CreateEmpresaAction;
-use App\Actions\Admin\CriarFilialAction;
-use App\Actions\Admin\UpdateEmpresaAction;
-use App\Contracts\Referencia\FonteDeMunicipios;
-use App\Contracts\Referencia\FonteDeUnidadesFederativas;
-use App\DTOs\Admin\EmpresaDTO;
-use App\DTOs\Admin\FilialDTO;
-use App\Exceptions\FilialException;
+use HT2ML\Core\Actions\Admin\AtualizarFilialAction;
+use HT2ML\Core\Actions\Admin\CreateEmpresaAction;
+use HT2ML\Core\Actions\Admin\CriarFilialAction;
+use HT2ML\Core\Actions\Admin\UpdateEmpresaAction;
+use HT2ML\Core\Contracts\Referencia\FonteDeMunicipios;
+use HT2ML\Core\Contracts\Referencia\FonteDeUnidadesFederativas;
+use HT2ML\Core\DTOs\Admin\EmpresaDTO;
+use HT2ML\Core\DTOs\Admin\FilialDTO;
+use HT2ML\Core\Exceptions\FilialException;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Models\Filial;

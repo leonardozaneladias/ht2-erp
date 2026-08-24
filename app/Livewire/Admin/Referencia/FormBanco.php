@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Actions\Admin\Referencia\CreateBancoAction;
-use App\Actions\Admin\Referencia\UpdateBancoAction;
-use App\DTOs\Admin\Referencia\BancoDTO;
 use App\Http\Requests\Admin\Referencia\BancoRules;
-use App\Models\Referencia\Banco;
+use HT2ML\Core\Actions\Admin\Referencia\CreateBancoAction;
+use HT2ML\Core\Actions\Admin\Referencia\UpdateBancoAction;
+use HT2ML\Core\DTOs\Admin\Referencia\BancoDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\Banco;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

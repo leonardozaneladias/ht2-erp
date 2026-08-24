@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Actions\Admin\Referencia\CreateTipoLogradouroAction;
-use App\Actions\Admin\Referencia\UpdateTipoLogradouroAction;
-use App\DTOs\Admin\Referencia\TipoLogradouroDTO;
 use App\Http\Requests\Admin\Referencia\TipoLogradouroRules;
-use App\Models\Referencia\TipoLogradouro;
+use HT2ML\Core\Actions\Admin\Referencia\CreateTipoLogradouroAction;
+use HT2ML\Core\Actions\Admin\Referencia\UpdateTipoLogradouroAction;
+use HT2ML\Core\DTOs\Admin\Referencia\TipoLogradouroDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\TipoLogradouro;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

@@ -45,7 +45,7 @@ de atividade suspeita por e-mail** aos super-admins, e a **aplicação do status
 
 ### Lockout (serviço)
 
-- **`App\Services\Admin\Security\ControleLockout`**:
+- **`HT2ML\Core\Services\Admin\Security\ControleLockout`**:
     - `estaBloqueada(AdminUser): bool`.
     - `registrarFalha(string $email): void` — incrementa o contador por e-mail no
       `RateLimiter` (chave `lockout:<email>`, decay = `lockout_duracao_minutos`); ao
@@ -56,7 +56,7 @@ de atividade suspeita por e-mail** aos super-admins, e a **aplicação do status
 
 ### Rate-limit configurável (helper)
 
-- **`App\Services\Admin\Security\LimiteTentativas`**: `excedido(string $chave): bool`,
+- **`HT2ML\Core\Services\Admin\Security\LimiteTentativas`**: `excedido(string $chave): bool`,
   `registrar(string $chave): void`, `limpar(string $chave): void` — lê
   `login_max_tentativas`/`login_janela_minutos` de `SegurancaSettings` (com piso
   `max(1, …)`). Refatora os `RateLimiter` inline de `Login` e `TwoFactorChallenge` e
@@ -64,11 +64,11 @@ de atividade suspeita por e-mail** aos super-admins, e a **aplicação do status
 
 ### Alertas (Notification em fila)
 
-- **`App\Enums\TipoAlertaSeguranca`** (`ContaBloqueada`, `PersonificacaoIniciada`,
+- **`HT2ML\Core\Enums\TipoAlertaSeguranca`** (`ContaBloqueada`, `PersonificacaoIniciada`,
   `LoginSuperAdmin`) — label/descrição PT-BR.
-- **`App\Notifications\AlertaSegurancaNotification`** (`implements ShouldQueue`, fila
+- **`HT2ML\Core\Notifications\AlertaSegurancaNotification`** (`implements ShouldQueue`, fila
   `emails`, canal `mail`): assunto + corpo a partir do tipo + contexto.
-- **`App\Services\Admin\Security\AlertaSeguranca`**: `contaBloqueada(AdminUser)`,
+- **`HT2ML\Core\Services\Admin\Security\AlertaSeguranca`**: `contaBloqueada(AdminUser)`,
   `personificacaoIniciada(AdminUser $ator, AdminUser $alvo)`, `superAdminLogou(AdminUser)`.
   Cada um respeita `alertas_seguranca_habilitados` (e o de super-admin respeita
   `alerta_login_super_admin`), resolve `AdminUser::role('super-admin')->where('ativo', true)->get()`

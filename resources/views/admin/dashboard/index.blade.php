@@ -1,5 +1,5 @@
 @php
-    /** @var \App\DTOs\Admin\DashboardMetricsDTO $metricas */
+    /** @var \HT2ML\Core\DTOs\Admin\DashboardMetricsDTO $metricas */
 @endphp
 
 <x-admin.layout title="Dashboard">

@@ -71,7 +71,7 @@ padrão do projeto (Actions logam via `activity()`) e é imune a esse ruído.
 
 ### Eventos de segurança (serviço dedicado)
 
-- **`App\Services\Admin\AuditoriaSeguranca`** (`log_name = 'auth'`):
+- **`HT2ML\Core\Services\Admin\AuditoriaSeguranca`** (`log_name = 'auth'`):
     - `loginBemSucedido(AdminUser $u, bool $via2fa): void` → `event('login')`.
     - `loginFalhou(string $email): void` → `event('login-falhou')` (sem causer,
       `properties.email`).
