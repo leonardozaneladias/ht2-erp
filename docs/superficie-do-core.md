@@ -69,25 +69,53 @@ dependem de `BrandingService`, `AppearanceService`, `MenuService`,
 `LoginSettings`, `SegurancaSettings`, `NotificacaoService` e
 `ImpersonationContext`.
 
-## A metade que o Composer não carrega — e essa é real
+## A metade que o Composer não carrega
 
 O design system tem um lado PHP/Blade e um lado de assets. O Composer entrega o
-primeiro; o segundo continua no app:
+primeiro. O segundo tem **dois** problemas distintos, e só um deles está
+resolvido.
 
-|                 | Volume              |
-| --------------- | ------------------- |
-| `resources/js`  | 18 arquivos, 118 KB |
-| `resources/css` | 37 arquivos, 134 KB |
+### Resolvido: o Tailwind não enxerga `vendor/`
 
-O acoplamento é menor do que parece: só **três** componentes Alpine são nomeados
-e definidos em JS (`afRowActions`, `afDatePicker`, `comboBox`); todo o resto usa
-`x-data` inline, que viaja no próprio blade. O resto do lado de assets é Tailwind
-e o tema Inspinia.
+A detecção automática do Tailwind 4 varre o projeto, mas **pula caminhos
+ignorados pelo git** — e `vendor/` é um deles. Medido:
 
-O caminho conhecido é `publishes()` no pacote mais, no app consumidor, um
-`@source` do Tailwind 4 apontando para `vendor/ht2ml/core/resources`. Isso mexe
-em `vite.config.js` e na configuração do Tailwind — é fatia própria, e é o que
-separa "o pacote tem os blades" de "o pacote renderiza sozinho".
+| Arquivo com uma classe única | Classe chega ao CSS? |
+| ---------------------------- | -------------------- |
+| sob `packages/` (versionado) | sim                  |
+| sob `vendor/` (gitignored)   | **não**              |
+
+Num app que instala `ht2ml/core` por Composer, os blades do pacote vivem em
+`vendor/ht2ml/core/resources/views`. Sem intervenção, o CSS sai **sem nenhuma
+das classes que só o núcleo usa** — o admin renderiza sem estilo, e nada no
+monorepo denuncia isso, porque lá `packages/` é versionado e a detecção pega.
+
+O pacote passou a trazer `resources/css/core.css`, com os `@source` relativos
+ao próprio arquivo — funcionam igual no monorepo e instalado. O app importa:
+
+```css
+@import '../../vendor/ht2ml/core/resources/css/core.css';
+```
+
+Provado nos dois sentidos: com o import a classe aparece; sem ele, e com
+`packages/` oculto da detecção (simulando o consumidor), some.
+
+### Em aberto: o tema e as dependências npm
+
+Os 37 arquivos de CSS (tema Inspinia, temas de cor, componentes) e os 18 de JS
+continuam em `resources/` no app. Movê-los para o pacote esbarra num limite
+real: **o Composer não carrega dependências npm.** A cadeia atual importa
+`choices.js`, `dropzone`, `flatpickr`, `quill`, `preline`, `simplebar`,
+`moment`, mais os plugins `@tailwindcss/typography`, `@tailwindcss/forms` e
+`@iconify/tailwind4`.
+
+Um pacote Composer com design system resolve isso publicando o CSS/JS e
+documentando as dependências npm que o consumidor precisa declarar — é o que
+Filament e afins fazem. É uma decisão de design própria, não uma movimentação
+de arquivos, e por isso não entrou nesta fatia.
+
+Só três componentes Alpine são nomeados em JS (`afRowActions`, `afDatePicker`,
+`comboBox`); todo o resto usa `x-data` inline e viaja no próprio blade.
 
 ## Dependências de vendor
 
