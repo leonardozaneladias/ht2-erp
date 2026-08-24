@@ -60,6 +60,12 @@ for item in "${INCLUIR[@]}"; do
     cp -R "${item}" "${TMP}/${item}"
 done
 
+# CI: vem de stubs/skeleton/.github, não do .github deste monorepo — o daqui
+# testa a plataforma, e o do produto precisa autenticar nos pacotes privados.
+if [[ -d "stubs/skeleton/.github" ]]; then
+    cp -R "stubs/skeleton/.github" "${TMP}/.github"
+fi
+
 # Testes: só o andaime (TestCase, Pest.php, Arch). A suíte da plataforma testa o
 # core e vive no monorepo — carregá-la aqui daria um skeleton que falha de saída.
 mkdir -p "${TMP}/tests/Feature" "${TMP}/tests/Unit"
