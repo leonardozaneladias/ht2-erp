@@ -1714,22 +1714,31 @@
         },
         {
             "name": "ht2ml/core",
-            "version": "dev-feat/extrair-demo-e-documentos",
+            "version": "dev-feat/ht2ml-skeleton",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
-                "reference": "27881118c49d9393e8a98acba8fbc66d2589ac97"
+                "reference": "2647ce5956ba712e4aaabfef6f68c8a65dc89700"
             },
             "require": {
+                "bacon/bacon-qr-code": "^3.1",
+                "barryvdh/laravel-dompdf": "^3.1",
                 "illuminate/auth": "^13.0",
                 "illuminate/bus": "^13.0",
+                "illuminate/console": "^13.0",
                 "illuminate/contracts": "^13.0",
                 "illuminate/database": "^13.0",
+                "illuminate/http": "^13.0",
                 "illuminate/notifications": "^13.0",
+                "illuminate/queue": "^13.0",
                 "illuminate/support": "^13.0",
+                "illuminate/validation": "^13.0",
                 "illuminate/view": "^13.0",
                 "livewire/livewire": "^4.2",
+                "maatwebsite/excel": "^3.1",
                 "php": "^8.4",
+                "power-components/livewire-powergrid": "^6.10",
+                "pragmarx/google2fa-laravel": "^3.0",
                 "spatie/laravel-activitylog": "^5.0",
                 "spatie/laravel-permission": "^8.0",
                 "spatie/laravel-settings": "^3.9"
@@ -1760,7 +1769,7 @@
         },
         {
             "name": "ht2ml/extensao-documentos",
-            "version": "dev-feat/extrair-demo-e-documentos",
+            "version": "dev-feat/ht2ml-skeleton",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-documentos",
@@ -1800,7 +1809,7 @@
         },
         {
             "name": "ht2ml/extensao-exemplo-demo",
-            "version": "dev-feat/extrair-demo-e-documentos",
+            "version": "dev-feat/ht2ml-skeleton",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-exemplo-demo",
@@ -1843,7 +1852,7 @@
         },
         {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-feat/extrair-demo-e-documentos",
+            "version": "dev-feat/ht2ml-skeleton",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
@@ -1893,7 +1902,7 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-feat/extrair-demo-e-documentos",
+            "version": "dev-feat/ht2ml-skeleton",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",
