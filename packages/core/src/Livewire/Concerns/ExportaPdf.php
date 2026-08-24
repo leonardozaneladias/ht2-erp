@@ -39,5 +39,27 @@ trait ExportaPdf
         $this->dispatch('toast', variant: 'success', message: 'Exportação enfileirada. Avisaremos quando estiver pronta.');
     }
 
+    /**
+     * As linhas COMO ESTÃO NA TELA: busca global, filtros de coluna e ordenação
+     * aplicados.
+     *
+     * Existe porque as quatro implementações de dadosParaExportacao() faziam
+     * `$this->datasource()->get()` — a query crua, sem nada disso. O usuário
+     * filtrava para 12 linhas, clicava "Exportar PDF" e recebia as 40.000: uma
+     * resposta errada entregue a um humano, além do risco de estourar a memória.
+     *
+     * prepareToExport() (trait WithExport do PowerGrid) aplica o
+     * SearchHandlerContract, o FilterHandler e o sortField sobre o datasource.
+     * Devolve models — o DataTransformer preserva a instância quando
+     * supportModel é true, apenas acrescentando os campos de fields() por
+     * forceFill —, então o mapeamento de cada tabela continua valendo.
+     *
+     * @return \Illuminate\Support\Collection<int, mixed>
+     */
+    protected function linhasParaExportacao(): \Illuminate\Support\Collection
+    {
+        return collect($this->prepareToExport());
+    }
+
     abstract protected function dadosParaExportacao(): ExportavelDTO;
 }

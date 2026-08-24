@@ -244,7 +244,7 @@ final class ExemploTable extends PowerGridComponent
      */
     protected function dadosParaExportacao(): ExportavelDTO
     {
-        $linhas = $this->datasource()->get()
+        $linhas = $this->linhasParaExportacao()
             ->map(fn (Exemplo $registro): array => [
                 ...$this->linhaMultiEmpresa($registro),
                 (string) $registro->nome,

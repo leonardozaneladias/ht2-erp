@@ -174,7 +174,7 @@ final class EmpresasTable extends PowerGridComponent
      */
     protected function dadosParaExportacao(): ExportavelDTO
     {
-        $linhas = $this->datasource()->get()
+        $linhas = $this->linhasParaExportacao()
             ->map(fn (Empresa $e): array => [
                 (string) $e->nome,
                 $e->cnpjFormatado ?? '—',
