@@ -98,18 +98,32 @@ Só invista em testbench isolado quando o módulo precisar de CI próprio.
 
 ## 3. Cortar um release de módulo (semver) — `release-module.sh`
 
-Quando o módulo estabiliza, extraia a pasta para um repositório Git próprio e versione por tag.
-O `bin/release-module.sh` automatiza o `git subtree split` + push + tag, lendo
-`vendor`/`prefixo`/`org` de `config/extensoes.php`:
+Quando o pacote estabiliza, extraia a pasta para um repositório Git próprio e versione por tag.
+O `bin/release-module.sh` automatiza o `git subtree split` + push + tag.
+
+**O nome do repo é derivado do `composer.json` do pacote**: `ht2ml/core` vira
+`<org>/ht2ml-core`, `ht2ml/extensao-rh` vira `<org>/ht2ml-extensao-rh`. Nada de convenção
+hardcoded — a anterior (`erp-module-{slug}`, `packages/modulo-{slug}`) ficou para trás quando
+os pacotes passaram a se chamar `ht2ml/*`, e o script deixou de achar qualquer coisa.
 
 ```bash
-# cria o repo do módulo 1x (privado)
-gh repo create leonardozaneladias/erp-module-rh --private
+# lista os pacotes e o repo que cada um teria
+./bin/release-module.sh
 
-# corta o release a partir do monorepo (subtree split + push + tag semver)
-make release-modulo slug=rh versao=v0.1.0
-# equivale a: ./bin/release-module.sh rh v0.1.0
+# cria o repo 1x (privado)
+gh repo create leonardozaneladias/ht2ml-core --private
+
+# ensaia — mostra o que faria, incluindo as notas do release
+./bin/release-module.sh core v0.1.0 --dry-run
+
+# corta o release (subtree split + push + tag + release no GitHub)
+make release-modulo pacote=core versao=v0.1.0
 ```
+
+O script recusa publicar quando: a versão já existe como tag no repo remoto, há mudanças não
+commitadas no prefixo (o split usaria só o commitado, e o release sairia diferente do que você
+vê), ou o `composer.json` do pacote está incompleto. As notas saem dos commits que tocaram o
+prefixo desde a última tag publicada.
 
 Convenção semver para módulos:
 
@@ -117,7 +131,7 @@ Convenção semver para módulos:
 - **minor** (`v1.1.0`) — campo/feature retrocompatível.
 - **major** (`v2.0.0`) — breaking: migração incompatível, rename de permissão/rota.
 
-O release deixa o `erp-module-rh` populado e versionado. O **consumo por Composer** (trocar o
+O release deixa o `ht2ml-extensao-rh` populado e versionado. O **consumo por Composer** (trocar o
 `path` por um `vcs` repository e `composer require "ht2ml/extensao-rh:^1.0"`) fica **latente**
 até o gatilho da seção 9.
 
@@ -238,7 +252,7 @@ quando houver gatilho real:
 
 | Tarefa                         | Comando                                                                             |
 | ------------------------------ | ----------------------------------------------------------------------------------- |
-| Criar casca de pacote          | `php artisan make:extensao Rh`                                                 |
+| Criar casca de pacote          | `php artisan make:extensao Rh`                                                      |
 | Gerar CRUD no pacote           | `php artisan make:modulo Funcionario --module=Rh --fields="..."`                    |
 | Cortar release de módulo       | `make release-modulo slug=rh versao=v0.1.0`                                         |
 | Novo cliente (clone+re-origin) | `make new-client` (após clone + re-origin)                                          |
