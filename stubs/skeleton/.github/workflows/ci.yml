@@ -1,19 +1,33 @@
 name: CI
 
+# Só em pull_request. NÃO há gatilho de push para main, e é economia deliberada:
+# com "Require branches to be up to date before merging" ligado na proteção da
+# main, a branch precisa estar atualizada para mergear — então o run do PR já é
+# o resultado do merge. Um run de push depois seria o mesmo teste de novo.
+#
+# Se a proteção da main não exigir branch atualizada, reative o push: sem isso,
+# dois PRs que passam isolados podem quebrar juntos e ninguém vê.
 on:
-    push:
-        branches: [main, develop]
     pull_request:
-        branches: [main, develop]
+        branches: [main]
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
-    cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+    group: ${{ github.workflow }}-${{ github.head_ref }}
+    cancel-in-progress: true
 
 jobs:
-    quality:
-        name: Qualidade (Pint + PHPStan + Prettier)
+    ci:
+        # Um job só, de propósito. Cada job paga checkout + setup do PHP +
+        # composer install + setup do Node + npm ci antes de fazer qualquer
+        # coisa útil — separar qualidade de testes dobra esse preparo para
+        # ganhar paralelismo que um produto com poucos testes não aproveita.
+        name: Qualidade e testes
         runs-on: ubuntu-latest
+
+        # Rascunho não roda: empurre quantas vezes quiser enquanto trabalha, e
+        # marque "Ready for review" quando quiser o veredito.
+        if: github.event.pull_request.draft == false
+
         steps:
             - uses: actions/checkout@v7
 
@@ -21,17 +35,22 @@ jobs:
               uses: shivammathur/setup-php@v2
               with:
                   php-version: '8.4'
-                  extensions: pdo, pdo_sqlite, sqlite3, redis, bcmath, mbstring, xml
+                  extensions: pdo, pdo_sqlite, sqlite3, bcmath, mbstring, xml
                   coverage: none
 
-            # Os pacotes ht2ml/* são PRIVADOS e o composer.json os declara por SSH
-            # (git@github.com:...), que é o que funciona na máquina de quem
-            # desenvolve. O runner não tem essa chave — então reescrevemos SSH para
-            # HTTPS autenticado por token. Assim o composer.json não precisa mudar
-            # de forma dependendo de onde roda.
+            # Os pacotes ht2ml/* são privados e o composer.json os declara por
+            # SSH, que é o que funciona na máquina de quem desenvolve. O runner
+            # não tem essa chave — reescrever para HTTPS autenticado evita
+            # manter duas formas de declarar o mesmo repositório.
             - name: Autenticar nos pacotes privados
-              run: |
-                  git config --global url."https://x-access-token:${{ secrets.COMPOSER_TOKEN }}@github.com/".insteadOf "git@github.com:"
+              run: git config --global url."https://x-access-token:${{ secrets.COMPOSER_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
+            - name: Cache do vendor
+              uses: actions/cache@v6
+              with:
+                  path: vendor
+                  key: composer-${{ hashFiles('composer.lock') }}
+                  restore-keys: composer-
 
             - name: Instalar dependências PHP
               run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -45,6 +64,14 @@ jobs:
             - name: Instalar dependências Node
               run: npm ci
 
+            - name: Preparar ambiente
+              run: cp .env.example .env && php artisan key:generate
+
+            # Os assets vêm antes dos testes: sem o manifest do Vite, toda tela
+            # devolve 500 e o teste de fumaça falha por motivo errado.
+            - name: Compilar assets
+              run: npm run build
+
             - name: Formatação PHP (Pint)
               run: ./vendor/bin/pint --test
 
@@ -54,45 +81,7 @@ jobs:
             - name: Formatação (Prettier)
               run: npx prettier --check "resources/**/*.{js,ts,tsx,css,json}" "*.{json,md,yaml,yml}" --ignore-path .prettierignore
 
-    tests:
-        name: Testes (Pest)
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v7
-
-            - name: Setup PHP 8.4
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: '8.4'
-                  extensions: pdo, pdo_sqlite, sqlite3, redis, bcmath, mbstring, xml
-                  coverage: none
-
-            - name: Autenticar nos pacotes privados
-              run: |
-                  git config --global url."https://x-access-token:${{ secrets.COMPOSER_TOKEN }}@github.com/".insteadOf "git@github.com:"
-
-            - name: Instalar dependências PHP
-              run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-            - name: Copiar .env
-              run: cp .env.example .env
-
-            - name: Gerar APP_KEY
-              run: php artisan key:generate
-
-            # Os assets são pré-requisito das telas: sem o manifest do Vite, toda
-            # página devolve 500. O Composer não carrega dependência npm, então
-            # este passo não é opcional.
-            - name: Setup Node 22
-              uses: actions/setup-node@v6
-              with:
-                  node-version: '22'
-                  cache: 'npm'
-
-            - name: Compilar assets
-              run: npm ci && npm run build
-
-            - name: Rodar testes
+            - name: Testes
               run: php artisan test --compact
               env:
                   APP_ENV: testing
