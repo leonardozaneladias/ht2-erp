@@ -15,7 +15,6 @@ use HT2ML\Core\Services\Admin\AccessResolver;
 use HT2ML\Core\Services\Admin\Referencia\CatalogoDeLocalidades;
 use HT2ML\Core\Services\Admin\Settings\SettingsRuntimeApplier;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
-use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -38,11 +37,6 @@ class AppServiceProvider extends ServiceProvider
         $this->registrarCatalogos();
 
         Model::preventLazyLoading(! app()->isProduction());
-
-        // Contribuições das extensões (permissões e menu). Roda aqui, e não no
-        // provider de cada extensão, porque os providers de pacote registram
-        // antes deste — então neste ponto todas já declararam.
-        ModuleRegistry::aplicarContribuicoes();
 
         // Aplica as configurações persistidas (idioma, e-mail, sessão) ao config()
         // em runtime. Tolerante a falhas durante a 1ª instalação/migração.

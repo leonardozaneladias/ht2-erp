@@ -79,6 +79,80 @@ final class CoreServiceProvider extends ServiceProvider
         $this->registrarComandos();
         $this->registrarListeners();
         $this->registrarComponentesLivewire();
+
+        // Contribuições das extensões (permissões e itens de menu) aplicadas ao
+        // config(). Mora aqui, e não no AppServiceProvider do produto, porque um
+        // produto que perdesse aquela linha perderia permissões e menu de TODAS
+        // as extensões — em silêncio, sem erro, sem tela quebrada. Nada no
+        // repositório impedia isso.
+        //
+        // booted() e não boot() direto: este provider também é de pacote e pode
+        // bootar ANTES dos providers das extensões — a ordem dentro do grupo do
+        // PackageManifest não é controlável. O booted() dispara depois que todos
+        // bootaram, que é exatamente a garantia que o AppServiceProvider obtinha
+        // por acidente de posição na lista.
+        $this->app->booted(static function (): void {
+            Support\Modules\ModuleRegistry::aplicarContribuicoes();
+        });
+
+        $this->app->booted(fn () => $this->registrarViewsDoPowerGrid());
+    }
+
+    /**
+     * Insere as views do PowerGrid sobrescritas pelo núcleo entre as do produto
+     * e as do vendor.
+     *
+     * Quatro views do PowerGrid são reescritas para trocar o <select> nativo
+     * pelo x-shared.combobox (filtros pesquisáveis e multi-seleção). Elas viviam
+     * em resources/views/vendor/ do app — e por isso já foram COPIADAS para o
+     * EduConecta, byte a byte. O terceiro produto esqueceria de copiá-las e
+     * perderia os filtros pesquisáveis em silêncio; e um `composer update` do
+     * PowerGrid num dos repositórios mudaria o comportamento só ali.
+     *
+     * A ordem importa e não é obtida por addNamespace()/prependNamespace():
+     *  - addNamespace() põe o núcleo DEPOIS do vendor → o override nunca vence;
+     *  - prependNamespace() põe o núcleo ANTES do produto → o produto perde a
+     *    capacidade de restilizar um filtro sem herdar a manutenção dos quatro.
+     * Por isso a lista é reconstruída à mão: produto → núcleo → vendor.
+     *
+     * Roda em booted() porque o provider do PowerGrid precisa ter registrado o
+     * namespace antes; resolver o factory aqui dispara os callAfterResolving
+     * pendentes, então os hints já estão completos.
+     */
+    private function registrarViewsDoPowerGrid(): void
+    {
+        $finder = View::getFinder();
+
+        if (! $finder instanceof \Illuminate\View\FileViewFinder) {
+            return;
+        }
+
+        $hints = $finder->getHints()['livewire-powergrid'] ?? [];
+
+        if ($hints === []) {
+            return;   // PowerGrid ausente: nada a sobrescrever.
+        }
+
+        // "Do produto" = sob um dos view.paths configurados, que é exatamente o
+        // critério do ServiceProvider::loadViewsFrom() ao publicar em
+        // resources/views/vendor/<namespace>.
+        $caminhosDoProduto = (array) config('view.paths', []);
+
+        $doProduto = array_filter(
+            $hints,
+            static fn (string $hint): bool => (bool) array_filter(
+                $caminhosDoProduto,
+                static fn (string $base): bool => str_starts_with($hint, rtrim((string) $base, '/') . '/'),
+            ),
+        );
+
+        $doVendor = array_diff($hints, $doProduto);
+
+        $finder->replaceNamespace('livewire-powergrid', [
+            ...array_values($doProduto),
+            __DIR__ . '/../resources/views/livewire-powergrid',
+            ...array_values($doVendor),
+        ]);
     }
 
     /**
