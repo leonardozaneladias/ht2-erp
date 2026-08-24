@@ -29,8 +29,9 @@ return [
     'namespace' => 'HT2ML',
 
     // Conta/org no GitHub (usada nos runbooks de distribuição e pelo bin/release-module.sh).
-    // Hoje é a conta pessoal; o repo de cada módulo é {org}/erp-module-{slug} (ex.:
-    // leonardozaneladias/erp-module-rh). Migra para a org ht2-erp depois, via transfer.
+    // O nome do repo de cada pacote é DERIVADO do composer.json dele — ht2ml/core vira
+    // {org}/ht2ml-core — e não de convenção escrita aqui: a anterior (erp-module-{slug})
+    // ficou obsoleta sem ninguém notar. Migra para a org ht2-erp depois, via transfer.
     'org' => 'leonardozaneladias',
 
     // Diretório onde as extensões em desenvolvimento vivem (path repository).

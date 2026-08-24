@@ -95,9 +95,10 @@ new-client:
 	./bin/new-client.sh $(ARGS)
 
 # Corta release de um módulo (subtree split + push + tag). Ex.:
-#   make release-modulo slug=rh versao=v0.1.0
+#   make release-modulo pacote=core versao=v0.1.0
+#   (pacote = nome do diretório em packages/)
 release-modulo:
-	./bin/release-module.sh $(slug) $(versao)
+	./bin/release-module.sh $(pacote) $(versao)
 
 # (NO CLIENTE) traz updates da base: git merge upstream/main + ações pós-merge.
 update-base:
