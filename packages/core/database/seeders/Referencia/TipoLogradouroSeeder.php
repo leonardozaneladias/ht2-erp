@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Database\Seeders\Referencia;
 
-use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
-
 /**
  * Tipos de logradouro. CSV: `nome,codigo,abrev`. Chave natural: nome.
  */
-final class TipoLogradouroSeeder extends CsvReferenceSeeder
+final class TipoLogradouroSeeder extends CsvCoreSeeder
 {
     protected function arquivo(): string
     {

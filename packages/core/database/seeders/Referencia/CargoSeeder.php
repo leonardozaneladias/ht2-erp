@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Database\Seeders\Referencia;
 
-use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
-
 /**
  * Cargos (CBO). CSV: `codigo_cbo,descricao`. Conjunto inicial curado (a expandir);
  * o catálogo é editável no admin. `ativo` não é atualizado no re-seed.
  */
-final class CargoSeeder extends CsvReferenceSeeder
+final class CargoSeeder extends CsvCoreSeeder
 {
     protected function arquivo(): string
     {

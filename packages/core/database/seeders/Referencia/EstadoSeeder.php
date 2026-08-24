@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace HT2ML\Core\Database\Seeders\Referencia;
 
 use HT2ML\Core\Enums\Referencia\RegiaoBrasil;
-use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 
 /**
  * Estados (27 UF). CSV: `codigo_ibge,sigla,nome`. A região é derivada do 1º
  * dígito do código IBGE (não vem no CSV).
  */
-final class EstadoSeeder extends CsvReferenceSeeder
+final class EstadoSeeder extends CsvCoreSeeder
 {
     protected function arquivo(): string
     {

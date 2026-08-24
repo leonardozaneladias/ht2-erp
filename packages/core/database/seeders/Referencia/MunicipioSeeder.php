@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Database\Seeders\Referencia;
 
-use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\DB;
  * pelos 2 primeiros dígitos do código IBGE do município (= código do estado).
  * Depende de EstadoSeeder ter rodado antes.
  */
-final class MunicipioSeeder extends CsvReferenceSeeder
+final class MunicipioSeeder extends CsvCoreSeeder
 {
     /** @var array<string, int>|null mapa codigo_ibge(2) do estado => estado_id */
     private ?array $mapaEstados = null;
