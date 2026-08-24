@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Exemplos\ExemploTable;
-use App\Models\Exemplo;
 use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
+use HT2ML\ExemploDemo\Livewire\Exemplos\ExemploTable;
+use HT2ML\ExemploDemo\Models\Exemplo;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -99,19 +99,19 @@ it('renderiza as ações de lixeira conforme a permissão', function () {
 
     // Super-admin vê as ações (controle positivo).
     $this->actingAs($this->super, 'admin');
-    $htmlSuperAtivos = view('livewire.admin.exemplos._acoes', ['row' => $ativo, 'verLixeira' => false])->render();
+    $htmlSuperAtivos = view('exemplo-demo::exemplos._acoes', ['row' => $ativo, 'verLixeira' => false])->render();
     expect($htmlSuperAtivos)->toContain('solicitarExcluir(' . $ativo->id . ')');
 
-    $htmlSuperLixeira = view('livewire.admin.exemplos._acoes', ['row' => $naLixeira, 'verLixeira' => true])->render();
+    $htmlSuperLixeira = view('exemplo-demo::exemplos._acoes', ['row' => $naLixeira, 'verLixeira' => true])->render();
     expect($htmlSuperLixeira)->toContain('solicitarRestaurar(' . $naLixeira->id . ')')
         ->and($htmlSuperLixeira)->toContain('solicitarExcluirDefinitivo(' . $naLixeira->id . ')');
 
     // gestor (só listar) não vê nenhuma ação de exclusão/restauração (controle negativo).
     $this->actingAs($this->gestor, 'admin');
-    $htmlGestorAtivos = view('livewire.admin.exemplos._acoes', ['row' => $ativo, 'verLixeira' => false])->render();
+    $htmlGestorAtivos = view('exemplo-demo::exemplos._acoes', ['row' => $ativo, 'verLixeira' => false])->render();
     expect($htmlGestorAtivos)->not->toContain('solicitarExcluir(');
 
-    $htmlGestorLixeira = view('livewire.admin.exemplos._acoes', ['row' => $naLixeira, 'verLixeira' => true])->render();
+    $htmlGestorLixeira = view('exemplo-demo::exemplos._acoes', ['row' => $naLixeira, 'verLixeira' => true])->render();
     expect($htmlGestorLixeira)->not->toContain('solicitarRestaurar(')
         ->and($htmlGestorLixeira)->not->toContain('solicitarExcluirDefinitivo(');
 });

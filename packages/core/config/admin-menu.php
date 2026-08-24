@@ -88,15 +88,6 @@ return [
         'key' => 'negocio',
         'title' => 'Negócio',
         'items' => [
-            // Exemplo (demo) é opcional: EXEMPLO_DEMO=false oculta em projetos-cliente.
-            ...(env('EXEMPLO_DEMO', true) ? [[
-                'key' => 'exemplos',
-                'label' => 'Exemplo (demo)',
-                'icon' => 'tabler--components',
-                'route' => 'admin.exemplos.index',
-                'permission' => 'exemplos.listar',
-                'active' => ['admin.exemplos.*'],
-            ]] : []),
             // make:modulo insere itens de menu acima desta linha
         ],
     ],

@@ -193,7 +193,7 @@ Unique: `(funcionario_id, funcao_id, inicio)`. Índices: `funcionario_id`, `func
 
 Unique: `(empresa_id, codigo)` parcial. Índice: `(empresa_id, ativo)`.
 
-> Nome de classe do model: `TipoDocumentoRh` (a tabela é `tipos_documento`) para não confundir com o enum `App\Enums\TipoDocumento` do core, que trata de numeração fiscal — conceito distinto.
+> Nome de classe do model: `TipoDocumentoRh` (a tabela é `tipos_documento`) para não confundir com o enum `HT2ML\Documentos\Enums\TipoDocumento` do core, que trata de numeração fiscal — conceito distinto.
 
 #### A5. `tipos_afastamento` — [E][S][A] (híbrido com flags eSocial)
 

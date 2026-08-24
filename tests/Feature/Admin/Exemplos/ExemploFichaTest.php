@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Exemplos\IndexExemplo;
-use App\Models\Exemplo;
 use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Enums\TipoConcessao;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
+use HT2ML\ExemploDemo\Livewire\Exemplos\IndexExemplo;
+use HT2ML\ExemploDemo\Models\Exemplo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -79,7 +79,7 @@ it('perfil só-consulta vê apenas o item Ver no kebab', function () {
     concederAcessoDireto($consulta, 'exemplos.listar', TipoConcessao::Grant);
 
     $this->actingAs($consulta, 'admin');
-    $html = view('livewire.admin.exemplos._acoes', ['row' => $registro, 'verLixeira' => false])->render();
+    $html = view('exemplo-demo::exemplos._acoes', ['row' => $registro, 'verLixeira' => false])->render();
 
     expect($html)->toContain("\$dispatch('exemplos::ver'")
         ->and($html)->not->toContain('Editar')
@@ -87,6 +87,6 @@ it('perfil só-consulta vê apenas o item Ver no kebab', function () {
 
     // No ramo da lixeira o Ver também aparece (decidir restauração).
     $registro->delete();
-    $htmlLixeira = view('livewire.admin.exemplos._acoes', ['row' => $registro->fresh(), 'verLixeira' => true])->render();
+    $htmlLixeira = view('exemplo-demo::exemplos._acoes', ['row' => $registro->fresh(), 'verLixeira' => true])->render();
     expect($htmlLixeira)->toContain("\$dispatch('exemplos::ver'");
 });

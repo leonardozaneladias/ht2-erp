@@ -147,7 +147,7 @@ php artisan make:modulo Funcao --module=Rh --tenant \
   --fields="nome:string, descricao:text:nullable, cor:color:nullable, ativo:boolean" \
   --menu="Funções" --menu-icon="tabler--badges"
 
-# tipos_documento (model TipoDocumentoRh — nome deliberado p/ não colidir com App\Enums\TipoDocumento)
+# tipos_documento (model TipoDocumentoRh — nome deliberado p/ não colidir com HT2ML\Documentos\Enums\TipoDocumento)
 php artisan make:modulo TipoDocumentoRh --module=Rh --tenant \
   --fields="codigo:string, nome:string, exige_numero:boolean, exige_validade:boolean, exige_orgao_emissor:boolean, exige_arquivo:boolean, sensivel_lgpd:boolean, ativo:boolean" \
   --menu="Tipos de Documento" --menu-icon="tabler--file-text"

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Exemplos\FormExemplo;
-use App\Livewire\Admin\Exemplos\IndexExemplo;
-use App\Models\Exemplo;
 use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\ExemploDemo\Livewire\Exemplos\FormExemplo;
+use HT2ML\ExemploDemo\Livewire\Exemplos\IndexExemplo;
+use HT2ML\ExemploDemo\Models\Exemplo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;

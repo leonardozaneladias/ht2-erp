@@ -133,7 +133,7 @@ Sequência linear sugerida para execução solo: **B1 → B2 → B3 → B4 → B
 3. **6 catálogos tenant** (gerados com `make:modulo <Recurso> --module=Rh --tenant`), conforme [01 §3 Bloco A](01-modelo-de-dominio.md):
     - `departamentos` (model `Departamento`) — hierárquico (`departamento_pai_id` self, CHECK `departamento_pai_id <> id`), `responsavel_funcionario_id` nullable.
     - `funcoes` (model `Funcao`) — vocabulário N:N (líder/preposto/…); o pivot `funcionario_funcao` é entregue em **B3** (precisa de `funcionarios`).
-    - `tipos_documento` (model **`TipoDocumentoRh`** — nome de classe deliberadamente distinto do enum `App\Enums\TipoDocumento` do core) — com flags `exige_*`, `sensivel_lgpd`.
+    - `tipos_documento` (model **`TipoDocumentoRh`** — nome de classe deliberadamente distinto do enum `HT2ML\Documentos\Enums\TipoDocumento` do core) — com flags `exige_*`, `sensivel_lgpd`.
     - `tipos_afastamento` (model `TipoAfastamento`) — híbrido com flags eSocial (`remunerado`, `conta_como_falta`, `suspende_contrato`, `exige_atestado`, `codigo_esocial`).
     - `escalas` (model `Escala`) — cabeçalho da jornada (cria também a casca; os `escala_dias` editáveis vivem em **B5**).
     - `rubricas` (model `Rubrica`) — proventos/descontos com incidências (`incide_inss/fgts/irrf`, `natureza`); usada de fato em **B6/B7**.
