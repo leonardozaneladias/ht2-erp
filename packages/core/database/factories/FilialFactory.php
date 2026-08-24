@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace HT2ML\Core\Database\Factories;
 
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Models\Filial;

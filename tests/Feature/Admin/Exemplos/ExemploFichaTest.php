@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Livewire\Admin\Exemplos\IndexExemplo;
 use App\Models\Exemplo;
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Enums\TipoConcessao;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;

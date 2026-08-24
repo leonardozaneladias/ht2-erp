@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\Referencia\CargoSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\CargoSeeder;
 use HT2ML\Core\Enums\Referencia\OrigemRegistro;
 use HT2ML\Core\Models\Referencia\Cargo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,7 +69,7 @@ it('o padrão do banco é sincronizado, para o que já existia antes desta colun
 });
 
 it('nem o super-admin exclui registro sincronizado pelo grid', function () {
-    $this->seed(Database\Seeders\RolePermissionSeeder::class);
+    $this->seed(HT2ML\Core\Database\Seeders\RolePermissionSeeder::class);
     $this->seed(CargoSeeder::class);
 
     $admin = criarAdminUser('super@teste.com');

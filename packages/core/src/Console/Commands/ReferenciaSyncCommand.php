@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Console\Commands;
 
-use Database\Seeders\Referencia\DadosReferenciaSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\DadosReferenciaSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

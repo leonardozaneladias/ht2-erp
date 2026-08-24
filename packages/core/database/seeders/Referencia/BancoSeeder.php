@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders\Referencia;
+namespace HT2ML\Core\Database\Seeders\Referencia;
 
 use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
 

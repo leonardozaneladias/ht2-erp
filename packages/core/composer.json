@@ -19,7 +19,9 @@
   },
   "autoload": {
     "psr-4": {
-      "HT2ML\\Core\\": "src/"
+      "HT2ML\\Core\\": "src/",
+      "HT2ML\\Core\\Database\\Factories\\": "database/factories/",
+      "HT2ML\\Core\\Database\\Seeders\\": "database/seeders/"
     }
   },
   "extra": {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Referencia\CargoTable;
 use HT2ML\Core\Livewire\Admin\Referencia\FormCargo;
 use HT2ML\Core\Livewire\Admin\Referencia\IndexCargo;

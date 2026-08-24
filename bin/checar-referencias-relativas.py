@@ -16,11 +16,18 @@ Sai com código 1 se achar alguma coisa.
 import pathlib, re, collections, sys
 
 raiz = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else '.')
-BASES = ('app', 'packages/core/src', 'packages/extensao-rh/src', 'packages/extensao-fiscal-br/src')
+BASES = (
+    'app', 'database/seeders', 'database/factories',
+    'packages/core/src', 'packages/core/database/seeders', 'packages/core/database/factories',
+    'packages/extensao-rh/src', 'packages/extensao-fiscal-br/src',
+    'packages/extensao-fiscal-br/database/seeders',
+)
 
 conhecidas = set()
 arquivos = []
 for base in BASES:
+    if not (raiz / base).is_dir():
+        continue
     for p in (raiz / base).rglob('*.php'):
         t = p.read_text(encoding='utf-8')
         ns = re.search(r'^namespace\s+([^;]+);', t, re.M)

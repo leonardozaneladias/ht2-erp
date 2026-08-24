@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\AtualizarFilialAction;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\DTOs\Admin\FilialDTO;
 use HT2ML\Core\Exceptions\FilialException;
 use HT2ML\Core\Livewire\Admin\Empresas\FormEmpresa;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\AtribuirPerfilEmMassaAction;
 use HT2ML\Core\Actions\Admin\BulkUserStatusAction;
 use HT2ML\Core\Actions\Admin\DefinirPerfilAtivoAction;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\DTOs\Admin\AtribuicaoPerfilMassaDTO;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;

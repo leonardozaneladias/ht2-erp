@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Models;
 
-use Database\Factories\FilialFactory;
+use HT2ML\Core\Database\Factories\FilialFactory;
 use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +19,7 @@ class Filial extends Model implements UsaSoftDeletes
 {
     use Auditavel;
 
-    /** @use HasFactory<\Database\Factories\FilialFactory> */
+    /** @use HasFactory<\HT2ML\Core\Database\Factories\FilialFactory> */
     use HasFactory;
 
     use SoftDeletes;

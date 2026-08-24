@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Configuracao\AbaSeguranca;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;

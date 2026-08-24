@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\Referencia\EstadoSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\EstadoSeeder;
 use HT2ML\Core\Enums\Referencia\RegiaoBrasil;
 use HT2ML\Core\Models\Referencia\Estado;
 use HT2ML\Core\Models\Referencia\Municipio;

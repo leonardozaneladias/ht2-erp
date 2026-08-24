@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use HT2ML\Rh\Livewire\Departamentos\DepartamentoTable;

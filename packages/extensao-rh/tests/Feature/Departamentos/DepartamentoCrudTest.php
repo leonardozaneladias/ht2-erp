@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Rh\Livewire\Departamentos\FormDepartamento;
 use HT2ML\Rh\Livewire\Departamentos\IndexDepartamento;

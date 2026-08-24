@@ -12,6 +12,7 @@ parameters:
     # das extensões para que os models delas sejam conhecidos.
     databaseMigrationsPath:
         - database/migrations
+        - packages/core/database/migrations
         - packages/extensao-rh/database/migrations
         - packages/extensao-fiscal-br/database/migrations
     treatPhpDocTypesAsCertain: false

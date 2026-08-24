@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario;
 use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Foundation\Testing\RefreshDatabase;

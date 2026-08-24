@@ -21,6 +21,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
@@ -29,6 +30,19 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        // O módulo de exemplo é do APP, não do core — por isso contribui as
+        // rotas pelo mesmo canal que uma extensão usa, em vez de estar dentro
+        // do routes/admin.php do pacote. Deixá-las lá fazia o pacote referenciar
+        // App\Livewire\..., e a instalação num Laravel limpo estourava com
+        // "Invalid route action". Ver docs/superficie-do-core.md.
+        ModuleRegistry::routes(function (): void {
+            Route::prefix('exemplos')->name('exemplos.')->group(function (): void {
+                Route::get('/', \App\Livewire\Admin\Exemplos\IndexExemplo::class)->name('index');
+                Route::get('/criar', \App\Livewire\Admin\Exemplos\FormExemplo::class)->name('create');
+                Route::get('/{exemplo}/editar', \App\Livewire\Admin\Exemplos\FormExemplo::class)->name('edit');
+            });
+        });
+
         $this->app->singleton(AccessResolver::class);
         $this->app->singleton(\HT2ML\Core\Support\Tenancy\TenantContext::class);
         $this->app->singleton(ImpersonationContext::class);

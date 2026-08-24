@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Models;
 
-use Database\Factories\AdminUserFactory;
+use HT2ML\Core\Database\Factories\AdminUserFactory;
 use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use HT2ML\Core\Settings\SegurancaSettings;
@@ -30,7 +30,7 @@ class AdminUser extends Authenticatable implements UsaSoftDeletes
 {
     use Auditavel;
 
-    /** @use HasFactory<\Database\Factories\AdminUserFactory> */
+    /** @use HasFactory<\HT2ML\Core\Database\Factories\AdminUserFactory> */
     use HasFactory;
 
     use HasRoles;

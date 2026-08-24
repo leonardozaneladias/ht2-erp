@@ -30,7 +30,7 @@ class MenuPersonalizacao extends Model
 {
     use Auditavel;
 
-    /** @use HasFactory<\Database\Factories\MenuPersonalizacaoFactory> */
+    /** @use HasFactory<\HT2ML\Core\Database\Factories\MenuPersonalizacaoFactory> */
     use HasFactory;
 
     protected $table = 'menu_personalizacoes';

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Models\Referencia;
 
-use Database\Factories\Referencia\CargoFactory;
+use HT2ML\Core\Database\Factories\Referencia\CargoFactory;
 use HT2ML\Core\Enums\Referencia\OrigemRegistro;
 use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Concerns\TemOrigem;

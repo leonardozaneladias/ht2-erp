@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\CreateAdminUserAction;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\DTOs\Admin\AdminUserDTO;
 use HT2ML\Core\Livewire\Admin\Auditoria\AuditoriaTable;
 use HT2ML\Core\Livewire\Admin\Auditoria\IndexAuditoria;

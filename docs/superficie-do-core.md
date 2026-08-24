@@ -45,7 +45,7 @@ dependência de vendor.
 | `Livewire\Concerns\ComLixeira`                             | ✅ `ht2ml/core` | Lixeira, restauração e exclusão definitiva                                                                           |
 | `Livewire\Concerns\EmiteNotificacoes`                      | ✅ `ht2ml/core` | Toasts padronizados                                                                                                  |
 
-Só em teste: `Database\Seeders\RolePermissionSeeder`.
+Só em teste: `HT2ML\Core\Database\Seeders\RolePermissionSeeder`.
 
 ## Design system Blade — resolvido, e não era o que parecia
 
@@ -131,9 +131,46 @@ Ao mover qualquer coisa nova para o pacote, a pergunta é sempre a mesma: _o
 framework encontrava isso sozinho?_ Se sim, agora é preciso declarar — ou
 ensinar a convenção ao namespace novo, quando houver como.
 
-## O que ainda falta para a prova definitiva
+## A prova de instalação — passa
 
-O plano define sucesso como _instalar a extensão num Laravel limpo, fora do
-monorepo_. Hoje isso **não passa**, e a razão é exatamente esta lista: os 13
-símbolos `App\...` e os 11 componentes Blade não têm pacote que os entregue.
-A prova fica bloqueada até `ht2ml/core` existir — e esta é a especificação dele.
+O plano definia sucesso assim: _instalar num Laravel limpo, fora do monorepo. Se
+não funcionar fora, a extração não aconteceu — só mudamos pastas de lugar._
+
+**Passa.** Receita para repetir:
+
+```bash
+composer create-project laravel/laravel /tmp/prova
+cd /tmp/prova
+# repositório path apontando para packages/* do monorepo
+composer config repositories.ht2ml path ../caminho/para/ht2-erp/packages/*
+composer config minimum-stability dev
+composer require ht2ml/core:@dev
+php artisan migrate --force
+```
+
+Resultado medido num Laravel 13.26.1 limpo:
+
+| Verificação                                                                                                            | Resultado                                                                    |
+| ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Tabelas do pacote (`admin_users`, `empresas`, `filiais`, `activity_log`, `permission_grants`, `estados`, `municipios`) | criadas pelas 42 migrations do pacote                                        |
+| Permissões vindas da config do pacote                                                                                  | **83** — exatamente 113 − 18 (fiscal-br) − 12 (RH), que não estão instaladas |
+| Seções de menu                                                                                                         | 4                                                                            |
+| Rotas `admin.*`                                                                                                        | 124                                                                          |
+| `<x-shared.button>`                                                                                                    | renderiza                                                                    |
+| `HT2ML\Core\Models\AdminUser`                                                                                          | carrega                                                                      |
+| `access:sync`                                                                                                          | registrado no artisan                                                        |
+
+### Dois defeitos que só a instalação limpa revelou
+
+**Rotas do pacote referenciando o app.** `routes/admin.php` foi para o pacote
+levando junto o bloco do módulo de exemplo, que aponta para
+`App\Livewire\Admin\Exemplos\*` — classes do app consumidor. No monorepo
+funcionava, porque a classe existe lá. Fora, `Invalid route action`. É a
+inversão de dependência que o ADR-0015 proíbe, e nenhum teste do monorepo
+poderia tê-la pego. Corrigido: o app contribui as próprias rotas pelo canal do
+`ModuleRegistry`, o mesmo que uma extensão usa.
+
+**Migration de vendor sem a dependência.** `create_pulse_tables` importa
+`Laravel\Pulse\Support\PulseMigration`, e o core não declara `laravel/pulse` —
+nem usa Pulse em nenhuma linha de código. Era uma migration publicada de uma
+ferramenta opcional de observabilidade que veio na carona. Voltou para o app.

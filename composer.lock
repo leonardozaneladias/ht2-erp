@@ -1714,11 +1714,11 @@
         },
         {
             "name": "ht2ml/core",
-            "version": "dev-feat/core-auth-tenancy-auditoria",
+            "version": "dev-feat/core-instalavel",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
-                "reference": "f099a7cba92dd5bed2893cf1c7f32311d4099f8a"
+                "reference": "27881118c49d9393e8a98acba8fbc66d2589ac97"
             },
             "require": {
                 "illuminate/auth": "^13.0",
@@ -1744,7 +1744,9 @@
             },
             "autoload": {
                 "psr-4": {
-                    "HT2ML\\Core\\": "src/"
+                    "HT2ML\\Core\\": "src/",
+                    "HT2ML\\Core\\Database\\Factories\\": "database/factories/",
+                    "HT2ML\\Core\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [
@@ -1758,7 +1760,7 @@
         },
         {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-feat/core-auth-tenancy-auditoria",
+            "version": "dev-feat/core-instalavel",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
@@ -1808,7 +1810,7 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-feat/core-auth-tenancy-auditoria",
+            "version": "dev-feat/core-instalavel",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",

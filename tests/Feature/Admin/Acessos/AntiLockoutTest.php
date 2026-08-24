@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Support\Access\AccessGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;

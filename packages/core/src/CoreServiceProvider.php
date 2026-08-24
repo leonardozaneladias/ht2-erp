@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -26,8 +27,37 @@ use Livewire\Livewire;
  */
 final class CoreServiceProvider extends ServiceProvider
 {
+    /** Configs que o núcleo entrega ao app hospedeiro. */
+    private const CONFIGS = ['access', 'admin-menu', 'branding', 'extensoes', 'settings'];
+
+    public function register(): void
+    {
+        // As 5 configs do núcleo. mergeConfigFrom permite ao app hospedeiro
+        // sobrescrever chaves publicando a sua própria versão, sem precisar
+        // copiar o arquivo inteiro.
+        foreach (self::CONFIGS as $nome) {
+            $this->mergeConfigFrom(__DIR__ . "/../config/{$nome}.php", $nome);
+        }
+    }
+
     public function boot(): void
     {
+        $this->publishes(
+            collect(self::CONFIGS)
+                ->mapWithKeys(fn (string $n): array => [__DIR__ . "/../config/{$n}.php" => config_path("{$n}.php")])
+                ->all(),
+            'core-config',
+        );
+
+        $this->registrarRotas();
+
+        // As 43 migrations do núcleo. loadMigrationsFrom() as inclui no
+        // `php artisan migrate` sem publicar nada — o app hospedeiro ganha as
+        // tabelas do core só por instalar o pacote. A ordem continua sendo a do
+        // timestamp no nome, somando os caminhos registrados, então migrations
+        // do app e de extensões se intercalam corretamente.
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
         Blade::anonymousComponentPath(__DIR__ . '/../resources/views/components');
 
         // Views nomeadas do núcleo, sob o namespace `core::`, para quem quiser
@@ -49,6 +79,23 @@ final class CoreServiceProvider extends ServiceProvider
         $this->registrarComandos();
         $this->registrarListeners();
         $this->registrarComponentesLivewire();
+    }
+
+    /**
+     * As rotas do admin, dentro do grupo `web`.
+     *
+     * Saíram de bootstrap/app.php para cá: um app que instala ht2ml/core ganha
+     * o /admin inteiro sem precisar declarar nada. O guard de cache é o mesmo
+     * que o loadRoutesFrom() do Laravel faz — com as rotas em cache, o arquivo
+     * não deve ser lido de novo.
+     */
+    private function registrarRotas(): void
+    {
+        if ($this->app->routesAreCached()) {
+            return;
+        }
+
+        Route::middleware('web')->group(__DIR__ . '/../routes/admin.php');
     }
 
     /**

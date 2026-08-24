@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Menus\GestaoMenus;
 use HT2ML\Core\Models\MenuPersonalizacao;
 use HT2ML\Core\Services\Admin\Menu\MenuService;

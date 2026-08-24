@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Referencia\BancoTable;
 use HT2ML\Core\Livewire\Admin\Referencia\FormBanco;
 use HT2ML\Core\Livewire\Admin\Referencia\IndexBanco;
