@@ -106,10 +106,20 @@ php -r '
 
 # Sobras do monorepo que não fazem sentido num produto novo.
 rm -f "${TMP}/composer.lock" "${TMP}/package-lock.json"
-rm -rf "${TMP}/storage/framework/views" "${TMP}/storage/logs"
-mkdir -p "${TMP}/storage/framework/views" "${TMP}/storage/logs"
-find "${TMP}/storage" -name '*.php' -delete 2>/dev/null || true
-find "${TMP}/storage" -name '*.log' -delete 2>/dev/null || true
+
+# Esvazia o storage SEM apagar os .gitignore de cada pasta: são eles que fazem o
+# git versionar o diretório vazio. Apagá-los publica um skeleton sem
+# storage/framework/views, e o primeiro artisan morre com
+# "Please provide a valid cache path" — foi o que aconteceu na primeira tentativa.
+find "${TMP}/storage" -type f ! -name '.gitignore' -delete 2>/dev/null || true
+for d in framework/views framework/cache/data framework/sessions framework/testing logs app/public; do
+    mkdir -p "${TMP}/storage/${d}"
+    [[ -f "${TMP}/storage/${d}/.gitignore" ]] || printf '*\n!.gitignore\n' > "${TMP}/storage/${d}/.gitignore"
+done
+# bootstrap/cache idem.
+mkdir -p "${TMP}/bootstrap/cache"
+find "${TMP}/bootstrap/cache" -type f ! -name '.gitignore' -delete 2>/dev/null || true
+[[ -f "${TMP}/bootstrap/cache/.gitignore" ]] || printf '*\n!.gitignore\n' > "${TMP}/bootstrap/cache/.gitignore"
 
 cat > "${TMP}/README.md" <<'MD'
 # Esqueleto de produto — plataforma HT2ML
@@ -166,7 +176,9 @@ git init -q -b main
 git add -A
 git -c user.email=skeleton@ht2ml.local -c user.name="HT2ML Skeleton" \
     commit -q -m "chore: skeleton ${VERSAO} gerado do monorepo da base"
-git tag "${VERSAO}"
+# Anotada: a config local exige mensagem em tag (forceSignAnnotated/annotate).
+    git -c user.email=skeleton@ht2ml.local -c user.name="HT2ML Skeleton" \
+        tag -a "${VERSAO}" -m "skeleton ${VERSAO}"
 git push --no-verify -q --force "${REPO_URL}" "main:refs/heads/main"
 git push --no-verify -q "${REPO_URL}" "refs/tags/${VERSAO}"
 cd "${ROOT_DIR}"
