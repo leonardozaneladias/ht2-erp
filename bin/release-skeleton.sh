@@ -142,7 +142,17 @@ php -r '
     $org = $argv[2];
     $d["repositories"] = [];
     foreach (["core", "extensao-rh", "extensao-fiscal-br", "extensao-exemplo-demo", "extensao-documentos"] as $slug) {
-        $d["repositories"][] = ["type" => "vcs", "url" => "git@github.com:{$org}/ht2ml-{$slug}.git"];
+        // no-api: o Composer usa GIT em vez da API do GitHub para estes
+        // repositórios. Sem isso ele baixa um zipball de api.github.com, que
+        // exige o token ter permissão na API — caminho que falha com
+        // "Could not authenticate against github.com" mesmo quando o mesmo
+        // token já autentica as operações git. Com no-api, uma credencial só
+        // (a reescrita de URL do CI) cobre tudo.
+        $d["repositories"][] = [
+            "type" => "vcs",
+            "url" => "git@github.com:{$org}/ht2ml-{$slug}.git",
+            "no-api" => true,
+        ];
     }
     // Só o core entra por padrão. Extensão é escolha do produto — e o demo
     // existe justamente para provar que dá para NÃO instalar.
@@ -150,6 +160,16 @@ php -r '
         if (str_starts_with($k, "ht2ml/")) { unset($d["require"][$k]); }
     }
     $d["require"]["ht2ml/core"] = $argv[3];
+    // Os ht2ml/* vêm por GIT; todo o resto por zip.
+    //
+    // O zip vem de api.github.com, e para repositório privado isso exige o
+    // token ter permissão na API — canal diferente do que autentica o git. Um
+    // CI que reescreve SSH para HTTPS resolve os refs e ainda assim morre no
+    // download, com "Could not authenticate against github.com". Declarar a
+    // preferência por pacote faz uma credencial só cobrir tudo, sem depender de
+    // fallback (que o Composer desliga em modo não interativo).
+    $d["config"] = ($d["config"] ?? []) + [];
+    $d["config"]["preferred-install"] = ["ht2ml/*" => "source", "*" => "dist"];
     ksort($d["require"]);
     file_put_contents($p, json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
 ' "${TMP}/composer.json" "${ORG}" "^${CORE_VER#v}"

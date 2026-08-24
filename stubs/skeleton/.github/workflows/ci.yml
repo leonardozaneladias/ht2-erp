@@ -38,19 +38,15 @@ jobs:
                   extensions: pdo, pdo_sqlite, sqlite3, bcmath, mbstring, xml
                   coverage: none
 
-            # Autenticar nos pacotes privados exige DUAS coisas, e é fácil parar
-            # na primeira achando que basta:
+            # O token precisa de Contents: Read-only nos repositórios ht2ml/*.
+            # Só Metadata NÃO basta, e o sintoma engana: `api/repos/<nome>`
+            # devolve 200 (é o que Metadata concede), enquanto baixar o zipball
+            # devolve 403 e o git clone falha. Parece problema de configuração do
+            # Composer; é permissão.
             #
-            # 1. A reescrita de URL abaixo cobre as operações GIT. O
-            #    composer.json declara os repositórios por SSH, que é o que
-            #    funciona na máquina de quem desenvolve; o runner não tem a
-            #    chave, então SSH vira HTTPS autenticado. É isso que permite ao
-            #    Composer LER os refs e montar a lista de versões.
-            #
-            # 2. O COMPOSER_AUTH mais abaixo cobre o DOWNLOAD. Com
-            #    --prefer-dist o Composer baixa um zipball de api.github.com
-            #    pelo próprio cliente HTTP, que não lê configuração do git — sem
-            #    o token ali, a resolução funciona e o download morre com 404.
+            # A reescrita de URL abaixo existe porque o composer.json declara os
+            # repositórios por SSH — a forma que funciona na máquina de quem
+            # desenvolve. O runner não tem essa chave.
             - name: Autenticar nos pacotes privados (git)
               run: git config --global url."https://x-access-token:${{ secrets.COMPOSER_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
@@ -61,10 +57,17 @@ jobs:
                   key: composer-${{ hashFiles('composer.lock') }}
                   restore-keys: composer-
 
+            # Sem --prefer-dist e com preferred-install declarado por pacote no
+            # composer.json (ht2ml/* por source, resto por dist): os privados vêm
+            # por git, autenticados pela reescrita acima, e os ~195 públicos por
+            # zip. O COMPOSER_AUTH cobre o caso de o Composer precisar da API.
+            #
+            # Com o token correto o dist dos privados também funcionaria — esta
+            # configuração é redundante de propósito, para o CI não depender de
+            # a permissão do token estar exatamente certa.
             - name: Instalar dependências PHP
-              run: composer install --no-interaction --prefer-dist --optimize-autoloader
+              run: composer install --no-interaction --optimize-autoloader
               env:
-                  # Cobre o download do zipball pela API (ver o passo de git acima).
                   COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.COMPOSER_TOKEN }}"}}'
 
             - name: Setup Node 22
