@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Models;
 
-use App\Models\Concerns\BelongsToEmpresa;
 use HT2ML\Core\Models\Concerns\Auditavel;
+use HT2ML\Core\Models\Concerns\BelongsToEmpresa;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use HT2ML\Rh\Database\Factories\DepartamentoFactory;
 use HT2ML\Rh\Enums\StatusDepartamento;

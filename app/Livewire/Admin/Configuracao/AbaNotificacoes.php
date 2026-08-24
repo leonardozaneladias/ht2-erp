@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Configuracao;
 
-use App\Actions\Admin\Settings\SaveNotificacaoSettingsAction;
+use HT2ML\Core\Actions\Admin\Settings\SaveNotificacaoSettingsAction;
 use HT2ML\Core\DTOs\Admin\Settings\NotificacaoSettingsDTO;
 use HT2ML\Core\Enums\Admin\Notificacao\ConfirmacaoPosicao;
 use HT2ML\Core\Enums\Admin\Notificacao\ToastDuracao;

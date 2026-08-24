@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Usuarios;
 
-use App\Actions\Admin\AtribuirPerfilEmMassaAction;
-use App\Actions\Admin\BulkUserStatusAction;
-use App\Actions\Admin\ToggleAdminUserStatusAction;
-use App\DTOs\Admin\AtribuicaoPerfilMassaDTO;
-use App\Exceptions\AccessException;
-use App\Services\Admin\HierarchyResolver;
-use App\Services\Admin\Security\ControleLockout;
+use HT2ML\Core\Actions\Admin\AtribuirPerfilEmMassaAction;
+use HT2ML\Core\Actions\Admin\BulkUserStatusAction;
+use HT2ML\Core\Actions\Admin\ToggleAdminUserStatusAction;
+use HT2ML\Core\DTOs\Admin\AtribuicaoPerfilMassaDTO;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Livewire\Concerns\ComLixeira;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Services\Admin\Security\ControleLockout;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

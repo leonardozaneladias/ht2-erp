@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Notificacoes;
 
-use App\Actions\Admin\Notificacoes\EnviarComunicadoAction;
-use App\DTOs\Admin\ComunicadoDTO;
-use App\Enums\PublicoComunicado;
-use App\Enums\TipoNotificacao;
 use Closure;
+use HT2ML\Core\Actions\Admin\Notificacoes\EnviarComunicadoAction;
+use HT2ML\Core\DTOs\Admin\ComunicadoDTO;
+use HT2ML\Core\Enums\PublicoComunicado;
+use HT2ML\Core\Enums\TipoNotificacao;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;

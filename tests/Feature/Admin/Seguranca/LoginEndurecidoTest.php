@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Livewire\Admin\Auth\Login;
-use App\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;

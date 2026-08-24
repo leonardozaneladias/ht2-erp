@@ -234,7 +234,7 @@ Campos de `funcionarios`, bloco _Contratação_ (01 §3 B1). Mudanças posterior
 
 ## 8. Aba 7 — Documentos / Anexos
 
-Metadados em `funcionario_documentos` (01 §3 B6); o **binário reaproveita o core**: `App\Models\Anexo` (MorphTo polimórfico) gerenciado pelo `App\Livewire\Admin\Shared\GerenciadorAnexos`. Cada linha de documento referencia o tipo no **catálogo tenant `tipos_documento`** ([04](04-catalogos-configuraveis.md)) e, opcionalmente, um `anexo_id`.
+Metadados em `funcionario_documentos` (01 §3 B6); o **binário reaproveita o core**: `HT2ML\Core\Models\Anexo` (MorphTo polimórfico) gerenciado pelo `App\Livewire\Admin\Shared\GerenciadorAnexos`. Cada linha de documento referencia o tipo no **catálogo tenant `tipos_documento`** ([04](04-catalogos-configuraveis.md)) e, opcionalmente, um `anexo_id`.
 
 ### 8.1 Campos por linha de documento
 
@@ -255,7 +255,7 @@ As flags do `tipos_documento` (01 §3 A4: `exige_numero`, `exige_validade`, `exi
 
 ### 8.3 Upload seguro (disco **privado**) reaproveitando o core
 
-- O binário entra como `App\Models\Anexo` com `anexavel_type = HT2ML\Rh\Models\Funcionario` (morph map) e `anexavel_id = funcionario.id`; `funcionario_documentos.anexo_id` aponta para ele (FK `nullOnDelete`).
+- O binário entra como `HT2ML\Core\Models\Anexo` com `anexavel_type = HT2ML\Rh\Models\Funcionario` (morph map) e `anexavel_id = funcionario.id`; `funcionario_documentos.anexo_id` aponta para ele (FK `nullOnDelete`).
 - O `GerenciadorAnexos` do core hoje grava no **disco `public`** com caminho fixo (`store('anexos','public')`) e monta a lista chamando `Anexo::url()`. Documentos de RH são **sensíveis** → disco **privado**. Como o driver `local`/privado **não** serve `url()` pública, a abordagem fiel ao [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) é um **componente próprio do pacote** (`GerenciadorAnexosRh`) que **reusa o _model_ `Anexo`** com `disco='rh_privado'` e caminho `rh/{empresa_id}/...` (§8.3 endurecimento), **sem editar** o componente do core. **Acesso sempre por rota de download assinada autorizada por Policy** (`Storage::disk('rh_privado')->download(...)`), **nunca** `Anexo::url()` nem link público. _Alternativa:_ tornar o `GerenciadorAnexos` do core parametrizável (disco + caminho + geração de URL) como mudança **aditiva aprovada** — mais invasiva ([ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)).
 - Ciclo de vida do arquivo segue o core: soft-delete do `Anexo` mantém o binário (retenção/auditoria); o arquivo físico só some no force-delete (evento `forceDeleted`). Combina com a guarda legal trabalhista (01 §8).
 

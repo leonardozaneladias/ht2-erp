@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace __NS_LIVEWIRE__;
 
-use App\DTOs\Admin\Export\ExportavelDTO;
+use HT2ML\Core\DTOs\Admin\Export\ExportavelDTO;
 use __NS_ENUMS__\__STATUS_ENUM__;
 use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
 __USE_COM_LIXEIRA__

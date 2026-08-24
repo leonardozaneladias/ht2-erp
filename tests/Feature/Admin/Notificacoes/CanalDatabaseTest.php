@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoAlertaSeguranca;
-use App\Enums\TipoNotificacao;
-use App\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Enums\TipoAlertaSeguranca;
+use HT2ML\Core\Enums\TipoNotificacao;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

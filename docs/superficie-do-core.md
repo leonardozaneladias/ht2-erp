@@ -102,6 +102,25 @@ extensões ainda não — `packages/extensao-rh/composer.json` declara apenas
 | `power-components/livewire-powergrid`                                                        | As tabelas                           |
 | `laravel/framework` (dev)                                                                    | Os testes bootam a aplicação inteira |
 
+## As três descobertas automáticas que morrem dentro de um pacote
+
+O Laravel encontra sozinho várias coisas em `app/`. **Nada disso vale dentro de
+um pacote**, e as três falham do pior jeito possível: sem erro nenhum.
+
+| Descoberta                              | O que sumiu ao mover                                                                  | Como se manifesta                                          |
+| --------------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `App\Models\X` → `App\Policies\XPolicy` | `EmpresaPolicy`                                                                       | Autorização **desligada**; `getPolicyFor()` devolve `null` |
+| `app/Console/Commands`                  | Os 5 comandos do core, incluindo `access:sync` e `referencia:sync` — passos de deploy | Somem do `artisan`                                         |
+| `app/Listeners`                         | `RegistrarLoginAdmin`                                                                 | Histórico de login **para de gravar**                      |
+
+Por isso o `CoreServiceProvider` declara tudo à mão, em três métodos
+(`registrarPolicies`, `registrarComandos`, `registrarListeners`), e cada um tem
+um teste de guarda em `tests/Feature/Core/` que falha se algo sumir **ou** se
+houver classe no pacote que ninguém registra.
+
+Ao mover qualquer coisa nova para o pacote, a pergunta é sempre a mesma: _o
+Laravel encontrava isso sozinho?_ Se sim, agora é preciso declarar.
+
 ## O que ainda falta para a prova definitiva
 
 O plano define sucesso como _instalar a extensão num Laravel limpo, fora do

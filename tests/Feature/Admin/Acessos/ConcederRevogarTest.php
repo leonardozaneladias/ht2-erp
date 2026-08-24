@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\ConcederAcessoDiretoAction;
-use App\Actions\Admin\RevogarAcessoDiretoAction;
-use App\DTOs\Admin\ConcessaoAcessoDTO;
-use App\Exceptions\AccessException;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\ConcederAcessoDiretoAction;
+use HT2ML\Core\Actions\Admin\RevogarAcessoDiretoAction;
+use HT2ML\Core\DTOs\Admin\ConcessaoAcessoDTO;
 use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\PermissionGrant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;

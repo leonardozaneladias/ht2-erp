@@ -390,7 +390,7 @@ git commit -m "feat(admin): permissão auditoria.todas-empresas no catálogo"
 
 declare(strict_types=1);
 
-use App\Services\Admin\AuditoriaSeguranca;
+use HT2ML\Core\Services\Admin\AuditoriaSeguranca;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;
 
@@ -577,7 +577,7 @@ Expected: FAIL — os eventos de login não são registrados ainda.
 Em `app/Livewire/Admin/Auth/Login.php`, adicionar o import:
 
 ```php
-use App\Services\Admin\AuditoriaSeguranca;
+use HT2ML\Core\Services\Admin\AuditoriaSeguranca;
 ```
 
 No método `authenticate()`:
@@ -640,7 +640,7 @@ git commit -m "feat(admin): audita login (sucesso, falha, bloqueio)"
 
 ```php
 use App\Livewire\Admin\Auth\TwoFactorChallenge;
-use App\Services\Admin\Security\TwoFactorService;
+use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 
 it('registra falha no desafio 2FA', function (): void {
     $user = criarAdminUser('u@teste.com');
@@ -670,7 +670,7 @@ Expected: FAIL — falha de 2FA não registrada.
 Em `app/Livewire/Admin/Auth/TwoFactorChallenge.php`, adicionar o import:
 
 ```php
-use App\Services\Admin\AuditoriaSeguranca;
+use HT2ML\Core\Services\Admin\AuditoriaSeguranca;
 ```
 
 No método `verificar()`:
@@ -800,7 +800,7 @@ a) `app/Http/Controllers/Admin/Auth/LogoutController.php` — adicionar import e
                 ->event('encerrada')
                 ->log('Personificação encerrada (logout)');
         } elseif ($usuario instanceof AdminUser) {
-            app(\App\Services\Admin\AuditoriaSeguranca::class)->logout($usuario);
+            app(\HT2ML\Core\Services\Admin\AuditoriaSeguranca::class)->logout($usuario);
         }
 
         Auth::guard('admin')->logout();
@@ -811,7 +811,7 @@ a) `app/Http/Controllers/Admin/Auth/LogoutController.php` — adicionar import e
     }
 ```
 
-b) `app/Livewire/Admin/Auth/ForgotPassword.php` — adicionar import `use App\Services\Admin\AuditoriaSeguranca;` e logar quando o link é enviado:
+b) `app/Livewire/Admin/Auth/ForgotPassword.php` — adicionar import `use HT2ML\Core\Services\Admin\AuditoriaSeguranca;` e logar quando o link é enviado:
 
 ```php
         if ($status === Password::RESET_LINK_SENT) {
@@ -823,7 +823,7 @@ b) `app/Livewire/Admin/Auth/ForgotPassword.php` — adicionar import `use App\Se
         }
 ```
 
-c) `app/Livewire/Admin/Auth/ResetPassword.php` — adicionar import `use App\Services\Admin\AuditoriaSeguranca;` e logar a aplicação no sucesso (o usuário é localizado por e-mail):
+c) `app/Livewire/Admin/Auth/ResetPassword.php` — adicionar import `use HT2ML\Core\Services\Admin\AuditoriaSeguranca;` e logar a aplicação no sucesso (o usuário é localizado por e-mail):
 
 ```php
         if ($status === Password::PASSWORD_RESET) {

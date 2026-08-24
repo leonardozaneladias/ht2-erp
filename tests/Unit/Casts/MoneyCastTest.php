@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Casts\MoneyCast;
-use App\Support\Money\Money;
+use HT2ML\Core\Casts\MoneyCast;
+use HT2ML\Core\Support\Money\Money;
 use Illuminate\Database\Eloquent\Model;
 
 // ---- get() ------------------------------------------------------------------

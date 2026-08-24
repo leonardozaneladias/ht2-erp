@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\Money\Money;
+use HT2ML\Core\Support\Money\Money;
 
 // ---- Construção --------------------------------------------------------------
 

@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Contracts\Referencia\FonteDeCargos;
-use App\Contracts\Referencia\FonteDeMunicipios;
-use App\Contracts\Referencia\FonteDeUnidadesFederativas;
 use App\Http\Middleware\AdminAuthenticate;
-use App\Policies\RolePolicy;
-use App\Services\Admin\AccessResolver;
-use App\Services\Admin\Referencia\CatalogoDeLocalidades;
 use App\Support\Documents\GeradorNumeroDocumento;
+use HT2ML\Core\Contracts\Referencia\FonteDeCargos;
+use HT2ML\Core\Contracts\Referencia\FonteDeMunicipios;
+use HT2ML\Core\Contracts\Referencia\FonteDeUnidadesFederativas;
 use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\PermissionGrant;
+use HT2ML\Core\Services\Admin\AccessResolver;
+use HT2ML\Core\Services\Admin\Referencia\CatalogoDeLocalidades;
 use HT2ML\Core\Services\Admin\Settings\SettingsRuntimeApplier;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use HT2ML\Core\Support\Modules\ModuleRegistry;
@@ -54,9 +53,8 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultView('vendor.pagination.inspinia');
         Paginator::defaultSimpleView('vendor.pagination.simple-inspinia');
 
-        // AdminUser, Empresa e PermissionGrant são registrados pelo
-        // CoreServiceProvider: policy de model do core viaja com o model.
-        Gate::policy(Role::class, RolePolicy::class);
+        // As policies do core — AdminUser, Empresa, PermissionGrant e Role —
+        // são registradas pelo CoreServiceProvider: policy viaja com a classe.
 
         // Reaplica o guard admin nas requisições de update do Livewire (AJAX).
         // Sem isto, $this->authorize() em métodos de ação resolve o guard padrão

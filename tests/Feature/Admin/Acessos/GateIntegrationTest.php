@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Services\Admin\AccessResolver;
 use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Enums\TipoConcessao;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Services\Admin\AccessResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 

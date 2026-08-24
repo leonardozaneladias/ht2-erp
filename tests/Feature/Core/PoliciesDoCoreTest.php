@@ -8,7 +8,9 @@ use HT2ML\Core\Models\PermissionGrant;
 use HT2ML\Core\Policies\AdminUserPolicy;
 use HT2ML\Core\Policies\EmpresaPolicy;
 use HT2ML\Core\Policies\PermissionGrantPolicy;
+use HT2ML\Core\Policies\RolePolicy;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Spatie\Permission\Models\Role;
 
 /**
  * Guarda contra uma regressão que já aconteceu.
@@ -32,6 +34,7 @@ it('resolve a policy de cada model do core', function (string $model, string $po
     'AdminUser' => [AdminUser::class, AdminUserPolicy::class],
     'Empresa' => [Empresa::class, EmpresaPolicy::class],
     'PermissionGrant' => [PermissionGrant::class, PermissionGrantPolicy::class],
+    'Role' => [Role::class, RolePolicy::class],
 ]);
 
 it('não deixa policy do core órfã: toda policy do pacote está registrada', function () {
@@ -41,7 +44,7 @@ it('não deixa policy do core órfã: toda policy do pacote está registrada', f
         ->map(fn (string $f): string => 'HT2ML\\Core\\Policies\\' . basename($f, '.php'))
         ->all();
 
-    $registradas = collect([AdminUser::class, Empresa::class, PermissionGrant::class])
+    $registradas = collect([AdminUser::class, Empresa::class, PermissionGrant::class, Role::class])
         ->map(fn (string $m): ?string => ($p = app(Gate::class)->getPolicyFor($m)) ? $p::class : null)
         ->filter()
         ->all();

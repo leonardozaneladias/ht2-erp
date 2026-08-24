@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Menu\CriarGrupoMenuAction;
-use App\Actions\Admin\Menu\CriarSecaoMenuAction;
-use App\Actions\Admin\Menu\ExcluirPersonalizacaoCustomAction;
 use App\Livewire\Admin\Menus\GestaoMenus;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\Menu\CriarGrupoMenuAction;
+use HT2ML\Core\Actions\Admin\Menu\CriarSecaoMenuAction;
+use HT2ML\Core\Actions\Admin\Menu\ExcluirPersonalizacaoCustomAction;
 use HT2ML\Core\Enums\TipoPersonalizacaoMenu;
 use HT2ML\Core\Models\MenuPersonalizacao;
 use HT2ML\Core\Services\Admin\Menu\MenuService;

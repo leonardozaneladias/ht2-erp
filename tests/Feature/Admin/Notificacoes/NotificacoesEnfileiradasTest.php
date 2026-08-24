@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Notifications\AlertaSegurancaNotification;
-use App\Notifications\ComunicadoNotification;
+use HT2ML\Core\Notifications\AlertaSegurancaNotification;
+use HT2ML\Core\Notifications\ComunicadoNotification;
 use HT2ML\Core\Notifications\ResetSenhaNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;

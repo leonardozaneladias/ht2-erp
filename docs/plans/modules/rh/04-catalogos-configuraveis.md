@@ -41,7 +41,7 @@ Assim o cliente adiciona uma linha nova (ex.: um tipo de afastamento próprio) e
 
 Para não repetir em cada subseção, vale para todos (confirmado no core — ver [01 §0](01-modelo-de-dominio.md)):
 
-- **Tenant-scoped** — trait `App\Models\Concerns\BelongsToEmpresa`: `empresa_id NOT NULL`, global scope `empresa` automático, auto-fill no `creating`. Toda unicidade é **por empresa** (índice único composto parcial `UNIQUE (empresa_id, <coluna>) WHERE deleted_at IS NULL`).
+- **Tenant-scoped** — trait `HT2ML\Core\Models\Concerns\BelongsToEmpresa`: `empresa_id NOT NULL`, global scope `empresa` automático, auto-fill no `creating`. Toda unicidade é **por empresa** (índice único composto parcial `UNIQUE (empresa_id, <coluna>) WHERE deleted_at IS NULL`).
 - **Lixeira** — `SoftDeletes` + contrato `UsaSoftDeletes` no model e trait `HT2ML\Core\Livewire\Concerns\ComLixeira` na Table. Três níveis: excluir → lixeira (`delete`), `restore`, excluir definitivamente (`forceDelete`). Catálogo **em uso** não é excluído fisicamente (`restrictOnDelete` nas FKs das filhas; ver §9). Detalhes em [`docs/lixeira.md`](../../../lixeira.md).
 - **Auditoria** — trait `Auditavel` (spatie/activitylog), append-only.
 - **CRUD via Livewire** — componentes `Index` (página + tabela embutida), `Form` (drawer/modal) e `Table` (PowerGrid com filtros, busca e lixeira). Validação em **FormRequest + Rules** (`Rule::unique()->where('empresa_id', ...)`). Transporte entre camadas por **DTO readonly**; gravação por **Actions**.
@@ -284,7 +284,7 @@ Essas flags alimentam o registro de `funcionario_afastamentos` e os cálculos de
 
 ## 8. Cargo — reaproveitamento da referência global (CBO)
 
-Cargo é **REFERÊNCIA global**, não catálogo tenant. O RH reaproveita o catálogo oficial `cargos` (`App\Models\Referencia\Cargo`, semeado pelo `CargoSeeder` com a CBO), sem recriá-lo:
+Cargo é **REFERÊNCIA global**, não catálogo tenant. O RH reaproveita o catálogo oficial `cargos` (`HT2ML\Core\Models\Referencia\Cargo`, semeado pelo `CargoSeeder` com a CBO), sem recriá-lo:
 
 - `funcionarios.cargo_id` aponta para `cargos` (selecionável no cadastro — satisfaz o `FuncionarioCargoTest`, que espera `cargosDisponiveis` populado).
 - O **nível hierárquico** que o organograma precisa mora em `funcionarios.cargo_nivel` (SMALLINT desnormalizado, cache), ou numa coluna `nivel_hierarquico` adicionada a `cargos` caso o catálogo global passe a ser editável por Tabelas Auxiliares.
@@ -308,7 +308,7 @@ Catálogos são fundação de cadastros, então a exclusão é defensiva:
 
 Toda empresa nova precisa nascer **já configurada** com o padrão — esse é o coração do requisito "padrão pronto, editável depois".
 
-- **Action idempotente** `HT2ML\Rh\Actions\ProvisionarCatalogosRh` (análoga ao `App\Actions\Admin\Menu\AplicarMenuPadraoAction` do core, que usa exatamente este padrão), semeia os catálogos tenant via `firstOrCreate` por chave estável: `(empresa_id, codigo)` para `tipos_documento`/`tipos_afastamento`/`rubricas`; `(empresa_id, nome)` para `departamentos`/`funcoes`/`escalas`. Rodar duas vezes é **no-op** — nunca duplica nem sobrescreve o que o cliente já editou.
+- **Action idempotente** `HT2ML\Rh\Actions\ProvisionarCatalogosRh` (análoga ao `HT2ML\Core\Actions\Admin\Menu\AplicarMenuPadraoAction` do core, que usa exatamente este padrão), semeia os catálogos tenant via `firstOrCreate` por chave estável: `(empresa_id, codigo)` para `tipos_documento`/`tipos_afastamento`/`rubricas`; `(empresa_id, nome)` para `departamentos`/`funcoes`/`escalas`. Rodar duas vezes é **no-op** — nunca duplica nem sobrescreve o que o cliente já editou.
 - **Gatilho:** chamada **na criação da empresa** (no fluxo de cadastro de empresa / listener do core), dentro de uma transação. Greenfield e reexecutável.
 - **O que NÃO entra aqui:** enums (vivem no código) e referências globais (`cargos`, `bancos`, `paises`… já semeados pelo core). A Action cuida só dos seis catálogos tenant (+ as filhas `escala_dias` e o conjunto de `funcionario_funcao`/`escala_funcionario` permanecem vazios — são preenchidos por atribuição). O catálogo **opcional** `centros_custo` (§7.1) **não** faz parte dos seis: nasce **vazio** por padrão e só é semeado (mínimo idempotente) se o cliente adotar centro de custo.
 - **Empacotamento (ADR-0015):** a Action e seus dados-semente vivem no pacote `packages/extensao-rh`; o core não é editado. O item de menu do RH já é contribuído pelo pacote (visto em `AplicarMenuPadraoAction`: grupo `grupo-tab-rh`).

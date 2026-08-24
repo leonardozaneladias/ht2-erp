@@ -77,7 +77,7 @@
                         with-meter
                     />
                     <small class="text-default-400 mt-1 block text-xs">
-                        {{ \App\Support\Settings\PasswordPolicy::descricao() }}
+                        {{ \HT2ML\Core\Support\Settings\PasswordPolicy::descricao() }}
                     </small>
                 </div>
             </div>

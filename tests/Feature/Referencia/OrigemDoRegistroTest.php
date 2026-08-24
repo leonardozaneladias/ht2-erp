@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\Referencia\Cargo;
 use Database\Seeders\Referencia\CargoSeeder;
 use HT2ML\Core\Enums\Referencia\OrigemRegistro;
+use HT2ML\Core\Models\Referencia\Cargo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 

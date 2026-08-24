@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Usuarios;
 
-use App\Actions\Admin\ConcederAcessoDiretoAction;
-use App\Actions\Admin\CreateAdminUserAction;
-use App\Actions\Admin\RevogarAcessoDiretoAction;
-use App\Actions\Admin\Security\DefinirEmailDoisFatoresAction;
-use App\Actions\Admin\SyncAcessoEmpresaAction;
-use App\Actions\Admin\UpdateAdminUserAction;
-use App\Contracts\Referencia\FonteDeCargos;
-use App\DTOs\Admin\AdminUserDTO;
-use App\DTOs\Admin\ConcessaoAcessoDTO;
-use App\Exceptions\AccessException;
-use App\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Actions\Admin\ConcederAcessoDiretoAction;
+use HT2ML\Core\Actions\Admin\CreateAdminUserAction;
+use HT2ML\Core\Actions\Admin\RevogarAcessoDiretoAction;
+use HT2ML\Core\Actions\Admin\Security\DefinirEmailDoisFatoresAction;
+use HT2ML\Core\Actions\Admin\SyncAcessoEmpresaAction;
+use HT2ML\Core\Actions\Admin\UpdateAdminUserAction;
+use HT2ML\Core\Contracts\Referencia\FonteDeCargos;
+use HT2ML\Core\DTOs\Admin\AdminUserDTO;
+use HT2ML\Core\DTOs\Admin\ConcessaoAcessoDTO;
 use HT2ML\Core\Enums\ModuloAcesso;
 use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Models\PermissionGrant;
+use HT2ML\Core\Services\Admin\HierarchyResolver;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -103,7 +103,7 @@ class FormUsuario extends Component
     public function salvar(
         CreateAdminUserAction $criar,
         UpdateAdminUserAction $atualizar,
-        \App\Actions\Admin\Convites\ConvidarUsuarioAction $convidar,
+        \HT2ML\Core\Actions\Admin\Convites\ConvidarUsuarioAction $convidar,
     ): void {
         $dados = $this->validate();
         $alvo = $this->resolverUsuario();
@@ -132,13 +132,13 @@ class FormUsuario extends Component
         }
 
         if ($this->avatar !== null) {
-            app(\App\Actions\Admin\AtualizarAvatarAction::class)->execute($usuario, $this->avatar);
+            app(\HT2ML\Core\Actions\Admin\AtualizarAvatarAction::class)->execute($usuario, $this->avatar);
         }
 
         $this->redirect(route('admin.usuarios.index'), navigate: true);
     }
 
-    public function removerFoto(\App\Actions\Admin\AtualizarAvatarAction $action): void
+    public function removerFoto(\HT2ML\Core\Actions\Admin\AtualizarAvatarAction $action): void
     {
         $alvo = $this->resolverUsuario();
 
@@ -179,7 +179,7 @@ class FormUsuario extends Component
         return null;
     }
 
-    public function reenviarConvite(\App\Actions\Admin\Convites\ConvidarUsuarioAction $convidar): void
+    public function reenviarConvite(\HT2ML\Core\Actions\Admin\Convites\ConvidarUsuarioAction $convidar): void
     {
         $alvo = $this->resolverUsuario();
 
@@ -453,8 +453,8 @@ class FormUsuario extends Component
         $senhaRegra = match (true) {
             // Criação por convite: a senha é definida pelo convidado no aceite.
             $this->usuarioId === null && $this->modoAcesso === 'convite' => ['exclude'],
-            $this->usuarioId === null => ['required', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'],
-            default => ['nullable', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'],
+            $this->usuarioId === null => ['required', 'string', \HT2ML\Core\Support\Settings\PasswordPolicy::rule(), 'max:191'],
+            default => ['nullable', 'string', \HT2ML\Core\Support\Settings\PasswordPolicy::rule(), 'max:191'],
         };
 
         $ator = Auth::guard('admin')->user();

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Support\Generator\CampoModulo;
+use HT2ML\Core\Support\Generator\CampoModulo;
 
 it('faz parse de aba(...) preservando o rótulo (case e acentos)', function (): void {
     $campo = CampoModulo::deToken('email:email:aba(Contato)');

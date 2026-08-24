@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Support\PowerGrid\Exports\ExportToCsv;
-use App\Support\PowerGrid\Exports\ExportToXLS;
+use HT2ML\Core\Support\PowerGrid\Exports\ExportToCsv;
+use HT2ML\Core\Support\PowerGrid\Exports\ExportToXLS;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\Boolean;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\InputText;
 use PowerComponents\LivewirePowerGrid\FilterAttributes\Number;
@@ -20,7 +20,7 @@ return [
     | Configure here the theme of your choice.
     */
 
-    'theme' => App\PowerGridThemes\InspiniaTheme::class,
+    'theme' => HT2ML\Core\PowerGridThemes\InspiniaTheme::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\Tailwind::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\DaisyUI::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Configuracao;
 
-use App\Actions\Admin\Settings\SaveLocalizacaoSettingsAction;
+use HT2ML\Core\Actions\Admin\Settings\SaveLocalizacaoSettingsAction;
 use HT2ML\Core\DTOs\Admin\Settings\LocalizacaoSettingsDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Settings\LocalizacaoSettings;

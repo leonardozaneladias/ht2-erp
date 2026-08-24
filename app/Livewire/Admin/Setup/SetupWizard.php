@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Setup;
 
-use App\Actions\Admin\Settings\ConcluirSetupAction;
+use HT2ML\Core\Actions\Admin\Settings\ConcluirSetupAction;
 use HT2ML\Core\DTOs\Admin\Settings\SetupDTO;
 use HT2ML\Core\Settings\BrandingSettings;
 use HT2ML\Core\Settings\GeneralSettings;
@@ -123,7 +123,7 @@ class SetupWizard extends Component
             3 => [
                 'admin_nome' => ['required', 'string', 'min:3', 'max:120'],
                 'admin_email' => ['required', 'email', 'max:191', Rule::unique('admin_users', 'email')->whereNull('deleted_at')],
-                'admin_senha' => ['required', 'string', \App\Support\Settings\PasswordPolicy::rule(), 'max:191'],
+                'admin_senha' => ['required', 'string', \HT2ML\Core\Support\Settings\PasswordPolicy::rule(), 'max:191'],
             ],
             default => [],
         };

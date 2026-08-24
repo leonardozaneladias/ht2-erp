@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Rules\Cnpj;
-use App\Rules\TituloEleitor;
+use HT2ML\Core\Rules\Cnpj;
 use HT2ML\Core\Rules\Cpf;
 use HT2ML\Core\Rules\Pis;
+use HT2ML\Core\Rules\TituloEleitor;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 /*

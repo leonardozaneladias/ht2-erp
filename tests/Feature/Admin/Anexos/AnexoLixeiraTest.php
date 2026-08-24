@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\Anexo;
+use HT2ML\Core\Models\Anexo;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;

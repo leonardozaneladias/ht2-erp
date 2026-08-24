@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Actions\Admin\Referencia\CreateCargoAction;
-use App\Actions\Admin\Referencia\UpdateCargoAction;
-use App\DTOs\Admin\Referencia\CargoDTO;
 use App\Http\Requests\Admin\Referencia\CargoRules;
-use App\Models\Referencia\Cargo;
+use HT2ML\Core\Actions\Admin\Referencia\CreateCargoAction;
+use HT2ML\Core\Actions\Admin\Referencia\UpdateCargoAction;
+use HT2ML\Core\DTOs\Admin\Referencia\CargoDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\Cargo;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

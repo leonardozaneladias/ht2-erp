@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Models\Referencia\Estado;
-use App\Models\Referencia\Municipio;
-use App\Models\Referencia\Pais;
 use Database\Seeders\Referencia\DadosReferenciaSeeder;
+use HT2ML\Core\Models\Referencia\Estado;
+use HT2ML\Core\Models\Referencia\Municipio;
+use HT2ML\Core\Models\Referencia\Pais;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

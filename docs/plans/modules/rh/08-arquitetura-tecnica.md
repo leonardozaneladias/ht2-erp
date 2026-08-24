@@ -16,11 +16,11 @@ Verificados no código real do gerador (`app/Console/Commands/MakeModuloCommand.
 
 1. **Gerador, não mão.** Toda a casca CRUD nasce de `make:extensao` + `make:modulo --module=Rh`. A mão entra **depois**, customizando migration/model/Rules/Actions para o que o [01](01-modelo-de-dominio.md) exige além do scaffold.
 2. **Aditivo ao core ([ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).** Rotas via `ModuleRegistry`, permissões mescladas em `config('access.modules')`, menu mesclado em `config('admin-menu')`, Livewire/Policies registrados **explicitamente** no `RhServiceProvider`. Zero edição de arquivos do boilerplate.
-3. **Multi-tenant lógico.** Toda tabela usa `App\Models\Concerns\BelongsToEmpresa` (global scope `empresa` + auto-fill no `creating`); `unique` sempre por empresa (`Rule::unique()->where('empresa_id', …)` **+** índice único parcial `WHERE deleted_at IS NULL`).
+3. **Multi-tenant lógico.** Toda tabela usa `HT2ML\Core\Models\Concerns\BelongsToEmpresa` (global scope `empresa` + auto-fill no `creating`); `unique` sempre por empresa (`Rule::unique()->where('empresa_id', …)` **+** índice único parcial `WHERE deleted_at IS NULL`).
 4. **Lixeira + LGPD por padrão.** `SoftDeletes`/`UsaSoftDeletes` + `ComLixeira` onde aplicável; PII em `atributosNaoAuditados()`; `cid`/financeiro `encrypted`; foto/documentos em disco privado.
 5. **Gate de qualidade por bloco.** `./vendor/bin/pint` · `npx prettier --write packages/extensao-rh/` · `./vendor/bin/phpstan analyse` (level 6) · `php artisan test`. Pós-instalação/migração: `php artisan migrate && php artisan access:sync && php artisan cache:clear`.
 
-> **Nota de nomenclatura (catálogo de departamento).** Os documentos de planejamento ([01](01-modelo-de-dominio.md)/[02](02-fase-1-blueprint.md)) são a **fonte de verdade** e nomeiam o catálogo de departamentos como tabela `departamentos`/model `Departamento`. Os testes-semente já presentes no repo (`tests/Feature/Rh/RhLixeiraTest.php`) referenciam `HT2ML\Rh\Models\Departamento` e a key de menu `rh-departamentos` (ver `App\Actions\Admin\Menu\AplicarMenuPadraoAction`). **Decida a nomenclatura final no [01](01-modelo-de-dominio.md) antes de gerar** e mantenha test + menu coerentes. Este guia usa `Departamento` (seguindo o blueprint); onde você optar por `Departamento`, troque o nome do recurso no `make:modulo` e os identificadores correspondentes — o resto do fluxo é idêntico.
+> **Nota de nomenclatura (catálogo de departamento).** Os documentos de planejamento ([01](01-modelo-de-dominio.md)/[02](02-fase-1-blueprint.md)) são a **fonte de verdade** e nomeiam o catálogo de departamentos como tabela `departamentos`/model `Departamento`. Os testes-semente já presentes no repo (`tests/Feature/Rh/RhLixeiraTest.php`) referenciam `HT2ML\Rh\Models\Departamento` e a key de menu `rh-departamentos` (ver `HT2ML\Core\Actions\Admin\Menu\AplicarMenuPadraoAction`). **Decida a nomenclatura final no [01](01-modelo-de-dominio.md) antes de gerar** e mantenha test + menu coerentes. Este guia usa `Departamento` (seguindo o blueprint); onde você optar por `Departamento`, troque o nome do recurso no `make:modulo` e os identificadores correspondentes — o resto do fluxo é idêntico.
 
 ---
 
@@ -320,7 +320,7 @@ Referência canônica de Table: `app/Livewire/Admin/Exemplos/ExemploTable.php` (
 
 ### 6.1 `ProvisionarCatalogosRh` (catálogos tenant, por empresa, idempotente)
 
-Action à mão em `src/Support`, **análoga a** `App\Actions\Admin\Menu\AplicarMenuPadraoAction` (transação + `firstOrCreate` por chave estável). Semeia, **por empresa ativa**, os defaults do [01 §5](01-modelo-de-dominio.md):
+Action à mão em `src/Support`, **análoga a** `HT2ML\Core\Actions\Admin\Menu\AplicarMenuPadraoAction` (transação + `firstOrCreate` por chave estável). Semeia, **por empresa ativa**, os defaults do [01 §5](01-modelo-de-dominio.md):
 
 - `tipos_documento` (RG, CPF, CTPS, PIS/PASEP, Título, Reservista, CNH `exige_validade`, Comprovante de Residência `exige_arquivo`, ASO `exige_validade`, …) — `firstOrCreate(['empresa_id','codigo'], [...])`.
 - `tipos_afastamento` (códigos eSocial tab. 18: Férias, Atestado ≤15d, INSS >15d `suspende_contrato`, Licença-maternidade, Falta injustificada `conta_como_falta`, …).

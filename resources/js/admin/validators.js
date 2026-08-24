@@ -70,7 +70,7 @@ export function validarPis(valor) {
 
 /**
  * Título de eleitor: 8 sequenciais + 2 de UF (01–28) + 2 DVs (módulo 11; resto 10 → 0;
- * resto 0 em SP/MG → 1). Par PHP: App\Rules\TituloEleitor (contrato no fixture).
+ * resto 0 em SP/MG → 1). Par PHP: HT2ML\Core\Rules\TituloEleitor (contrato no fixture).
  */
 export function validarTituloEleitor(valor) {
   const titulo = digitos(valor);

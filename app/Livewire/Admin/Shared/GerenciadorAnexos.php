@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Shared;
 
-use App\Models\Anexo;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Anexo;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;

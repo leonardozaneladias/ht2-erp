@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
-use App\Services\Admin\AuditoriaSeguranca;
-use App\Services\Admin\Security\LimiteTentativas;
+use HT2ML\Core\Services\Admin\AuditoriaSeguranca;
+use HT2ML\Core\Services\Admin\Security\LimiteTentativas;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\View\View;

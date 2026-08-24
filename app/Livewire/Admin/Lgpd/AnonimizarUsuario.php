@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Lgpd;
 
-use App\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
-use App\Exceptions\AccessException;
 use App\Livewire\Concerns\ConfirmsPassword;
+use HT2ML\Core\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;

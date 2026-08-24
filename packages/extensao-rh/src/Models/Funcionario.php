@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Models;
 
-use App\Models\Concerns\BelongsToEmpresa;
 use HT2ML\Core\Models\Concerns\Auditavel;
+use HT2ML\Core\Models\Concerns\BelongsToEmpresa;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use HT2ML\Rh\Database\Factories\FuncionarioFactory;
 use HT2ML\Rh\Enums\StatusFuncionario;
@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * em runtime, onde o valor é um objeto Money (ADR-0014).
  *
  * @property StatusFuncionario $status
- * @property \App\Support\Money\Money $salario
+ * @property \HT2ML\Core\Support\Money\Money $salario
  * @property \Illuminate\Support\Carbon $admissao
  * @property \Illuminate\Support\Carbon|null $deleted_at
  */
@@ -55,7 +55,7 @@ class Funcionario extends Model implements UsaSoftDeletes
     {
         return [
             'status' => StatusFuncionario::class,
-            'salario' => \App\Casts\MoneyCast::class,
+            'salario' => \HT2ML\Core\Casts\MoneyCast::class,
             'admissao' => 'date',
         ];
     }

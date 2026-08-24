@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Imports\BaseImport;
+use HT2ML\Core\Imports\BaseImport;
 use Maatwebsite\Excel\Validators\Failure;
 
 test('BaseImport inicia com zero linhas importadas', function () {

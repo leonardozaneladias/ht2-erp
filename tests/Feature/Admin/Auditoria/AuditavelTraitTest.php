@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\CreateAdminUserAction;
-use App\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
-use App\Actions\Admin\ToggleAdminUserStatusAction;
-use App\Actions\Admin\UpdateAdminUserAction;
-use App\DTOs\Admin\AdminUserDTO;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\CreateAdminUserAction;
+use HT2ML\Core\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
+use HT2ML\Core\Actions\Admin\ToggleAdminUserStatusAction;
+use HT2ML\Core\Actions\Admin\UpdateAdminUserAction;
+use HT2ML\Core\DTOs\Admin\AdminUserDTO;
 use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;

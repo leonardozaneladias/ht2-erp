@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
-use App\Services\Admin\AuditoriaSeguranca;
-use App\Services\Admin\Security\AlertaSeguranca;
-use App\Services\Admin\Security\ControleLockout;
-use App\Services\Admin\Security\LimiteTentativas;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Services\Admin\AuditoriaSeguranca;
+use HT2ML\Core\Services\Admin\Security\AlertaSeguranca;
+use HT2ML\Core\Services\Admin\Security\ControleLockout;
+use HT2ML\Core\Services\Admin\Security\LimiteTentativas;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;

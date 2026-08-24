@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Acesso;
 
-use App\Actions\Admin\SalvarPerfilAction;
-use App\DTOs\Admin\PerfilDTO;
-use App\Exceptions\AccessException;
-use App\Policies\RolePolicy;
+use HT2ML\Core\Actions\Admin\SalvarPerfilAction;
+use HT2ML\Core\DTOs\Admin\PerfilDTO;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Policies\RolePolicy;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Auth;

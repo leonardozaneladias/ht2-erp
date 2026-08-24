@@ -466,8 +466,8 @@ git commit -m "feat(admin): policy de personificação (permissão + hierarquia)
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
-use App\Exceptions\AccessException;
+use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -553,10 +553,10 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin\Impersonation;
 
-use App\Exceptions\AccessException;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\AdminUser;
-use App\Services\Admin\AccessResolver;
-use App\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Services\Admin\AccessResolver;
+use HT2ML\Core\Services\Admin\HierarchyResolver;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Support\Facades\Auth;
 
@@ -662,7 +662,7 @@ git commit -m "feat(admin): action de iniciar personificação"
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Impersonation\EncerrarImpersonationAction;
+use HT2ML\Core\Actions\Admin\Impersonation\EncerrarImpersonationAction;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -724,7 +724,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin\Impersonation;
 
 use HT2ML\Core\Models\AdminUser;
-use App\Services\Admin\AccessResolver;
+use HT2ML\Core\Services\Admin\AccessResolver;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Support\Facades\Auth;
 
@@ -800,7 +800,7 @@ git commit -m "feat(admin): action de encerrar personificação"
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
+use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -961,7 +961,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\Admin\Impersonation\EncerrarImpersonationAction;
+use HT2ML\Core\Actions\Admin\Impersonation\EncerrarImpersonationAction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 
@@ -1075,7 +1075,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Actions\Admin\Impersonation\EncerrarImpersonationAction;
+use HT2ML\Core\Actions\Admin\Impersonation\EncerrarImpersonationAction;
 use HT2ML\Core\Settings\SegurancaSettings;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Closure;
@@ -1608,8 +1608,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Impersonation;
 
-use App\Actions\Admin\Impersonation\IniciarImpersonationAction;
-use App\Exceptions\AccessException;
+use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
+use HT2ML\Core\Exceptions\AccessException;
 use App\Livewire\Concerns\ConfirmsPassword;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;

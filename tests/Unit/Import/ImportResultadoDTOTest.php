@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\DTOs\Admin\ImportResultadoDTO;
+use HT2ML\Core\DTOs\Admin\ImportResultadoDTO;
 
 test('ImportResultadoDTO armazena dados corretamente', function () {
     $dto = new ImportResultadoDTO(

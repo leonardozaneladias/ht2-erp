@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Export\ExportarTabelaPdfAction;
-use App\DTOs\Admin\Export\ExportavelDTO;
-use App\Jobs\GerarExportacaoPdfJob;
+use HT2ML\Core\Actions\Admin\Export\ExportarTabelaPdfAction;
+use HT2ML\Core\DTOs\Admin\Export\ExportavelDTO;
+use HT2ML\Core\Jobs\GerarExportacaoPdfJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;

@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\Referencia\Moeda $registro */
+    /** @var \HT2ML\Core\Models\Referencia\Moeda $registro */
 @endphp
 
 {{-- Ficha de visualização ("Ver") — corpo do x-admin.ficha-drawer. --}}

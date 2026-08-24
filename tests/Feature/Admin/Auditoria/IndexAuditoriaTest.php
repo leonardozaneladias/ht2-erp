@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\CreateAdminUserAction;
-use App\DTOs\Admin\AdminUserDTO;
 use App\Livewire\Admin\Auditoria\AuditoriaTable;
 use App\Livewire\Admin\Auditoria\IndexAuditoria;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\CreateAdminUserAction;
+use HT2ML\Core\DTOs\Admin\AdminUserDTO;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;

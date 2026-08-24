@@ -185,7 +185,7 @@ class Product extends Model
 namespace App\Models;
 
 use App\Casts\AddressCast;
-use App\Casts\MoneyCast;
+use HT2ML\Core\Casts\MoneyCast;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Model;
 

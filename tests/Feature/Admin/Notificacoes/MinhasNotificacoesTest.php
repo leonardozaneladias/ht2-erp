@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoNotificacao;
 use App\Livewire\Admin\Notificacoes\MinhasNotificacoes;
-use App\Notifications\ComunicadoNotification;
+use HT2ML\Core\Enums\TipoNotificacao;
+use HT2ML\Core\Notifications\ComunicadoNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

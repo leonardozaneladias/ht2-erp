@@ -12,7 +12,7 @@ Relacionados: [00-prd.md](00-prd.md) · [05-organograma-acl-hierarquica.md](05-o
 
 Verificadas no código real (`app/Models/Exemplo.php`, `app/Models/Concerns/*`, `app/Models/Anexo.php`, migrations e ADRs):
 
-- **Tenancy** — trait `App\Models\Concerns\BelongsToEmpresa`: toda tabela de negócio tem `empresa_id BIGINT NOT NULL`, global scope `empresa` automático e auto-fill no `creating`. `filial_id BIGINT NULL` onde a lotação física importa.
+- **Tenancy** — trait `HT2ML\Core\Models\Concerns\BelongsToEmpresa`: toda tabela de negócio tem `empresa_id BIGINT NOT NULL`, global scope `empresa` automático e auto-fill no `creating`. `filial_id BIGINT NULL` onde a lotação física importa.
 - **Soft delete** — contrato `HT2ML\Core\Models\Contracts\UsaSoftDeletes` + trait `SoftDeletes`: `deleted_at` em toda tabela de negócio e nos catálogos tenant. Lixeira via `HT2ML\Core\Livewire\Concerns\ComLixeira` (3 permissões: `deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete).
 - **Auditoria** — trait `HT2ML\Core\Models\Concerns\Auditavel` (spatie/activitylog). PII vai para `atributosNaoAuditados()` por model (ver §8 LGPD).
 - **Dinheiro** — INTEGER em centavos (ADR-0014). Coluna `*_centavos`. Nunca `float`/`decimal` para dinheiro. Operações via helper de Money do core.
@@ -494,7 +494,7 @@ CHECK: `gestor_id <> id`; `data_demissao IS NULL OR data_demissao >= data_admiss
 | observacao                       | TEXT         | S    |                                           |
 | created_at/updated_at/deleted_at |              |      |                                           |
 
-Índices: `funcionario_id`, `(empresa_id, tipo_documento_id)`, `anexo_id`, `data_validade` (relatório "a vencer"). `atributosNaoAuditados()`: `['numero']`. O binário vai em `App\Models\Anexo` (`anexavel_type=Funcionario`); ver [03](03-cadastro-pessoa-documentos.md).
+Índices: `funcionario_id`, `(empresa_id, tipo_documento_id)`, `anexo_id`, `data_validade` (relatório "a vencer"). `atributosNaoAuditados()`: `['numero']`. O binário vai em `HT2ML\Core\Models\Anexo` (`anexavel_type=Funcionario`); ver [03](03-cadastro-pessoa-documentos.md).
 
 ### Bloco C — Linha do tempo / histórico
 
@@ -794,7 +794,7 @@ Esta é a **lista canônica** de tudo que é sensível no módulo: o que é, ond
 
 Esta é a lista **canônica** das permissões do módulo. README, [02](02-fase-1-blueprint.md), specs [03](03-cadastro-pessoa-documentos.md)–[09](09-roadmap-fases.md) e os ADRs referenciam **estes** slugs; **divergência de vocabulário corrige-se aqui primeiro**. O que `php artisan access:sync` publica na tabela `permissions` é exatamente esta lista (mesclada em `config('access.modules')['negocio']` pelo `RhServiceProvider` — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
 
-**Convenções de slug** (confirmadas no gerador real `App\Support\Generator\EspecificacaoModulo::permissaoBase()` = `"{slug}.{snakePlural}"`):
+**Convenções de slug** (confirmadas no gerador real `HT2ML\Core\Support\Generator\EspecificacaoModulo::permissaoBase()` = `"{slug}.{snakePlural}"`):
 
 - Slug = **`rh.<recurso_snake_plural>.<acao>`** — prefixo `rh.` obrigatório (anti-colisão); recurso em **`snake_case` plural** (= nome da tabela); ação em `snake_case`. (Atenção: a chave de **menu** usa `rh-<recurso>` e a **URL** usa kebab-case — só a **permissão** usa `snake_case`; não confundir com o slug kebab de [04](04-catalogos-configuraveis.md), que se alinha a esta tabela.)
 - **CRUD padrão** (gerado por `make:modulo` para recurso tenant): `listar`, `criar`, `editar`, `deletar`, `restaurar`, `excluir_permanente` (as três últimas = fluxo `ComLixeira`).

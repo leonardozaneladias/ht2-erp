@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\Referencia\Municipio $registro */
+    /** @var \HT2ML\Core\Models\Referencia\Municipio $registro */
 @endphp
 
 {{-- Ficha de visualização ("Ver") — corpo do x-admin.ficha-drawer. --}}

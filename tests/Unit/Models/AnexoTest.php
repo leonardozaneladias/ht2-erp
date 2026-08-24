@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Models\Anexo;
-use App\Models\Concerns\Anexavel;
+use HT2ML\Core\Models\Anexo;
+use HT2ML\Core\Models\Concerns\Anexavel;
 
 test('Anexo formata tamanho em bytes', function () {
     $anexo = new Anexo(['tamanho' => 500]);

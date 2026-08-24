@@ -295,7 +295,7 @@
                                                 <x-shared.badge variant="success" icon="tabler--check">
                                                     Permitido</x-shared.badge
                                                 >
-                                            @elseif ($dto->origem === \App\Enums\OrigemAcesso::Deny)
+                                            @elseif ($dto->origem === \HT2ML\Core\Enums\OrigemAcesso::Deny)
                                                 <x-shared.badge variant="danger" icon="tabler--ban">
                                                     Negado</x-shared.badge
                                                 >

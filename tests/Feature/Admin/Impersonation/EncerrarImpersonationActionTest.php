@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\Impersonation\EncerrarImpersonationAction;
+use HT2ML\Core\Actions\Admin\Impersonation\EncerrarImpersonationAction;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;

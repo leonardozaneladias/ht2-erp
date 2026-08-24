@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Auth;
 
-use App\Services\Admin\AuditoriaSeguranca;
-use App\Support\Settings\PasswordPolicy;
 use HT2ML\Core\Models\AdminUser;
+use HT2ML\Core\Services\Admin\AuditoriaSeguranca;
+use HT2ML\Core\Support\Settings\PasswordPolicy;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;

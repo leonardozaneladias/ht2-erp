@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\SyncRolesEmpresaAction;
-use App\DTOs\Admin\SyncRolesEmpresaDTO;
-use App\Exceptions\AccessException;
-use App\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Actions\Admin\SyncRolesEmpresaAction;
+use HT2ML\Core\DTOs\Admin\SyncRolesEmpresaDTO;
+use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;
+use HT2ML\Core\Services\Admin\HierarchyResolver;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;

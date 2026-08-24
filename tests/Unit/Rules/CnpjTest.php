@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Rules\Cnpj;
+use HT2ML\Core\Rules\Cnpj;
 use Illuminate\Support\Facades\Validator;
 
 describe('Cnpj Rule', function (): void {

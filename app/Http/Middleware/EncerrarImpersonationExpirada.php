@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Actions\Admin\Impersonation\EncerrarImpersonationAction;
 use Closure;
+use HT2ML\Core\Actions\Admin\Impersonation\EncerrarImpersonationAction;
 use HT2ML\Core\Settings\SegurancaSettings;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Http\Request;

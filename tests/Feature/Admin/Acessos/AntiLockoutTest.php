@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Exceptions\AccessException;
-use App\Support\Access\AccessGuard;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Exceptions\AccessException;
+use HT2ML\Core\Support\Access\AccessGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 

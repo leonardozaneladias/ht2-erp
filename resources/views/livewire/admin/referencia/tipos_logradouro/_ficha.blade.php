@@ -1,5 +1,5 @@
 @php
-    /** @var \App\Models\Referencia\TipoLogradouro $registro */
+    /** @var \HT2ML\Core\Models\Referencia\TipoLogradouro $registro */
 @endphp
 
 {{-- Ficha de visualização ("Ver") — corpo do x-admin.ficha-drawer. --}}

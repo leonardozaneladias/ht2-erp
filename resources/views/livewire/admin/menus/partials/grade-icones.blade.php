@@ -2,7 +2,7 @@
      build do iconify/tailwind. Espera: $modelo (propriedade Livewire) e
      $selecionado (valor atual). --}}
 <div class="grid grid-cols-8 gap-1.5">
-    @foreach (\App\Support\Menu\IconesMenu::disponiveis() as $opcao)
+    @foreach (\HT2ML\Core\Support\Menu\IconesMenu::disponiveis() as $opcao)
         <button
             type="button"
             wire:click="$set('{{ $modelo }}', '{{ $opcao }}')"

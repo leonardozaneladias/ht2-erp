@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Referencia;
 
-use App\Actions\Admin\Referencia\CreatePaisAction;
-use App\Actions\Admin\Referencia\UpdatePaisAction;
-use App\DTOs\Admin\Referencia\PaisDTO;
 use App\Http\Requests\Admin\Referencia\PaisRules;
-use App\Models\Referencia\Pais;
+use HT2ML\Core\Actions\Admin\Referencia\CreatePaisAction;
+use HT2ML\Core\Actions\Admin\Referencia\UpdatePaisAction;
+use HT2ML\Core\DTOs\Admin\Referencia\PaisDTO;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
+use HT2ML\Core\Models\Referencia\Pais;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

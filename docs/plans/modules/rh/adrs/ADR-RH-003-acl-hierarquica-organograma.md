@@ -15,7 +15,7 @@ status: proposed
 
 O cliente exige que um **gestor enxergue seus subordinados** (e os subordinados deles, recursivamente) e mais ninguém — enquanto o RH/diretoria vê todos. Isso é um requisito de **visibilidade de dados** que o RBAC do core (spatie/laravel-permission) **não** cobre: a permissão `rh.funcionarios.listar` diz _se_ o usuário pode listar funcionários, não _quais_. Dois gestores de áreas distintas têm a **mesma** permissão e precisam de **conjuntos diferentes** de linhas.
 
-O core já tem `App\Services\Admin\HierarchyResolver`, mas ele resolve **hierarquia de papéis RBAC** (quem pode gerir quem, por nível de papel) — conceito ortogonal ao **organograma de pessoas** (quem é subordinado de quem). Reusar a palavra "hierarquia" para os dois colidiria semanticamente e geraria bug por confusão.
+O core já tem `HT2ML\Core\Services\Admin\HierarchyResolver`, mas ele resolve **hierarquia de papéis RBAC** (quem pode gerir quem, por nível de papel) — conceito ortogonal ao **organograma de pessoas** (quem é subordinado de quem). Reusar a palavra "hierarquia" para os dois colidiria semanticamente e geraria bug por confusão.
 
 A pergunta: como adicionar "o gestor vê sua subárvore" de forma **segura por construção** (difícil de furar), sem editar o core e sem confundir com o eixo RBAC já existente?
 
@@ -86,6 +86,6 @@ Na **Fase 1** a recursão é resolvida por CTE Postgres (sem closure table). Det
 
 - [ADR-RH-001: Funcionário como agregado-raiz e vínculo com AdminUser](ADR-RH-001-funcionario-agregado-e-vinculo-adminuser.md) — resolve "qual funcionário sou eu" e o fail-closed que ancora este eixo.
 - [ADR-0015: Módulos de negócio como pacotes Composer distribuíveis](../../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) — eixo aditivo no pacote, core intocado.
-- `App\Services\Admin\HierarchyResolver` (core) — hierarquia de **papéis RBAC**, eixo distinto do organograma (origem da escolha de vocabulário).
-- `App\Models\Concerns\BelongsToEmpresa` (core) — padrão de global scope (`addGlobalScope`) espelhado por `VisivelNaHierarquia`.
+- `HT2ML\Core\Services\Admin\HierarchyResolver` (core) — hierarquia de **papéis RBAC**, eixo distinto do organograma (origem da escolha de vocabulário).
+- `HT2ML\Core\Models\Concerns\BelongsToEmpresa` (core) — padrão de global scope (`addGlobalScope`) espelhado por `VisivelNaHierarquia`.
 - [01 — Modelo de Domínio](../01-modelo-de-dominio.md) (§3 B1 `gestor_id`, §7 índice `(empresa_id, gestor_id)`) · [05 — Organograma e ACL hierárquica](../05-organograma-acl-hierarquica.md).

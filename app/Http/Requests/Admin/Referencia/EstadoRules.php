@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Referencia;
 
-use App\Enums\Referencia\RegiaoBrasil;
+use HT2ML\Core\Enums\Referencia\RegiaoBrasil;
 use Illuminate\Validation\Rule;
 
 /**

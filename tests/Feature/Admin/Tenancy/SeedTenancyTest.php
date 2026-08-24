@@ -35,7 +35,7 @@ it('semeia 2+ empresas e habilita o filtro multi-empresa para o gestor', functio
     // global) → o filtro multi-empresa fica de fato disponível na demo.
     expect($gestor->empresasAcessiveis()->count())->toBeGreaterThanOrEqual(2);
 
-    $resolver = app(App\Services\Admin\AccessResolver::class);
+    $resolver = app(HT2ML\Core\Services\Admin\AccessResolver::class);
 
     $elegiveis = Empresa::query()
         ->pluck('id')

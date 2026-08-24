@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\Referencia\RegiaoBrasil;
+use HT2ML\Core\Enums\Referencia\RegiaoBrasil;
 use HT2ML\FiscalBr\Enums\TipoCfop;
 
 it('RegiaoBrasil::peloCodigoIbge deriva a região pelo 1º dígito', function () {

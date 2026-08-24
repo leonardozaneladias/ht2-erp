@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Actions\Admin\ToggleAdminUserStatusAction;
 use App\Livewire\Admin\Usuarios\UsuariosTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Actions\Admin\ToggleAdminUserStatusAction;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
