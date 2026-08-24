@@ -66,6 +66,16 @@ if [[ -d "stubs/skeleton/.github" ]]; then
     cp -R "stubs/skeleton/.github" "${TMP}/.github"
 fi
 
+# O .gitattributes do monorepo marca /.github como export-ignore — convenção
+# correta para BIBLIOTECA (ninguém quer CI dentro de vendor/) e errada para
+# TEMPLATE DE PROJETO: o composer create-project baixa o tarball do GitHub, que
+# respeita export-ignore, e o produto novo nascia sem CI nenhum. O skeleton
+# exporta tudo.
+if [[ -f "${TMP}/.gitattributes" ]]; then
+    grep -v 'export-ignore' "${TMP}/.gitattributes" > "${TMP}/.gitattributes.novo" || true
+    mv "${TMP}/.gitattributes.novo" "${TMP}/.gitattributes"
+fi
+
 # Testes: só o andaime (TestCase, Pest.php, Arch). A suíte da plataforma testa o
 # core e vive no monorepo — carregá-la aqui daria um skeleton que falha de saída.
 mkdir -p "${TMP}/tests/Feature" "${TMP}/tests/Unit"
@@ -88,6 +98,20 @@ it('serve a tela de login do admin', function () {
 });
 PHP
 
+# A restrição do core é a ÚLTIMA VERSÃO PUBLICADA DELE, não a versão do skeleton
+# — os dois versionam independente. Usar a do skeleton fazia v0.2.1 exigir
+# `ht2ml/core: ^0.2.1`, que não existe, e o composer install do produto novo
+# morria com "does not match the constraint". Funcionou nos primeiros releases
+# só porque os números coincidiam.
+CORE_URL="git@github.com:${ORG}/ht2ml-core.git"
+CORE_VER="$(git ls-remote --tags "${CORE_URL}" 2>/dev/null \
+    | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)"
+if [[ -z "${CORE_VER}" ]]; then
+    echo -e "${RED}Não achei nenhuma tag em ${ORG}/ht2ml-core — publique o core antes do skeleton.${NC}"
+    exit 1
+fi
+echo -e "  ${GREEN}✓${NC} core publicado mais recente: ${CORE_VER}"
+
 # composer.json: sai o path repository do monorepo, entram os VCS dos pacotes.
 php -r '
     $p = $argv[1];
@@ -108,7 +132,7 @@ php -r '
     $d["require"]["ht2ml/core"] = $argv[3];
     ksort($d["require"]);
     file_put_contents($p, json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
-' "${TMP}/composer.json" "${ORG}" "^${VERSAO#v}"
+' "${TMP}/composer.json" "${ORG}" "^${CORE_VER#v}"
 
 # Sobras do monorepo que não fazem sentido num produto novo.
 rm -f "${TMP}/composer.lock" "${TMP}/package-lock.json"
