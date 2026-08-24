@@ -27,6 +27,7 @@ return [
             'label' => 'Excluir exemplos permanentemente',
             'descricao' => 'Remover exemplos definitivamente do banco (irreversível).',
         ],
+        // make:modulo insere as permissões do módulo acima desta linha
     ],
 
     'menu' => [
@@ -38,5 +39,6 @@ return [
             'permission' => 'exemplos.listar',
             'active' => ['admin.exemplos.*'],
         ],
+        // make:modulo insere os itens de menu do módulo acima desta linha
     ],
 ];

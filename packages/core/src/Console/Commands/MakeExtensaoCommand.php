@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HT2ML\Core\Console\Commands;
 
 use HT2ML\Core\Support\Generator\Extensao;
+use HT2ML\Core\Support\Generator\ResolvedorDeStubs;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -49,13 +50,8 @@ final class MakeExtensaoCommand extends Command
             return self::FAILURE;
         }
 
-        $stubDir = base_path('stubs/extensao');
-
-        if (! File::isDirectory($stubDir)) {
-            $this->error("Stubs não encontrados em {$stubDir}. Eles fazem parte do boilerplate.");
-
-            return self::FAILURE;
-        }
+        // Stubs vêm do pacote, com o produto sobrescrevendo arquivo a arquivo.
+        $stubs = new ResolvedorDeStubs('extensao');
 
         $repl = [
             '__MODULO_STUDLY__' => $pkg->studly,
@@ -75,7 +71,7 @@ final class MakeExtensaoCommand extends Command
         ];
 
         foreach ($arquivos as $stub => $relativo) {
-            $this->gerarArquivo("{$stubDir}/{$stub}", "{$pkg->dir}/{$relativo}", $repl);
+            $this->gerarArquivo($stubs->caminho($stub), "{$pkg->dir}/{$relativo}", $repl);
         }
 
         foreach (['database/migrations', 'database/factories', 'resources/views', 'tests'] as $vazio) {
