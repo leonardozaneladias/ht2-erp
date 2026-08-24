@@ -19,6 +19,20 @@ use Illuminate\Support\ServiceProvider;
  */
 final class DocumentosServiceProvider extends ServiceProvider
 {
+    /**
+     * O binding vive AQUI, não no AppServiceProvider do app.
+     *
+     * Estava lá porque a classe morava em app/. Quando ela virou pacote, o
+     * singleton ficou para trás — e um produto que não instala esta extensão
+     * tinha um AppServiceProvider referenciando classe inexistente. O PHPStan
+     * do skeleton pegou: "Class HT2ML\Documentos\Support\GeradorNumeroDocumento
+     * not found".
+     */
+    public function register(): void
+    {
+        $this->app->singleton(Support\GeradorNumeroDocumento::class);
+    }
+
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');

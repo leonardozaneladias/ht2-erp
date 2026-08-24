@@ -16,7 +16,6 @@ use HT2ML\Core\Services\Admin\Referencia\CatalogoDeLocalidades;
 use HT2ML\Core\Services\Admin\Settings\SettingsRuntimeApplier;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use HT2ML\Core\Support\Modules\ModuleRegistry;
-use HT2ML\Documentos\Support\GeradorNumeroDocumento;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
@@ -32,7 +31,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AccessResolver::class);
         $this->app->singleton(\HT2ML\Core\Support\Tenancy\TenantContext::class);
         $this->app->singleton(ImpersonationContext::class);
-        $this->app->singleton(GeradorNumeroDocumento::class);
     }
 
     public function boot(): void

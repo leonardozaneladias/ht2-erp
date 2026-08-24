@@ -60,9 +60,37 @@ for item in "${INCLUIR[@]}"; do
     cp -R "${item}" "${TMP}/${item}"
 done
 
+# Configs que o monorepo tem mas que NÃO servem a um produto: o phpstan.neon
+# daqui aponta para packages/*, que não existe no consumidor, e o phpstan morre
+# com "Path does not exist" no primeiro uso. Os stubs sobrescrevem.
+for stub in "${ROOT_DIR}"/stubs/skeleton/*; do
+    [[ -f "${stub}" ]] || continue
+    cp "${stub}" "${TMP}/$(basename "${stub}")"
+done
+
+# CI: vem de stubs/skeleton/.github, não do .github deste monorepo — o daqui
+# testa a plataforma, e o do produto precisa autenticar nos pacotes privados.
+if [[ -d "stubs/skeleton/.github" ]]; then
+    cp -R "stubs/skeleton/.github" "${TMP}/.github"
+fi
+
+# O .gitattributes do monorepo marca /.github como export-ignore — convenção
+# correta para BIBLIOTECA (ninguém quer CI dentro de vendor/) e errada para
+# TEMPLATE DE PROJETO: o composer create-project baixa o tarball do GitHub, que
+# respeita export-ignore, e o produto novo nascia sem CI nenhum. O skeleton
+# exporta tudo.
+if [[ -f "${TMP}/.gitattributes" ]]; then
+    grep -v 'export-ignore' "${TMP}/.gitattributes" > "${TMP}/.gitattributes.novo" || true
+    mv "${TMP}/.gitattributes.novo" "${TMP}/.gitattributes"
+fi
+
 # Testes: só o andaime (TestCase, Pest.php, Arch). A suíte da plataforma testa o
 # core e vive no monorepo — carregá-la aqui daria um skeleton que falha de saída.
 mkdir -p "${TMP}/tests/Feature" "${TMP}/tests/Unit"
+# .gitkeep porque o git não versiona diretório vazio, e o phpunit.xml declara
+# tests/Unit como suíte: sem o arquivo, o publish perde a pasta e o
+# `php artisan test` do produto novo morre com "Test directory not found".
+touch "${TMP}/tests/Unit/.gitkeep"
 for f in tests/TestCase.php tests/Pest.php; do
     [[ -f "${f}" ]] && cp "${f}" "${TMP}/${f}"
 done
@@ -71,16 +99,38 @@ cat > "${TMP}/tests/Feature/SmokeTest.php" <<'PHP'
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 /**
  * O único teste que o skeleton traz: a plataforma subiu?
  *
  * Se ht2ml/core está instalado e registrado, a tela de login do admin responde.
  * É o mínimo que prova que o create-project entregou algo funcional.
+ *
+ * RefreshDatabase é obrigatório aqui: as configurações do núcleo são lidas da
+ * tabela `settings` no boot, e sem schema a página estoura com
+ * "no such table: settings" em vez de renderizar.
  */
+uses(RefreshDatabase::class);
+
 it('serve a tela de login do admin', function () {
     $this->get('/admin/login')->assertOk();
 });
 PHP
+
+# A restrição do core é a ÚLTIMA VERSÃO PUBLICADA DELE, não a versão do skeleton
+# — os dois versionam independente. Usar a do skeleton fazia v0.2.1 exigir
+# `ht2ml/core: ^0.2.1`, que não existe, e o composer install do produto novo
+# morria com "does not match the constraint". Funcionou nos primeiros releases
+# só porque os números coincidiam.
+CORE_URL="git@github.com:${ORG}/ht2ml-core.git"
+CORE_VER="$(git ls-remote --tags "${CORE_URL}" 2>/dev/null \
+    | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)"
+if [[ -z "${CORE_VER}" ]]; then
+    echo -e "${RED}Não achei nenhuma tag em ${ORG}/ht2ml-core — publique o core antes do skeleton.${NC}"
+    exit 1
+fi
+echo -e "  ${GREEN}✓${NC} core publicado mais recente: ${CORE_VER}"
 
 # composer.json: sai o path repository do monorepo, entram os VCS dos pacotes.
 php -r '
@@ -92,7 +142,17 @@ php -r '
     $org = $argv[2];
     $d["repositories"] = [];
     foreach (["core", "extensao-rh", "extensao-fiscal-br", "extensao-exemplo-demo", "extensao-documentos"] as $slug) {
-        $d["repositories"][] = ["type" => "vcs", "url" => "git@github.com:{$org}/ht2ml-{$slug}.git"];
+        // no-api: o Composer usa GIT em vez da API do GitHub para estes
+        // repositórios. Sem isso ele baixa um zipball de api.github.com, que
+        // exige o token ter permissão na API — caminho que falha com
+        // "Could not authenticate against github.com" mesmo quando o mesmo
+        // token já autentica as operações git. Com no-api, uma credencial só
+        // (a reescrita de URL do CI) cobre tudo.
+        $d["repositories"][] = [
+            "type" => "vcs",
+            "url" => "git@github.com:{$org}/ht2ml-{$slug}.git",
+            "no-api" => true,
+        ];
     }
     // Só o core entra por padrão. Extensão é escolha do produto — e o demo
     // existe justamente para provar que dá para NÃO instalar.
@@ -100,9 +160,19 @@ php -r '
         if (str_starts_with($k, "ht2ml/")) { unset($d["require"][$k]); }
     }
     $d["require"]["ht2ml/core"] = $argv[3];
+    // Os ht2ml/* vêm por GIT; todo o resto por zip.
+    //
+    // O zip vem de api.github.com, e para repositório privado isso exige o
+    // token ter permissão na API — canal diferente do que autentica o git. Um
+    // CI que reescreve SSH para HTTPS resolve os refs e ainda assim morre no
+    // download, com "Could not authenticate against github.com". Declarar a
+    // preferência por pacote faz uma credencial só cobrir tudo, sem depender de
+    // fallback (que o Composer desliga em modo não interativo).
+    $d["config"] = ($d["config"] ?? []) + [];
+    $d["config"]["preferred-install"] = ["ht2ml/*" => "source", "*" => "dist"];
     ksort($d["require"]);
     file_put_contents($p, json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
-' "${TMP}/composer.json" "${ORG}" "^${VERSAO#v}"
+' "${TMP}/composer.json" "${ORG}" "^${CORE_VER#v}"
 
 # Sobras do monorepo que não fazem sentido num produto novo.
 rm -f "${TMP}/composer.lock" "${TMP}/package-lock.json"
@@ -151,6 +221,13 @@ composer require ht2ml/extensao-exemplo-demo # vitrine do design system
 
 Os repositórios já estão declarados no `composer.json`.
 MD
+
+# O produto não pode nascer reprovando o próprio job de qualidade. Os JSON que
+# este script reescreve saem com formatação diferente da que o Prettier espera.
+if command -v npx >/dev/null 2>&1; then
+    (cd "${TMP}" && npx --yes prettier --write \
+        "composer.json" "package.json" "README.md" ".prettierrc" >/dev/null 2>&1) || true
+fi
 
 TOTAL="$(find "${TMP}" -type f | wc -l | tr -d ' ')"
 echo -e "  ${GREEN}✓${NC} árvore montada: ${TOTAL} arquivos"

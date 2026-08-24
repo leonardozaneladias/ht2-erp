@@ -1,0 +1,20 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+
+    # Só o código DO PRODUTO. A plataforma é analisada no repositório dela, e
+    # reanalisar vendor/ aqui só produziria ruído sobre código que este projeto
+    # não controla.
+    paths:
+        - app/
+
+    # O Larastan infere as colunas dos models a partir das migrations. Inclui as
+    # do ht2ml/core para que Empresa, AdminUser e afins sejam conhecidos ao serem
+    # usados no código do produto.
+    databaseMigrationsPath:
+        - database/migrations
+        - vendor/ht2ml/core/database/migrations
+
+    treatPhpDocTypesAsCertain: false

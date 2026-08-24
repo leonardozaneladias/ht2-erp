@@ -1,0 +1,107 @@
+name: CI
+
+# Só em pull_request. NÃO há gatilho de push para main, e é economia deliberada:
+# com "Require branches to be up to date before merging" ligado na proteção da
+# main, a branch precisa estar atualizada para mergear — então o run do PR já é
+# o resultado do merge. Um run de push depois seria o mesmo teste de novo.
+#
+# Se a proteção da main não exigir branch atualizada, reative o push: sem isso,
+# dois PRs que passam isolados podem quebrar juntos e ninguém vê.
+on:
+    pull_request:
+        branches: [main]
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci:
+        # Um job só, de propósito. Cada job paga checkout + setup do PHP +
+        # composer install + setup do Node + npm ci antes de fazer qualquer
+        # coisa útil — separar qualidade de testes dobra esse preparo para
+        # ganhar paralelismo que um produto com poucos testes não aproveita.
+        name: Qualidade e testes
+        runs-on: ubuntu-latest
+
+        # Rascunho não roda: empurre quantas vezes quiser enquanto trabalha, e
+        # marque "Ready for review" quando quiser o veredito.
+        if: github.event.pull_request.draft == false
+
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Setup PHP 8.4
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  extensions: pdo, pdo_sqlite, sqlite3, bcmath, mbstring, xml
+                  coverage: none
+
+            # O token precisa de Contents: Read-only nos repositórios ht2ml/*.
+            # Só Metadata NÃO basta, e o sintoma engana: `api/repos/<nome>`
+            # devolve 200 (é o que Metadata concede), enquanto baixar o zipball
+            # devolve 403 e o git clone falha. Parece problema de configuração do
+            # Composer; é permissão.
+            #
+            # A reescrita de URL abaixo existe porque o composer.json declara os
+            # repositórios por SSH — a forma que funciona na máquina de quem
+            # desenvolve. O runner não tem essa chave.
+            - name: Autenticar nos pacotes privados (git)
+              run: git config --global url."https://x-access-token:${{ secrets.COMPOSER_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
+            - name: Cache do vendor
+              uses: actions/cache@v6
+              with:
+                  path: vendor
+                  key: composer-${{ hashFiles('composer.lock') }}
+                  restore-keys: composer-
+
+            # Sem --prefer-dist e com preferred-install declarado por pacote no
+            # composer.json (ht2ml/* por source, resto por dist): os privados vêm
+            # por git, autenticados pela reescrita acima, e os ~195 públicos por
+            # zip. O COMPOSER_AUTH cobre o caso de o Composer precisar da API.
+            #
+            # Com o token correto o dist dos privados também funcionaria — esta
+            # configuração é redundante de propósito, para o CI não depender de
+            # a permissão do token estar exatamente certa.
+            - name: Instalar dependências PHP
+              run: composer install --no-interaction --optimize-autoloader
+              env:
+                  COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.COMPOSER_TOKEN }}"}}'
+
+            - name: Setup Node 22
+              uses: actions/setup-node@v6
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Instalar dependências Node
+              run: npm ci
+
+            - name: Preparar ambiente
+              run: cp .env.example .env && php artisan key:generate
+
+            # Os assets vêm antes dos testes: sem o manifest do Vite, toda tela
+            # devolve 500 e o teste de fumaça falha por motivo errado.
+            - name: Compilar assets
+              run: npm run build
+
+            - name: Formatação PHP (Pint)
+              run: ./vendor/bin/pint --test
+
+            - name: Análise estática (PHPStan)
+              run: ./vendor/bin/phpstan analyse --no-progress --error-format=github
+
+            - name: Formatação (Prettier)
+              run: npx prettier --check "resources/**/*.{js,ts,tsx,css,json}" "*.{json,md,yaml,yml}" --ignore-path .prettierignore
+
+            - name: Testes
+              run: php artisan test --compact
+              env:
+                  APP_ENV: testing
+                  DB_CONNECTION: sqlite
+                  DB_DATABASE: ':memory:'
+                  CACHE_STORE: array
+                  QUEUE_CONNECTION: sync
+                  SESSION_DRIVER: array

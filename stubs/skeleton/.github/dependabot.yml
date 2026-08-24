@@ -1,0 +1,41 @@
+version: 2
+
+# MENSAL e agrupado ao máximo. Cada PR do Dependabot custa um ciclo de CI, e num
+# repositório privado isso sai dos minutos da conta. Semanal com três grupos
+# gerava ~21 PRs por mês; assim são 3.
+#
+# Atualização de SEGURANÇA ignora o agendamento e vem na hora — o intervalo
+# mensal atrasa só o bump de rotina.
+updates:
+    - package-ecosystem: 'composer'
+      directory: '/'
+      schedule:
+          interval: 'monthly'
+      open-pull-requests-limit: 1
+      commit-message:
+          prefix: 'chore(deps)'
+      groups:
+          php:
+              patterns: ['*']
+
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'monthly'
+      open-pull-requests-limit: 1
+      commit-message:
+          prefix: 'chore(deps)'
+      groups:
+          js:
+              patterns: ['*']
+
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'monthly'
+      open-pull-requests-limit: 1
+      commit-message:
+          prefix: 'ci(deps)'
+      groups:
+          actions:
+              patterns: ['*']
