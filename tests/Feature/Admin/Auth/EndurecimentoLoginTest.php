@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Auth\Login;
 use HT2ML\Core\Livewire\Admin\Auth\ResetPassword;
 use HT2ML\Core\Models\AdminUser;

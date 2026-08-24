@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Empresas\EmpresasTable;
 use HT2ML\Core\Models\Empresa;
 use Illuminate\Foundation\Testing\RefreshDatabase;

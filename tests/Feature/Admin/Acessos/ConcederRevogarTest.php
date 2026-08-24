@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\ConcederAcessoDiretoAction;
 use HT2ML\Core\Actions\Admin\RevogarAcessoDiretoAction;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\DTOs\Admin\ConcessaoAcessoDTO;
 use HT2ML\Core\Enums\TipoConcessao;
 use HT2ML\Core\Exceptions\AccessException;

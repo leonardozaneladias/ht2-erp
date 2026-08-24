@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories\Referencia;
+namespace HT2ML\Core\Database\Factories\Referencia;
 
 use HT2ML\Core\Models\Referencia\Pais;
 use Illuminate\Database\Eloquent\Factories\Factory;

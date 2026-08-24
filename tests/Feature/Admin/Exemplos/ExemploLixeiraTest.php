@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Livewire\Admin\Exemplos\ExemploTable;
 use App\Models\Exemplo;
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

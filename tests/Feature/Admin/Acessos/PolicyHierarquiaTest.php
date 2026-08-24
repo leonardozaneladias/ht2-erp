@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;

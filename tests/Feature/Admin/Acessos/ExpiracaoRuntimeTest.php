@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Enums\TipoConcessao;
 use HT2ML\Core\Services\Admin\AccessResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;

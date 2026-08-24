@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use HT2ML\Core\Database\Seeders\AdminUserSeeder;
+use HT2ML\Core\Database\Seeders\EmpresaSeeder;
+use HT2ML\Core\Database\Seeders\MenuPadraoSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\DadosReferenciaSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,7 +20,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Dados de referência (reais, via CSV) antes dos seeders de demo.
-        $this->call(Referencia\DadosReferenciaSeeder::class);
+        $this->call(DadosReferenciaSeeder::class);
 
         // Extensões que semeiam dados consumidos pelos seeders do core
         // (catálogos, tabelas de apoio) registram-se com antesDoCore: true.

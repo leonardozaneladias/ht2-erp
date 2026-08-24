@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\Lgpd\AnonimizarUsuarioAction;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;

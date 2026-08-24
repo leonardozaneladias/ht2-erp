@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Configuracao\AbaDangerZone;
 use HT2ML\Core\Settings\AppearanceSettings;
 use HT2ML\Core\Settings\BrandingSettings;

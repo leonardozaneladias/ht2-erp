@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Livewire\Admin\Exemplos\FormExemplo;
 use App\Livewire\Admin\Exemplos\IndexExemplo;
 use App\Models\Exemplo;
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;

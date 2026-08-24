@@ -167,12 +167,6 @@ Route::prefix('admin')->name('admin.')->middleware([HT2ML\Core\Http\Middleware\E
 
     Route::get('/comunicados', HT2ML\Core\Livewire\Admin\Notificacoes\EnviarComunicado::class)->name('comunicados');
 
-    Route::prefix('exemplos')->name('exemplos.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Exemplos\IndexExemplo::class)->name('index');
-        Route::get('/criar', App\Livewire\Admin\Exemplos\FormExemplo::class)->name('create');
-        Route::get('/{exemplo}/editar', App\Livewire\Admin\Exemplos\FormExemplo::class)->name('edit');
-    });
-
     // Tabelas Auxiliares (dados de referência) — CRUD por catálogo.
     Route::prefix('referencia')->name('referencia.')->group(function (): void {
         Route::prefix('estados')->name('estados.')->group(function (): void {

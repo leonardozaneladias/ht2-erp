@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\SyncPermissoesPerfilAction;
 use HT2ML\Core\Actions\Admin\SyncRolesUsuarioAction;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\DTOs\Admin\SyncPermissoesPerfilDTO;
 use HT2ML\Core\DTOs\Admin\SyncRolesDTO;
 use HT2ML\Core\Exceptions\AccessException;

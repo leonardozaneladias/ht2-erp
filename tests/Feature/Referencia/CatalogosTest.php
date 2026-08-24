@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\Referencia\BancoSeeder;
-use Database\Seeders\Referencia\CargoSeeder;
-use Database\Seeders\Referencia\MoedaSeeder;
-use Database\Seeders\Referencia\TipoLogradouroSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\BancoSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\CargoSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\MoedaSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\TipoLogradouroSeeder;
 use HT2ML\Core\Models\Referencia\Banco;
 use HT2ML\Core\Models\Referencia\Cargo;
 use HT2ML\Core\Models\Referencia\Moeda;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Acesso\SeletorPerfilAtivo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

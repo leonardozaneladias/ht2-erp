@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders;
+namespace HT2ML\Core\Database\Seeders;
 
 use HT2ML\Core\Actions\Admin\Menu\AplicarMenuPadraoAction;
 use Illuminate\Database\Seeder;

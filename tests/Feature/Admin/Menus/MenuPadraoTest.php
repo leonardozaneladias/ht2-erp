@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\Menu\AplicarMenuPadraoAction;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Enums\TipoPersonalizacaoMenu;
 use HT2ML\Core\Models\MenuPersonalizacao;
 use HT2ML\Core\Services\Admin\Menu\MenuService;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Database\Seeders\Referencia\CargoSeeder;
-use Database\Seeders\Referencia\EstadoSeeder;
-use Database\Seeders\Referencia\MunicipioSeeder;
-use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\CargoSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\EstadoSeeder;
+use HT2ML\Core\Database\Seeders\Referencia\MunicipioSeeder;
+use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Livewire\Admin\Empresas\FormEmpresa;
 use HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario;
 use HT2ML\Core\Models\Empresa;

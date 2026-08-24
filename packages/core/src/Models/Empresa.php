@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Models;
 
-use Database\Factories\EmpresaFactory;
+use HT2ML\Core\Database\Factories\EmpresaFactory;
 use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\Contracts\UsaSoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +22,7 @@ class Empresa extends Model implements UsaSoftDeletes
 {
     use Auditavel;
 
-    /** @use HasFactory<\Database\Factories\EmpresaFactory> */
+    /** @use HasFactory<\HT2ML\Core\Database\Factories\EmpresaFactory> */
     use HasFactory;
 
     use SoftDeletes;
