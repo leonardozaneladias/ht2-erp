@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Database\Seeders\Referencia;
 
-use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
-
 /**
  * Bancos (participantes do SPB, fonte BrasilAPI/BACEN). CSV:
  * `ispb,codigo_compe,nome,nome_completo`. Chave natural: ISPB (8 díg).
  */
-final class BancoSeeder extends CsvReferenceSeeder
+final class BancoSeeder extends CsvCoreSeeder
 {
     protected function arquivo(): string
     {

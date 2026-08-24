@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Database\Seeders\Referencia;
 
-use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
-
 /**
  * Países (ISO 3166-1, fonte IBGE). CSV: `codigo_iso2,codigo_iso3,codigo_numerico,nome`.
  * `ativo` não é atualizado no re-seed (preserva a escolha do admin).
  */
-final class PaisSeeder extends CsvReferenceSeeder
+final class PaisSeeder extends CsvCoreSeeder
 {
     protected function arquivo(): string
     {

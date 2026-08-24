@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Database\Seeders\Referencia;
 
-use HT2ML\Core\Support\Referencia\CsvReferenceSeeder;
-
 /**
  * Moedas (ISO 4217). CSV: `codigo_iso,numerico,nome,simbolo,casas_decimais`.
  * `ativo` não é atualizado no re-seed (preserva a escolha do admin).
  */
-final class MoedaSeeder extends CsvReferenceSeeder
+final class MoedaSeeder extends CsvCoreSeeder
 {
     protected function arquivo(): string
     {
