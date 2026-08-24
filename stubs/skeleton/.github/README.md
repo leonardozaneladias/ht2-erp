@@ -9,18 +9,44 @@
 Sem ele o `composer install` falha com `Repository not found` — os pacotes da
 plataforma são privados.
 
-### Por que um token, e não deploy keys
+### O token entra em DOIS lugares, e é fácil parar no primeiro
 
 O `composer.json` declara os pacotes por SSH (`git@github.com:...`), que é o que
-funciona na máquina de quem desenvolve. O runner não tem essa chave. Em vez de
-manter duas formas de declarar o mesmo repositório, o workflow reescreve SSH
-para HTTPS autenticado:
+funciona na máquina de quem desenvolve. O runner não tem essa chave.
+
+**1. Reescrita de URL — cobre as operações git.**
 
 ```yaml
 git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "git@github.com:"
 ```
 
-Um token só cobre todos os pacotes.
+É isso que permite ao Composer ler os refs do repositório e montar a lista de
+versões.
+
+**2. `COMPOSER_AUTH` — cobre o download.**
+
+```yaml
+env:
+    COMPOSER_AUTH: '{"github-oauth":{"github.com":"${TOKEN}"}}'
+```
+
+Com `--prefer-dist`, o Composer baixa um zipball de `api.github.com` usando o
+próprio cliente HTTP, que **não lê configuração do git**. Só com o passo 1, a
+resolução funciona e o download morre com `404 Not Found` — sintoma confuso,
+porque parece que o repositório não existe quando o problema é credencial.
+
+Um token só cobre os dois usos e todos os pacotes.
+
+### Os secrets ficam em dois cofres
+
+| Onde                                                                  | Para quê          |
+| --------------------------------------------------------------------- | ----------------- |
+| _Settings → Secrets and variables → **Actions** → Repository secrets_ | PRs normais       |
+| _Settings → Secrets and variables → **Dependabot**_                   | PRs do Dependabot |
+
+São cofres separados: um PR aberto pelo Dependabot **não enxerga** os secrets de
+Actions — é proteção do GitHub contra exfiltração por PR automático. Sem a
+segunda cópia, todo PR do Dependabot falha no `composer install`.
 
 ## Como este CI economiza minutos
 

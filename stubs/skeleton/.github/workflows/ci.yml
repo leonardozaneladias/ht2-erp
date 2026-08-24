@@ -38,11 +38,20 @@ jobs:
                   extensions: pdo, pdo_sqlite, sqlite3, bcmath, mbstring, xml
                   coverage: none
 
-            # Os pacotes ht2ml/* são privados e o composer.json os declara por
-            # SSH, que é o que funciona na máquina de quem desenvolve. O runner
-            # não tem essa chave — reescrever para HTTPS autenticado evita
-            # manter duas formas de declarar o mesmo repositório.
-            - name: Autenticar nos pacotes privados
+            # Autenticar nos pacotes privados exige DUAS coisas, e é fácil parar
+            # na primeira achando que basta:
+            #
+            # 1. A reescrita de URL abaixo cobre as operações GIT. O
+            #    composer.json declara os repositórios por SSH, que é o que
+            #    funciona na máquina de quem desenvolve; o runner não tem a
+            #    chave, então SSH vira HTTPS autenticado. É isso que permite ao
+            #    Composer LER os refs e montar a lista de versões.
+            #
+            # 2. O COMPOSER_AUTH mais abaixo cobre o DOWNLOAD. Com
+            #    --prefer-dist o Composer baixa um zipball de api.github.com
+            #    pelo próprio cliente HTTP, que não lê configuração do git — sem
+            #    o token ali, a resolução funciona e o download morre com 404.
+            - name: Autenticar nos pacotes privados (git)
               run: git config --global url."https://x-access-token:${{ secrets.COMPOSER_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
             - name: Cache do vendor
@@ -54,6 +63,9 @@ jobs:
 
             - name: Instalar dependências PHP
               run: composer install --no-interaction --prefer-dist --optimize-autoloader
+              env:
+                  # Cobre o download do zipball pela API (ver o passo de git acima).
+                  COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.COMPOSER_TOKEN }}"}}'
 
             - name: Setup Node 22
               uses: actions/setup-node@v6
