@@ -23,8 +23,11 @@
 /* Tailwind precisa escanear as classes do PowerGrid, do tema e dos grids */
 @source "../../vendor/power-components/livewire-powergrid/src/Themes/Tailwind.php";
 @source "../../vendor/power-components/livewire-powergrid/resources/views/**/*.php";
-@source "../../app/Livewire/Admin/**/*Table.php";
-@source "../../app/PowerGridThemes/*.php";
+/* As fontes do núcleo. Sem este import, um app que instala ht2ml/core por
+   Composer recebe os blades mas o Tailwind não os lê — vendor/ é gitignored e
+   a detecção automática do Tailwind 4 pula caminhos ignorados. Ver o
+   cabeçalho do arquivo importado. */
+@import "../../vendor/ht2ml/core/resources/css/core.css";
 
 /* Tokens do PowerGrid casados com a paleta Inspinia.
    pg-primary e uma rampa NEUTRA fixa (50=claro -> 950=escuro): o PowerGrid

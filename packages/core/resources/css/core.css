@@ -1,0 +1,20 @@
+/* =========================================================================
+   Fontes do Tailwind para o núcleo — importe isto no CSS do app.
+   -------------------------------------------------------------------------
+   A detecção automática do Tailwind 4 varre o projeto, mas PULA caminhos
+   ignorados pelo git — e `vendor/` é um deles. Num app que instala
+   ht2ml/core por Composer, os blades do pacote vivem em
+   vendor/ht2ml/core/resources/views e o Tailwind nunca os lê: o CSS sai sem
+   NENHUMA das classes que só o núcleo usa, e o admin renderiza sem estilo.
+
+   Medido: uma classe única num arquivo sob vendor/ não aparece no build;
+   a mesma classe sob packages/ aparece.
+
+   Estes @source resolvem relativo a ESTE arquivo, então funcionam tanto no
+   monorepo (packages/core/resources/css) quanto instalado
+   (vendor/ht2ml/core/resources/css).
+   ========================================================================= */
+
+@source "../views/**/*.blade.php";
+@source "../../src/**/*.php";
+@source "../../routes/*.php";
