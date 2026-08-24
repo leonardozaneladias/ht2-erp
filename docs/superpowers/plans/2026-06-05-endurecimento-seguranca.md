@@ -720,7 +720,7 @@ git commit -m "feat(admin): serviço de lockout de conta"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\Login;
+use HT2ML\Core\Livewire\Admin\Auth\Login;
 use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -897,7 +897,7 @@ git commit -m "feat(admin): login com lockout, status ativo e alerta de super-ad
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\TwoFactorChallenge;
+use HT2ML\Core\Livewire\Admin\Auth\TwoFactorChallenge;
 use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 use HT2ML\Core\Settings\SegurancaSettings;
@@ -1009,7 +1009,7 @@ git commit -m "feat(admin): 2FA com throttle configurável e alerta de super-adm
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\ForgotPassword;
+use HT2ML\Core\Livewire\Admin\Auth\ForgotPassword;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -1144,10 +1144,10 @@ final class GarantirContaAtiva
 }
 ```
 
-- [ ] **Step 4: Registrar na cadeia** — em `routes/admin.php`, no array de middlewares do grupo autenticado, inserir `App\Http\Middleware\GarantirContaAtiva::class` logo APÓS `'admin.auth'` e ANTES de `App\Http\Middleware\EncerrarImpersonationExpirada::class`. O array fica:
+- [ ] **Step 4: Registrar na cadeia** — em `routes/admin.php`, no array de middlewares do grupo autenticado, inserir `HT2ML\Core\Http\Middleware\GarantirContaAtiva::class` logo APÓS `'admin.auth'` e ANTES de `HT2ML\Core\Http\Middleware\EncerrarImpersonationExpirada::class`. O array fica:
 
 ```php
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\GarantirContaAtiva::class, App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class])->group(function () use ($placeholder): void {
+Route::prefix('admin')->name('admin.')->middleware([HT2ML\Core\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', HT2ML\Core\Http\Middleware\GarantirContaAtiva::class, HT2ML\Core\Http\Middleware\EncerrarImpersonationExpirada::class, HT2ML\Core\Http\Middleware\CheckInactivity::class, HT2ML\Core\Http\Middleware\EnsureTwoFactorEnabled::class, HT2ML\Core\Http\Middleware\DefinirContextoTenant::class])->group(function () use ($placeholder): void {
 ```
 
 - [ ] **Step 5: Verde** — `ddev artisan test --filter=ContaAtivaTest` → PASSA.
@@ -1244,7 +1244,7 @@ git commit -m "feat(admin): alerta de segurança ao iniciar personificação"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Usuarios\UsuariosTable;
+use HT2ML\Core\Livewire\Admin\Usuarios\UsuariosTable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
@@ -1332,7 +1332,7 @@ git commit -m "feat(admin): desbloqueio manual de conta na tabela de usuários"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Configuracao\AbaSeguranca;
+use HT2ML\Core\Livewire\Admin\Configuracao\AbaSeguranca;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

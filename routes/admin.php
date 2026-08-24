@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Admin\Auth\LogoutController;
-use App\Http\Controllers\Admin\DashboardController;
+use HT2ML\Core\Http\Controllers\Admin\Auth\LogoutController;
+use HT2ML\Core\Http\Controllers\Admin\DashboardController;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
@@ -92,27 +92,27 @@ if (app()->isLocal()) {
 }
 
 // ── Setup Wizard (público enquanto a instalação não foi concluída) ──────────
-Route::get('/admin/setup', App\Livewire\Admin\Setup\SetupWizard::class)->name('admin.setup');
+Route::get('/admin/setup', HT2ML\Core\Livewire\Admin\Setup\SetupWizard::class)->name('admin.setup');
 
 // ── Auth (redireciona para o setup enquanto não instalado) ──────────────────
-Route::prefix('admin')->name('admin.')->middleware(App\Http\Middleware\EnsureSystemConfigured::class)->group(function (): void {
-    Route::get('/login', App\Livewire\Admin\Auth\Login::class)->name('login');
-    Route::get('/esqueceu-senha', App\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
-    Route::get('/resetar-senha/{token}', App\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
-    Route::get('/convite/{token}', App\Livewire\Admin\Auth\AceitarConvite::class)->name('convite.aceitar');
-    Route::get('/two-factor-challenge', App\Livewire\Admin\Auth\TwoFactorChallenge::class)->name('two-factor-challenge');
+Route::prefix('admin')->name('admin.')->middleware(HT2ML\Core\Http\Middleware\EnsureSystemConfigured::class)->group(function (): void {
+    Route::get('/login', HT2ML\Core\Livewire\Admin\Auth\Login::class)->name('login');
+    Route::get('/esqueceu-senha', HT2ML\Core\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
+    Route::get('/resetar-senha/{token}', HT2ML\Core\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
+    Route::get('/convite/{token}', HT2ML\Core\Livewire\Admin\Auth\AceitarConvite::class)->name('convite.aceitar');
+    Route::get('/two-factor-challenge', HT2ML\Core\Livewire\Admin\Auth\TwoFactorChallenge::class)->name('two-factor-challenge');
 });
 
 // ── Admin autenticado (setup tem precedência sobre o login) ─────────────────
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', Illuminate\Session\Middleware\AuthenticateSession::class, App\Http\Middleware\GarantirContaAtiva::class, App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class, App\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function (): void {
+Route::prefix('admin')->name('admin.')->middleware([HT2ML\Core\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', Illuminate\Session\Middleware\AuthenticateSession::class, HT2ML\Core\Http\Middleware\GarantirContaAtiva::class, HT2ML\Core\Http\Middleware\EncerrarImpersonationExpirada::class, HT2ML\Core\Http\Middleware\CheckInactivity::class, HT2ML\Core\Http\Middleware\EnsureTwoFactorEnabled::class, HT2ML\Core\Http\Middleware\DefinirContextoTenant::class, HT2ML\Core\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function (): void {
     Route::redirect('/', '/admin/dashboard');
 
     Route::post('/logout', LogoutController::class)->name('logout');
-    Route::post('/impersonation/sair', [App\Http\Controllers\Admin\ImpersonationController::class, 'sair'])
+    Route::post('/impersonation/sair', [HT2ML\Core\Http\Controllers\Admin\ImpersonationController::class, 'sair'])
         ->name('impersonation.sair');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/conta', App\Livewire\Admin\Conta\MinhaConta::class)->name('conta');
+    Route::get('/conta', HT2ML\Core\Livewire\Admin\Conta\MinhaConta::class)->name('conta');
 
     Route::prefix('perfil')->name('perfil.')->group(function (): void {
         Route::redirect('/', '/admin/conta')->name('show');
@@ -121,21 +121,21 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
     Route::prefix('conta')->name('conta.')->group(function (): void {
         Route::redirect('/editar', '/admin/conta')->name('edit');
         Route::redirect('/seguranca', '/admin/conta?aba=seguranca')->name('seguranca');
-        Route::get('/notificacoes', App\Livewire\Admin\Notificacoes\MinhasNotificacoes::class)->name('notificacoes');
+        Route::get('/notificacoes', HT2ML\Core\Livewire\Admin\Notificacoes\MinhasNotificacoes::class)->name('notificacoes');
     });
 
     Route::prefix('empresas')->name('empresas.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Empresas\IndexEmpresas::class)->name('index');
-        Route::get('/nova', App\Livewire\Admin\Empresas\FormEmpresa::class)->name('create');
-        Route::get('/{empresa}/editar', App\Livewire\Admin\Empresas\FormEmpresa::class)->name('edit');
+        Route::get('/', HT2ML\Core\Livewire\Admin\Empresas\IndexEmpresas::class)->name('index');
+        Route::get('/nova', HT2ML\Core\Livewire\Admin\Empresas\FormEmpresa::class)->name('create');
+        Route::get('/{empresa}/editar', HT2ML\Core\Livewire\Admin\Empresas\FormEmpresa::class)->name('edit');
     });
 
     Route::prefix('usuarios')->name('usuarios.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Usuarios\IndexUsuarios::class)->name('index');
-        Route::get('/novo', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('create');
-        Route::get('/{usuario}/editar', App\Livewire\Admin\Usuarios\FormUsuario::class)->name('edit');
-        Route::get('/{usuario}/lgpd/json', [App\Http\Controllers\Admin\LgpdController::class, 'exportarJson'])->name('lgpd.json');
-        Route::get('/{usuario}/lgpd/pdf', [App\Http\Controllers\Admin\LgpdController::class, 'exportarPdf'])->name('lgpd.pdf');
+        Route::get('/', HT2ML\Core\Livewire\Admin\Usuarios\IndexUsuarios::class)->name('index');
+        Route::get('/novo', HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario::class)->name('create');
+        Route::get('/{usuario}/editar', HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario::class)->name('edit');
+        Route::get('/{usuario}/lgpd/json', [HT2ML\Core\Http\Controllers\Admin\LgpdController::class, 'exportarJson'])->name('lgpd.json');
+        Route::get('/{usuario}/lgpd/pdf', [HT2ML\Core\Http\Controllers\Admin\LgpdController::class, 'exportarPdf'])->name('lgpd.pdf');
     });
 
     // Rotas legadas de perfis — consolidadas no hub de Controle de Acesso.
@@ -146,7 +146,7 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
     });
 
     Route::prefix('acesso')->name('acesso.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Acesso\ControleAcesso::class)->name('index');
+        Route::get('/', HT2ML\Core\Livewire\Admin\Acesso\ControleAcesso::class)->name('index');
         // Telas antigas (matriz, simulador, histórico) absorvidas pelo hub.
         Route::redirect('/matriz', '/admin/acesso')->name('matriz');
         Route::redirect('/simulador', '/admin/acesso')->name('simulador');
@@ -154,18 +154,18 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
     });
 
     Route::prefix('auditoria')->name('auditoria.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Auditoria\IndexAuditoria::class)->name('index');
+        Route::get('/', HT2ML\Core\Livewire\Admin\Auditoria\IndexAuditoria::class)->name('index');
     });
 
     Route::prefix('configuracoes')->name('configuracoes.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)->name('index');
+        Route::get('/', HT2ML\Core\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)->name('index');
     });
 
     Route::prefix('menus')->name('menus.')->group(function (): void {
-        Route::get('/', App\Livewire\Admin\Menus\GestaoMenus::class)->name('index');
+        Route::get('/', HT2ML\Core\Livewire\Admin\Menus\GestaoMenus::class)->name('index');
     });
 
-    Route::get('/comunicados', App\Livewire\Admin\Notificacoes\EnviarComunicado::class)->name('comunicados');
+    Route::get('/comunicados', HT2ML\Core\Livewire\Admin\Notificacoes\EnviarComunicado::class)->name('comunicados');
 
     Route::prefix('exemplos')->name('exemplos.')->group(function (): void {
         Route::get('/', App\Livewire\Admin\Exemplos\IndexExemplo::class)->name('index');
@@ -176,45 +176,45 @@ Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSy
     // Tabelas Auxiliares (dados de referência) — CRUD por catálogo.
     Route::prefix('referencia')->name('referencia.')->group(function (): void {
         Route::prefix('estados')->name('estados.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexEstado::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormEstado::class)->name('create');
-            Route::get('/{estado}/editar', App\Livewire\Admin\Referencia\FormEstado::class)->name('edit');
+            Route::get('/', HT2ML\Core\Livewire\Admin\Referencia\IndexEstado::class)->name('index');
+            Route::get('/criar', HT2ML\Core\Livewire\Admin\Referencia\FormEstado::class)->name('create');
+            Route::get('/{estado}/editar', HT2ML\Core\Livewire\Admin\Referencia\FormEstado::class)->name('edit');
         });
 
         Route::prefix('paises')->name('paises.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexPais::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormPais::class)->name('create');
-            Route::get('/{pais}/editar', App\Livewire\Admin\Referencia\FormPais::class)->name('edit');
+            Route::get('/', HT2ML\Core\Livewire\Admin\Referencia\IndexPais::class)->name('index');
+            Route::get('/criar', HT2ML\Core\Livewire\Admin\Referencia\FormPais::class)->name('create');
+            Route::get('/{pais}/editar', HT2ML\Core\Livewire\Admin\Referencia\FormPais::class)->name('edit');
         });
 
         Route::prefix('municipios')->name('municipios.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexMunicipio::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormMunicipio::class)->name('create');
-            Route::get('/{municipio}/editar', App\Livewire\Admin\Referencia\FormMunicipio::class)->name('edit');
+            Route::get('/', HT2ML\Core\Livewire\Admin\Referencia\IndexMunicipio::class)->name('index');
+            Route::get('/criar', HT2ML\Core\Livewire\Admin\Referencia\FormMunicipio::class)->name('create');
+            Route::get('/{municipio}/editar', HT2ML\Core\Livewire\Admin\Referencia\FormMunicipio::class)->name('edit');
         });
 
         Route::prefix('moedas')->name('moedas.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexMoeda::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormMoeda::class)->name('create');
-            Route::get('/{moeda}/editar', App\Livewire\Admin\Referencia\FormMoeda::class)->name('edit');
+            Route::get('/', HT2ML\Core\Livewire\Admin\Referencia\IndexMoeda::class)->name('index');
+            Route::get('/criar', HT2ML\Core\Livewire\Admin\Referencia\FormMoeda::class)->name('create');
+            Route::get('/{moeda}/editar', HT2ML\Core\Livewire\Admin\Referencia\FormMoeda::class)->name('edit');
         });
 
         Route::prefix('bancos')->name('bancos.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexBanco::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormBanco::class)->name('create');
-            Route::get('/{banco}/editar', App\Livewire\Admin\Referencia\FormBanco::class)->name('edit');
+            Route::get('/', HT2ML\Core\Livewire\Admin\Referencia\IndexBanco::class)->name('index');
+            Route::get('/criar', HT2ML\Core\Livewire\Admin\Referencia\FormBanco::class)->name('create');
+            Route::get('/{banco}/editar', HT2ML\Core\Livewire\Admin\Referencia\FormBanco::class)->name('edit');
         });
 
         Route::prefix('cargos')->name('cargos.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexCargo::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormCargo::class)->name('create');
-            Route::get('/{cargo}/editar', App\Livewire\Admin\Referencia\FormCargo::class)->name('edit');
+            Route::get('/', HT2ML\Core\Livewire\Admin\Referencia\IndexCargo::class)->name('index');
+            Route::get('/criar', HT2ML\Core\Livewire\Admin\Referencia\FormCargo::class)->name('create');
+            Route::get('/{cargo}/editar', HT2ML\Core\Livewire\Admin\Referencia\FormCargo::class)->name('edit');
         });
 
         Route::prefix('tipos-logradouro')->name('tipos_logradouro.')->group(function (): void {
-            Route::get('/', App\Livewire\Admin\Referencia\IndexTipoLogradouro::class)->name('index');
-            Route::get('/criar', App\Livewire\Admin\Referencia\FormTipoLogradouro::class)->name('create');
-            Route::get('/{tipo_logradouro}/editar', App\Livewire\Admin\Referencia\FormTipoLogradouro::class)->name('edit');
+            Route::get('/', HT2ML\Core\Livewire\Admin\Referencia\IndexTipoLogradouro::class)->name('index');
+            Route::get('/criar', HT2ML\Core\Livewire\Admin\Referencia\FormTipoLogradouro::class)->name('create');
+            Route::get('/{tipo_logradouro}/editar', HT2ML\Core\Livewire\Admin\Referencia\FormTipoLogradouro::class)->name('edit');
         });
 
     });

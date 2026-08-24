@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Empresas\EmpresasTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Empresas\EmpresasTable;
 use HT2ML\Core\Models\Empresa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

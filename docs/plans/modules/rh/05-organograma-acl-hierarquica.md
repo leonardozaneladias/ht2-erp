@@ -394,7 +394,7 @@ E a própria CTE **repete** `empresa_id`/`deleted_at` internamente (§4.2) — r
 
 ### 5.4 Desativações conscientes (escape hatches)
 
-Espelhando o `withoutGlobalScope('empresa')` do core e o padrão de troca de scope visto em `App\Livewire\Concerns\FiltraPorMultiEmpresa` (que faz `withoutGlobalScope('empresa')` e reaplica `whereIn(empresa_id, …)` só sobre a interseção autorizada):
+Espelhando o `withoutGlobalScope('empresa')` do core e o padrão de troca de scope visto em `HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa` (que faz `withoutGlobalScope('empresa')` e reaplica `whereIn(empresa_id, …)` só sobre a interseção autorizada):
 
 | Escape                                           | Efeito                                                                         | Quando usar                                                                                                                                                          |
 | ------------------------------------------------ | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -408,7 +408,7 @@ Espelhando o `withoutGlobalScope('empresa')` do core e o padrão de troca de sco
 
 ## 6. Interação com o filtro multi-empresa do core
 
-O eixo tenant não é necessariamente "uma empresa só". O core já oferece, via `App\Livewire\Concerns\FiltraPorMultiEmpresa`, um filtro que permite a um usuário com a capability `listagens.multi_empresa` (e acesso a 2+ empresas) **incluir outras empresas** numa listagem PowerGrid — sempre limitado pelo RBAC estrito por empresa (`AccessResolver::permiteNaEmpresa($user, $abilityListar, $empresaId)`), com a interseção `selecionadas ∩ elegíveis` blindando contra injeção de `empresa_id` pelo cliente.
+O eixo tenant não é necessariamente "uma empresa só". O core já oferece, via `HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa`, um filtro que permite a um usuário com a capability `listagens.multi_empresa` (e acesso a 2+ empresas) **incluir outras empresas** numa listagem PowerGrid — sempre limitado pelo RBAC estrito por empresa (`AccessResolver::permiteNaEmpresa($user, $abilityListar, $empresaId)`), com a interseção `selecionadas ∩ elegíveis` blindando contra injeção de `empresa_id` pelo cliente.
 
 No RH, os dois mecanismos **compõem por AND**, cada um no seu eixo:
 

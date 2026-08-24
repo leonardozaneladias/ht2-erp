@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Lgpd\AnonimizarUsuario;
+use HT2ML\Core\Livewire\Admin\Lgpd\AnonimizarUsuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;

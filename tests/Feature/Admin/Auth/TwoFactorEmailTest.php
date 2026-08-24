@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\Login;
-use App\Livewire\Admin\Auth\TwoFactorChallenge;
-use App\Livewire\Admin\Conta\SegurancaConta;
-use App\Livewire\Admin\Usuarios\FormUsuario;
 use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Enums\TipoAlertaSeguranca;
+use HT2ML\Core\Livewire\Admin\Auth\Login;
+use HT2ML\Core\Livewire\Admin\Auth\TwoFactorChallenge;
+use HT2ML\Core\Livewire\Admin\Conta\SegurancaConta;
+use HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Notifications\CodigoVerificacaoEmailNotification;

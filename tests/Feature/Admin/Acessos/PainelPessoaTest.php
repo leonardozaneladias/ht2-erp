@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Acesso\ControleAcesso;
-use App\Livewire\Admin\Acesso\PainelPessoa;
 use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Livewire\Admin\Acesso\ControleAcesso;
+use HT2ML\Core\Livewire\Admin\Acesso\PainelPessoa;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Models\PermissionGrant;
 use HT2ML\Core\Support\Tenancy\TenantContext;

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Setup\SetupWizard;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Setup\SetupWizard;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Settings\BrandingSettings;

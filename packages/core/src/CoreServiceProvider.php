@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 /**
  * Entrega o design system e as views do núcleo.
@@ -47,6 +48,29 @@ final class CoreServiceProvider extends ServiceProvider
         $this->registrarPolicies();
         $this->registrarComandos();
         $this->registrarListeners();
+        $this->registrarComponentesLivewire();
+    }
+
+    /**
+     * A quarta descoberta automática que morre num pacote — e a única que dá
+     * para restaurar em vez de substituir.
+     *
+     * O Livewire encontra componentes sozinho em app/Livewire, derivando o
+     * alias do namespace: App\Livewire\Admin\Auditoria\HistoricoRegistro vira
+     * `admin.auditoria.historico-registro`. Dentro de um pacote não há
+     * descoberta, e sem isto toda tela do admin morre com
+     * "Unable to find component".
+     *
+     * addLocation() ensina a mesma convenção para o namespace do pacote, então
+     * os aliases seguem idênticos e nenhum blade consumidor muda. A alternativa
+     * — 64 chamadas Livewire::component() — funcionaria igual, mas exigiria
+     * lembrar de acrescentar uma linha a cada componente novo.
+     *
+     * Ver tests/Feature/Core/ComponentesLivewireDoCoreTest.php.
+     */
+    private function registrarComponentesLivewire(): void
+    {
+        Livewire::addLocation(classNamespace: 'HT2ML\\Core\\Livewire');
     }
 
     /**

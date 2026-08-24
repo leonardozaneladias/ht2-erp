@@ -16,12 +16,12 @@
 | Contexto ativo    | `HT2ML\Core\Support\Tenancy\TenantContext` (sessão: `tenant.empresa_id` / `tenant.filial_id`) + colunas `admin_users.empresa_ativa_id` / `filial_ativa_id` |
 
 O contexto ativo é hidratado a cada requisição admin autenticada pelo middleware
-`App\Http\Middleware\DefinirContextoTenant`, que revalida o acesso e cai para a
+`HT2ML\Core\Http\Middleware\DefinirContextoTenant`, que revalida o acesso e cai para a
 empresa padrão quando necessário. `HT2ML\Core\Support\Tenancy\TenantResolver` decide as
 empresas/filiais acessíveis (super-admin enxerga todas as ativas).
 
 A troca de empresa/filial acontece pelo seletor da topbar
-(`App\Livewire\Admin\Tenancy\SeletorEmpresaFilial`), que delega às actions
+(`HT2ML\Core\Livewire\Admin\Tenancy\SeletorEmpresaFilial`), que delega às actions
 `DefinirEmpresaAtivaAction` / `DefinirFilialAtivaAction` (persistem coluna + sessão
 e invalidam o cache de acesso).
 
@@ -93,7 +93,7 @@ A **lixeira** (trait `ComLixeira`) compõe **por fora** deste escopo:
 `aplicarLixeira($this->aplicarEscopoMultiEmpresa(Model::query()))` — os global scopes
 `empresa` e `SoftDeletingScope` são independentes. Ver [`lixeira.md`](lixeira.md).
 
-> O trait `App\Livewire\Concerns\FiltraPorMultiEmpresa` dá a usuários autorizados um
+> O trait `HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa` dá a usuários autorizados um
 > **multiselect de empresa (e filial)** para ver registros de várias empresas/filiais de uma vez,
 > com uma coluna **Empresa** (e **Filial**) identificando cada linha.
 
@@ -120,7 +120,7 @@ O recurso aparece somente quando o usuário **tem a permissão global `listagens
 **Como aplicar numa tabela tenant** (o gerador `make:modulo --tenant` já injeta isto):
 
 ```php
-use App\Livewire\Concerns\FiltraPorMultiEmpresa;
+use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;
 
 final class ExemploTable extends PowerGridComponent
 {

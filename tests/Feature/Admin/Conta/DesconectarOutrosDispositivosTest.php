@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Conta\SegurancaConta;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Conta\SegurancaConta;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Activitylog\Models\Activity;
@@ -46,7 +46,7 @@ it('a troca da própria senha não derruba a sessão atual (AuthenticateSession)
     marcarInstalado();
 
     Livewire::actingAs($user, 'admin')
-        ->test(App\Livewire\Admin\Conta\TrocarSenha::class)
+        ->test(HT2ML\Core\Livewire\Admin\Conta\TrocarSenha::class)
         ->set('senhaAtual', 'password')
         ->set('novaSenha', 'NovaSenhaForte1!')
         ->set('novaSenha_confirmation', 'NovaSenhaForte1!')

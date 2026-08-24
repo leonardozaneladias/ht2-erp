@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\FormPais;
-use App\Livewire\Admin\Referencia\IndexPais;
-use App\Livewire\Admin\Referencia\PaisTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\FormPais;
+use HT2ML\Core\Livewire\Admin\Referencia\IndexPais;
+use HT2ML\Core\Livewire\Admin\Referencia\PaisTable;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Referencia\Pais;
 use Illuminate\Foundation\Testing\RefreshDatabase;

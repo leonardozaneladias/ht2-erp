@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\EstadoTable;
-use App\Livewire\Admin\Referencia\FormEstado;
-use App\Livewire\Admin\Referencia\IndexEstado;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\EstadoTable;
+use HT2ML\Core\Livewire\Admin\Referencia\FormEstado;
+use HT2ML\Core\Livewire\Admin\Referencia\IndexEstado;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Referencia\Estado;
 use Illuminate\Foundation\Testing\RefreshDatabase;

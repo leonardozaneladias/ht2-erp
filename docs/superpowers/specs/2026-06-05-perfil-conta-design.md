@@ -34,7 +34,7 @@ usuário opera somente sobre a própria conta.
 
 ### Página tabulada (parent)
 
-- **`App\Livewire\Admin\Conta\MinhaConta`** — Livewire full-page (`#[Layout]` +
+- **`HT2ML\Core\Livewire\Admin\Conta\MinhaConta`** — Livewire full-page (`#[Layout]` +
   `#[Url] public string $aba = 'perfil'`). Renderiza `x-shared.tab-nav` e monta, inline,
   o componente aninhado da aba ativa. `$aba` sincroniza com a query string
   (`/admin/conta?aba=seguranca`) → abas deep-linkáveis, sem recarga.
@@ -50,7 +50,7 @@ usuário opera somente sobre a própria conta.
 
 ### Abas (componentes aninhados)
 
-- **Perfil** → `App\Livewire\Admin\Conta\PerfilConta` (`WithFileUploads`):
+- **Perfil** → `HT2ML\Core\Livewire\Admin\Conta\PerfilConta` (`WithFileUploads`):
     - **Avatar**: upload (`image`, `mimes:jpg,jpeg,png,webp`, `max:2048`) → disco `public`
       em `avatars/` via `SettingsFileUploadService::substituir` (apaga o anterior) → grava o
       caminho em `avatar_url`. Remoção volta ao fallback de iniciais.
@@ -58,14 +58,14 @@ usuário opera somente sobre a própria conta.
       empresas e do último login.
     - Salva via **`HT2ML\Core\Actions\Admin\Conta\AtualizarPerfilAction`** (nome + avatar).
 - **Segurança** → painel que monta três blocos:
-    - **`App\Livewire\Admin\Conta\TrocarSenha`** (novo): senha atual + nova + confirmação;
+    - **`HT2ML\Core\Livewire\Admin\Conta\TrocarSenha`** (novo): senha atual + nova + confirmação;
       valida a atual contra o hash + regras `Password::defaults()`; ao salvar atualiza o hash,
       **regenera a sessão** e audita `activity('conta')->event('senha_alterada')`. A senha
       atual é a trava (sem modal extra de reconfirmação).
-    - **`App\Livewire\Admin\Conta\SegurancaConta`** (existente, 2FA) — ajustado para render
+    - **`HT2ML\Core\Livewire\Admin\Conta\SegurancaConta`** (existente, 2FA) — ajustado para render
       como painel (sem `#[Layout]` próprio quando aninhado).
-    - **`App\Livewire\Admin\Conta\HistoricoLogins`** (novo, leitura): últimos ~10 acessos.
-- **Preferências** → `App\Livewire\Admin\Conta\PreferenciasConta`: selects de **idioma**
+    - **`HT2ML\Core\Livewire\Admin\Conta\HistoricoLogins`** (novo, leitura): últimos ~10 acessos.
+- **Preferências** → `HT2ML\Core\Livewire\Admin\Conta\PreferenciasConta`: selects de **idioma**
   (`locale`) e **fuso horário** (`timezone`); salva nas novas colunas. Locales = os que a
   instância oferece; timezones = lista do PHP (`DateTimeZone`), destacando o Brasil.
 
@@ -97,7 +97,7 @@ usuário opera somente sobre a própria conta.
 detecto via flag/`TenantContext` de impersonação e não registro). Se já houver código setando
 `last_login_*` no `Login.php`, migra para o listener (fonte única).
 
-**② Aplicação das preferências.** Middleware **`App\Http\Middleware\AplicarPreferenciasUsuario`**
+**② Aplicação das preferências.** Middleware **`HT2ML\Core\Http\Middleware\AplicarPreferenciasUsuario`**
 (no grupo `admin.auth`, após o contexto de tenant): `App::setLocale($user->locale ?? localeDaInstância)`
 por request. O **fuso** é aplicado só na **exibição** (helper/Blade formata datas no `timezone`
 do usuário); não altera `config('app.timezone')` global (que afetaria gravação). Nulo = herda

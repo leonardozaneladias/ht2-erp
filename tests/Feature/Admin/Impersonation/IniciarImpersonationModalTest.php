@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Impersonation\IniciarImpersonation;
+use HT2ML\Core\Livewire\Admin\Impersonation\IniciarImpersonation;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;

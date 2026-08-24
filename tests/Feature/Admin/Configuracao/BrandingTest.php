@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Configuracao\AbaAparencia;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Configuracao\AbaAparencia;
 use HT2ML\Core\Services\Admin\Settings\BrandingService;
 use HT2ML\Core\Settings\BrandingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;

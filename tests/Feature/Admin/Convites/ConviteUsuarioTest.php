@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\AceitarConvite;
-use App\Livewire\Admin\Usuarios\FormUsuario;
 use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\Convites\AceitarConviteAction;
 use HT2ML\Core\Actions\Admin\Convites\ConvidarUsuarioAction;
 use HT2ML\Core\Exceptions\AccessException;
+use HT2ML\Core\Livewire\Admin\Auth\AceitarConvite;
+use HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Notifications\ConviteUsuarioNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;

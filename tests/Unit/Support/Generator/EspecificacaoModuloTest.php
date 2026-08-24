@@ -110,7 +110,7 @@ it('--tenant injeta o filtro multi-empresa na Table', function (): void {
     $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], tenant: true);
     $tokens = $spec->tokens();
 
-    expect($tokens['__USE_MULTI_EMPRESA__'])->toContain('use App\Livewire\Concerns\FiltraPorMultiEmpresa;')
+    expect($tokens['__USE_MULTI_EMPRESA__'])->toContain('use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;')
         ->and($tokens['__TRAIT_MULTI_EMPRESA__'])->toBe('use FiltraPorMultiEmpresa;')
         ->and($tokens['__PERMISSAO_LISTAGEM__'])->toContain("return 'exemplos.listar';")
         ->and($tokens['__DS_OPEN__'])->toBe('$this->aplicarEscopoMultiEmpresa(')

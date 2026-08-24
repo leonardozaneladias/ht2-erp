@@ -537,7 +537,7 @@ git commit -m "feat(admin): serviço de auditoria de eventos de segurança"
 - [ ] **Step 1: Write the failing test (adicionar ao arquivo da Task 4)**
 
 ```php
-use App\Livewire\Admin\Auth\Login;
+use HT2ML\Core\Livewire\Admin\Auth\Login;
 use Livewire\Livewire;
 
 it('registra falha de login pela tela', function (): void {
@@ -639,7 +639,7 @@ git commit -m "feat(admin): audita login (sucesso, falha, bloqueio)"
 - [ ] **Step 1: Write the failing test (adicionar ao arquivo)**
 
 ```php
-use App\Livewire\Admin\Auth\TwoFactorChallenge;
+use HT2ML\Core\Livewire\Admin\Auth\TwoFactorChallenge;
 use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 
 it('registra falha no desafio 2FA', function (): void {
@@ -733,7 +733,7 @@ git commit -m "feat(admin): audita desafio 2FA (falha, bloqueio, sucesso)"
 - [ ] **Step 1: Write the failing test (adicionar ao arquivo)**
 
 ```php
-use App\Livewire\Admin\Auth\ForgotPassword;
+use HT2ML\Core\Livewire\Admin\Auth\ForgotPassword;
 
 it('registra logout genuíno (não durante personificação)', function (): void {
     $user = criarAdminUser('u@teste.com');
@@ -865,7 +865,7 @@ git commit -m "feat(admin): audita logout e reset de senha"
 - [ ] **Step 1: Write the failing test (adicionar ao arquivo da Task 3)**
 
 ```php
-use App\Livewire\Admin\Auditoria\AuditoriaTable;
+use HT2ML\Core\Livewire\Admin\Auditoria\AuditoriaTable;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Livewire\Livewire;

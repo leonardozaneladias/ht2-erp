@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\CargoTable;
-use App\Livewire\Admin\Referencia\FormCargo;
-use App\Livewire\Admin\Referencia\IndexCargo;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\CargoTable;
+use HT2ML\Core\Livewire\Admin\Referencia\FormCargo;
+use HT2ML\Core\Livewire\Admin\Referencia\IndexCargo;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Referencia\Cargo;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\FormBanco;
-use App\Livewire\Admin\Referencia\FormCargo;
-use App\Livewire\Admin\Referencia\FormEstado;
-use App\Livewire\Admin\Referencia\FormMoeda;
-use App\Livewire\Admin\Referencia\FormMunicipio;
-use App\Livewire\Admin\Referencia\FormPais;
-use App\Livewire\Admin\Referencia\FormTipoLogradouro;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\FormBanco;
+use HT2ML\Core\Livewire\Admin\Referencia\FormCargo;
+use HT2ML\Core\Livewire\Admin\Referencia\FormEstado;
+use HT2ML\Core\Livewire\Admin\Referencia\FormMoeda;
+use HT2ML\Core\Livewire\Admin\Referencia\FormMunicipio;
+use HT2ML\Core\Livewire\Admin\Referencia\FormPais;
+use HT2ML\Core\Livewire\Admin\Referencia\FormTipoLogradouro;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\FiscalBr\Livewire\FormCfop;
 use HT2ML\FiscalBr\Livewire\FormCnae;

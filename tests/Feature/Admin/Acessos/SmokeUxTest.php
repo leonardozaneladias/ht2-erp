@@ -53,5 +53,5 @@ it('persiste o guard admin nas requisições de update do Livewire', function ()
     // Sem este middleware persistente, $this->authorize() em métodos de ação
     // resolveria o guard padrão (web, vazio) e retornaria 403 no navegador.
     expect(Livewire\Livewire::getPersistentMiddleware())
-        ->toContain(App\Http\Middleware\AdminAuthenticate::class);
+        ->toContain(HT2ML\Core\Http\Middleware\AdminAuthenticate::class);
 });

@@ -28,10 +28,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         $middleware->encryptCookies(except: ['appearance', 'admin-mode']);
         $middleware->alias([
-            'admin.auth' => App\Http\Middleware\AdminAuthenticate::class,
+            'admin.auth' => HT2ML\Core\Http\Middleware\AdminAuthenticate::class,
         ]);
-        $middleware->append(App\Http\Middleware\AttachRequestId::class);
-        $middleware->appendToGroup('web', App\Http\Middleware\SecurityHeaders::class);
+        $middleware->append(HT2ML\Core\Http\Middleware\AttachRequestId::class);
+        $middleware->appendToGroup('web', HT2ML\Core\Http\Middleware\SecurityHeaders::class);
         $middleware->appendToGroup('api', [
             'throttle:api',
         ]);

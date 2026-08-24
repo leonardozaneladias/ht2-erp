@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Acesso\PainelPessoa;
-use App\Livewire\Admin\Impersonation\IniciarImpersonation;
-use App\Livewire\Admin\Usuarios\UsuariosTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Acesso\PainelPessoa;
+use HT2ML\Core\Livewire\Admin\Impersonation\IniciarImpersonation;
+use HT2ML\Core\Livewire\Admin\Usuarios\UsuariosTable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 

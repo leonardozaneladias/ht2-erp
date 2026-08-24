@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Http\Middleware\AdminAuthenticate;
 use App\Support\Documents\GeradorNumeroDocumento;
 use HT2ML\Core\Contracts\Referencia\FonteDeCargos;
 use HT2ML\Core\Contracts\Referencia\FonteDeMunicipios;
 use HT2ML\Core\Contracts\Referencia\FonteDeUnidadesFederativas;
+use HT2ML\Core\Http\Middleware\AdminAuthenticate;
 use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\PermissionGrant;

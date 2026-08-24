@@ -81,7 +81,7 @@ de atividade suspeita por e-mail** aos super-admins, e a **aplicação do status
 - **`Login::authenticate()`**: após validar credenciais, checa `estaBloqueada`
   (recusa "conta temporariamente bloqueada") e `ativo` (recusa "conta desativada");
   não autentica nesses casos.
-- **`App\Http\Middleware\GarantirContaAtiva`** (cadeia autenticada, após `admin.auth`):
+- **`HT2ML\Core\Http\Middleware\GarantirContaAtiva`** (cadeia autenticada, após `admin.auth`):
   desloga + redireciona ao login quem ficou `ativo = false` durante a sessão.
 
 ### Desbloqueio manual (UI)

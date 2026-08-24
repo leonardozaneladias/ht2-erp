@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\DefinirContextoTenant;
 use HT2ML\Core\Actions\Admin\DefinirEmpresaAtivaAction;
 use HT2ML\Core\Actions\Admin\DefinirFilialAtivaAction;
+use HT2ML\Core\Http\Middleware\DefinirContextoTenant;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use HT2ML\Core\Support\Tenancy\TenantResolver;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Acesso\ControleAcesso;
-use App\Livewire\Admin\Acesso\PainelHistorico;
 use Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Actions\Admin\ConcederAcessoDiretoAction;
 use HT2ML\Core\DTOs\Admin\ConcessaoAcessoDTO;
 use HT2ML\Core\Enums\TipoConcessao;
+use HT2ML\Core\Livewire\Admin\Acesso\ControleAcesso;
+use HT2ML\Core\Livewire\Admin\Acesso\PainelHistorico;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;

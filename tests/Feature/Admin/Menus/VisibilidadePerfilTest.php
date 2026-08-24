@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Menus\GestaoMenus;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Menus\GestaoMenus;
 use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Services\Admin\Menu\MenuService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
