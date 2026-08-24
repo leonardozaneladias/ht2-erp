@@ -60,6 +60,14 @@ for item in "${INCLUIR[@]}"; do
     cp -R "${item}" "${TMP}/${item}"
 done
 
+# Configs que o monorepo tem mas que NÃO servem a um produto: o phpstan.neon
+# daqui aponta para packages/*, que não existe no consumidor, e o phpstan morre
+# com "Path does not exist" no primeiro uso. Os stubs sobrescrevem.
+for stub in "${ROOT_DIR}"/stubs/skeleton/*; do
+    [[ -f "${stub}" ]] || continue
+    cp "${stub}" "${TMP}/$(basename "${stub}")"
+done
+
 # CI: vem de stubs/skeleton/.github, não do .github deste monorepo — o daqui
 # testa a plataforma, e o do produto precisa autenticar nos pacotes privados.
 if [[ -d "stubs/skeleton/.github" ]]; then
@@ -181,6 +189,13 @@ composer require ht2ml/extensao-exemplo-demo # vitrine do design system
 
 Os repositórios já estão declarados no `composer.json`.
 MD
+
+# O produto não pode nascer reprovando o próprio job de qualidade. Os JSON que
+# este script reescreve saem com formatação diferente da que o Prettier espera.
+if command -v npx >/dev/null 2>&1; then
+    (cd "${TMP}" && npx --yes prettier --write \
+        "composer.json" "package.json" "README.md" ".prettierrc" >/dev/null 2>&1) || true
+fi
 
 TOTAL="$(find "${TMP}" -type f | wc -l | tr -d ' ')"
 echo -e "  ${GREEN}✓${NC} árvore montada: ${TOTAL} arquivos"
