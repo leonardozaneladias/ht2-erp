@@ -87,6 +87,10 @@ fi
 # Testes: só o andaime (TestCase, Pest.php, Arch). A suíte da plataforma testa o
 # core e vive no monorepo — carregá-la aqui daria um skeleton que falha de saída.
 mkdir -p "${TMP}/tests/Feature" "${TMP}/tests/Unit"
+# .gitkeep porque o git não versiona diretório vazio, e o phpunit.xml declara
+# tests/Unit como suíte: sem o arquivo, o publish perde a pasta e o
+# `php artisan test` do produto novo morre com "Test directory not found".
+touch "${TMP}/tests/Unit/.gitkeep"
 for f in tests/TestCase.php tests/Pest.php; do
     [[ -f "${f}" ]] && cp "${f}" "${TMP}/${f}"
 done
@@ -95,12 +99,20 @@ cat > "${TMP}/tests/Feature/SmokeTest.php" <<'PHP'
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 /**
  * O único teste que o skeleton traz: a plataforma subiu?
  *
  * Se ht2ml/core está instalado e registrado, a tela de login do admin responde.
  * É o mínimo que prova que o create-project entregou algo funcional.
+ *
+ * RefreshDatabase é obrigatório aqui: as configurações do núcleo são lidas da
+ * tabela `settings` no boot, e sem schema a página estoura com
+ * "no such table: settings" em vez de renderizar.
  */
+uses(RefreshDatabase::class);
+
 it('serve a tela de login do admin', function () {
     $this->get('/admin/login')->assertOk();
 });
