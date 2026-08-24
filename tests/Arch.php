@@ -33,5 +33,5 @@ arch('models usam Auditavel ou estão na whitelist consciente')
         HT2ML\Core\Models\Activity::class,               // o log em si (append-only)
         HT2ML\Core\Models\LoginHistory::class,           // histórico append-only (já é trilha)
         App\Models\User::class,                   // scaffold do guard web (portal futuro decidirá)
-        App\Models\DocumentSequence::class,       // contador técnico de infra, não entidade de negócio
+        HT2ML\Documentos\Models\DocumentSequence::class,       // contador técnico de infra, não entidade de negócio
     ]);

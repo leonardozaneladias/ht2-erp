@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Exemplos\ExemploTable;
-use App\Models\Exemplo;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Models\Filial;
 use HT2ML\Core\Support\Tenancy\TenantContext;
+use HT2ML\ExemploDemo\Livewire\Exemplos\ExemploTable;
+use HT2ML\ExemploDemo\Models\Exemplo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;

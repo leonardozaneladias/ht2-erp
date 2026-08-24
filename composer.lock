@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "975c1a3c3e9b9de706454ec840879973",
+    "content-hash": "02bb937ffea2e4d2cc352fb321da108d",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1714,7 +1714,7 @@
         },
         {
             "name": "ht2ml/core",
-            "version": "dev-feat/core-instalavel",
+            "version": "dev-feat/extrair-demo-e-documentos",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
@@ -1759,8 +1759,91 @@
             }
         },
         {
+            "name": "ht2ml/extensao-documentos",
+            "version": "dev-feat/extrair-demo-e-documentos",
+            "dist": {
+                "type": "path",
+                "url": "packages/extensao-documentos",
+                "reference": "7e9896a491f9b4234463552adc694df13fb60d5e"
+            },
+            "require": {
+                "ht2ml/core": "@dev",
+                "illuminate/support": "^13.0",
+                "php": "^8.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HT2ML\\Documentos\\DocumentosServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HT2ML\\Documentos\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "HT2ML\\Documentos\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Extensão Documentos.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ht2ml/extensao-exemplo-demo",
+            "version": "dev-feat/extrair-demo-e-documentos",
+            "dist": {
+                "type": "path",
+                "url": "packages/extensao-exemplo-demo",
+                "reference": "7b28efdccc1c09cd84114ea9d7e3d0492098f2b6"
+            },
+            "require": {
+                "ht2ml/core": "@dev",
+                "illuminate/support": "^13.0",
+                "livewire/livewire": "^4.2",
+                "php": "^8.4",
+                "power-components/livewire-powergrid": "^6.10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HT2ML\\ExemploDemo\\ExemploDemoServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HT2ML\\ExemploDemo\\": "src/",
+                    "HT2ML\\ExemploDemo\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "HT2ML\\ExemploDemo\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Extensão ExemploDemo.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-feat/core-instalavel",
+            "version": "dev-feat/extrair-demo-e-documentos",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
@@ -1810,7 +1893,7 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-feat/core-instalavel",
+            "version": "dev-feat/extrair-demo-e-documentos",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",
@@ -14542,6 +14625,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "ht2ml/core": 20,
+        "ht2ml/extensao-documentos": 20,
+        "ht2ml/extensao-exemplo-demo": 20,
         "ht2ml/extensao-fiscal-br": 20,
         "ht2ml/extensao-rh": 20
     },

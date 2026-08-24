@@ -43,8 +43,13 @@
                 :colors="['--color-primary']"
             />
         </div>
-        <div>
-            <livewire:admin.exemplo-counter />
-        </div>
+        @if (class_exists(\HT2ML\ExemploDemo\Livewire\ExemploCounter::class))
+            {{-- Componente da extensão de demonstração: o núcleo NÃO depende dela.
+                 Sem ht2ml/extensao-exemplo-demo instalada, este bloco some em vez
+                 de estourar "Unable to find component". --}}
+            <div>
+                <livewire:exemplo-counter />
+            </div>
+        @endif
     </div>
 </x-admin.layout>

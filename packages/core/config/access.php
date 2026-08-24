@@ -240,33 +240,6 @@ return [
         | mova suas permissões para a chave correspondente.
         */
         ModuloAcesso::Negocio->value => [
-            // Permissões do Exemplo (demo) — opcionais (ver EXEMPLO_DEMO em config/extensoes.php).
-            ...(env('EXEMPLO_DEMO', true) ? [
-                'exemplos.listar' => [
-                    'label' => 'Listar exemplos',
-                    'descricao' => 'Ver a listagem de exemplos.',
-                ],
-                'exemplos.criar' => [
-                    'label' => 'Criar exemplos',
-                    'descricao' => 'Cadastrar novos registros de exemplo.',
-                ],
-                'exemplos.editar' => [
-                    'label' => 'Editar exemplos',
-                    'descricao' => 'Alterar dados e status de exemplos.',
-                ],
-                'exemplos.deletar' => [
-                    'label' => 'Excluir exemplos',
-                    'descricao' => 'Mover exemplos para a lixeira.',
-                ],
-                'exemplos.restaurar' => [
-                    'label' => 'Restaurar exemplos',
-                    'descricao' => 'Restaurar exemplos da lixeira.',
-                ],
-                'exemplos.excluir_permanente' => [
-                    'label' => 'Excluir exemplos permanentemente',
-                    'descricao' => 'Remover exemplos definitivamente do banco (irreversível).',
-                ],
-            ] : []),
             // make:modulo insere permissões de negócio acima desta linha
         ],
 

@@ -21,6 +21,8 @@ BASES = (
     'packages/core/src', 'packages/core/database/seeders', 'packages/core/database/factories',
     'packages/extensao-rh/src', 'packages/extensao-fiscal-br/src',
     'packages/extensao-fiscal-br/database/seeders',
+    'packages/extensao-exemplo-demo/src', 'packages/extensao-exemplo-demo/database/factories',
+    'packages/extensao-documentos/src',
 )
 
 conhecidas = set()

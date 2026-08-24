@@ -358,7 +358,7 @@ O self-service (§11, [05 §9](05-organograma-acl-hierarquica.md)) depende do v�
 
 ## 12. Fluxo técnico (Livewire → Rules → DTO → Action)
 
-Segue o padrão do core (referência viva: `App\Livewire\Admin\Exemplos\FormExemplo` + `App\Http\Requests\Admin\ExemploRules`).
+Segue o padrão do core (referência viva: `HT2ML\ExemploDemo\Livewire\Exemplos\FormExemplo` + `HT2ML\ExemploDemo\Http\Requests\ExemploRules`).
 
 ```
 FormFuncionario (mount / salvar)

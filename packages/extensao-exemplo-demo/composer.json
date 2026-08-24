@@ -1,0 +1,32 @@
+{
+  "name": "ht2ml/extensao-exemplo-demo",
+  "description": "Extensão ExemploDemo.",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.4",
+    "ht2ml/core": "@dev",
+    "illuminate/support": "^13.0",
+    "livewire/livewire": "^4.2",
+    "power-components/livewire-powergrid": "^6.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "HT2ML\\ExemploDemo\\": "src/",
+      "HT2ML\\ExemploDemo\\Database\\Factories\\": "database/factories/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HT2ML\\ExemploDemo\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "HT2ML\\ExemploDemo\\ExemploDemoServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable"
+}

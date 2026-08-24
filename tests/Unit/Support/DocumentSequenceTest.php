@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Enums\TipoDocumento;
-use App\Models\DocumentSequence;
-use App\Support\Documents\GeradorNumeroDocumento;
 use HT2ML\Core\Models\Empresa;
+use HT2ML\Documentos\Enums\TipoDocumento;
+use HT2ML\Documentos\Models\DocumentSequence;
+use HT2ML\Documentos\Support\GeradorNumeroDocumento;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -116,7 +116,7 @@ Para não repetir em cada subseção, vale para todos (confirmado no core — ve
 
 **Propósito.** Catálogo dos tipos de documento que o RH guarda por funcionário (RG, CTPS, CNH…). As **flags** ditam o que o formulário do documento exige, sem código por tipo.
 
-> **Nome de classe:** o model é `TipoDocumentoRh` (tabela `tipos_documento`) para não colidir com o enum `App\Enums\TipoDocumento` do core, que trata de numeração fiscal — conceito distinto.
+> **Nome de classe:** o model é `TipoDocumentoRh` (tabela `tipos_documento`) para não colidir com o enum `HT2ML\Documentos\Enums\TipoDocumento` do core, que trata de numeração fiscal — conceito distinto.
 
 **Colunas-chave e comportamento** (tabela `tipos_documento`, [01 §A4](01-modelo-de-dominio.md)):
 
