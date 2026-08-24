@@ -56,7 +56,3 @@ it('referencia:sync com conjunto inexistente falha (FAILURE)', function () {
         ->expectsOutputToContain('Nenhum conjunto reconhecido')
         ->assertFailed();
 });
-
-arch('models de Referência não são tenant-scoped (sem BelongsToEmpresa)')
-    ->expect('App\Models\Referencia')
-    ->not->toUse('HT2ML\Core\Models\Concerns\BelongsToEmpresa');
