@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Conta\HistoricoLogins;
+use HT2ML\Core\Livewire\Admin\Conta\HistoricoLogins;
 use HT2ML\Core\Models\LoginHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

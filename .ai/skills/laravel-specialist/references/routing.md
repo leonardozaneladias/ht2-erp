@@ -68,7 +68,7 @@ Route::middleware('throttle:60,1')->group(function () {
 ```php
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use HT2ML\Core\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;

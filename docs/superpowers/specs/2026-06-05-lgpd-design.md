@@ -49,7 +49,7 @@ agendado e manual).
       empresa, `permission_grants`;
     - **atividades**: `activity_log` onde o usuário é causer/subject — as **1000 mais
       recentes** (created_at, log_name, event, descrição).
-- **`App\Http\Controllers\Admin\LgpdController`** (thin): `exportarJson` (`response()->json`
+- **`HT2ML\Core\Http\Controllers\Admin\LgpdController`** (thin): `exportarJson` (`response()->json`
   com `Content-Disposition: attachment`, `JSON_PRETTY_PRINT`) e `exportarPdf`
   (`Pdf::loadView('admin.lgpd.export', ...)->download()`). Cada um `authorize('exportarDados', $usuario)`
   e loga `activity('lgpd')->event('exportado')`.
@@ -70,7 +70,7 @@ agendado e manual).
   `papeisPorEmpresa()->detach()`, `permissionGrants()->delete()`), loga
   `activity('lgpd')->causedBy($ator)->performedOn($alvo)->event('anonimizado')`.
 - `AdminUserPolicy::anonimizar(auth, usuario)` = `can('usuarios.anonimizar') && podeGerir`.
-- UI: **`App\Livewire\Admin\Lgpd\AnonimizarUsuario`** (modal montado em `IndexUsuarios`,
+- UI: **`HT2ML\Core\Livewire\Admin\Lgpd\AnonimizarUsuario`** (modal montado em `IndexUsuarios`,
   acionado por ação de linha "Anonimizar (LGPD)" na `UsuariosTable`) — `ConfirmsPassword`
     - campo `confirmacao` que deve ser "ANONIMIZAR" → `Gate::authorize('anonimizar')` →
       a Action. Login já é barrado (senha embaralhada + `ativo=false`, Fase C-2). Badge

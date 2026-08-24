@@ -102,24 +102,34 @@ extensões ainda não — `packages/extensao-rh/composer.json` declara apenas
 | `power-components/livewire-powergrid`                                                        | As tabelas                           |
 | `laravel/framework` (dev)                                                                    | Os testes bootam a aplicação inteira |
 
-## As três descobertas automáticas que morrem dentro de um pacote
+## As quatro descobertas automáticas que morrem dentro de um pacote
 
-O Laravel encontra sozinho várias coisas em `app/`. **Nada disso vale dentro de
-um pacote**, e as três falham do pior jeito possível: sem erro nenhum.
+O Laravel — e o Livewire — encontram sozinhos várias coisas em `app/`. **Nada
+disso vale dentro de um pacote**, e as quatro falham do pior jeito possível: sem
+erro nenhum. O comportamento simplesmente deixa de acontecer.
 
 | Descoberta                              | O que sumiu ao mover                                                                  | Como se manifesta                                          |
 | --------------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `App\Models\X` → `App\Policies\XPolicy` | `EmpresaPolicy`                                                                       | Autorização **desligada**; `getPolicyFor()` devolve `null` |
 | `app/Console/Commands`                  | Os 5 comandos do core, incluindo `access:sync` e `referencia:sync` — passos de deploy | Somem do `artisan`                                         |
 | `app/Listeners`                         | `RegistrarLoginAdmin`                                                                 | Histórico de login **para de gravar**                      |
+| `App\Livewire` → alias por convenção    | As 64 telas do admin                                                                  | 500 com "Unable to find component"                         |
 
-Por isso o `CoreServiceProvider` declara tudo à mão, em três métodos
-(`registrarPolicies`, `registrarComandos`, `registrarListeners`), e cada um tem
-um teste de guarda em `tests/Feature/Core/` que falha se algo sumir **ou** se
-houver classe no pacote que ninguém registra.
+Três delas exigem **substituir** a descoberta por declaração explícita. A quarta
+é a exceção: `Livewire::addLocation(classNamespace: 'HT2ML\Core\Livewire')`
+**restaura** a mesma convenção para o namespace do pacote, então os aliases
+seguem idênticos e nenhum blade consumidor muda. Uma linha no lugar de 64
+chamadas `Livewire::component()` — e continua valendo para todo componente novo.
+
+O `CoreServiceProvider` cuida das quatro, e cada uma tem teste de guarda em
+`tests/Feature/Core/`. Os testes das três primeiras falham nos **dois** sentidos:
+se algo sumir do registro, ou se houver classe no pacote que ninguém registra.
+Foi essa segunda direção que pegou a `RolePolicy` migrada com a declaração
+esquecida para trás.
 
 Ao mover qualquer coisa nova para o pacote, a pergunta é sempre a mesma: _o
-Laravel encontrava isso sozinho?_ Se sim, agora é preciso declarar.
+framework encontrava isso sozinho?_ Se sim, agora é preciso declarar — ou
+ensinar a convenção ao namespace novo, quando houver como.
 
 ## O que ainda falta para a prova definitiva
 

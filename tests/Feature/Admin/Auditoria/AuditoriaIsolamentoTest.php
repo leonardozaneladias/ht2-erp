@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auditoria\AuditoriaTable;
+use HT2ML\Core\Livewire\Admin\Auditoria\AuditoriaTable;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;

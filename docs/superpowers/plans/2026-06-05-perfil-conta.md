@@ -457,7 +457,7 @@ git commit -m "feat(admin): registra histórico de login e last_login via listen
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Conta\PerfilConta;
+use HT2ML\Core\Livewire\Admin\Conta\PerfilConta;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -710,7 +710,7 @@ git commit -m "feat(admin): aba de perfil com avatar e nome"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Conta\TrocarSenha;
+use HT2ML\Core\Livewire\Admin\Conta\TrocarSenha;
 use HT2ML\Core\Models\Activity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -891,7 +891,7 @@ git commit -m "feat(admin): troca de senha na conta"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Conta\HistoricoLogins;
+use HT2ML\Core\Livewire\Admin\Conta\HistoricoLogins;
 use HT2ML\Core\Models\LoginHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -1026,7 +1026,7 @@ git commit -m "feat(admin): histórico de logins na conta"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Conta\PreferenciasConta;
+use HT2ML\Core\Livewire\Admin\Conta\PreferenciasConta;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -1274,10 +1274,10 @@ final class AplicarPreferenciasUsuario
 }
 ```
 
-- [ ] **Step 4: Registrar no grupo autenticado** — em `routes/admin.php`, no array de middleware do grupo autenticado (a linha que começa com `Route::prefix('admin')->name('admin.')->middleware([...`), adicione `App\Http\Middleware\AplicarPreferenciasUsuario::class` logo APÓS `App\Http\Middleware\DefinirContextoTenant::class`:
+- [ ] **Step 4: Registrar no grupo autenticado** — em `routes/admin.php`, no array de middleware do grupo autenticado (a linha que começa com `Route::prefix('admin')->name('admin.')->middleware([...`), adicione `HT2ML\Core\Http\Middleware\AplicarPreferenciasUsuario::class` logo APÓS `HT2ML\Core\Http\Middleware\DefinirContextoTenant::class`:
 
 ```php
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\GarantirContaAtiva::class, App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class, App\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function () use ($placeholder): void {
+Route::prefix('admin')->name('admin.')->middleware([HT2ML\Core\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', HT2ML\Core\Http\Middleware\GarantirContaAtiva::class, HT2ML\Core\Http\Middleware\EncerrarImpersonationExpirada::class, HT2ML\Core\Http\Middleware\CheckInactivity::class, HT2ML\Core\Http\Middleware\EnsureTwoFactorEnabled::class, HT2ML\Core\Http\Middleware\DefinirContextoTenant::class, HT2ML\Core\Http\Middleware\AplicarPreferenciasUsuario::class])->group(function () use ($placeholder): void {
 ```
 
 - [ ] **Step 5: Verde** — `ddev artisan test --filter=PreferenciasMiddlewareTest` → PASSA (2 testes).
@@ -1453,7 +1453,7 @@ class MinhaConta extends Component
 - [ ] **Step 5: Rotas** — em `routes/admin.php`, substitua o bloco dos placeholders (os grupos `Route::prefix('perfil')...` e `Route::prefix('conta')...`, atuais linhas ~102-110) por:
 
 ```php
-    Route::get('/conta', App\Livewire\Admin\Conta\MinhaConta::class)->name('conta');
+    Route::get('/conta', HT2ML\Core\Livewire\Admin\Conta\MinhaConta::class)->name('conta');
 
     Route::prefix('perfil')->name('perfil.')->group(function (): void {
         Route::redirect('/', '/admin/conta')->name('show');

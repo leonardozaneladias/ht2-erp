@@ -81,13 +81,13 @@ it('nem o super-admin exclui registro sincronizado pelo grid', function () {
     // Super-admin bypassa policies via Gate::before — só a guarda do ComLixeira
     // o segura, e é exatamente isso que este teste prova.
     Livewire\Livewire::actingAs($admin, 'admin')
-        ->test(App\Livewire\Admin\Referencia\CargoTable::class)
+        ->test(HT2ML\Core\Livewire\Admin\Referencia\CargoTable::class)
         ->call('excluir', $sincronizado->id);
 
     expect(Cargo::query()->whereKey($sincronizado->id)->exists())->toBeTrue();
 
     Livewire\Livewire::actingAs($admin, 'admin')
-        ->test(App\Livewire\Admin\Referencia\CargoTable::class)
+        ->test(HT2ML\Core\Livewire\Admin\Referencia\CargoTable::class)
         ->call('excluir', $proprio->id);
 
     expect(Cargo::query()->whereKey($proprio->id)->exists())->toBeFalse()

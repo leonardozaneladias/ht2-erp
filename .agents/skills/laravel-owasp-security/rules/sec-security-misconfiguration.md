@@ -122,7 +122,7 @@ class SecurityHeaders
 ->withMiddleware(function (Middleware $middleware): void {
     $middleware->web(append: [
         App\Http\Middleware\HandleInertiaRequests::class,
-        App\Http\Middleware\SecurityHeaders::class,
+        HT2ML\Core\Http\Middleware\SecurityHeaders::class,
     ]);
 })
 ```

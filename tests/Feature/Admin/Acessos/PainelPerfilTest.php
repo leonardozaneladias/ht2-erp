@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Acesso\ControleAcesso;
-use App\Livewire\Admin\Acesso\PainelPerfil;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Acesso\ControleAcesso;
+use HT2ML\Core\Livewire\Admin\Acesso\PainelPerfil;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;

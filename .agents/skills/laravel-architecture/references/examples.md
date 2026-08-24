@@ -113,7 +113,7 @@ namespace App\Http\Web\Controllers;
 
 use App\Actions\Order\CreateOrderAction;
 use App\Data\Transformers\Web\OrderDataTransformer;
-use App\Http\Controllers\Controller;
+use HT2ML\Core\Http\Controllers\Controller;
 use App\Http\Web\Requests\CreateOrderRequest;
 use App\Http\Web\Resources\OrderResource;
 

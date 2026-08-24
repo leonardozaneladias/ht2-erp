@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\FormTipoLogradouro;
-use App\Livewire\Admin\Referencia\IndexTipoLogradouro;
-use App\Livewire\Admin\Referencia\TipoLogradouroTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\FormTipoLogradouro;
+use HT2ML\Core\Livewire\Admin\Referencia\IndexTipoLogradouro;
+use HT2ML\Core\Livewire\Admin\Referencia\TipoLogradouroTable;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Referencia\TipoLogradouro;
 use Illuminate\Foundation\Testing\RefreshDatabase;

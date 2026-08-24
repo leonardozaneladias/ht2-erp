@@ -267,7 +267,7 @@ final class EspecificacaoModulo
             '__MODEL_USE_TENANT__' => $this->tenant ? 'use HT2ML\Core\Models\Concerns\BelongsToEmpresa;' : '',
             '__MODEL_TRAIT_TENANT__' => $this->tenant ? 'use BelongsToEmpresa;' : '',
             // Filtro multi-empresa nas listagens (só faz sentido em módulos tenant).
-            '__USE_MULTI_EMPRESA__' => $this->tenant ? 'use App\Livewire\Concerns\FiltraPorMultiEmpresa;' : '',
+            '__USE_MULTI_EMPRESA__' => $this->tenant ? 'use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;' : '',
             '__TRAIT_MULTI_EMPRESA__' => $this->tenant ? 'use FiltraPorMultiEmpresa;' : '',
             '__PERMISSAO_LISTAGEM__' => $this->tenant ? $this->metodoPermissaoListagem() : '',
             '__DS_OPEN__' => $this->tenant ? '$this->aplicarEscopoMultiEmpresa(' : '',

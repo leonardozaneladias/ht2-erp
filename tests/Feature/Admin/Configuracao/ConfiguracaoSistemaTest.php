@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Configuracao\AbaEmpresa;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Configuracao\AbaEmpresa;
 use HT2ML\Core\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -86,7 +86,7 @@ it('filtra as seções da navegação pela busca', function () {
     $admin->assignRole('super-admin');
 
     Livewire::actingAs($admin, 'admin')
-        ->test(App\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)
+        ->test(HT2ML\Core\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)
         ->set('busca', 'fuso')
         ->assertSee('Localização')
         ->assertDontSee('Tela de login');
@@ -97,7 +97,7 @@ it('troca a aba ativa via irPara', function () {
     $admin->assignRole('super-admin');
 
     Livewire::actingAs($admin, 'admin')
-        ->test(App\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)
+        ->test(HT2ML\Core\Livewire\Admin\Configuracao\ConfiguracaoSistema::class)
         ->call('irPara', 'seguranca')
         ->assertSet('abaAtiva', 'seguranca')
         ->assertSee('Política de senha');

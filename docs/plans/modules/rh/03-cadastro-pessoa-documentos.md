@@ -234,7 +234,7 @@ Campos de `funcionarios`, bloco _Contratação_ (01 §3 B1). Mudanças posterior
 
 ## 8. Aba 7 — Documentos / Anexos
 
-Metadados em `funcionario_documentos` (01 §3 B6); o **binário reaproveita o core**: `HT2ML\Core\Models\Anexo` (MorphTo polimórfico) gerenciado pelo `App\Livewire\Admin\Shared\GerenciadorAnexos`. Cada linha de documento referencia o tipo no **catálogo tenant `tipos_documento`** ([04](04-catalogos-configuraveis.md)) e, opcionalmente, um `anexo_id`.
+Metadados em `funcionario_documentos` (01 §3 B6); o **binário reaproveita o core**: `HT2ML\Core\Models\Anexo` (MorphTo polimórfico) gerenciado pelo `HT2ML\Core\Livewire\Admin\Shared\GerenciadorAnexos`. Cada linha de documento referencia o tipo no **catálogo tenant `tipos_documento`** ([04](04-catalogos-configuraveis.md)) e, opcionalmente, um `anexo_id`.
 
 ### 8.1 Campos por linha de documento
 

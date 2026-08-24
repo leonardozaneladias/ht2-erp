@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Configuracao\AbaEmail;
-use App\Livewire\Admin\Configuracao\AbaLocalizacao;
-use App\Livewire\Admin\Configuracao\AbaSeguranca;
-use App\Livewire\Admin\Usuarios\FormUsuario;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Configuracao\AbaEmail;
+use HT2ML\Core\Livewire\Admin\Configuracao\AbaLocalizacao;
+use HT2ML\Core\Livewire\Admin\Configuracao\AbaSeguranca;
+use HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario;
 use HT2ML\Core\Settings\EmailSettings;
 use HT2ML\Core\Settings\LocalizacaoSettings;
 use HT2ML\Core\Settings\SegurancaSettings;

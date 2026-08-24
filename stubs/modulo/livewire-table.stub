@@ -8,7 +8,7 @@ use HT2ML\Core\DTOs\Admin\Export\ExportavelDTO;
 use __NS_ENUMS__\__STATUS_ENUM__;
 use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
 __USE_COM_LIXEIRA__
-use App\Livewire\Concerns\ExportaPdf;
+use HT2ML\Core\Livewire\Concerns\ExportaPdf;
 __USE_MULTI_EMPRESA__
 use __NS_MODELS__\__MODULO_STUDLY__;
 use Illuminate\Contracts\View\View;

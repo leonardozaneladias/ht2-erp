@@ -189,7 +189,7 @@ use App\Actions\Order\CreateOrderAction;
 use App\Actions\Order\DeleteOrderAction;
 use App\Actions\Order\UpdateOrderAction;
 use App\Data\Transformers\Web\OrderDataTransformer;
-use App\Http\Controllers\Controller;
+use HT2ML\Core\Http\Controllers\Controller;
 use App\Http\Web\Queries\OrderIndexQuery;
 use App\Http\Web\Requests\CreateOrderRequest;
 use App\Http\Web\Requests\UpdateOrderRequest;

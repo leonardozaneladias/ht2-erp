@@ -69,7 +69,7 @@ it('aplica o menu padrão ao concluir o Setup Wizard', function () {
     $this->seed(RolePermissionSeeder::class);
     marcarInstalado(false);
 
-    Livewire\Livewire::test(App\Livewire\Admin\Setup\SetupWizard::class)
+    Livewire\Livewire::test(HT2ML\Core\Livewire\Admin\Setup\SetupWizard::class)
         ->set('nome_cliente', 'Cliente Acme')
         ->call('proximo')
         ->set('nome_sistema', 'ERP Acme')

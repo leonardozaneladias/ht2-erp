@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Acesso\SeletorPerfilAtivo;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Acesso\SeletorPerfilAtivo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;

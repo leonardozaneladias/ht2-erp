@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Usuarios\FormUsuario;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Usuarios\FormUsuario;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -110,7 +110,7 @@ it('audita também a troca da própria foto no Minha Conta', function () {
     $user = criarAdminUser('proprio@teste.com');
 
     Livewire::actingAs($user, 'admin')
-        ->test(App\Livewire\Admin\Conta\PerfilConta::class)
+        ->test(HT2ML\Core\Livewire\Admin\Conta\PerfilConta::class)
         ->set('avatar', UploadedFile::fake()->image('p.jpg', 256, 256))
         ->call('salvar')
         ->assertHasNoErrors();

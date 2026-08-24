@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\FormMoeda;
-use App\Livewire\Admin\Referencia\IndexMoeda;
-use App\Livewire\Admin\Referencia\MoedaTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\FormMoeda;
+use HT2ML\Core\Livewire\Admin\Referencia\IndexMoeda;
+use HT2ML\Core\Livewire\Admin\Referencia\MoedaTable;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Referencia\Moeda;
 use Illuminate\Foundation\Testing\RefreshDatabase;

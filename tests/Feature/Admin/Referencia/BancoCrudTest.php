@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\BancoTable;
-use App\Livewire\Admin\Referencia\FormBanco;
-use App\Livewire\Admin\Referencia\IndexBanco;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\BancoTable;
+use HT2ML\Core\Livewire\Admin\Referencia\FormBanco;
+use HT2ML\Core\Livewire\Admin\Referencia\IndexBanco;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Referencia\Banco;
 use Illuminate\Foundation\Testing\RefreshDatabase;

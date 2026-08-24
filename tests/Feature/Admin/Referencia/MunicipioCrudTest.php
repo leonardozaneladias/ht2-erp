@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Referencia\FormMunicipio;
-use App\Livewire\Admin\Referencia\IndexMunicipio;
-use App\Livewire\Admin\Referencia\MunicipioTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Referencia\FormMunicipio;
+use HT2ML\Core\Livewire\Admin\Referencia\IndexMunicipio;
+use HT2ML\Core\Livewire\Admin\Referencia\MunicipioTable;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Models\Referencia\Estado;
 use HT2ML\Core\Models\Referencia\Municipio;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\Login;
-use App\Livewire\Admin\Auth\ResetPassword;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Auth\Login;
+use HT2ML\Core\Livewire\Admin\Auth\ResetPassword;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Settings\SegurancaSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;

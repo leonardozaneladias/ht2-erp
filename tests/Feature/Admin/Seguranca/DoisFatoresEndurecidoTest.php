@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\TwoFactorChallenge;
+use HT2ML\Core\Livewire\Admin\Auth\TwoFactorChallenge;
 use HT2ML\Core\Notifications\AlertaSegurancaNotification;
 use HT2ML\Core\Services\Admin\Security\TwoFactorService;
 use HT2ML\Core\Settings\SegurancaSettings;

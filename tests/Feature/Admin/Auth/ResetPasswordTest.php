@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\ResetPassword;
+use HT2ML\Core\Livewire\Admin\Auth\ResetPassword;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -407,9 +407,9 @@ Route::post('/resetar-senha', [ResetPasswordController::class, 'reset'])->name('
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Depois:
-Route::get('/login', \App\Livewire\Admin\Auth\Login::class)->name('login');
-Route::get('/esqueceu-senha', \App\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
-Route::get('/resetar-senha/{token}', \App\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
+Route::get('/login', \HT2ML\Core\Livewire\Admin\Auth\Login::class)->name('login');
+Route::get('/esqueceu-senha', \HT2ML\Core\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
+Route::get('/resetar-senha/{token}', \HT2ML\Core\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
 // ...
 Route::post('/logout', LogoutController::class)->name('logout');
 ```

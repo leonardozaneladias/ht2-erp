@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Empresas\EmpresasTable;
 use Database\Seeders\RolePermissionSeeder;
+use HT2ML\Core\Livewire\Admin\Empresas\EmpresasTable;
 use HT2ML\Core\Models\Empresa;
 use HT2ML\Core\Models\Filial;
 use HT2ML\Core\Support\Tenancy\TenantContext;

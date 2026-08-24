@@ -229,7 +229,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin\Auth;
 
-use App\Http\Controllers\Controller;
+use HT2ML\Core\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -284,7 +284,7 @@ mkdir -p resources/views/livewire/admin/auth
 // tests/Feature/Admin/Auth/LoginTest.php
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\Login;
+use HT2ML\Core\Livewire\Admin\Auth\Login;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -359,7 +359,7 @@ it('redireciona para dashboard se já autenticado', function () {
 php artisan test tests/Feature/Admin/Auth/LoginTest.php
 ```
 
-Esperado: FAIL — classe `App\Livewire\Admin\Auth\Login` não existe.
+Esperado: FAIL — classe `HT2ML\Core\Livewire\Admin\Auth\Login` não existe.
 
 - [ ] **Criar o componente Livewire**
 
@@ -517,7 +517,7 @@ git commit -m "feat(auth): Livewire Login full-page com testes"
 // tests/Feature/Admin/Auth/ForgotPasswordTest.php
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\ForgotPassword;
+use HT2ML\Core\Livewire\Admin\Auth\ForgotPassword;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -701,7 +701,7 @@ git commit -m "feat(auth): Livewire ForgotPassword full-page com testes"
 // tests/Feature/Admin/Auth/ResetPasswordTest.php
 declare(strict_types=1);
 
-use App\Livewire\Admin\Auth\ResetPassword;
+use HT2ML\Core\Livewire\Admin\Auth\ResetPassword;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -943,9 +943,9 @@ Route::get('/resetar-senha/{token}', [ResetPasswordController::class, 'showForm'
 Route::post('/resetar-senha', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 // DEPOIS (substituir por):
-Route::get('/login', \App\Livewire\Admin\Auth\Login::class)->name('login');
-Route::get('/esqueceu-senha', \App\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
-Route::get('/resetar-senha/{token}', \App\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
+Route::get('/login', \HT2ML\Core\Livewire\Admin\Auth\Login::class)->name('login');
+Route::get('/esqueceu-senha', \HT2ML\Core\Livewire\Admin\Auth\ForgotPassword::class)->name('password.request');
+Route::get('/resetar-senha/{token}', \HT2ML\Core\Livewire\Admin\Auth\ResetPassword::class)->name('password.reset');
 ```
 
 Localizar a rota de logout e substituir:
@@ -955,7 +955,7 @@ Localizar a rota de logout e substituir:
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // DEPOIS:
-Route::post('/logout', \App\Http\Controllers\Admin\Auth\LogoutController::class)->name('logout');
+Route::post('/logout', \HT2ML\Core\Http\Controllers\Admin\Auth\LogoutController::class)->name('logout');
 ```
 
 Remover os `use` imports dos controllers antigos no topo do arquivo (LoginController, ForgotPasswordController, ResetPasswordController).
@@ -968,10 +968,10 @@ php artisan route:list --path=admin | grep -E "login|logout|senha|resetar"
 
 Esperado (rotas listadas):
 ```
-GET|HEAD   admin/login               admin.login           App\Livewire\Admin\Auth\Login
-GET|HEAD   admin/esqueceu-senha      admin.password.request App\Livewire\Admin\Auth\ForgotPassword
-GET|HEAD   admin/resetar-senha/{token} admin.password.reset App\Livewire\Admin\Auth\ResetPassword
-POST       admin/logout              admin.logout           App\Http\Controllers\Admin\Auth\LogoutController
+GET|HEAD   admin/login               admin.login           HT2ML\Core\Livewire\Admin\Auth\Login
+GET|HEAD   admin/esqueceu-senha      admin.password.request HT2ML\Core\Livewire\Admin\Auth\ForgotPassword
+GET|HEAD   admin/resetar-senha/{token} admin.password.reset HT2ML\Core\Livewire\Admin\Auth\ResetPassword
+POST       admin/logout              admin.logout           HT2ML\Core\Http\Controllers\Admin\Auth\LogoutController
 ```
 
 - [ ] **Deletar controllers antigos**

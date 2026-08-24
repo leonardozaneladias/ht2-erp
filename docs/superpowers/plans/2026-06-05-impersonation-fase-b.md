@@ -962,7 +962,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use HT2ML\Core\Actions\Admin\Impersonation\EncerrarImpersonationAction;
-use App\Http\Controllers\Controller;
+use HT2ML\Core\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 
 final class ImpersonationController extends Controller
@@ -981,7 +981,7 @@ final class ImpersonationController extends Controller
 Em `routes/admin.php`, dentro do grupo autenticado, logo após a rota `logout`:
 
 ```php
-    Route::post('/impersonation/sair', [App\Http\Controllers\Admin\ImpersonationController::class, 'sair'])
+    Route::post('/impersonation/sair', [HT2ML\Core\Http\Controllers\Admin\ImpersonationController::class, 'sair'])
         ->name('impersonation.sair');
 ```
 
@@ -1112,7 +1112,7 @@ final class EncerrarImpersonationExpirada
 Em `routes/admin.php:94`, no array de middlewares do grupo autenticado, inserir `EncerrarImpersonationExpirada` logo após `'admin.auth'`:
 
 ```php
-Route::prefix('admin')->name('admin.')->middleware([App\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', App\Http\Middleware\EncerrarImpersonationExpirada::class, App\Http\Middleware\CheckInactivity::class, App\Http\Middleware\EnsureTwoFactorEnabled::class, App\Http\Middleware\DefinirContextoTenant::class])->group(function () use ($placeholder): void {
+Route::prefix('admin')->name('admin.')->middleware([HT2ML\Core\Http\Middleware\EnsureSystemConfigured::class, 'admin.auth', HT2ML\Core\Http\Middleware\EncerrarImpersonationExpirada::class, HT2ML\Core\Http\Middleware\CheckInactivity::class, HT2ML\Core\Http\Middleware\EnsureTwoFactorEnabled::class, HT2ML\Core\Http\Middleware\DefinirContextoTenant::class])->group(function () use ($placeholder): void {
 ```
 
 - [ ] **Step 5: Run test to verify it passes**
@@ -1221,7 +1221,7 @@ git commit -m "feat(admin): não exigir 2FA do alvo durante personificação"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Conta\SegurancaConta;
+use HT2ML\Core\Livewire\Admin\Conta\SegurancaConta;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -1349,7 +1349,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin\Auth;
 
-use App\Http\Controllers\Controller;
+use HT2ML\Core\Http\Controllers\Controller;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Http\RedirectResponse;
@@ -1542,7 +1542,7 @@ git commit -m "feat(admin): banner global de personificação"
 
 declare(strict_types=1);
 
-use App\Livewire\Admin\Impersonation\IniciarImpersonation;
+use HT2ML\Core\Livewire\Admin\Impersonation\IniciarImpersonation;
 use HT2ML\Core\Models\AdminUser;
 use HT2ML\Core\Support\Impersonation\ImpersonationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -1610,7 +1610,7 @@ namespace App\Livewire\Admin\Impersonation;
 
 use HT2ML\Core\Actions\Admin\Impersonation\IniciarImpersonationAction;
 use HT2ML\Core\Exceptions\AccessException;
-use App\Livewire\Concerns\ConfirmsPassword;
+use HT2ML\Core\Livewire\Concerns\ConfirmsPassword;
 use HT2ML\Core\Models\AdminUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;

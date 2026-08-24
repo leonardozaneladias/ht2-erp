@@ -71,7 +71,7 @@ controle total sobre as cinco decisões acima.
 
 ### Entrada (UI)
 
-- **`App\Livewire\Admin\Impersonation\IniciarImpersonation`** — modal acionado por
+- **`HT2ML\Core\Livewire\Admin\Impersonation\IniciarImpersonation`** — modal acionado por
   ação de linha "Entrar como" na tabela de Usuários (`IndexUsuarios`). Usa o trait
   `ConfirmsPassword` + campo `motivo` (obrigatório, mín. 5 / máx. 255 chars) →
   `Gate::authorize('impersonate', $alvo)` → chama a Action → redireciona ao
@@ -80,7 +80,7 @@ controle total sobre as cinco decisões acima.
 ### Saída + banner (global)
 
 - **`POST /admin/impersonation/sair`** (`admin.impersonation.sair`) →
-  **`App\Http\Controllers\Admin\ImpersonationController@sair`** (thin) →
+  **`HT2ML\Core\Http\Controllers\Admin\ImpersonationController@sair`** (thin) →
   `EncerrarImpersonationAction`.
 - **`x-admin.impersonation-banner`** (Blade) no topo do `.wrapper` em
   `layout.blade.php`, renderizado só quando `ativo()`. Mostra "Você está como
@@ -89,7 +89,7 @@ controle total sobre as cinco decisões acima.
 
 ### Expiração + travas
 
-- **`App\Http\Middleware\EncerrarImpersonationExpirada`** — registrado logo após
+- **`HT2ML\Core\Http\Middleware\EncerrarImpersonationExpirada`** — registrado logo após
   `admin.auth` na cadeia autenticada: se `ativo()` e `expirado()`, reverte ao
   original + flash "Personificação expirada".
 - **`EnsureTwoFactorEnabled`** passa a **ignorar** a exigência de 2FA enquanto
