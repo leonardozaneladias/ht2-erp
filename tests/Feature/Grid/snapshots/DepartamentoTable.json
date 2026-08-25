@@ -1,0 +1,56 @@
+{
+    "colunas": [
+        {
+            "titulo": "Nome",
+            "campo": "nome",
+            "dataField": "nome",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "nome",
+                "placeholder": "Filtrar por nome"
+            }
+        },
+        {
+            "titulo": "Sigla",
+            "campo": "sigla",
+            "dataField": "sigla",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "sigla",
+                "placeholder": "Filtrar por sigla"
+            }
+        },
+        {
+            "titulo": "Status",
+            "campo": "status_label",
+            "dataField": "status",
+            "busca": false,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "multi_select",
+                "coluna": "status"
+            }
+        },
+        {
+            "titulo": "Ações",
+            "campo": "",
+            "dataField": "",
+            "busca": false,
+            "ordena": false,
+            "oculta": false,
+            "filtro": null
+        }
+    ],
+    "exportacao": [
+        "Nome",
+        "Sigla",
+        "Status"
+    ]
+}

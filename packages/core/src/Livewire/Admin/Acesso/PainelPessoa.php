@@ -10,7 +10,6 @@ use HT2ML\Core\Actions\Admin\SyncRolesEmpresaAction;
 use HT2ML\Core\DTOs\Admin\AcessoEfetivoDTO;
 use HT2ML\Core\DTOs\Admin\ConcessaoAcessoDTO;
 use HT2ML\Core\DTOs\Admin\SyncRolesEmpresaDTO;
-use HT2ML\Core\Enums\ModuloAcesso;
 use HT2ML\Core\Enums\TipoConcessao;
 use HT2ML\Core\Exceptions\AccessException;
 use HT2ML\Core\Livewire\Concerns\EmiteNotificacoes;
@@ -20,6 +19,7 @@ use HT2ML\Core\Models\PermissionGrant;
 use HT2ML\Core\Policies\AdminUserPolicy;
 use HT2ML\Core\Services\Admin\AcessoService;
 use HT2ML\Core\Services\Admin\HierarchyResolver;
+use HT2ML\Core\Support\Access\AreaDeAcesso;
 use HT2ML\Core\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -311,7 +311,7 @@ class PainelPessoa extends Component
             ->get()
             ->map(static function (Permission $permissao): array {
                 $modulo = $permissao->getAttribute('modulo');
-                $moduloLabel = is_string($modulo) ? (ModuloAcesso::tryFrom($modulo)?->label() ?? $modulo) : null;
+                $moduloLabel = is_string($modulo) ? AreaDeAcesso::de($modulo)->label : null;
                 $label = $permissao->getAttribute('label') ?? $permissao->name;
 
                 return [

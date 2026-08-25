@@ -36,13 +36,28 @@ it('as permissões das extensões chegam ao catálogo sem ajuda do produto', fun
 it('os itens de menu das extensões chegam à sidebar sem ajuda do produto', function (): void {
     $secoes = collect((array) config('admin-menu'));
 
-    $negocio = $secoes->firstWhere('key', 'negocio');
-    expect($negocio)->not->toBeNull();
-    expect(collect($negocio['items'] ?? [])->pluck('key'))
-        ->toContain('rh-funcionarios')
-        ->toContain('rh-departamentos');
-
+    // O RH declara os itens em Tabelas Auxiliares, dentro do grupo que ele
+    // próprio declara — antes esse arranjo vinha da AplicarMenuPadraoAction,
+    // que hardcodava as chaves do RH dentro do core.
     $auxiliares = $secoes->firstWhere('key', 'tabelas-auxiliares');
     expect($auxiliares)->not->toBeNull();
-    expect(collect($auxiliares['items'] ?? [])->pluck('key'))->toContain('ref-cnaes');
+    expect(collect($auxiliares['items'] ?? [])->pluck('key'))
+        ->toContain('rh-funcionarios')
+        ->toContain('rh-departamentos')
+        ->toContain('ref-cnaes');
+
+    expect($auxiliares['grupos'] ?? [])->toHaveKey('grupo-tab-rh');
+});
+
+it('a sidebar composta põe cada item da extensão no grupo declarado por ela', function (): void {
+    $secoes = app(HT2ML\Core\Services\Admin\Menu\MenuService::class)
+        ->estruturaParaSidebar(null, mostrarTudo: true);
+
+    $auxiliares = collect($secoes)->firstWhere('key', 'tabelas-auxiliares');
+    $porKey = collect($auxiliares['items'] ?? [])->keyBy('key');
+
+    expect(array_column($porKey['grupo-tab-rh']['children'] ?? [], 'key'))
+        ->toBe(['rh-departamentos', 'rh-funcionarios'])
+        ->and(collect($porKey['grupo-tab-cadastros']['children'] ?? [])->pluck('key'))
+        ->toContain('ref-estados', 'ref-cnaes');
 });

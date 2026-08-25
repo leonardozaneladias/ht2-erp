@@ -336,14 +336,55 @@ final class CampoModulo
         return ! in_array($this->tipo, ['text', 'richtext', 'multiselect'], true);
     }
 
-    public function filtroPowerGrid(): ?string
+    /**
+     * A declaração deste campo na base declarativa: `Campo::tipo('nome', 'Rótulo')->...`.
+     *
+     * Substitui QUATRO emissões que o gerador fazia em paralelo — a entrada de
+     * `fields()`, a `Column::make()`, o `Filter::` e a célula do PDF. Elas
+     * divergiam, e a divergência era o defeito: toda coluna saía `searchable()`
+     * (inclusive cor hexadecimal e data), dinheiro ia para a tela em centavos
+     * crus, booleano renderizava `0`/`1`, e campo numérico ou de data nascia
+     * sem filtro nenhum. Nenhum desses era erro de quem gerou: era o que o
+     * gerador imprimia.
+     *
+     * @param  string|null  $enumShort  nome curto do Enum de status, quando aplicável
+     */
+    public function campoDeclarativo(?string $enumShort = null): string
     {
-        return match ($this->tipo) {
-            'boolean' => "Filter::boolean('{$this->nome}')",
-            'enum' => null, // tratado a parte (multiSelect com cases do Enum)
-            'string', 'email', 'url', 'cnpj', 'cpf', 'pis', 'cep', 'phone' => "Filter::inputText('{$this->nome}')->placeholder('Filtrar por {$this->label()}')",
-            default => null,
+        $rotulo = $this->label();
+
+        $declaracao = match ($this->tipo) {
+            'money' => "Campo::dinheiro('{$this->nome}', '{$rotulo}')",
+            'integer', 'decimal', 'float' => "Campo::numero('{$this->nome}', '{$rotulo}')",
+            'boolean' => "Campo::booleano('{$this->nome}', '{$rotulo}')",
+            'date' => "Campo::data('{$this->nome}', '{$rotulo}')",
+            'datetime' => "Campo::dataHora('{$this->nome}', '{$rotulo}')",
+            'enum' => sprintf("Campo::enum('%s', '%s', %s::class)", $this->nome, $rotulo, $enumShort ?? 'self'),
+            default => "Campo::texto('{$this->nome}', '{$rotulo}')",
         };
+
+        // Texto longo, rich text e multiselect não cabem numa célula: a coluna
+        // existe e fica no seletor, escondida. Antes elas simplesmente não
+        // existiam, e quem quisesse ver a descrição tinha de abrir a ficha.
+        if (! $this->ehColunaVisivel()) {
+            $declaracao .= '->ocultoPorPadrao()->pesquisavel(false)->filtravel(false)';
+        }
+
+        // Cor é um hexadecimal: buscar texto nele é ruído que degrada a busca
+        // global da tela inteira.
+        if ($this->tipo === 'color') {
+            $declaracao .= '->pesquisavel(false)->filtravel(false)';
+        }
+
+        if (! $this->nullable) {
+            $declaracao .= '->obrigatorio()';
+        }
+
+        if ($this->unique) {
+            $declaracao .= '->unico()';
+        }
+
+        return $declaracao . ',';
     }
 
     // ---- Blade form -------------------------------------------------------

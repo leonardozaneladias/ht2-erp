@@ -82,8 +82,11 @@ it('devolve item do grupo para a raiz limpando grupo_key', function () {
         ->where('key', 'usuarios')
         ->firstOrFail();
 
+    // secao_key é gravada porque 'usuarios' tem grupo DECLARADO no config: sair
+    // dele é uma decisão que precisa ficar registrada, senão o render seguinte
+    // o devolveria ao 'grupo-cadastros'.
     expect($usuarios->grupo_key)->toBeNull()
-        ->and($usuarios->secao_key)->toBeNull()
+        ->and($usuarios->secao_key)->toBe('administracao')
         ->and($usuarios->ordem)->toBe(1);
 });
 

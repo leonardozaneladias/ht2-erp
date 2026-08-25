@@ -95,7 +95,8 @@ final class TipoLogradouroTable extends PowerGridComponent
             Filter::inputText('nome')->placeholder('Filtrar por nome'),
             Filter::inputText('codigo')->placeholder('Filtrar por código'),
             Filter::inputText('abrev')->placeholder('Filtrar por abreviação'),
-            Filter::boolean('ativo'),
+            Filter::boolean('ativo')
+                ->label('Sim', 'Não'),
         ];
     }
 

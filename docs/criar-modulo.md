@@ -32,12 +32,47 @@ Para `make:modulo Cliente` o gerador cria (tudo com `declare(strict_types=1)`):
 | Actions (§6)          | `app/Actions/Admin/Create                                                                                        | UpdateClienteAction.php` (`execute()` + transação) |
 | Service (§5.6)        | `app/Services/Admin/ClienteService.php`                                                                          |
 | Policy                | `app/Policies/ClientePolicy.php` (auto-descoberta por convenção)                                                 |
-| Livewire              | `app/Livewire/Admin/Clientes/{IndexCliente,FormCliente,ClienteTable}.php`                                        |
+| Livewire              | `app/Livewire/Admin/Clientes/{IndexCliente,FormCliente,ClienteTable}.php` (Index e Table declarativos — ver abaixo) |
 | Views                 | `resources/views/livewire/admin/clientes/{index-clientes,form-cliente,_acoes,_ficha}.blade.php`                  |
 | Teste Feature         | `tests/Feature/Admin/Clientes/ClienteCrudTest.php`                                                               |
 | Rotas                 | injetadas em `routes/admin.php` (`admin.clientes.{index,create,edit}`)                                           |
 | Permissões            | injetadas em `config/access.php` (`clientes.{listar,criar,editar,deletar,restaurar,excluir_permanente}`)         |
 | Menu lateral          | item injetado em `config/admin-menu.php` (seção **Negócio**), visível só p/ super-admin até atribuir a permissão |
+
+### A tabela e a listagem são declarativas
+
+`ClienteTable` estende `HT2ML\Core\Livewire\Grid\RecursoTable` e declara
+quatro coisas — o model, a chave do recurso, o prefixo das rotas e a **lista de
+campos**. A base deriva `fields()`, `columns()`, `filters()`, a exportação, o
+eager-load e as regras de validação a partir dessa lista única:
+
+```php
+protected function campos(): array
+{
+    return [
+        Campo::texto('nome', 'Nome')->obrigatorio()->max(120),
+        Campo::dinheiro('preco', 'Preço'),              // centavos → R$ 1.234,56, filtro numérico
+        Campo::data('vence_em', 'Vencimento'),          // d/m/Y, datepicker
+        Campo::booleano('ativo', 'Ativo'),              // Sim/Não, filtro booleano em português
+        Campo::relacao('turma_id', 'Turma', 'turma'),   // eager-load automático
+        Campo::enum('status', 'Status', StatusCliente::class),
+    ];
+}
+```
+
+Antes, o gerador imprimia quatro listas paralelas sobre os mesmos campos, e elas
+divergiam: **toda** coluna saía `searchable()` (inclusive cor hexadecimal e
+data), dinheiro ia para a tela em centavos crus, booleano renderizava `0`/`1`, e
+campo numérico ou de data nascia sem filtro nenhum.
+
+Quando o desenho não couber, a fuga é graduada: **por campo**
+(`->comColuna()`, `->comFiltro()`, `->paraExportar()`, `Campo::personalizado()`),
+**por método** (sobrescreva e chame `parent::`), ou **não estenda** — a base é
+opt-in, nunca obrigatória.
+
+`--tenant` traz `use RecursoMultiEmpresa;`, que liga as seis composições da
+dimensão multiempresa de uma vez. Não há como pegar cinco e esquecer a do
+escopo, que é a que vaza linha de outra empresa.
 
 ## Lixeira (soft-delete)
 
@@ -180,7 +215,11 @@ Padrão completo (e como adotar em módulo legado): [`docs/visualizacao.md`](vis
 2. **Regras de negócio:** Actions/Service (cálculos, eventos, integrações).
 3. **Validação fina:** `ProdutoRules::regras()` (reutilizada por Livewire e
    FormRequests).
-4. **Relacionamentos no Model** e eager-load no `datasource()` da Table (evita N+1).
+4. **Relacionamentos no Model.** O eager-load NÃO é mais passo manual: declare
+   o campo com `Campo::relacao('turma_id', 'Turma', 'turma')` e a
+   `RecursoTable` emite o `->with()` sozinha. Passo manual documentado é fonte
+   de bug documentada — em vinte telas com FK, era a diferença entre vinte N+1
+   e nenhum.
 
 ## Gerar dentro de um módulo-pacote (HT2 ERP)
 

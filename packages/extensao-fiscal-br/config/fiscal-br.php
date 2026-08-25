@@ -48,6 +48,8 @@ return [
             'route' => 'admin.referencia.cnaes.index',
             'permission' => 'cnaes.listar',
             'active' => ['admin.referencia.cnaes.*'],
+            'grupo' => 'grupo-tab-cadastros',
+            'ordem' => 800,
         ],
         [
             'key' => 'ref-cfops',
@@ -56,6 +58,8 @@ return [
             'route' => 'admin.referencia.cfops.index',
             'permission' => 'cfops.listar',
             'active' => ['admin.referencia.cfops.*'],
+            'grupo' => 'grupo-tab-cadastros',
+            'ordem' => 900,
         ],
         [
             'key' => 'ref-ncms',
@@ -64,6 +68,8 @@ return [
             'route' => 'admin.referencia.ncms.index',
             'permission' => 'ncms.listar',
             'active' => ['admin.referencia.ncms.*'],
+            'grupo' => 'grupo-tab-cadastros',
+            'ordem' => 1000,
         ],
         // make:modulo insere os itens de menu do módulo acima desta linha
     ],

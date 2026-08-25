@@ -25,18 +25,42 @@ O ponto de partida de um produto novo, obtido por `composer create-project`.
 _Avoid_: template, clone da base
 
 **Módulo**:
-Unidade de funcionalidade de negócio que vive dentro do próprio produto.
-_Avoid_: feature, submódulo
+Área de negócio com superfície administrativa própria: ao menos uma permissão e
+ao menos uma rota ou item de menu. Identificado por uma chave kebab estável
+(`rh`, `escola`). Pode viver dentro do produto ou viajar num pacote (ADR-0021).
+_Avoid_: feature, submódulo, área
+
+**Recurso**:
+Uma entidade com seu CRUD, dentro de um módulo. Identificado por uma chave no
+plural (`alunos`). É o que `make:recurso` gera.
+_Avoid_: entidade, tela, CRUD
+
+**Área de acesso**:
+A gaveta do catálogo de permissões — a divisão que a matriz de acesso usa para
+agrupar ~200 permissões em algo navegável. Por convenção 1:1 com um módulo, mas
+não por invariante: `tabelas_auxiliares` atravessa pacotes por natureza.
+_Avoid_: módulo de acesso, grupo de permissões
+
+**Seção de menu**:
+A gaveta de primeiro nível da sidebar. Por convenção 1:1 com um módulo. Dentro
+dela, **grupo** é a subdivisão (submenu) — apresentação pura, sem rota nem
+permissão própria.
+_Avoid_: categoria, menu pai
 
 **Extensão**:
-Unidade de funcionalidade de negócio distribuída como pacote, instalável em
-qualquer produto. Um módulo vive no produto; uma extensão atravessa produtos.
+O envelope: um pacote que carrega um módulo (**extensão-módulo**) ou só código
+sem UI (**extensão-biblioteca**). Um pacote de módulo carrega exatamente um
+módulo, e a chave é derivável do nome do pacote (`ht2ml/extensao-rh` → `rh`).
+Diz-se "o módulo RH, distribuído no pacote `ht2ml/extensao-rh`".
 _Avoid_: plugin, módulo-pacote, módulo empacotado
 
 **Pacote**:
 A forma de distribuição — o artefato Composer. Core, extensões e skeleton são
 todos pacotes; "pacote" descreve como a coisa viaja, não o que ela é.
 _Avoid_: biblioteca, dependência
+
+**Submódulo**: não existe. É (i) um **recurso**, se for entidade com CRUD, ou
+(ii) um segundo **módulo** que declara dependência do primeiro.
 
 ## Contextos
 
@@ -50,7 +74,8 @@ _Avoid_: biblioteca, dependência
 
 ## Relações
 
-- **Core → RH**: o RH consome o contexto ativo, o registro de permissões e o menu do core; a dependência é de mão única.
+- **Core → RH**: o RH consome o contexto ativo, o registro de permissões e o menu do core.
+- **A dependência é de mão única, nos dois sentidos** (ADR-0022): o produto e a extensão nunca editam o core, e o core nunca conhece extensão alguma — nem por classe, nem por literal de string. Dois guards no CI (`tests/Arch/CoreNaoConheceExtensaoTest.php`). Quando o core precisa de algo que só uma extensão sabe fazer, o corte é no contrato.
 
 ## ADRs
 

@@ -38,8 +38,16 @@ it('renomeia um item e troca o ícone pelo drawer', function () {
     expect($personalizacao->label)->toBe('Equipe')
         ->and($personalizacao->icone)->toBe('tabler--users-group');
 
+    // 'usuarios' nasce DENTRO do grupo 'grupo-cadastros', que o config declara —
+    // então procurá-lo no primeiro nível da seção não o acha. Antes ele ficava
+    // solto porque a disposição só era aplicada pelo setup, que os testes não
+    // rodam; em produção, o arranjo agrupado já era o que o usuário via.
     $secoes = app(MenuService::class)->estruturaParaSidebar($this->admin);
-    $item = collect($secoes)->flatMap(fn (array $secao): array => $secao['items'])->firstWhere('key', 'usuarios');
+
+    $item = collect($secoes)
+        ->flatMap(fn (array $secao): array => $secao['items'])
+        ->flatMap(fn (array $entrada): array => [$entrada, ...$entrada['children']])
+        ->firstWhere('key', 'usuarios');
 
     expect($item['label'])->toBe('Equipe')
         ->and($item['icon'])->toBe('tabler--users-group');

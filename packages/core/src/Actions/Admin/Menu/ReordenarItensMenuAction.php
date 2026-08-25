@@ -60,10 +60,20 @@ class ReordenarItensMenuAction
                 foreach (array_values($keys) as $posicao => $key) {
                     if (in_array($key, $chavesGrupos, true)) {
                         // Grupo reordenado/movido no nível raiz da seção.
-                        $grupo = MenuPersonalizacao::query()
-                            ->where('tipo', TipoPersonalizacaoMenu::Grupo)
-                            ->where('key', $key)
-                            ->firstOrFail();
+                        //
+                        // firstOrNew, não firstOrFail: um grupo DECLARADO no
+                        // config existe sem linha no banco, e a linha nasce na
+                        // primeira vez que alguém o arrasta. Com firstOrFail,
+                        // reordenar qualquer coisa numa seção que tivesse um
+                        // grupo declarado estourava ModelNotFoundException.
+                        //
+                        // e_custom fica no default (false): o grupo veio do
+                        // config, então não é excluível pela tela, e restaurar
+                        // apaga a personalização e o devolve ao declarado.
+                        $grupo = MenuPersonalizacao::query()->firstOrNew([
+                            'tipo' => TipoPersonalizacaoMenu::Grupo,
+                            'key' => $key,
+                        ]);
 
                         $grupo->ordem = $posicao + 1;
                         $grupo->secao_key = $containerKey;
@@ -84,9 +94,15 @@ class ReordenarItensMenuAction
                         $personalizacao->secao_key = null;
                     } else {
                         // Seção destino só é gravada quando difere da natural —
-                        // mantém o badge "Personalizado" significativo.
+                        // mantém o badge "Personalizado" significativo. A exceção
+                        // é o item que o config declara DENTRO de um grupo: aí
+                        // pousar na raiz da própria seção é a decisão de tirá-lo
+                        // do grupo, e precisa ficar gravada. Sem isto o item
+                        // voltaria ao grupo declarado no próximo render, porque
+                        // grupo_key nulo é indistinguível de "ninguém decidiu".
                         $personalizacao->grupo_key = null;
                         $personalizacao->secao_key = $containerKey === $this->menu->secaoNaturalDoItem($key)
+                            && $this->menu->grupoNaturalDoItem($key) === null
                             ? null
                             : $containerKey;
                     }

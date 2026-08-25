@@ -4,50 +4,38 @@ declare(strict_types=1);
 
 namespace __NS_LIVEWIRE__;
 
-use HT2ML\Core\Livewire\Concerns\ComFicha;
+use HT2ML\Core\Livewire\Grid\RecursoIndex;
 use __NS_MODELS__\__MODULO_STUDLY__;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
-use Livewire\Component;
 
 /**
- * Listagem de __MODULO_LABEL_PLURAL__ (wrapper fino sobre o grid PowerGrid).
+ * Listagem de __MODULO_LABEL_PLURAL__ (invólucro fino sobre o grid PowerGrid).
  */
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('__MODULO_LABEL_PLURAL__')]
-class Index__MODULO_STUDLY__ extends Component
+class Index__MODULO_STUDLY__ extends RecursoIndex
 {
-    use ComFicha;
-
-    public function mount(): void
-    {
-        $this->authorize('viewAny', __MODULO_STUDLY__::class);
-    }
-
-    #[On('__MODULO_SNAKE_PLURAL__::ver')]
-    public function verRegistro(int $id): void
-    {
-        $this->abrirFicha($id);
-    }
-
-    public function render(): View
-    {
-        return view('__VIEW_PREFIX__.index-__MODULO_SNAKE_PLURAL__', [
-            'podeCriar' => Auth::guard('admin')->user()?->can('create', __MODULO_STUDLY__::class) ?? false,
-        ]);
-    }
-
-    protected function modelClassFicha(): string
+    /**
+     * @return class-string<__MODULO_STUDLY__>
+     */
+    protected function model(): string
     {
         return __MODULO_STUDLY__::class;
     }
 
-    protected function urlEditarFicha(Model $registro): ?string
+    protected function recurso(): string
     {
-        return route('admin.__MODULO_ROTA_NOME__.edit', ['__MODULO_PARAM__' => $registro->getKey()]);
+        return '__MODULO_SNAKE_PLURAL__';
+    }
+
+    protected function rotaBase(): string
+    {
+        return 'admin.__MODULO_ROTA_NOME__';
+    }
+
+    protected function view(): string
+    {
+        return '__VIEW_PREFIX__.index-__MODULO_SNAKE_PLURAL__';
     }
 }

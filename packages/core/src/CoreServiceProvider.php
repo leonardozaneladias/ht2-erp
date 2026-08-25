@@ -228,6 +228,7 @@ final class CoreServiceProvider extends ServiceProvider
         $this->commands([
             Console\Commands\AccessExpirarCommand::class,
             Console\Commands\AccessSyncCommand::class,
+            Console\Commands\DoutorCommand::class,
             Console\Commands\MakeExtensaoCommand::class,
             Console\Commands\MakeModuloCommand::class,
             Console\Commands\ReferenciaSyncCommand::class,

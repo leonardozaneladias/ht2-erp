@@ -1,0 +1,58 @@
+{
+    "colunas": [
+        {
+            "titulo": "Código CBO",
+            "campo": "codigo_cbo",
+            "dataField": "codigo_cbo",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "codigo_cbo",
+                "placeholder": "Filtrar por código"
+            }
+        },
+        {
+            "titulo": "Descrição",
+            "campo": "descricao",
+            "dataField": "descricao",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "descricao",
+                "placeholder": "Filtrar por descrição"
+            }
+        },
+        {
+            "titulo": "Ativo",
+            "campo": "ativo_label",
+            "dataField": "ativo",
+            "busca": false,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "boolean",
+                "coluna": "ativo",
+                "sim": "Sim",
+                "nao": "Não"
+            }
+        },
+        {
+            "titulo": "Ações",
+            "campo": "",
+            "dataField": "",
+            "busca": false,
+            "ordena": false,
+            "oculta": false,
+            "filtro": null
+        }
+    ],
+    "exportacao": [
+        "Código CBO",
+        "Descrição",
+        "Ativo"
+    ]
+}

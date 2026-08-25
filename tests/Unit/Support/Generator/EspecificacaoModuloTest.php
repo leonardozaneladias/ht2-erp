@@ -106,33 +106,53 @@ it('anota @var list<string> na prop multiselect do formulário', function (): vo
     expect(specDeTokens(['tags:multiselect(a|b|c)'])->formProps())->toContain('@var list<string>');
 });
 
-it('--tenant injeta o filtro multi-empresa na Table', function (): void {
+it('--tenant traz o trait que liga as seis composições multiempresa de uma vez', function (): void {
     $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], tenant: true);
     $tokens = $spec->tokens();
 
-    expect($tokens['__USE_MULTI_EMPRESA__'])->toContain('use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;')
-        ->and($tokens['__TRAIT_MULTI_EMPRESA__'])->toBe('use FiltraPorMultiEmpresa;')
-        ->and($tokens['__PERMISSAO_LISTAGEM__'])->toContain("return 'exemplos.listar';")
-        ->and($tokens['__DS_OPEN__'])->toBe('$this->aplicarEscopoMultiEmpresa(')
-        ->and($tokens['__DS_CLOSE__'])->toBe(')')
-        ->and($tokens['__FIELDS_OPEN__'])->toBe('$this->camposMultiEmpresa(')
-        ->and($tokens['__COLUNAS_MULTI_EMPRESA__'])->toBe('...$this->colunasMultiEmpresa(),')
-        ->and($tokens['__FILTROS_MULTI_EMPRESA__'])->toBe('...$this->filtrosMultiEmpresa(),')
-        ->and($tokens['__PDF_LINHA_MULTI_EMPRESA__'])->toBe('...$this->linhaMultiEmpresa($registro),')
-        ->and($tokens['__PDF_CABECALHOS_MULTI_EMPRESA__'])->toBe('...$this->cabecalhosMultiEmpresa(), ');
+    // Antes eram OITO tokens interpolados em pontos diferentes do stub — o
+    // escopo do datasource, os campos, as colunas, os filtros e as duas metades
+    // da exportação. Emitir sete e esquecer o primeiro produzia uma tela que
+    // passava em todos os testes de um tenant só e vazava linhas de outra
+    // empresa no dia em que a segunda fosse cadastrada. Agora é um trait: ou
+    // vêm as seis, ou não vem nenhuma.
+    expect($tokens['__USE_MULTI_EMPRESA__'])->toBe('use HT2ML\Core\Livewire\Grid\RecursoMultiEmpresa;')
+        ->and($tokens['__TRAIT_MULTI_EMPRESA__'])->toBe('use RecursoMultiEmpresa;');
 });
 
 it('sem --tenant, os tokens multi-empresa ficam vazios', function (): void {
     $tokens = specDeTokens(['nome:string'])->tokens();
 
     expect($tokens['__USE_MULTI_EMPRESA__'])->toBe('')
-        ->and($tokens['__TRAIT_MULTI_EMPRESA__'])->toBe('')
-        ->and($tokens['__PERMISSAO_LISTAGEM__'])->toBe('')
-        ->and($tokens['__DS_OPEN__'])->toBe('')
-        ->and($tokens['__DS_CLOSE__'])->toBe('')
-        ->and($tokens['__COLUNAS_MULTI_EMPRESA__'])->toBe('')
-        ->and($tokens['__PDF_LINHA_MULTI_EMPRESA__'])->toBe('')
-        ->and($tokens['__PDF_CABECALHOS_MULTI_EMPRESA__'])->toBe('');
+        ->and($tokens['__TRAIT_MULTI_EMPRESA__'])->toBe('');
+});
+
+it('a permissão de listagem não é mais redigitada pelo gerador', function (): void {
+    $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], tenant: true);
+
+    // A RecursoTable deriva permissaoListagem() de permissaoBase(). Enquanto o
+    // gerador emitia o método, ele usava uma SEGUNDA fórmula — snakePlural() —
+    // que discordava da primeira em modo pacote: 'departamentos.listar' contra
+    // 'rh.departamentos.listar'. Permissão inexistente, seletor de empresas
+    // vazio para quem não é super-admin, e nenhum erro na tela.
+    expect($spec->tokens())->not->toHaveKey('__PERMISSAO_LISTAGEM__');
+});
+
+it('a lista de campos declarativos carrega o tipo, a obrigatoriedade e a unicidade', function (): void {
+    $spec = specDeTokens(['nome:string', 'preco:money', 'obs:text', 'sku:string:unique:nullable']);
+
+    $campos = $spec->camposDeclarativos();
+
+    expect($campos)
+        ->toContain("Campo::texto('nome', 'Nome')->obrigatorio(),")
+        // money → dinheiro: a tela mostra R$ e o filtro é numérico. Antes saía
+        // como texto pesquisável, com o valor em centavos crus.
+        ->toContain("Campo::dinheiro('preco', 'Preco')->obrigatorio(),")
+        // Texto longo não cabe na célula: coluna existe, mas escondida.
+        ->toContain("Campo::texto('obs', 'Obs')->ocultoPorPadrao()")
+        ->toContain('->unico()')
+        // O enum de status entra sempre, e como enum — não como string crua.
+        ->toContain("Campo::enum('status', 'Status', StatusExemplo::class)->obrigatorio(),");
 });
 
 it('com soft-delete, permissoes adiciona restaurar/excluir_permanente e deletar vira lixeira', function (): void {
@@ -168,20 +188,15 @@ it('com soft-delete, os tokens e blocos de lixeira são preenchidos', function (
     $spec = new EspecificacaoModulo('Exemplo', [CampoModulo::deToken('nome:string')], softDelete: true);
     $tokens = $spec->tokens();
 
-    expect($tokens['__USE_COM_LIXEIRA__'])->toBe('use HT2ML\Core\Livewire\Concerns\ComLixeira;')
-        ->and($tokens['__TRAIT_COM_LIXEIRA__'])->toBe('use ComLixeira;')
-        ->and($tokens['__DS_LIXEIRA_OPEN__'])->toBe('$this->aplicarLixeira(')
-        ->and($tokens['__DS_LIXEIRA_CLOSE__'])->toBe(')')
-        // A toolbar do grid virou uma VIEW ÚNICA do core; o gerador não copia mais um
-        // `_lixeira-toggle` e um `_export-pdf` por módulo. Ele só declara o prefixo das
-        // permissões, de onde a view deriva `{prefixo}.restaurar`.
-        ->and($tokens['__PERMISSAO_BASE__'])->toContain('permissaoBase')
-        ->and($tokens['__PERMISSAO_BASE__'])->toContain("return 'exemplos';")
-        ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe(", 'verLixeira' => \$this->verLixeira")
-        ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('use HT2ML\Core\Models\Contracts\UsaSoftDeletes;')
+    // A lixeira sumiu dos tokens da Table de propósito: RecursoTable a deriva
+    // do MODEL (`class_uses_recursive` + a interface UsaSoftDeletes), então uma
+    // tabela não consegue mais afirmar que tem lixeira sobre um model que não
+    // tem. Antes isso era uma flag do gerador, e a tela só quebrava quando
+    // alguém clicasse em "Ver lixeira".
+    expect($tokens['__MODEL_USE_LIXEIRA__'])->toBe('use HT2ML\Core\Models\Contracts\UsaSoftDeletes;')
         ->and($tokens['__MODEL_IMPLEMENTS_LIXEIRA__'])->toBe(' implements UsaSoftDeletes')
         ->and($tokens['__MODEL_DELETED_AT_PROPERTY__'])->toContain('@property \Illuminate\Support\Carbon|null $deleted_at')
-        ->and($spec->metodoModelClassLixeira())->toContain('modelClassLixeira')
+        ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe(", 'verLixeira' => \$this->verLixeira")
         ->and($spec->metodosPolicyLixeira())->toContain('exemplos.restaurar')
         ->and($spec->metodosPolicyLixeira())->toContain('exemplos.excluir_permanente')
         ->and($spec->factoryTrashed())->toContain('public function trashed(): static')
@@ -192,18 +207,13 @@ it('sem soft-delete, os tokens de lixeira ficam vazios e o header usa _export-pd
     $spec = specDeTokens(['nome:string']);
     $tokens = $spec->tokens();
 
-    expect($tokens['__USE_COM_LIXEIRA__'])->toBe('')
-        ->and($tokens['__TRAIT_COM_LIXEIRA__'])->toBe('')
-        ->and($tokens['__DS_LIXEIRA_OPEN__'])->toBe('')
-        ->and($tokens['__DS_LIXEIRA_CLOSE__'])->toBe('')
-        // Sem SoftDeletes não há lixeira: o método não é gerado, e a view única exibe
-        // apenas a metade do "Exportar PDF".
-        ->and($tokens['__PERMISSAO_BASE__'])->toBe('')
-        ->and($tokens['__VERLIXEIRA_PARAM__'])->toBe('')
+    // Sem SoftDeletes o MODEL não implementa UsaSoftDeletes, e é daí que a
+    // RecursoTable conclui que não há lixeira. A view única exibe apenas a
+    // metade do "Exportar PDF".
+    expect($tokens['__VERLIXEIRA_PARAM__'])->toBe('')
         ->and($tokens['__MODEL_USE_LIXEIRA__'])->toBe('')
         ->and($tokens['__MODEL_IMPLEMENTS_LIXEIRA__'])->toBe('')
         ->and($tokens['__MODEL_DELETED_AT_PROPERTY__'])->toBe('')
-        ->and($spec->metodoModelClassLixeira())->toBe('')
         ->and($spec->metodosPolicyLixeira())->toBe('')
         ->and($spec->factoryTrashed())->toBe('')
         ->and($spec->testeSoftDelete())->toBe('');

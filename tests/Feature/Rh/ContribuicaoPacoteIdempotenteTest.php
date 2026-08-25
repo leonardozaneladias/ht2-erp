@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use HT2ML\Core\Exceptions\ContribuicoesInvalidas;
 use HT2ML\Core\Support\Modules\ModuleRegistry;
 use HT2ML\Rh\RhServiceProvider;
 
@@ -55,9 +56,24 @@ it('não corrompe label e descricao das permissões ao aplicar duas vezes', func
     }
 });
 
-it('recusa módulo de acesso inexistente', function () {
+it('recusa área de acesso inexistente — na aplicação, não na declaração', function () {
     ModuleRegistry::permissoes('modulo-que-nao-existe', ['x' => ['label' => 'X']]);
-})->throws(InvalidArgumentException::class, 'Módulo de acesso desconhecido');
+
+    try {
+        ModuleRegistry::aplicarContribuicoes();
+        $this->fail('esperava ContribuicoesInvalidas');
+    } catch (ContribuicoesInvalidas $e) {
+        expect($e->problemas)->toHaveCount(1)
+            ->and($e->problemas[0]->alvo)->toBe('modulo-que-nao-existe');
+    } finally {
+        // O registry é estático de propósito (ver o docblock dele), então uma
+        // declaração inválida sobrevive ao teste — e, como aplicarContribuicoes()
+        // roda no booted() de CADA boot, derrubaria todo o resto do processo.
+        // Antes isto não aparecia porque o throw acontecia na DECLARAÇÃO e nada
+        // ficava guardado; o registry se protegia por acidente.
+        ModuleRegistry::flush();
+    }
+});
 
 it('respeita o módulo declarado pela extensão', function () {
     ModuleRegistry::flush();

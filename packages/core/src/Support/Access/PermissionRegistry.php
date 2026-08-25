@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace HT2ML\Core\Support\Access;
 
 use HT2ML\Core\DTOs\Admin\PermissionDefinitionDTO;
-use HT2ML\Core\Enums\ModuloAcesso;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
 
@@ -21,11 +20,11 @@ final class PermissionRegistry
         /** @var Collection<int, PermissionDefinitionDTO> $definicoes */
         $definicoes = collect();
 
-        foreach ($this->modulos() as $modulo => $permissoes) {
+        foreach ($this->areas() as $area => $permissoes) {
             foreach ($permissoes as $nome => $meta) {
                 $definicoes->push(PermissionDefinitionDTO::fromArray([
                     'nome' => $nome,
-                    'modulo' => $modulo,
+                    'area' => $area,
                     'label' => $meta['label'],
                     'descricao' => $meta['descricao'] ?? null,
                 ]));
@@ -36,14 +35,14 @@ final class PermissionRegistry
     }
 
     /**
-     * Permissões agrupadas por módulo (valor do enum ModuloAcesso).
+     * Permissões agrupadas pela área do catálogo.
      *
      * @return Collection<string, Collection<int, PermissionDefinitionDTO>>
      */
-    public function porModulo(): Collection
+    public function porArea(): Collection
     {
         return $this->todas()->groupBy(
-            fn (PermissionDefinitionDTO $definicao): string => $definicao->modulo->value,
+            fn (PermissionDefinitionDTO $definicao): string => $definicao->area->chave,
         );
     }
 
@@ -65,11 +64,11 @@ final class PermissionRegistry
         return in_array($permissao, $this->nomes(), true);
     }
 
-    public function moduloDe(string $permissao): ?ModuloAcesso
+    public function areaDe(string $permissao): ?AreaDeAcesso
     {
         return $this->todas()
             ->first(fn (PermissionDefinitionDTO $definicao): bool => $definicao->nome === $permissao)
-            ?->modulo;
+            ?->area;
     }
 
     /**
@@ -89,13 +88,15 @@ final class PermissionRegistry
     }
 
     /**
+     * O catálogo, indexado pela chave da área.
+     *
      * @return array<string, array<string, array{label: string, descricao?: ?string}>>
      */
-    private function modulos(): array
+    private function areas(): array
     {
-        /** @var array<string, array<string, array{label: string, descricao?: ?string}>> $modulos */
-        $modulos = config('access.modules', []);
+        /** @var array<string, array<string, array{label: string, descricao?: ?string}>> $areas */
+        $areas = config('access.modules', []);
 
-        return $modulos;
+        return $areas;
     }
 }

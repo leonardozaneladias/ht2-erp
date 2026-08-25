@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use HT2ML\Core\Enums\ModuloAcesso;
+use HT2ML\Core\Support\Access\AreaDeAcesso;
 
 return [
 
@@ -68,9 +69,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Áreas do catálogo (as gavetas da matriz de acesso)
+    |--------------------------------------------------------------------------
+    | Conjunto ABERTO: as onze do core vêm do enum ModuloAcesso, sem redigitar,
+    | e um produto ou extensão acrescenta as suas — o produto aqui, a extensão
+    | via ModuleRegistry::areaDeAcesso(). Cada chave de 'modules' abaixo precisa
+    | ter uma área correspondente; `php artisan ht2ml:doutor` verifica.
+    |
+    | Quando as duas descrevem a mesma área, esta config vence: o pacote sugere,
+    | quem instala decide — a mesma semântica que label e ícone do menu já têm.
+    */
+
+    'areas' => AreaDeAcesso::sementeDoEnum(),
+
+    /*
+    |--------------------------------------------------------------------------
     | Catálogo de permissões (fonte de verdade)
     |--------------------------------------------------------------------------
-    | Estrutura: módulo (valor de ModuloAcesso) => [ permissão => [label, descricao] ].
+    | Estrutura: área (chave de 'areas' acima) => [ permissão => [label, descricao] ].
     | Sincronizado para a tabela `permissions` via `php artisan access:sync`.
     | A interface (matriz, simulador) consome os metadados já gravados na tabela.
     */
@@ -236,8 +252,9 @@ return [
         /*
         | Módulos de negócio gerados via `php artisan make:modulo`. Cada módulo
         | declara aqui suas permissões (listar/criar/editar/deletar). Para dar a
-        | um módulo a própria seção na matriz, crie um case em ModuloAcesso e
-        | mova suas permissões para a chave correspondente.
+        | um módulo a própria gaveta na matriz, acrescente uma chave em 'areas'
+        | acima — ou, num pacote, ModuleRegistry::areaDeAcesso() — e mova suas
+        | permissões para lá. Empilhar tudo aqui torna a tela innavegável.
         */
         ModuloAcesso::Negocio->value => [
             // make:modulo insere permissões de negócio acima desta linha

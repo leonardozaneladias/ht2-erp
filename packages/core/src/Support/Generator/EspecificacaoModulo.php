@@ -267,33 +267,13 @@ final class EspecificacaoModulo
             '__MODEL_USE_TENANT__' => $this->tenant ? 'use HT2ML\Core\Models\Concerns\BelongsToEmpresa;' : '',
             '__MODEL_TRAIT_TENANT__' => $this->tenant ? 'use BelongsToEmpresa;' : '',
             // Filtro multi-empresa nas listagens (só faz sentido em módulos tenant).
-            '__USE_MULTI_EMPRESA__' => $this->tenant ? 'use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;' : '',
-            '__TRAIT_MULTI_EMPRESA__' => $this->tenant ? 'use FiltraPorMultiEmpresa;' : '',
-            '__PERMISSAO_LISTAGEM__' => $this->tenant ? $this->metodoPermissaoListagem() : '',
-            '__DS_OPEN__' => $this->tenant ? '$this->aplicarEscopoMultiEmpresa(' : '',
-            '__DS_CLOSE__' => $this->tenant ? ')' : '',
-            '__FIELDS_OPEN__' => $this->tenant ? '$this->camposMultiEmpresa(' : '',
-            '__FIELDS_CLOSE__' => $this->tenant ? ')' : '',
-            '__COLUNAS_MULTI_EMPRESA__' => $this->tenant ? '...$this->colunasMultiEmpresa(),' : '',
-            '__FILTROS_MULTI_EMPRESA__' => $this->tenant ? '...$this->filtrosMultiEmpresa(),' : '',
-            '__PDF_LINHA_MULTI_EMPRESA__' => $this->tenant ? '...$this->linhaMultiEmpresa($registro),' : '',
-            '__PDF_CABECALHOS_MULTI_EMPRESA__' => $this->tenant ? '...$this->cabecalhosMultiEmpresa(), ' : '',
+            '__USE_MULTI_EMPRESA__' => $this->tenant ? 'use HT2ML\Core\Livewire\Grid\RecursoMultiEmpresa;' : '',
+            '__TRAIT_MULTI_EMPRESA__' => $this->tenant ? 'use RecursoMultiEmpresa;' : '',
             // Lixeira (soft-delete): vazios quando !softDelete → saída idêntica à antiga.
-            '__USE_COM_LIXEIRA__' => $this->softDelete ? 'use HT2ML\Core\Livewire\Concerns\ComLixeira;' : '',
-            '__TRAIT_COM_LIXEIRA__' => $this->softDelete ? 'use ComLixeira;' : '',
-            '__DS_LIXEIRA_OPEN__' => $this->softDelete ? '$this->aplicarLixeira(' : '',
-            '__DS_LIXEIRA_CLOSE__' => $this->softDelete ? ')' : '',
             // A toolbar do grid (lixeira + exportar PDF) é uma VIEW ÚNICA do core
             // (livewire.admin.partials.lixeira-toolbar) — o gerador não copia mais um
             // `_lixeira-toggle` e um `_export-pdf` por módulo. O que ela precisa saber é
             // o prefixo das permissões, que vem daqui.
-            '__PERMISSAO_BASE__' => $this->softDelete
-                ? "/** Prefixo das permissões do recurso (ComLixeira). */\n"
-                    . "    protected function permissaoBase(): string\n"
-                    . "    {\n"
-                    . "        return '{$this->permissaoBase()}';\n"
-                    . '    }'
-                : '',
             '__VERLIXEIRA_PARAM__' => $this->softDelete ? ", 'verLixeira' => \$this->verLixeira" : '',
             '__MODEL_USE_LIXEIRA__' => $this->softDelete ? 'use HT2ML\Core\Models\Contracts\UsaSoftDeletes;' : '',
             '__MODEL_IMPLEMENTS_LIXEIRA__' => $this->softDelete ? ' implements UsaSoftDeletes' : '',
@@ -566,59 +546,25 @@ final class EspecificacaoModulo
 
     // ---- Blocos: PowerGrid ------------------------------------------------
 
-    public function pgFields(int $espacos = 12): string
-    {
-        $linhas = ['->add(\'id\')'];
-
-        foreach ($this->campos as $campo) {
-            if (! $campo->ehColunaVisivel()) {
-                continue;
-            }
-            $linhas[] = "->add('{$campo->nome}')";
-        }
-        $linhas[] = "->add('status_badge', fn ({$this->studly} \$registro): string => \$this->renderStatus(\$registro))";
-
-        return $this->bloco($linhas, $espacos);
-    }
-
-    public function pgColumns(int $espacos = 12): string
+    /**
+     * A lista de campos da RecursoTable.
+     *
+     * Substituiu cinco emissões que corriam em paralelo — a entrada de
+     * fields(), a Column::make(), o Filter::, o cabeçalho e a célula do PDF —
+     * e que divergiam entre si. A divergência ERA o defeito.
+     */
+    public function camposDeclarativos(int $espacos = 12): string
     {
         $linhas = [];
 
         foreach ($this->campos as $campo) {
-            if (! $campo->ehColunaVisivel()) {
-                continue;
-            }
-            $linhas[] = "Column::make('{$campo->label()}', '{$campo->nome}')";
-            $linhas[] = '    ->searchable()';
-            $linhas[] = '    ->sortable(),';
-            $linhas[] = '';
+            $linhas[] = $campo->campoDeclarativo($this->statusEnumShort());
         }
 
-        $linhas[] = "Column::make('Status', 'status_badge', 'status')";
-        $linhas[] = '    ->sortable(),';
-        $linhas[] = '';
-        $linhas[] = "Column::action('Ações'),";
-
-        return $this->bloco($linhas, $espacos);
-    }
-
-    public function pgFilters(int $espacos = 12): string
-    {
-        $linhas = [];
-
-        foreach ($this->campos as $campo) {
-            $filtro = $campo->filtroPowerGrid();
-            if ($filtro !== null) {
-                $linhas[] = $filtro . ',';
-            }
-        }
-
-        // status: multiSelect com os cases do Enum
-        $linhas[] = "Filter::multiSelect('status', 'status')";
-        $linhas[] = "    ->dataSource({$this->statusEnumShort()}::options())";
-        $linhas[] = "    ->optionValue('value')";
-        $linhas[] = "    ->optionLabel('label'),";
+        $linhas[] = sprintf(
+            "Campo::enum('status', 'Status', %s::class)->obrigatorio(),",
+            $this->statusEnumShort(),
+        );
 
         return $this->bloco($linhas, $espacos);
     }
@@ -640,7 +586,7 @@ final class EspecificacaoModulo
             }
         }
 
-        // O enum de status é gerado à parte dos --fields (como em pgColumns).
+        // O enum de status é gerado à parte dos --fields.
         if (! $temStatus) {
             $linhas[] = '<x-shared.field-display label="Status">';
             $linhas[] = '    <x-shared.badge :variant="$registro->status->variant()" pill size="sm">{{ $registro->status->label() }}</x-shared.badge>';
@@ -651,35 +597,6 @@ final class EspecificacaoModulo
     }
 
     // ---- Blocos: Export PDF ----------------------------------------------
-
-    public function pdfColunas(): string
-    {
-        $labels = [];
-
-        foreach ($this->campos as $campo) {
-            if ($campo->ehColunaVisivel()) {
-                $labels[] = "'{$campo->label()}'";
-            }
-        }
-        $labels[] = "'Status'";
-
-        return implode(', ', $labels);
-    }
-
-    public function pdfMapRow(int $espacos = 16): string
-    {
-        $linhas = [];
-
-        foreach ($this->campos as $campo) {
-            if (! $campo->ehColunaVisivel()) {
-                continue;
-            }
-            $linhas[] = "(string) \$registro->{$campo->nome},";
-        }
-        $linhas[] = '$registro->status->label(),';
-
-        return $this->bloco($linhas, $espacos);
-    }
 
     // ---- Blocos: Blade form ----------------------------------------------
 
@@ -833,23 +750,6 @@ final class EspecificacaoModulo
     // após a geração (o gerador não formata a saída).
 
     /** Método modelClassLixeira() exigido pelo trait ComLixeira (Table). */
-    public function metodoModelClassLixeira(): string
-    {
-        if (! $this->softDelete) {
-            return '';
-        }
-
-        return <<<PHP
-    /**
-         * @return class-string<{$this->studly}>
-         */
-        protected function modelClassLixeira(): string
-        {
-            return {$this->studly}::class;
-        }
-    PHP;
-    }
-
     /** Métodos restore()/forceDelete() da Policy. */
     public function metodosPolicyLixeira(): string
     {
@@ -937,29 +837,6 @@ final class EspecificacaoModulo
     private function nsBase(): string
     {
         return $this->pacote !== null ? $this->pacote->namespaceBase : 'App';
-    }
-
-    /**
-     * Método permissaoListagem() exigido pelo trait FiltraPorMultiEmpresa. A
-     * indentação é normalizada pelo Pint após a geração.
-     */
-    private function metodoPermissaoListagem(): string
-    {
-        // permissaoBase(), e NÃO snakePlural(): em modo pacote o prefixo do
-        // módulo faz parte da permissão ('rh.departamentos.listar'). A fórmula
-        // antiga era uma SEGUNDA fórmula, que discordava da usada em
-        // permissoes() — e gerou 'departamentos.listar', permissão inexistente,
-        // nas duas telas do RH. Efeito: empresasElegiveis() em
-        // FiltraPorMultiEmpresa negava toda empresa para quem não é super-admin,
-        // desligando o filtro multiempresa em silêncio.
-        $permissao = $this->permissaoBase() . '.listar';
-
-        return <<<PHP
-    protected function permissaoListagem(): string
-        {
-            return '{$permissao}';
-        }
-    PHP;
     }
 
     private function formBodyCardUnico(): string

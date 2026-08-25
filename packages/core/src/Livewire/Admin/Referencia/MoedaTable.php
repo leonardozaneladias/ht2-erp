@@ -108,7 +108,8 @@ final class MoedaTable extends PowerGridComponent
             Filter::inputText('numerico')->placeholder('Filtrar por código numérico'),
             Filter::inputText('nome')->placeholder('Filtrar por nome'),
             Filter::inputText('simbolo')->placeholder('Filtrar por símbolo'),
-            Filter::boolean('ativo'),
+            Filter::boolean('ativo')
+                ->label('Sim', 'Não'),
         ];
     }
 
