@@ -493,75 +493,61 @@ PHP;
 
         $arquivo = base_path("{$pkg->dir}/config/{$pkg->slug}.php");
         $conteudo = $original = (string) File::get($arquivo);
-        $base = $spec->permissaoBase();
+        $chave = $spec->snakePlural();
 
-        // A injeção depende de comentários-marcador no config do pacote. Quando
-        // eles faltam — e faltavam em 2 dos 3 pacotes — os dois blocos abaixo
-        // eram pulados, o arquivo era reescrito idêntico e o comando reportava
-        // "criado (permissões + menu)" assim mesmo. Resultado: 19 arquivos, uma
-        // rota, e uma tela INALCANÇÁVEL — sem item de menu e com o gate negando,
-        // porque a permissão nunca chegou ao catálogo. Falha silenciosa.
-        $marcadorPerm = '        // make:modulo insere as permissões do módulo acima desta linha';
-        $marcadorMenu = '        // make:modulo insere os itens de menu do módulo acima desta linha';
+        // A injeção depende de um comentário-marcador no config do pacote.
+        // Quando ele falta — e faltava em 2 dos 3 pacotes — o bloco era pulado,
+        // o arquivo era reescrito idêntico e o comando reportava "criado" assim
+        // mesmo. Resultado: 19 arquivos, uma rota, e uma tela INALCANÇÁVEL, sem
+        // item de menu e com o gate negando porque a permissão nunca chegou ao
+        // catálogo. Falha silenciosa.
+        $marcador = '        // make:recurso insere os recursos do módulo acima desta linha';
 
-        foreach (['permissões' => $marcadorPerm, 'itens de menu' => $marcadorMenu] as $oQue => $marcador) {
-            if (! str_contains($conteudo, $marcador)) {
-                $this->error("O config {$pkg->dir}/config/{$pkg->slug}.php não tem o marcador de {$oQue}.");
-                $this->line('  Acrescente esta linha dentro do array correspondente:');
-                $this->line("  {$marcador}");
-            }
+        if (! str_contains($conteudo, $marcador)) {
+            $this->error("O config {$pkg->dir}/config/{$pkg->slug}.php não tem o marcador de recursos.");
+            $this->line('  Acrescente esta linha dentro do array \'recursos\':');
+            $this->line("  {$marcador}");
+
+            return;
         }
 
-        $injetou = [];
-
-        if (! str_contains($conteudo, "'{$base}.listar'") && str_contains($conteudo, $marcadorPerm)) {
-            $injetou[] = 'permissões';
-            $linhas = [];
-            foreach ($spec->permissoes() as $perm => $meta) {
-                $linhas[] = "        '{$perm}' => ['label' => '{$meta['label']}', 'descricao' => '{$meta['descricao']}'],";
-            }
-            $conteudo = str_replace($marcadorPerm, implode("\n", $linhas) . "\n" . $marcadorPerm, $conteudo);
+        if (str_contains($conteudo, "'{$chave}' => [")) {
+            return;
         }
 
-        $key = $pkg->slug . '-' . $spec->snakePlural();
+        // UMA entrada, de onde saem seis permissões, o item de menu, o nome da
+        // rota, a permissão que guarda o item e o padrão de `active`. Antes eram
+        // dois blocos escritos por extenso — vinte linhas de permissão e sete de
+        // menu — e cada linha era uma chance de divergir da fórmula do catálogo.
+        $linhas = [
+            "        '{$chave}' => [",
+            sprintf("            'label' => '%s',", $this->option('menu') ?: $spec->studlyPlural),
+            sprintf("            'singular' => '%s',", mb_strtolower($spec->studly)),
+            sprintf("            'icone' => '%s',", $this->option('menu-icon')),
+        ];
+
+        if ($this->option('sem-soft-delete')) {
+            $linhas[] = "            'sem_lixeira' => true,";
+        }
 
         // --skip-menu era ignorado em modo pacote: o item entrava de qualquer
         // jeito, e quem pediu para não ter menu descobria depois, na tela.
-        if (! $this->option('skip-menu')
-            && ! str_contains($conteudo, "'key' => '{$key}'")
-            && str_contains($conteudo, $marcadorMenu)
-        ) {
-            $injetou[] = 'menu';
-            $label = (string) ($this->option('menu') ?: $spec->studlyPlural);
-            $icon = (string) $this->option('menu-icon');
-            $bloco = implode("\n", [
-                '        [',
-                "            'key' => '{$key}',",
-                "            'label' => '{$label}',",
-                "            'icon' => '{$icon}',",
-                "            'route' => 'admin.{$base}.index',",
-                "            'permission' => '{$base}.listar',",
-                "            'active' => ['admin.{$base}.*'],",
-                '        ],',
-                $marcadorMenu,
-            ]);
-            $conteudo = str_replace($marcadorMenu, $bloco, $conteudo);
+        if ($this->option('skip-menu')) {
+            $linhas[] = "            'sem_menu' => true,";
         }
 
+        $linhas[] = '        ],';
+
+        $conteudo = str_replace($marcador, implode("\n", $linhas) . "\n" . $marcador, $conteudo);
+
         if ($conteudo === $original) {
-            // Nada mudou: ou já estava lá, ou os marcadores faltam. Em ambos os
-            // casos anunciar "criado" seria mentira — e mentira verde é pior que
-            // erro vermelho.
+            // Nada mudou. Anunciar "criado" seria mentira — e mentira verde é
+            // pior que erro vermelho.
             return;
         }
 
         File::put($arquivo, $conteudo);
-        $this->criados[] = sprintf(
-            '%s/config/%s.php (%s)',
-            $pkg->dir,
-            $pkg->slug,
-            implode(' + ', $injetou),
-        );
+        $this->criados[] = sprintf('%s/config/%s.php (recurso %s)', $pkg->dir, $pkg->slug, $chave);
     }
 
     private function registrarNoProviderPacote(EspecificacaoModulo $spec): void

@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 /*
 |--------------------------------------------------------------------------
-| Configuração do módulo Rh (HT2 ERP)
+| Extensão RH
 |--------------------------------------------------------------------------
 |
-| Publicável: php artisan vendor:publish --tag=rh-config
-| É aqui que mora a customização por cliente (config-driven, ADR-0015): o
-| catálogo de permissões e os itens de menu do módulo. O make:modulo preenche
-| estas listas (entre as âncoras) ao gerar cada recurso CRUD.
+| Onde o módulo entra no core e como ele se apresenta. As PERMISSÕES e os ITENS
+| DE MENU não estão aqui: são derivados da chave de cada recurso pelo
+| ModuloBuilder (ADR-0021), porque escrevê-los à mão é a chance de divergir —
+| e já divergiram uma vez, com o gerador emitindo 'departamentos.listar' onde o
+| catálogo dizia 'rh.departamentos.listar'.
+|
+| O que sobra aqui é decisão de quem instala: onde as contribuições entram,
+| como cada recurso é chamado e em que ordem aparece.
 |
 */
 
 return [
-    // Onde as contribuições desta extensão entram no core.
-    // 'modulo_acesso' é uma chave de config('access.areas') — as onze do core ou
-    // uma declarada com ModuleRegistry::areaDeAcesso(); 'secao_menu',
-    // a key de uma seção existente em config/admin-menu.php.
+    // Área do catálogo de acesso e seção da sidebar onde as contribuições entram.
+    // 'modulo_acesso' é uma chave de config('access.areas'); 'secao_menu', a key
+    // de uma seção de config('admin-menu').
     'modulo_acesso' => 'negocio',
     'secao_menu' => 'tabelas-auxiliares',
 
@@ -34,45 +37,23 @@ return [
         ],
     ],
 
-    // Permissões do módulo, no formato do catálogo do core (config/access.php).
-    'permissoes' => [
-        'rh.funcionarios.listar' => ['label' => 'Listar funcionarios', 'descricao' => 'Ver a listagem de funcionarios.'],
-        'rh.funcionarios.criar' => ['label' => 'Criar funcionarios', 'descricao' => 'Cadastrar novos registros de funcionario.'],
-        'rh.funcionarios.editar' => ['label' => 'Editar funcionarios', 'descricao' => 'Alterar dados e status de funcionarios.'],
-        'rh.funcionarios.deletar' => ['label' => 'Excluir funcionarios', 'descricao' => 'Mover funcionarios para a lixeira.'],
-        'rh.funcionarios.restaurar' => ['label' => 'Restaurar funcionarios', 'descricao' => 'Restaurar funcionarios da lixeira.'],
-        'rh.funcionarios.excluir_permanente' => ['label' => 'Excluir funcionarios permanentemente', 'descricao' => 'Remover funcionarios definitivamente (irreversível).'],
-        'rh.departamentos.listar' => ['label' => 'Listar departamentos', 'descricao' => 'Ver a listagem de departamentos.'],
-        'rh.departamentos.criar' => ['label' => 'Criar departamentos', 'descricao' => 'Cadastrar novos registros de departamento.'],
-        'rh.departamentos.editar' => ['label' => 'Editar departamentos', 'descricao' => 'Alterar dados e status de departamentos.'],
-        'rh.departamentos.deletar' => ['label' => 'Excluir departamentos', 'descricao' => 'Mover departamentos para a lixeira.'],
-        'rh.departamentos.restaurar' => ['label' => 'Restaurar departamentos', 'descricao' => 'Restaurar departamentos da lixeira.'],
-        'rh.departamentos.excluir_permanente' => ['label' => 'Excluir departamentos permanentemente', 'descricao' => 'Remover departamentos definitivamente (irreversível).'],
-        // make:modulo insere as permissões do módulo acima desta linha
-    ],
-
-    // Itens de menu (grupo "RH" da seção Tabelas Auxiliares).
-    'menu' => [
-        [
-            'key' => 'rh-funcionarios',
-            'label' => 'Funcionarios',
-            'icon' => 'tabler--folder',
-            'route' => 'admin.rh.funcionarios.index',
-            'permission' => 'rh.funcionarios.listar',
-            'active' => ['admin.rh.funcionarios.*'],
-            'grupo' => 'grupo-tab-rh',
-            'ordem' => 600,
-        ],
-        [
-            'key' => 'rh-departamentos',
+    // Um recurso por linha. Dele saem seis permissões, o item de menu, o nome
+    // da rota, a permissão que guarda o item e o padrão de `active`.
+    'recursos' => [
+        'departamentos' => [
             'label' => 'Departamentos',
-            'icon' => 'tabler--folder',
-            'route' => 'admin.rh.departamentos.index',
-            'permission' => 'rh.departamentos.listar',
-            'active' => ['admin.rh.departamentos.*'],
+            'singular' => 'departamento',
+            'icone' => 'tabler--folder',
             'grupo' => 'grupo-tab-rh',
             'ordem' => 500,
         ],
-        // make:modulo insere os itens de menu do módulo acima desta linha
+        'funcionarios' => [
+            'label' => 'Funcionários',
+            'singular' => 'funcionário',
+            'icone' => 'tabler--folder',
+            'grupo' => 'grupo-tab-rh',
+            'ordem' => 600,
+        ],
+        // make:recurso insere os recursos do módulo acima desta linha
     ],
 ];

@@ -21,16 +21,22 @@ final class RhServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/rh.php', 'rh');
 
-        // Registrado no register() para que o callback exista antes do carregamento
-        // de routes/admin.php — o require roda DENTRO do grupo admin do core, então
-        // as rotas do módulo herdam o prefixo /admin, o name "admin." e o middleware.
-        ModuleRegistry::routes(function (): void {
-            $rotas = __DIR__ . '/../routes/admin.php';
+        // Declarado no register() por causa das ROTAS: o callback precisa existir
+        // antes do carregamento de routes/admin.php, e o require roda DENTRO do
+        // grupo admin do core — o módulo herda prefixo /admin, name "admin." e
+        // todo o middleware. O resto do builder é preguiçoso: só é aplicado em
+        // aplicarContribuicoes(), então a ordem das chamadas aqui não importa.
+        ModuleRegistry::modulo('rh')
+            ->label('Recursos Humanos')
+            ->icone('tabler--users-group')
+            ->deConfig('rh')
+            ->rotas(function (): void {
+                $rotas = __DIR__ . '/../routes/admin.php';
 
-            if (is_file($rotas)) {
-                require $rotas;
-            }
-        });
+                if (is_file($rotas)) {
+                    require $rotas;
+                }
+            });
     }
 
     public function boot(): void
@@ -41,27 +47,6 @@ final class RhServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/rh.php' => config_path('rh.php'),
         ], 'rh-config');
-
-        ModuleRegistry::permissoes(
-            (string) config('rh.modulo_acesso', 'negocio'),
-            (array) config('rh.permissoes', []),
-        );
-        $secao = (string) config('rh.secao_menu', 'negocio');
-
-        /** @var array<string, array<string, mixed>> $grupos */
-        $grupos = (array) config('rh.grupos', []);
-
-        foreach ($grupos as $chave => $grupo) {
-            ModuleRegistry::grupoDeMenu(
-                (string) $chave,
-                (string) ($grupo['secao'] ?? $secao),
-                (string) ($grupo['label'] ?? $chave),
-                (string) ($grupo['icone'] ?? 'tabler--folder'),
-                isset($grupo['ordem']) ? (int) $grupo['ordem'] : null,
-            );
-        }
-
-        ModuleRegistry::itensDeMenu($secao, (array) config('rh.menu', []));
 
         \Livewire\Livewire::component('rh.funcionarios.index', Livewire\Funcionarios\IndexFuncionario::class);
         \Livewire\Livewire::component('rh.funcionarios.form', Livewire\Funcionarios\FormFuncionario::class);

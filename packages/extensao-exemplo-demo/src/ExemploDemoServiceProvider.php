@@ -22,6 +22,12 @@ final class ExemploDemoServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/exemplo-demo.php', 'exemplo-demo');
 
+        // Recursos NOVOS deste pacote, pelo builder. Os antigos continuam nas
+        // chamadas diretas do boot(): as chaves deles já estão em uso.
+        ModuleRegistry::modulo('exemplo-demo')
+            ->label('Exemplo Demo')
+            ->deConfig('exemplo-demo');
+
         ModuleRegistry::routes(function (): void {
             $rotas = __DIR__ . '/../routes/admin.php';
 

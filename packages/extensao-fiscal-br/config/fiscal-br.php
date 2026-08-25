@@ -73,4 +73,16 @@ return [
         ],
         // make:modulo insere os itens de menu do módulo acima desta linha
     ],
+    // Grupos (submenus) declarados por esta extensão. Faixa das extensões: 500+.
+    'grupos' => [
+    ],
+
+    // Recursos NOVOS entram aqui, e deles saem permissões, item de menu, rota e
+    // padrão de `active` — derivados da chave (ADR-0021). Os recursos ANTIGOS
+    // continuam nas listas acima: as chaves deles já estão atribuídas a perfis e
+    // gravadas em menu_personalizacoes, e renomeá-las é migração de dados em
+    // produção, não refatoração.
+    'recursos' => [
+        // make:recurso insere os recursos do módulo acima desta linha
+    ],
 ];

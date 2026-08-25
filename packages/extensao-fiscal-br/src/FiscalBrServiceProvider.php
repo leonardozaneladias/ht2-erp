@@ -30,6 +30,12 @@ final class FiscalBrServiceProvider extends ServiceProvider
         // sobrevive à troca de instância de app entre testes, e loadRoutesFrom() lê
         // $this->app — que, vindo de uma instância já descartada, estoura
         // "Target class [files] does not exist".
+        // Recursos NOVOS deste pacote, pelo builder. Os antigos continuam nas
+        // chamadas diretas do boot(): as chaves deles já estão em uso.
+        ModuleRegistry::modulo('fiscal-br')
+            ->label('Fiscal BR')
+            ->deConfig('fiscal-br');
+
         ModuleRegistry::routes(function (): void {
             $rotas = __DIR__ . '/../routes/admin.php';
 

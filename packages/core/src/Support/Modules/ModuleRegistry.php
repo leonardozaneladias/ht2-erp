@@ -57,6 +57,9 @@ final class ModuleRegistry
     /** @var list<ProblemaDeContribuicao> */
     private static array $problemas = [];
 
+    /** @var array<string, ModuloBuilder> */
+    private static array $modulos = [];
+
     /** @var array<string, array{key: string, title: string, ordem: int|null, items: list<array<string, mixed>>}> */
     private static array $secoes = [];
 
@@ -114,6 +117,37 @@ final class ModuleRegistry
     public static function seeders(bool $antesDoCore = false): array
     {
         return self::$seeders[$antesDoCore ? 'antes' : 'depois'];
+    }
+
+    /**
+     * Declara um MÓDULO e devolve o builder — a forma preferida de contribuir.
+     *
+     * Os canais abaixo continuam públicos e continuam funcionando, mas cada um
+     * recebe uma string solta e nenhum sabe que três delas pertencem à mesma
+     * coisa. É dessa cegueira que veio a permissão de listagem escrita por duas
+     * fórmulas discordantes. O builder deriva as cinco convenções de uma chave.
+     *
+     * Redeclarar a mesma chave devolve o MESMO builder: sob `config:cache` o
+     * boot roda de novo sobre o próprio resultado, e dois builders com os
+     * mesmos recursos duplicariam os itens de menu.
+     */
+    public static function modulo(string $chave): ModuloBuilder
+    {
+        return self::$modulos[$chave] ??= new ModuloBuilder($chave);
+    }
+
+    /**
+     * A permissão de um recurso, perguntada em vez de recalculada.
+     *
+     * É a costura que mata a classe de bug: o componente consulta, e uma
+     * segunda fórmula deixa de ter onde nascer. Sem módulo declarado, ainda
+     * assim devolve a convenção — para que a resposta nunca seja o silêncio.
+     */
+    public static function permissaoDoRecurso(string $modulo, string $recurso, ?string $acao = null): string
+    {
+        $base = "{$modulo}.{$recurso}";
+
+        return $acao === null ? $base : "{$base}.{$acao}";
     }
 
     /**
@@ -252,6 +286,12 @@ final class ModuleRegistry
     {
         self::$problemas = [];
 
+        // Os builders primeiro: eles alimentam os canais abaixo, e por serem
+        // preguiçosos a ordem em que o provider chamou os métodos não importa.
+        foreach (self::$modulos as $modulo) {
+            $modulo->aplicar();
+        }
+
         self::aplicarAreas();
         self::aplicarPermissoes();
         self::aplicarMenu();
@@ -308,6 +348,7 @@ final class ModuleRegistry
         self::$catalogos = [];
         self::$origens = [];
         self::$problemas = [];
+        self::$modulos = [];
     }
 
     private static function aplicarAreas(): void
