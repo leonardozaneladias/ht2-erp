@@ -6,7 +6,7 @@
 ARGS = $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: up down restart bash artisan migrate fresh seed horizon test \
-        test-e2e composer npm dev lint quality logs status setup setup-client \
+        test-e2e composer npm dev lint quality doutor logs status setup setup-client \
         new-client release-modulo update-base
 
 up:
@@ -59,6 +59,11 @@ lint:
 
 quality:
 	ddev npm run quality
+
+# Diagnóstico das contribuições dos módulos: áreas, seções, grupos, permissões,
+# rotas e ícones. Exit 1 quando algo não fecha — o mesmo que o CI roda.
+doutor:
+	ddev exec php artisan ht2ml:doutor
 
 logs:
 	ddev logs -f

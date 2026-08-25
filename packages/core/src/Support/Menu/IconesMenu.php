@@ -21,7 +21,10 @@ final class IconesMenu
     public static function disponiveis(): array
     {
         return [
-            // Em uso no registro do menu (config/admin-menu.php)
+            // Em uso no registro do menu (config/admin-menu.php e configs de
+            // extensão). Estes sete faltavam: a tela recusava justamente os
+            // ícones que o menu já usava, então trocar o ícone de "Bancos" era
+            // um caminho sem volta — `php artisan ht2ml:doutor` os apontou.
             'tabler--dashboard',
             'tabler--building-community',
             'tabler--shield-lock',
@@ -30,6 +33,13 @@ final class IconesMenu
             'tabler--bell',
             'tabler--settings',
             'tabler--layout-sidebar',
+            'tabler--building-estate',
+            'tabler--coin',
+            'tabler--building-bank',
+            'tabler--road',
+            'tabler--list-numbers',
+            'tabler--barcode',
+            'tabler--components',
             // Navegação / geral
             'tabler--home',
             'tabler--layout-grid',
