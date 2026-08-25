@@ -102,7 +102,7 @@
                     </div>
                     <div class="mt-5 space-y-4">
                         @forelse ($permissoesAgrupadas as $grupo => $permissoes)
-                            @php ($moduloLabel = \HT2ML\Core\Enums\ModuloAcesso::tryFrom($grupo)?->label() ?? \Illuminate\Support\Str::headline($grupo))
+                            @php ($moduloLabel = \HT2ML\Core\Support\Access\AreaDeAcesso::de($grupo)->label)
                             <div class="border-default-200 rounded-lg border p-4">
                                 <div class="mb-3 flex items-center justify-between gap-2">
                                     <p class="text-default-500 text-xs font-semibold tracking-wide uppercase">
@@ -154,7 +154,7 @@
                     {{-- Leitura: permissões atuais sem edição --}}
                     <div class="space-y-4">
                         @foreach ($permissoesAgrupadas as $grupo => $permissoes)
-                            @php ($moduloLabel = \HT2ML\Core\Enums\ModuloAcesso::tryFrom($grupo)?->label() ?? \Illuminate\Support\Str::headline($grupo))
+                            @php ($moduloLabel = \HT2ML\Core\Support\Access\AreaDeAcesso::de($grupo)->label)
                             <div class="border-default-200 rounded-lg border p-4">
                                 <p class="text-default-500 mb-3 text-xs font-semibold tracking-wide uppercase">
                                     {{ $moduloLabel }}

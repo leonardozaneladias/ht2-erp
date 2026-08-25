@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use HT2ML\Core\Enums\ModuloAcesso;
 use HT2ML\Core\Support\Access\PermissionRegistry;
 
 it('lista os nomes das permissões do catálogo', function () {
@@ -12,26 +11,26 @@ it('lista os nomes das permissões do catálogo', function () {
         ->toContain('dashboard.view', 'usuarios.criar', 'perfis.gerenciar', 'acessos.conceder');
 });
 
-it('agrupa as permissões por módulo', function () {
+it('agrupa as permissões por área', function () {
     $registry = new PermissionRegistry;
 
-    $porModulo = $registry->porModulo();
+    $porArea = $registry->porArea();
 
-    expect($porModulo->keys()->all())->toContain('dashboard', 'usuarios', 'perfis', 'acessos');
-    expect($porModulo->get('usuarios'))->not->toBeNull();
+    expect($porArea->keys()->all())->toContain('dashboard', 'usuarios', 'perfis', 'acessos');
+    expect($porArea->get('usuarios'))->not->toBeNull();
 });
 
-it('resolve o módulo de uma permissão conhecida', function () {
+it('resolve a área de uma permissão conhecida', function () {
     $registry = new PermissionRegistry;
 
-    expect($registry->moduloDe('usuarios.criar'))->toBe(ModuloAcesso::Usuarios);
-    expect($registry->moduloDe('acessos.conceder'))->toBe(ModuloAcesso::Acessos);
+    expect($registry->areaDe('usuarios.criar')?->chave)->toBe('usuarios');
+    expect($registry->areaDe('acessos.conceder')?->chave)->toBe('acessos');
 });
 
-it('retorna null para o módulo de uma permissão inexistente', function () {
+it('retorna null para a área de uma permissão inexistente', function () {
     $registry = new PermissionRegistry;
 
-    expect($registry->moduloDe('inexistente.xpto'))->toBeNull();
+    expect($registry->areaDe('inexistente.xpto'))->toBeNull();
 });
 
 it('verifica a existência de uma permissão no catálogo', function () {

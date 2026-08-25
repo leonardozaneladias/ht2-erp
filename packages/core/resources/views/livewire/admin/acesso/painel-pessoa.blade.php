@@ -279,7 +279,7 @@
                 </div>
                 <x-shared.accordion>
                     @foreach ($acessoEfetivo as $modulo => $itens)
-                        @php ($moduloLabel = \HT2ML\Core\Enums\ModuloAcesso::tryFrom($modulo)?->label() ?? \Illuminate\Support\Str::headline($modulo))
+                        @php ($moduloLabel = \HT2ML\Core\Support\Access\AreaDeAcesso::de($modulo)->label)
                         @php ($permitidasNoModulo = $itens->filter(fn ($dto) => $dto->permitido)->count())
                         <x-shared.accordion-item
                             :id="'efe-' . $modulo"

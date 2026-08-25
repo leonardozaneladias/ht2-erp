@@ -28,7 +28,11 @@ final class AccessSyncCommand extends Command
 
         foreach ($registry->todas() as $definicao) {
             $metadados = [
-                'modulo' => $definicao->modulo->value,
+                // A coluna ainda se chama 'modulo'; o conceito virou 'área de
+                // acesso' (ADR-0021). Renomear a coluna é migration e toca a
+                // tela de acesso — fica para quando o vocabulário novo estiver
+                // assentado. O DADO é o mesmo dos dois lados.
+                'modulo' => $definicao->area->chave,
                 'label' => $definicao->label,
                 'descricao' => $definicao->descricao,
             ];
