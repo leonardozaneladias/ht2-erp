@@ -189,7 +189,8 @@ final class ExemploTable extends PowerGridComponent
             Filter::inputText('cep')->placeholder('Filtrar por Cep'),
             Filter::inputText('cnpj')->placeholder('Filtrar por Cnpj'),
             Filter::inputText('cpf')->placeholder('Filtrar por Cpf'),
-            Filter::boolean('destaque'),
+            Filter::boolean('destaque')
+                ->label('Sim', 'Não'),
             Filter::multiSelect('status', 'status')
                 ->dataSource(StatusExemplo::options())
                 ->optionValue('value')
