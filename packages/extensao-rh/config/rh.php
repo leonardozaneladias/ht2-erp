@@ -16,10 +16,23 @@ declare(strict_types=1);
 
 return [
     // Onde as contribuições desta extensão entram no core.
-    // 'modulo_acesso' precisa ser um caso de HT2ML\Core\Enums\ModuloAcesso; 'secao_menu',
+    // 'modulo_acesso' é uma chave de config('access.areas') — as onze do core ou
+    // uma declarada com ModuleRegistry::areaDeAcesso(); 'secao_menu',
     // a key de uma seção existente em config/admin-menu.php.
     'modulo_acesso' => 'negocio',
-    'secao_menu' => 'negocio',
+    'secao_menu' => 'tabelas-auxiliares',
+
+    // Grupos (submenus) que esta extensão declara. Antes, este arranjo vivia
+    // hardcoded na AplicarMenuPadraoAction do core — o core conhecendo a
+    // extensão pelo nome. Faixa de ordem das extensões: 500+.
+    'grupos' => [
+        'grupo-tab-rh' => [
+            'secao' => 'tabelas-auxiliares',
+            'label' => 'RH',
+            'icone' => 'tabler--users-group',
+            'ordem' => 500,
+        ],
+    ],
 
     // Permissões do módulo, no formato do catálogo do core (config/access.php).
     'permissoes' => [
@@ -38,7 +51,7 @@ return [
         // make:modulo insere as permissões do módulo acima desta linha
     ],
 
-    // Itens de menu (seção "Negócio" da sidebar).
+    // Itens de menu (grupo "RH" da seção Tabelas Auxiliares).
     'menu' => [
         [
             'key' => 'rh-funcionarios',
@@ -47,6 +60,8 @@ return [
             'route' => 'admin.rh.funcionarios.index',
             'permission' => 'rh.funcionarios.listar',
             'active' => ['admin.rh.funcionarios.*'],
+            'grupo' => 'grupo-tab-rh',
+            'ordem' => 600,
         ],
         [
             'key' => 'rh-departamentos',
@@ -55,6 +70,8 @@ return [
             'route' => 'admin.rh.departamentos.index',
             'permission' => 'rh.departamentos.listar',
             'active' => ['admin.rh.departamentos.*'],
+            'grupo' => 'grupo-tab-rh',
+            'ordem' => 500,
         ],
         // make:modulo insere os itens de menu do módulo acima desta linha
     ],

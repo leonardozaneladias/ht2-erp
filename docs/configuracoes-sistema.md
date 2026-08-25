@@ -88,9 +88,11 @@ e aplicado no frontend por `NotificacaoService::paraJsConfig()` (injetado pelo p
 
 Enquanto `GeneralSettings::instalado === false`, o middleware
 `EnsureSystemConfigured` redireciona o painel para `/admin/setup`. O assistente
-coleta empresa, marca e cria o primeiro super-admin (`ConcluirSetupAction`),
-aplica a disposição padrão do menu (`AplicarMenuPadraoAction` — grupos
-Cadastros/Segurança; deploy não roda seeders) e então marca `instalado = true`.
+coleta empresa, marca e cria o primeiro super-admin (`ConcluirSetupAction`) e
+então marca `instalado = true`. A disposição padrão do menu não é aplicada por
+ninguém: ela é **declarada** em `config/admin-menu.php` e nas configs das
+extensões (ADR-0022), então a instalação nasce com `menu_personalizacoes` vazia
+e cada linha ali passa a significar uma decisão humana.
 
 - **Dev**: `migrate:fresh --seed` marca `instalado = true` (pula o wizard).
 - **Cliente novo**: `migrate` sem `--seed` deixa `instalado = false` → o wizard roda.

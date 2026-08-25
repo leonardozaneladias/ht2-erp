@@ -19,10 +19,13 @@ beforeEach(function () {
 });
 
 it('renderiza a sidebar com personalizações aplicadas', function () {
+    // 'auditoria' é um dos dois itens que o config declara SOLTOS na seção
+    // Administração — e item de topo é o único que renderiza ícone: a view do
+    // accordion mostra apenas o texto dos filhos de um grupo.
     MenuPersonalizacao::create([
         'tipo' => 'item',
-        'key' => 'usuarios',
-        'label' => 'Equipe',
+        'key' => 'auditoria',
+        'label' => 'Trilhas',
         'icone' => 'tabler--user-star',
     ]);
     MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'comunicados', 'ativo' => false]);
@@ -30,20 +33,41 @@ it('renderiza a sidebar com personalizações aplicadas', function () {
     $this->actingAs($this->admin, 'admin');
 
     $this->blade('<x-admin.sidebar />')
-        ->assertSee('Equipe')
+        ->assertSee('Trilhas')
         ->assertSee('tabler--user-star')
-        ->assertDontSee('Usuários admin')
+        ->assertDontSee('Logs de auditoria')
         ->assertDontSee('Comunicados');
 });
 
+it('a personalização de label chega a um item dentro de grupo declarado', function () {
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'usuarios', 'label' => 'Equipe']);
+
+    $this->actingAs($this->admin, 'admin');
+
+    $this->blade('<x-admin.sidebar />')
+        ->assertSee('Equipe')
+        ->assertDontSee('Usuários admin');
+});
+
 it('aplica a ordem personalizada na sidebar', function () {
-    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'configuracoes', 'ordem' => 1]);
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'comunicados', 'ordem' => 1]);
 
     $this->actingAs($this->admin, 'admin');
 
     $html = (string) $this->blade('<x-admin.sidebar />');
 
-    expect(strpos($html, 'Configurações'))->toBeLessThan(strpos($html, 'Empresas'));
+    expect(strpos($html, 'Comunicados'))->toBeLessThan(strpos($html, 'Logs de auditoria'));
+});
+
+it('a ordem personalizada vale dentro do grupo declarado', function () {
+    // O config declara empresas(100) antes de usuarios(200) no grupo-cadastros.
+    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'usuarios', 'ordem' => 1]);
+
+    $this->actingAs($this->admin, 'admin');
+
+    $html = (string) $this->blade('<x-admin.sidebar />');
+
+    expect(strpos($html, 'Usuários admin'))->toBeLessThan(strpos($html, 'Empresas'));
 });
 
 it('não quebra com personalização órfã e a omite do menu', function () {

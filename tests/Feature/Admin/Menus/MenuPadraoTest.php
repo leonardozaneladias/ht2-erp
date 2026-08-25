@@ -2,23 +2,41 @@
 
 declare(strict_types=1);
 
-use HT2ML\Core\Actions\Admin\Menu\AplicarMenuPadraoAction;
 use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
-use HT2ML\Core\Enums\TipoPersonalizacaoMenu;
 use HT2ML\Core\Models\MenuPersonalizacao;
 use HT2ML\Core\Services\Admin\Menu\MenuService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('aplica a disposição padrão com os grupos Organização e Segurança', function () {
-    expect(app(AplicarMenuPadraoAction::class)->execute())->toBeTrue();
+/*
+|--------------------------------------------------------------------------
+| A disposição padrão do menu deixou de ser código
+|--------------------------------------------------------------------------
+|
+| Até aqui era a AplicarMenuPadraoAction: 60 linhas que gravavam 23 linhas em
+| menu_personalizacoes no primeiro setup, hardcodando 'grupo-tab-rh',
+| 'ref-cnaes', 'ref-cfops', 'ref-ncms', 'rh-departamentos' e 'rh-funcionarios'
+| — o core conhecendo extensões pelo nome, que é exatamente o que ADR-0015
+| proíbe na direção inversa.
+|
+| Ela fazia duas coisas: agrupar e ordenar. As duas viraram declaração na config
+| de cada dono (`grupos`, `grupo`, `ordem`), então sobrou nada.
+|
+| O ganho colateral está no primeiro teste: a tabela nasce VAZIA. Antes, toda
+| instalação nova chegava com 23 linhas que nenhum humano tinha escolhido, e a
+| tela de Gestão de Menus marcava cada uma delas como "personalizado" — o badge
+| não significava nada.
+|
+*/
 
+it('a disposição padrão vem do config, com a tabela de personalizações vazia', function (): void {
     $secoes = app(MenuService::class)->estruturaParaSidebar(null, mostrarTudo: true);
     $administracao = collect($secoes)->firstWhere('key', 'administracao');
     $porKey = collect($administracao['items'])->keyBy('key');
 
-    expect(array_column($administracao['items'], 'key'))
+    expect(MenuPersonalizacao::query()->count())->toBe(0)
+        ->and(array_column($administracao['items'], 'key'))
         ->toBe(['grupo-cadastros', 'grupo-seguranca', 'auditoria', 'comunicados'])
         ->and(array_column($porKey['grupo-cadastros']['children'], 'key'))->toBe(['empresas', 'usuarios'])
         ->and(array_column($porKey['grupo-seguranca']['children'], 'key'))->toBe(['acesso', 'menus', 'configuracoes'])
@@ -30,42 +48,36 @@ it('aplica a disposição padrão com os grupos Organização e Segurança', fun
     expect(array_column($principal['items'], 'key'))->toBe(['dashboard']);
 });
 
-it('é idempotente e vira no-op quando já existe qualquer grupo', function () {
-    app(AplicarMenuPadraoAction::class)->execute();
-    $total = MenuPersonalizacao::query()->count();
+it('a seção Tabelas Auxiliares agrupa os catálogos e o RH sem o core citar nenhum', function (): void {
+    $secoes = app(MenuService::class)->estruturaParaSidebar(null, mostrarTudo: true);
+    $porKey = collect(collect($secoes)->firstWhere('key', 'tabelas-auxiliares')['items'])->keyBy('key');
 
-    // Segunda aplicação não duplica nem altera nada.
-    expect(app(AplicarMenuPadraoAction::class)->execute())->toBeFalse()
-        ->and(MenuPersonalizacao::query()->count())->toBe($total);
+    expect(array_column($porKey['grupo-tab-cadastros']['children'], 'key'))->toBe([
+        'ref-estados', 'ref-paises', 'ref-municipios', 'ref-moedas',
+        'ref-bancos', 'ref-cargos', 'ref-tipos-logradouro',
+        'ref-cnaes', 'ref-cfops', 'ref-ncms',
+    ])->and(array_column($porKey['grupo-tab-rh']['children'], 'key'))
+        ->toBe(['rh-departamentos', 'rh-funcionarios']);
 
-    // Instalação com grupo próprio do cliente também é no-op.
-    MenuPersonalizacao::query()->delete();
-    MenuPersonalizacao::create([
-        'tipo' => 'grupo', 'key' => 'grupo-do-cliente', 'label' => 'Meu Grupo',
-        'secao_key' => 'principal', 'e_custom' => true,
-    ]);
-
-    expect(app(AplicarMenuPadraoAction::class)->execute())->toBeFalse()
-        ->and(MenuPersonalizacao::query()->where('key', 'grupo-cadastros')->exists())->toBeFalse();
+    // Que o arranjo não veio do core é afirmado pelo guard A2, em
+    // tests/Arch/CoreNaoConheceExtensaoTest.php — ali com varredura recursiva
+    // de verdade e token_get_all, não com um glob de um nível só.
 });
 
-it('não sobrescreve personalização de item pré-existente', function () {
-    MenuPersonalizacao::create(['tipo' => 'item', 'key' => 'empresas', 'label' => 'Organizações', 'ordem' => 9]);
+it('nada é marcado como personalizado numa instalação nova', function (): void {
+    $gestao = app(MenuService::class)->estruturaParaGestao();
 
-    app(AplicarMenuPadraoAction::class)->execute();
+    $personalizados = collect($gestao['secoes'])
+        ->flatMap(fn (array $secao): array => [$secao, ...$secao['items']])
+        ->filter(fn (array $entrada): bool => (bool) ($entrada['personalizado'] ?? false))
+        ->pluck('key')
+        ->all();
 
-    $empresas = MenuPersonalizacao::query()
-        ->where('tipo', TipoPersonalizacaoMenu::Item)
-        ->where('key', 'empresas')
-        ->firstOrFail();
-
-    // firstOrCreate preservou a linha do cliente (sem grupo_key do padrão).
-    expect($empresas->label)->toBe('Organizações')
-        ->and($empresas->ordem)->toBe(9)
-        ->and($empresas->grupo_key)->toBeNull();
+    expect($personalizados)->toBe([])
+        ->and($gestao['orfas'])->toBeEmpty();
 });
 
-it('aplica o menu padrão ao concluir o Setup Wizard', function () {
+it('concluir o Setup Wizard não grava personalização de menu nenhuma', function (): void {
     $this->seed(RolePermissionSeeder::class);
     marcarInstalado(false);
 
@@ -79,6 +91,11 @@ it('aplica o menu padrão ao concluir o Setup Wizard', function () {
         ->set('admin_senha', 'SenhaForte1')
         ->call('concluir');
 
-    expect(MenuPersonalizacao::query()->where('key', 'grupo-cadastros')->exists())->toBeTrue()
-        ->and(MenuPersonalizacao::query()->where('key', 'grupo-seguranca')->exists())->toBeTrue();
+    expect(MenuPersonalizacao::query()->count())->toBe(0);
+
+    // E a sidebar sai montada mesmo assim.
+    $administracao = collect(app(MenuService::class)->estruturaParaSidebar(null, mostrarTudo: true))
+        ->firstWhere('key', 'administracao');
+
+    expect(array_column($administracao['items'], 'key'))->toContain('grupo-cadastros');
 });

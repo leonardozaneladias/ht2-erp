@@ -46,10 +46,22 @@ final class RhServiceProvider extends ServiceProvider
             (string) config('rh.modulo_acesso', 'negocio'),
             (array) config('rh.permissoes', []),
         );
-        ModuleRegistry::itensDeMenu(
-            (string) config('rh.secao_menu', 'negocio'),
-            (array) config('rh.menu', []),
-        );
+        $secao = (string) config('rh.secao_menu', 'negocio');
+
+        /** @var array<string, array<string, mixed>> $grupos */
+        $grupos = (array) config('rh.grupos', []);
+
+        foreach ($grupos as $chave => $grupo) {
+            ModuleRegistry::grupoDeMenu(
+                (string) $chave,
+                (string) ($grupo['secao'] ?? $secao),
+                (string) ($grupo['label'] ?? $chave),
+                (string) ($grupo['icone'] ?? 'tabler--folder'),
+                isset($grupo['ordem']) ? (int) $grupo['ordem'] : null,
+            );
+        }
+
+        ModuleRegistry::itensDeMenu($secao, (array) config('rh.menu', []));
 
         \Livewire\Livewire::component('rh.funcionarios.index', Livewire\Funcionarios\IndexFuncionario::class);
         \Livewire\Livewire::component('rh.funcionarios.form', Livewire\Funcionarios\FormFuncionario::class);

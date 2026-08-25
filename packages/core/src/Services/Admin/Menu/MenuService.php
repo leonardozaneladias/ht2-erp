@@ -10,6 +10,7 @@ use HT2ML\Core\Models\MenuPersonalizacao;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use LogicException;
 
 /**
@@ -28,7 +29,7 @@ use LogicException;
  */
 final class MenuService
 {
-    private const CACHE_KEY = 'admin-menu.estrutura';
+    private const CACHE_PREFIXO = 'admin-menu.estrutura';
 
     private const CACHE_TTL = 600;
 
@@ -145,17 +146,23 @@ final class MenuService
     }
 
     /**
-     * Keys dos grupos existentes (sempre criados pela tela).
+     * Keys dos grupos existentes: os declarados no config e os criados na tela.
+     *
+     * Os declarados precisam entrar aqui porque é esta lista que valida o
+     * destino de um arraste — sem eles, arrastar um item para um grupo que veio
+     * do config seria recusado como "container desconhecido".
      *
      * @return list<string>
      */
     public function chavesDeGrupos(): array
     {
-        return $this->personalizacoes()
+        $daTela = $this->personalizacoes()
             ->filter(fn (MenuPersonalizacao $p): bool => $p->tipo === TipoPersonalizacaoMenu::Grupo)
             ->pluck('key')
-            ->values()
             ->all();
+
+        /** @var list<string> */
+        return array_values(array_unique([...array_keys($this->gruposDeclarados()), ...$daTela]));
     }
 
     /**
@@ -191,14 +198,20 @@ final class MenuService
     }
 
     /**
-     * Valores padrão (do config) de um item ou seção — base da normalização
-     * das personalizações (valor igual ao padrão vira null). Grupos e seções
-     * custom não têm padrão (retorna null).
+     * Valores padrão (do config) de um item, seção ou grupo declarado — base da
+     * normalização das personalizações (valor igual ao padrão vira null).
+     * Grupos criados na tela e seções custom não têm padrão (retorna null).
      *
      * @return array{label: string, icone: string|null}|null
      */
     public function padraoDe(TipoPersonalizacaoMenu $tipo, string $key): ?array
     {
+        if ($tipo === TipoPersonalizacaoMenu::Grupo) {
+            $grupo = $this->gruposDeclarados()[$key] ?? null;
+
+            return $grupo === null ? null : ['label' => $grupo['label'], 'icone' => $grupo['icone']];
+        }
+
         foreach ($this->registro() as $secao) {
             if ($tipo === TipoPersonalizacaoMenu::Secao && $secao['key'] === $key) {
                 return ['label' => $secao['title'], 'icone' => null];
@@ -209,6 +222,25 @@ final class MenuService
                     if ($item['key'] === $key) {
                         return ['label' => $item['label'], 'icone' => $item['icon'] ?? null];
                     }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Grupo em que o item está declarado no config (null = fora de grupo).
+     *
+     * Existe para a ReordenarItensMenuAction saber que tirar o item do grupo é
+     * uma DECISÃO que precisa ficar gravada — ver o tri-estado em mesclar().
+     */
+    public function grupoNaturalDoItem(string $itemKey): ?string
+    {
+        foreach ($this->registro() as $secao) {
+            foreach ($secao['items'] as $item) {
+                if ($item['key'] === $itemKey) {
+                    return is_string($item['grupo'] ?? null) ? $item['grupo'] : null;
                 }
             }
         }
@@ -234,7 +266,27 @@ final class MenuService
 
     public function invalidarCache(): void
     {
-        Cache::forget(self::CACHE_KEY);
+        Cache::forget($this->chaveDeCache());
+    }
+
+    /**
+     * Chave do cache, com a impressão digital do registro.
+     *
+     * O TTL é de 600s e `invalidarCache()` só é chamado quando alguém mexe na
+     * tela — instalar uma extensão, publicar uma config ou fazer deploy de um
+     * módulo novo não passa por ali. Sem a impressão digital, a sidebar ficava
+     * até dez minutos sem os itens recém-instalados, e o suporte aprendia a
+     * "esperar um pouco" em vez de a confiar na tela. Com ela, config diferente
+     * é cache diferente: frio na hora, sem ninguém precisar lembrar.
+     */
+    private function chaveDeCache(): string
+    {
+        // config() cru, NÃO registro(): registro() valida as keys e LANÇA. Como
+        // invalidarCache() é chamado por toda Action de menu, derivar a chave do
+        // registro validado fazia um config quebrado impedir até de salvar uma
+        // personalização — quando antes ele só quebrava a sidebar. A impressão
+        // digital é do config, e é do config que ela deve sair.
+        return self::CACHE_PREFIXO . ':' . substr(md5(serialize(config('admin-menu', []))), 0, 12);
     }
 
     /**
@@ -246,7 +298,7 @@ final class MenuService
     private function estruturaMesclada(): array
     {
         /** @var list<array<string, mixed>> */
-        return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, fn (): array => $this->mesclar());
+        return Cache::remember($this->chaveDeCache(), self::CACHE_TTL, fn (): array => $this->mesclar());
     }
 
     /**
@@ -274,7 +326,9 @@ final class MenuService
                 'titlePadrao' => $secao['title'],
                 'personalizado' => $ajuste !== null,
                 'eCustom' => false,
-                'posicao' => [$ajuste->ordem ?? PHP_INT_MAX, $indiceSecao],
+                // O declarado é sugestão, o banco é a decisão de quem instalou —
+                // a mesma semântica que label e icone já tinham.
+                'posicao' => [$ajuste->ordem ?? $secao['ordem'] ?? PHP_INT_MAX, $indiceSecao],
                 'items' => [],
             ];
 
@@ -303,30 +357,56 @@ final class MenuService
             return [];
         }
 
-        // 2. Grupos (sempre custom): seção destino com fallback na 1ª seção.
+        // 2. Grupos: os declarados no config e os criados na tela, com o banco
+        //    vencendo em tudo que o humano decidiu. Seção destino com fallback
+        //    na 1ª seção.
+        $declarados = $this->gruposDeclarados();
+
+        $ajustesDeGrupo = $personalizacoes
+            ->filter(fn (MenuPersonalizacao $p): bool => $p->tipo === TipoPersonalizacaoMenu::Grupo)
+            ->keyBy(fn (MenuPersonalizacao $p): string => $p->key);
+
         $grupos = [];
         $indiceGrupo = 0;
 
-        foreach ($personalizacoes as $personalizacao) {
-            if ($personalizacao->tipo !== TipoPersonalizacaoMenu::Grupo) {
-                continue;
-            }
+        $chavesDeGrupo = array_values(array_unique(
+            [...array_keys($declarados), ...$ajustesDeGrupo->keys()->all()],
+        ));
 
-            $destino = $personalizacao->secao_key !== null && isset($secoes[$personalizacao->secao_key])
-                ? $personalizacao->secao_key
+        foreach ($chavesDeGrupo as $chave) {
+            // Duas origens para o mesmo grupo, e a precedência é sempre a mesma:
+            // o que o humano decidiu na tela vence o que o pacote declarou.
+            $declarado = $declarados[$chave] ?? [];
+            $ajuste = $ajustesDeGrupo[$chave] ?? null;
+
+            $decidido = $ajuste === null ? [] : array_filter([
+                'secao' => $ajuste->secao_key,
+                'label' => $ajuste->label,
+                'icone' => $ajuste->icone,
+                'ordem' => $ajuste->ordem,
+            ], static fn (int|string|null $valor): bool => $valor !== null);
+
+            $desejada = $decidido['secao'] ?? $declarado['secao'] ?? null;
+            $destino = $desejada !== null && isset($secoes[$desejada])
+                ? $desejada
                 : array_key_first($secoes);
 
-            $grupos[$personalizacao->key] = [
+            $grupos[$chave] = [
                 'tipo' => 'grupo',
-                'key' => $personalizacao->key,
-                'label' => $personalizacao->label ?? $personalizacao->key,
-                'icon' => $personalizacao->icone ?? 'tabler--folder',
-                'ativo' => $personalizacao->ativo,
-                'eCustom' => true,
-                'personalizado' => true,
+                'key' => $chave,
+                'label' => $decidido['label'] ?? $declarado['label'] ?? $chave,
+                'labelPadrao' => $declarado['label'] ?? null,
+                'icon' => $decidido['icone'] ?? $declarado['icone'] ?? 'tabler--folder',
+                'iconPadrao' => $declarado['icone'] ?? null,
+                // `ativo` fora do array acima porque é bool: false é uma decisão,
+                // não um "não preenchido", e array_filter o descartaria.
+                'ativo' => $ajuste === null ? true : $ajuste->ativo,
+                // eCustom = nasceu na tela, não no config. Órfão nunca é.
+                'eCustom' => $declarado === [],
+                'personalizado' => $ajuste !== null,
                 'destinoSecao' => $destino,
                 // Tie-break alto: grupo sem ordem cai depois dos itens sem ordem.
-                'posicao' => [$personalizacao->ordem ?? PHP_INT_MAX, 100000 + $indiceGrupo],
+                'posicao' => [$decidido['ordem'] ?? $declarado['ordem'] ?? PHP_INT_MAX, 100000 + $indiceGrupo],
                 'children' => [],
             ];
 
@@ -355,14 +435,27 @@ final class MenuService
                     'secaoNaturalKey' => $secao['key'],
                     'grupoKey' => null,
                     'personalizado' => $ajuste !== null,
-                    'posicao' => [$ajuste->ordem ?? PHP_INT_MAX, $indiceNatural],
+                    'posicao' => [$ajuste->ordem ?? $item['ordem'] ?? PHP_INT_MAX, $indiceNatural],
                 ]);
 
                 $indiceNatural++;
 
-                if ($ajuste?->grupo_key !== null && isset($grupos[$ajuste->grupo_key])) {
-                    $entry['grupoKey'] = $ajuste->grupo_key;
-                    $childrenPorGrupo[$ajuste->grupo_key][] = $entry;
+                // Tri-estado, e é por isso que não é um `??` simples: `grupo_key`
+                // nulo significa DUAS coisas — "ninguém decidiu" (linha criada só
+                // para renomear) e "decidiu-se que é fora de grupo" (item
+                // arrastado para a raiz). O que distingue é `secao_key`, que a
+                // ReordenarItensMenuAction grava justamente nesse caso. Sem isto,
+                // arrastar um item para fora de um grupo declarado seria desfeito
+                // no próximo render.
+                $grupoKey = $ajuste?->grupo_key;
+
+                if ($grupoKey === null && $ajuste?->secao_key === null) {
+                    $grupoKey = is_string($item['grupo'] ?? null) ? $item['grupo'] : null;
+                }
+
+                if ($grupoKey !== null && isset($grupos[$grupoKey])) {
+                    $entry['grupoKey'] = $grupoKey;
+                    $childrenPorGrupo[$grupoKey][] = $entry;
 
                     continue;
                 }
@@ -411,6 +504,35 @@ final class MenuService
         unset($secao);
 
         return $secoes;
+    }
+
+    /**
+     * Grupos declarados no config, indexados pela key.
+     *
+     * @return array<string, array{key: string, secao: string, label: string, icone: string, ordem: int|null}>
+     */
+    private function gruposDeclarados(): array
+    {
+        $grupos = [];
+
+        foreach ($this->registro() as $secao) {
+            /** @var array<string, array<string, mixed>> $declarados */
+            $declarados = $secao['grupos'] ?? [];
+
+            foreach ($declarados as $chave => $grupo) {
+                $chave = (string) $chave;
+
+                $grupos[$chave] = [
+                    'key' => $chave,
+                    'secao' => $secao['key'],
+                    'label' => is_string($grupo['label'] ?? null) ? $grupo['label'] : Str::headline($chave),
+                    'icone' => is_string($grupo['icone'] ?? null) ? $grupo['icone'] : 'tabler--folder',
+                    'ordem' => is_int($grupo['ordem'] ?? null) ? $grupo['ordem'] : null,
+                ];
+            }
+        }
+
+        return $grupos;
     }
 
     /**

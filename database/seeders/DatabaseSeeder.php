@@ -6,7 +6,6 @@ namespace Database\Seeders;
 
 use HT2ML\Core\Database\Seeders\AdminUserSeeder;
 use HT2ML\Core\Database\Seeders\EmpresaSeeder;
-use HT2ML\Core\Database\Seeders\MenuPadraoSeeder;
 use HT2ML\Core\Database\Seeders\Referencia\DadosReferenciaSeeder;
 use HT2ML\Core\Database\Seeders\RolePermissionSeeder;
 use HT2ML\Core\Support\Modules\ModuleRegistry;
@@ -30,7 +29,6 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             EmpresaSeeder::class,
             AdminUserSeeder::class,
-            MenuPadraoSeeder::class,
         ]);
 
         // Demais extensões: já encontram empresas, perfis e usuários no lugar.

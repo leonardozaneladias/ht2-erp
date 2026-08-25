@@ -48,25 +48,52 @@ it('abre a página pela rota como super-admin', function () {
         ->assertSee('Gestão de menus');
 });
 
-it('reordena itens dentro da própria seção sem gravar secao_key', function () {
+it('reordena item solto dentro da própria seção sem gravar secao_key', function () {
+    // 'auditoria' e 'comunicados' são os dois itens que o config declara SOLTOS
+    // na seção — os outros cinco nascem dentro de grupos.
     Livewire::actingAs($this->admin, 'admin')
         ->test(GestaoMenus::class)
-        ->call('reordenarItens', 'usuarios', 'secao:administracao', [
-            'secao:administracao' => ['usuarios', 'empresas', 'acesso', 'auditoria', 'comunicados', 'configuracoes', 'menus'],
+        ->call('reordenarItens', 'comunicados', 'secao:administracao', [
+            'secao:administracao' => ['comunicados', 'auditoria', 'grupo-cadastros', 'grupo-seguranca'],
         ])
         ->assertHasNoErrors()
         ->assertDispatched('toast', variant: 'success');
 
-    $usuarios = MenuPersonalizacao::query()->where('key', 'usuarios')->firstOrFail();
+    $comunicados = MenuPersonalizacao::query()->where('key', 'comunicados')->firstOrFail();
 
-    expect($usuarios->ordem)->toBe(1)
-        ->and($usuarios->secao_key)->toBeNull();
+    // Seção natural e sem grupo declarado: nada a gravar além da ordem — é o
+    // que mantém o badge "Personalizado" significativo.
+    expect($comunicados->ordem)->toBe(1)
+        ->and($comunicados->secao_key)->toBeNull();
 
     // O cache foi invalidado: a sidebar reflete a nova ordem.
     $secoes = app(MenuService::class)->estruturaParaSidebar($this->admin);
     $administracao = collect($secoes)->firstWhere('key', 'administracao');
 
-    expect(array_column($administracao['items'], 'key')[0])->toBe('usuarios');
+    expect(array_column($administracao['items'], 'key')[0])->toBe('comunicados');
+});
+
+it('tirar do grupo declarado grava a seção — é decisão, não ausência dela', function () {
+    Livewire::actingAs($this->admin, 'admin')
+        ->test(GestaoMenus::class)
+        ->call('reordenarItens', 'usuarios', 'secao:administracao', [
+            'secao:administracao' => ['usuarios', 'auditoria', 'comunicados', 'grupo-cadastros', 'grupo-seguranca'],
+        ])
+        ->assertHasNoErrors();
+
+    $usuarios = MenuPersonalizacao::query()->where('key', 'usuarios')->firstOrFail();
+
+    // grupo_key nulo significa DUAS coisas — "ninguém decidiu" e "decidiu-se que
+    // é fora de grupo". O que as distingue é secao_key. Sem gravá-la, o item
+    // voltaria ao 'grupo-cadastros' declarado no render seguinte.
+    expect($usuarios->grupo_key)->toBeNull()
+        ->and($usuarios->secao_key)->toBe('administracao')
+        ->and($usuarios->ordem)->toBe(1);
+
+    $secoes = app(MenuService::class)->estruturaParaSidebar($this->admin);
+    $administracao = collect($secoes)->firstWhere('key', 'administracao');
+
+    expect(array_column($administracao['items'], 'key'))->toContain('usuarios');
 });
 
 it('move item para outra seção gravando secao_key', function () {
