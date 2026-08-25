@@ -214,7 +214,13 @@ final class ExemploTable extends PowerGridComponent
 
     protected function permissaoListagem(): string
     {
-        return 'exemplos.listar';
+        // Derivado de permissaoBase(), nunca literal: as duas fórmulas já
+        // divergiram uma vez. O gerador emitia snakePlural().'.listar' e o
+        // catálogo usava permissaoBase().'.listar', então esta tabela exigia uma
+        // permissão inexistente — e empresasElegiveis() negava toda empresa a
+        // quem não fosse super-admin, desligando o filtro multiempresa em
+        // silêncio. Ver tests/Feature/Modules/PermissaoDeListagemTest.php.
+        return $this->permissaoBase() . '.listar';
     }
 
     /**
@@ -238,7 +244,7 @@ final class ExemploTable extends PowerGridComponent
      */
     protected function dadosParaExportacao(): ExportavelDTO
     {
-        $linhas = $this->datasource()->get()
+        $linhas = $this->linhasParaExportacao()
             ->map(fn (Exemplo $registro): array => [
                 ...$this->linhaMultiEmpresa($registro),
                 (string) $registro->nome,

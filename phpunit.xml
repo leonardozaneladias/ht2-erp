@@ -18,6 +18,12 @@
         <testsuite name="Extensoes">
             <directory>packages/*/tests</directory>
         </testsuite>
+        <!-- Regras de arquitetura. Suíte própria porque tests/Arch.php, na raiz de
+             tests/, não era coberto por nenhuma das suítes acima — e por isso
+             nunca rodou. -->
+        <testsuite name="Arch">
+            <directory>tests/Arch</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

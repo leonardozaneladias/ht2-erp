@@ -37,7 +37,7 @@ horizon:
 	ddev exec supervisorctl restart webextradaemons:horizon
 
 test:
-	ddev artisan test --parallel --testsuite=Unit,Feature,Extensoes
+	ddev artisan test --parallel --testsuite=Unit,Feature,Extensoes,Arch
 
 # E2E (browser real via Playwright). Roda no HOST, não no container:
 # o Chromium do Playwright vive no macOS e o vendor/ é compartilhado.

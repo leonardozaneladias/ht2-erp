@@ -945,7 +945,14 @@ final class EspecificacaoModulo
      */
     private function metodoPermissaoListagem(): string
     {
-        $permissao = $this->snakePlural() . '.listar';
+        // permissaoBase(), e NÃO snakePlural(): em modo pacote o prefixo do
+        // módulo faz parte da permissão ('rh.departamentos.listar'). A fórmula
+        // antiga era uma SEGUNDA fórmula, que discordava da usada em
+        // permissoes() — e gerou 'departamentos.listar', permissão inexistente,
+        // nas duas telas do RH. Efeito: empresasElegiveis() em
+        // FiltraPorMultiEmpresa negava toda empresa para quem não é super-admin,
+        // desligando o filtro multiempresa em silêncio.
+        $permissao = $this->permissaoBase() . '.listar';
 
         return <<<PHP
     protected function permissaoListagem(): string
@@ -1016,7 +1023,11 @@ final class EspecificacaoModulo
     private function campoBladeLinha(CampoModulo $campo): string
     {
         if ($campo->ehStatus()) {
-            return '<x-shared.select-search name="status" label="Status" wire:model="status" :options="\App\Enums\\' . $this->statusEnumShort() . '::options()" required />';
+            // nsEnums(), e não '\App\Enums' fixo: o enum de status é gerado
+            // DENTRO do módulo, então em modo pacote ele mora em
+            // HT2ML\<Pacote>\Enums. O literal antigo obrigava a corrigir o blade
+            // à mão depois de gerar — foi o que aconteceu com o RH.
+            return '<x-shared.select-search name="status" label="Status" wire:model="status" :options="\\' . $this->nsEnums() . '\\' . $this->statusEnumShort() . '::options()" required />';
         }
 
         return $campo->componenteBlade();

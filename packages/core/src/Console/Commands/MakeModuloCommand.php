@@ -7,6 +7,7 @@ namespace HT2ML\Core\Console\Commands;
 use HT2ML\Core\Support\Generator\CampoModulo;
 use HT2ML\Core\Support\Generator\EspecificacaoModulo;
 use HT2ML\Core\Support\Generator\Extensao;
+use HT2ML\Core\Support\Generator\ResolvedorDeStubs;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -71,19 +72,16 @@ final class MakeModuloCommand extends Command
 
         $spec = new EspecificacaoModulo($nome, $campos, tenant: (bool) $this->option('tenant'), pacote: $pacote, softDelete: ! (bool) $this->option('sem-soft-delete'));
 
-        $stubDir = base_path('stubs/modulo');
-        if (! File::isDirectory($stubDir)) {
-            $this->error("Stubs não encontrados em {$stubDir}. Eles fazem parte do boilerplate.");
-
-            return self::FAILURE;
-        }
+        // Os stubs viajam DENTRO do pacote; o produto sobrescreve arquivo a
+        // arquivo em stubs/modulo/. Ver ResolvedorDeStubs.
+        $stubs = new ResolvedorDeStubs('modulo');
 
         $repl = $this->montarReplacements($spec);
         $arquivos = $this->mapaArquivos($spec);
         $this->resolverMigrationExistente($spec, $arquivos);
 
         foreach ($arquivos as $stub => $destino) {
-            $this->gerarArquivo($stubDir, $stub, $destino, $repl);
+            $this->gerarArquivo($stubs, $stub, $destino, $repl);
         }
 
         if ($spec->pacote !== null) {
@@ -122,7 +120,7 @@ final class MakeModuloCommand extends Command
             : '';
 
         $htmlHelper = $spec->dtoUsaHtmlHelper()
-            ? "\$html = static fn (string \$chave): ?string => isset(\$data[\$chave]) && trim((string) \$data[\$chave]) !== ''\n            ? \\App\\Support\\Html\\HtmlSanitizer::clean((string) \$data[\$chave])\n            : null;\n\n        "
+            ? "\$html = static fn (string \$chave): ?string => isset(\$data[\$chave]) && trim((string) \$data[\$chave]) !== ''\n            ? \\HT2ML\\Core\\Support\\Html\\HtmlSanitizer::clean((string) \$data[\$chave])\n            : null;\n\n        "
             : '';
 
         return [
@@ -237,7 +235,7 @@ final class MakeModuloCommand extends Command
     /**
      * @param  array<string, string>  $repl
      */
-    private function gerarArquivo(string $stubDir, string $stub, string $destinoRelativo, array $repl): void
+    private function gerarArquivo(ResolvedorDeStubs $stubs, string $stub, string $destinoRelativo, array $repl): void
     {
         $destino = base_path($destinoRelativo);
 
@@ -247,8 +245,7 @@ final class MakeModuloCommand extends Command
             return;
         }
 
-        $conteudo = (string) File::get("{$stubDir}/{$stub}");
-        $conteudo = strtr($conteudo, $repl);
+        $conteudo = strtr($stubs->conteudo($stub), $repl);
 
         File::ensureDirectoryExists(dirname($destino));
         File::put($destino, $conteudo);
@@ -500,11 +497,30 @@ PHP;
         }
 
         $arquivo = base_path("{$pkg->dir}/config/{$pkg->slug}.php");
-        $conteudo = (string) File::get($arquivo);
+        $conteudo = $original = (string) File::get($arquivo);
         $base = $spec->permissaoBase();
 
+        // A injeção depende de comentários-marcador no config do pacote. Quando
+        // eles faltam — e faltavam em 2 dos 3 pacotes — os dois blocos abaixo
+        // eram pulados, o arquivo era reescrito idêntico e o comando reportava
+        // "criado (permissões + menu)" assim mesmo. Resultado: 19 arquivos, uma
+        // rota, e uma tela INALCANÇÁVEL — sem item de menu e com o gate negando,
+        // porque a permissão nunca chegou ao catálogo. Falha silenciosa.
         $marcadorPerm = '        // make:modulo insere as permissões do módulo acima desta linha';
+        $marcadorMenu = '        // make:modulo insere os itens de menu do módulo acima desta linha';
+
+        foreach (['permissões' => $marcadorPerm, 'itens de menu' => $marcadorMenu] as $oQue => $marcador) {
+            if (! str_contains($conteudo, $marcador)) {
+                $this->error("O config {$pkg->dir}/config/{$pkg->slug}.php não tem o marcador de {$oQue}.");
+                $this->line('  Acrescente esta linha dentro do array correspondente:');
+                $this->line("  {$marcador}");
+            }
+        }
+
+        $injetou = [];
+
         if (! str_contains($conteudo, "'{$base}.listar'") && str_contains($conteudo, $marcadorPerm)) {
+            $injetou[] = 'permissões';
             $linhas = [];
             foreach ($spec->permissoes() as $perm => $meta) {
                 $linhas[] = "        '{$perm}' => ['label' => '{$meta['label']}', 'descricao' => '{$meta['descricao']}'],";
@@ -513,8 +529,14 @@ PHP;
         }
 
         $key = $pkg->slug . '-' . $spec->snakePlural();
-        $marcadorMenu = '        // make:modulo insere os itens de menu do módulo acima desta linha';
-        if (! str_contains($conteudo, "'key' => '{$key}'") && str_contains($conteudo, $marcadorMenu)) {
+
+        // --skip-menu era ignorado em modo pacote: o item entrava de qualquer
+        // jeito, e quem pediu para não ter menu descobria depois, na tela.
+        if (! $this->option('skip-menu')
+            && ! str_contains($conteudo, "'key' => '{$key}'")
+            && str_contains($conteudo, $marcadorMenu)
+        ) {
+            $injetou[] = 'menu';
             $label = (string) ($this->option('menu') ?: $spec->studlyPlural);
             $icon = (string) $this->option('menu-icon');
             $bloco = implode("\n", [
@@ -531,8 +553,20 @@ PHP;
             $conteudo = str_replace($marcadorMenu, $bloco, $conteudo);
         }
 
+        if ($conteudo === $original) {
+            // Nada mudou: ou já estava lá, ou os marcadores faltam. Em ambos os
+            // casos anunciar "criado" seria mentira — e mentira verde é pior que
+            // erro vermelho.
+            return;
+        }
+
         File::put($arquivo, $conteudo);
-        $this->criados[] = "{$pkg->dir}/config/{$pkg->slug}.php (permissões + menu)";
+        $this->criados[] = sprintf(
+            '%s/config/%s.php (%s)',
+            $pkg->dir,
+            $pkg->slug,
+            implode(' + ', $injetou),
+        );
     }
 
     private function registrarNoProviderPacote(EspecificacaoModulo $spec): void

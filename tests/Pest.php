@@ -14,6 +14,11 @@ pest()->extend(TestCase::class)
 pest()->extend(TestCase::class)
     ->in('Unit');
 
+// Regras de arquitetura. Sem esta linha o diretório não é coletado: foi
+// exatamente o que manteve tests/Arch.php inerte desde sempre.
+pest()->extend(TestCase::class)
+    ->in('Arch');
+
 // Extensões: os testes vivem em packages/*/tests, fora da árvore tests/, e por
 // isso não são alcançados pelos ->in('Feature'|'Unit') acima. Sem esta linha
 // eles simplesmente não rodam — foi o que aconteceu com o módulo de RH desde
@@ -46,6 +51,35 @@ pest()->beforeEach(function () {
 pest()->beforeEach(function () {
     $this->withoutVite();
 })->in('Feature', __DIR__ . '/../packages');
+
+/**
+ * Namespaces raiz de todo pacote em packages/, lidos dos composer.json.
+ *
+ * Derivado, e não escrito à mão, para que uma extensão nova entre nas regras de
+ * arquitetura sozinha — allowlist apodrece na próxima extensão, e o EduConecta
+ * traz quatro. Os sub-prefixos (Database\Factories, Database\Seeders) ficam de
+ * fora: apontam para diretórios fora de src/ e já são cobertos pelo raiz.
+ *
+ * @return list<string>
+ */
+function namespacesDosPacotes(): array
+{
+    $namespaces = [];
+
+    foreach (glob(dirname(__DIR__) . '/packages/*/composer.json') ?: [] as $arquivo) {
+        $composer = json_decode((string) file_get_contents($arquivo), true);
+
+        foreach (array_keys($composer['autoload']['psr-4'] ?? []) as $namespace) {
+            $namespace = rtrim((string) $namespace, '\\');
+
+            if (! str_contains($namespace, '\\Database\\')) {
+                $namespaces[$namespace] = true;
+            }
+        }
+    }
+
+    return array_keys($namespaces);
+}
 
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);
