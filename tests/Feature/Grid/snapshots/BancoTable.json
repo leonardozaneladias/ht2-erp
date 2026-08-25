@@ -1,0 +1,86 @@
+{
+    "colunas": [
+        {
+            "titulo": "ISPB",
+            "campo": "ispb",
+            "dataField": "ispb",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "ispb",
+                "placeholder": "Filtrar por ISPB"
+            }
+        },
+        {
+            "titulo": "COMPE",
+            "campo": "codigo_compe",
+            "dataField": "codigo_compe",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "codigo_compe",
+                "placeholder": "Filtrar por COMPE"
+            }
+        },
+        {
+            "titulo": "Nome",
+            "campo": "nome",
+            "dataField": "nome",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "nome",
+                "placeholder": "Filtrar por nome"
+            }
+        },
+        {
+            "titulo": "Nome completo",
+            "campo": "nome_completo",
+            "dataField": "nome_completo",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "nome_completo",
+                "placeholder": "Filtrar por nome completo"
+            }
+        },
+        {
+            "titulo": "Ativo",
+            "campo": "ativo_label",
+            "dataField": "ativo",
+            "busca": false,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "boolean",
+                "coluna": "ativo",
+                "sim": "Sim",
+                "nao": "Não"
+            }
+        },
+        {
+            "titulo": "Ações",
+            "campo": "",
+            "dataField": "",
+            "busca": false,
+            "ordena": false,
+            "oculta": false,
+            "filtro": null
+        }
+    ],
+    "exportacao": [
+        "ISPB",
+        "COMPE",
+        "Nome",
+        "Nome completo",
+        "Ativo"
+    ]
+}

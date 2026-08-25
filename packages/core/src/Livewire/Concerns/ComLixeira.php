@@ -285,6 +285,16 @@ trait ComLixeira
     {
         $classe = $this->modelClassLixeira();
 
-        return $classe::query()->onlyTrashed()->findOrFail($id);
+        // Mesmo motivo de aplicarLixeira(): equivale a onlyTrashed(), escrito
+        // com métodos do Builder base. `onlyTrashed()` vem do trait, e num
+        // class-string genérico (`class-string<Model&UsaSoftDeletes>`, que é o
+        // que a base declarativa entrega) a análise estática não a encontra.
+        $registro = $classe::query()
+            ->withoutGlobalScope(SoftDeletingScope::class)
+            ->whereNotNull((new $classe)->getTable() . '.deleted_at')
+            ->findOrFail($id);
+
+        /** @var Model&UsaSoftDeletes $registro */
+        return $registro;
     }
 }

@@ -4,50 +4,38 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Livewire\Admin\Referencia;
 
-use HT2ML\Core\Livewire\Concerns\ComFicha;
+use HT2ML\Core\Livewire\Grid\RecursoIndex;
 use HT2ML\Core\Models\Referencia\Pais;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
-use Livewire\Component;
 
 /**
- * Listagem de Países (wrapper fino sobre o grid PowerGrid).
+ * Listagem de Países (invólucro fino sobre o grid PowerGrid).
  */
 #[Layout('components.admin.layout', ['withLivewire' => true, 'renderHeader' => false])]
 #[Title('Países')]
-class IndexPais extends Component
+class IndexPais extends RecursoIndex
 {
-    use ComFicha;
-
-    public function mount(): void
-    {
-        $this->authorize('viewAny', Pais::class);
-    }
-
-    #[On('paises::ver')]
-    public function verRegistro(int $id): void
-    {
-        $this->abrirFicha($id);
-    }
-
-    public function render(): View
-    {
-        return view('livewire.admin.referencia.paises.index-paises', [
-            'podeCriar' => Auth::guard('admin')->user()?->can('create', Pais::class) ?? false,
-        ]);
-    }
-
-    protected function modelClassFicha(): string
+    /**
+     * @return class-string<Pais>
+     */
+    protected function model(): string
     {
         return Pais::class;
     }
 
-    protected function urlEditarFicha(Model $registro): ?string
+    protected function recurso(): string
     {
-        return route('admin.referencia.paises.edit', ['pais' => $registro->getKey()]);
+        return 'paises';
+    }
+
+    protected function rotaBase(): string
+    {
+        return 'admin.referencia.paises';
+    }
+
+    protected function view(): string
+    {
+        return 'livewire.admin.referencia.paises.index-paises';
     }
 }

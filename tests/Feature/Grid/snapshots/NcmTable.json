@@ -1,0 +1,43 @@
+{
+    "colunas": [
+        {
+            "titulo": "Código",
+            "campo": "codigo",
+            "dataField": "codigo",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "codigo",
+                "placeholder": "Filtrar por código"
+            }
+        },
+        {
+            "titulo": "Descrição",
+            "campo": "descricao",
+            "dataField": "descricao",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "descricao",
+                "placeholder": "Filtrar por descrição"
+            }
+        },
+        {
+            "titulo": "Ações",
+            "campo": "",
+            "dataField": "",
+            "busca": false,
+            "ordena": false,
+            "oculta": false,
+            "filtro": null
+        }
+    ],
+    "exportacao": [
+        "Código",
+        "Descrição"
+    ]
+}

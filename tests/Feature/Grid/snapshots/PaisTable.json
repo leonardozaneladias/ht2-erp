@@ -1,0 +1,86 @@
+{
+    "colunas": [
+        {
+            "titulo": "Código ISO2",
+            "campo": "codigo_iso2",
+            "dataField": "codigo_iso2",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "codigo_iso2",
+                "placeholder": "Filtrar por código ISO2"
+            }
+        },
+        {
+            "titulo": "Código ISO3",
+            "campo": "codigo_iso3",
+            "dataField": "codigo_iso3",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "codigo_iso3",
+                "placeholder": "Filtrar por código ISO3"
+            }
+        },
+        {
+            "titulo": "Código numérico",
+            "campo": "codigo_numerico",
+            "dataField": "codigo_numerico",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "codigo_numerico",
+                "placeholder": "Filtrar por código numérico"
+            }
+        },
+        {
+            "titulo": "Nome",
+            "campo": "nome",
+            "dataField": "nome",
+            "busca": true,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "input_text",
+                "coluna": "nome",
+                "placeholder": "Filtrar por nome"
+            }
+        },
+        {
+            "titulo": "Ativo",
+            "campo": "ativo_label",
+            "dataField": "ativo",
+            "busca": false,
+            "ordena": true,
+            "oculta": false,
+            "filtro": {
+                "widget": "boolean",
+                "coluna": "ativo",
+                "sim": "Sim",
+                "nao": "Não"
+            }
+        },
+        {
+            "titulo": "Ações",
+            "campo": "",
+            "dataField": "",
+            "busca": false,
+            "ordena": false,
+            "oculta": false,
+            "filtro": null
+        }
+    ],
+    "exportacao": [
+        "Código ISO2",
+        "Código ISO3",
+        "Código numérico",
+        "Nome",
+        "Ativo"
+    ]
+}

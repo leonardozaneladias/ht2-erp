@@ -4,132 +4,38 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Livewire\Admin\Referencia;
 
-use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
-use HT2ML\Core\Livewire\Concerns\ComLixeira;
+use HT2ML\Core\Livewire\Grid\Campo;
+use HT2ML\Core\Livewire\Grid\RecursoTable;
 use HT2ML\Core\Models\Referencia\Banco;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridComponent;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
-use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
-final class BancoTable extends PowerGridComponent
+final class BancoTable extends RecursoTable
 {
-    use ComAcoesCrud;
-    use ComLixeira;
-    use WithExport;
-
-    public string $tableName = 'bancos-table';
-
-    /**
-     * @return array<int, mixed>
-     */
-    public function setUp(): array
+    protected function model(): string
     {
-        return [
-            PowerGrid::header()
-                ->showSearchInput()
-                ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
-            PowerGrid::exportable('bancos')
-                ->striped()
-                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-        ];
+        return Banco::class;
     }
 
-    /**
-     * @return Builder<Banco>
-     */
-    public function datasource(): Builder
-    {
-        return $this->aplicarLixeira(Banco::query());
-    }
-
-    public function fields(): PowerGridFields
-    {
-        return PowerGrid::fields()
-            ->add('id')
-            ->add('ispb')
-            ->add('codigo_compe')
-            ->add('nome')
-            ->add('nome_completo')
-            ->add('ativo_label', fn (Banco $registro): string => $registro->ativo ? 'Sim' : 'Não');
-    }
-
-    /**
-     * @return array<int, Column>
-     */
-    public function columns(): array
-    {
-        return [
-            Column::make('ISPB', 'ispb')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('COMPE', 'codigo_compe')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('Nome', 'nome')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('Nome completo', 'nome_completo')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('Ativo', 'ativo_label', 'ativo')
-                ->sortable(),
-
-            Column::action('Ações'),
-        ];
-    }
-
-    /**
-     * @return array<int, FilterBase>
-     */
-    public function filters(): array
-    {
-        return [
-            Filter::inputText('ispb')->placeholder('Filtrar por ISPB'),
-            Filter::inputText('codigo_compe')->placeholder('Filtrar por COMPE'),
-            Filter::inputText('nome')->placeholder('Filtrar por nome'),
-            Filter::inputText('nome_completo')->placeholder('Filtrar por nome completo'),
-            Filter::boolean('ativo'),
-        ];
-    }
-
-    /** Prefixo das permissões do recurso (ComLixeira). */
-    protected function permissaoBase(): string
+    protected function recurso(): string
     {
         return 'bancos';
     }
 
-    /** Evento que abre a ficha "Ver" (ComAcoesCrud). */
-    protected function eventoVer(): string
+    protected function rotaBase(): string
     {
-        return 'bancos::ver';
-    }
-
-    /** Rota de edição do registro (ComAcoesCrud). */
-    protected function rotaEditar(Model $row): string
-    {
-        return route('admin.referencia.bancos.edit', ['banco' => $row->getKey()]);
+        return 'admin.referencia.bancos';
     }
 
     /**
-     * @return class-string<Banco>
+     * @return list<Campo>
      */
-    protected function modelClassLixeira(): string
+    protected function campos(): array
     {
-        return Banco::class;
+        return [
+            Campo::texto('ispb', 'ISPB'),
+            Campo::texto('codigo_compe', 'COMPE'),
+            Campo::texto('nome', 'Nome'),
+            Campo::texto('nome_completo', 'Nome completo'),
+            Campo::booleano('ativo', 'Ativo'),
+        ];
     }
 }

@@ -4,120 +4,36 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Livewire\Admin\Referencia;
 
-use HT2ML\Core\Livewire\Concerns\ComAcoesCrud;
-use HT2ML\Core\Livewire\Concerns\ComLixeira;
+use HT2ML\Core\Livewire\Grid\Campo;
+use HT2ML\Core\Livewire\Grid\RecursoTable;
 use HT2ML\Core\Models\Referencia\Cargo;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridComponent;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
-use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
-final class CargoTable extends PowerGridComponent
+final class CargoTable extends RecursoTable
 {
-    use ComAcoesCrud;
-    use ComLixeira;
-    use WithExport;
-
-    public string $tableName = 'cargos-table';
-
-    /**
-     * @return array<int, mixed>
-     */
-    public function setUp(): array
+    protected function model(): string
     {
-        return [
-            PowerGrid::header()
-                ->showSearchInput()
-                ->showToggleColumns()
-                ->includeViewOnTop('livewire.admin.partials.lixeira-toolbar'),
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
-            PowerGrid::exportable('cargos')
-                ->striped()
-                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-        ];
+        return Cargo::class;
     }
 
-    /**
-     * @return Builder<Cargo>
-     */
-    public function datasource(): Builder
-    {
-        return $this->aplicarLixeira(Cargo::query());
-    }
-
-    public function fields(): PowerGridFields
-    {
-        return PowerGrid::fields()
-            ->add('id')
-            ->add('codigo_cbo')
-            ->add('descricao')
-            ->add('ativo_label', fn (Cargo $r): string => $r->ativo ? 'Sim' : 'Não');
-    }
-
-    /**
-     * @return array<int, Column>
-     */
-    public function columns(): array
-    {
-        return [
-            Column::make('Código CBO', 'codigo_cbo')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('Descrição', 'descricao')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('Ativo', 'ativo_label', 'ativo')
-                ->sortable(),
-
-            Column::action('Ações'),
-        ];
-    }
-
-    /**
-     * @return array<int, FilterBase>
-     */
-    public function filters(): array
-    {
-        return [
-            Filter::inputText('codigo_cbo')->placeholder('Filtrar por código'),
-            Filter::inputText('descricao')->placeholder('Filtrar por descrição'),
-            Filter::boolean('ativo'),
-        ];
-    }
-
-    /** Prefixo das permissões do recurso (ComLixeira). */
-    protected function permissaoBase(): string
+    protected function recurso(): string
     {
         return 'cargos';
     }
 
-    /** Evento que abre a ficha "Ver" (ComAcoesCrud). */
-    protected function eventoVer(): string
+    protected function rotaBase(): string
     {
-        return 'cargos::ver';
-    }
-
-    /** Rota de edição do registro (ComAcoesCrud). */
-    protected function rotaEditar(Model $row): string
-    {
-        return route('admin.referencia.cargos.edit', ['cargo' => $row->getKey()]);
+        return 'admin.referencia.cargos';
     }
 
     /**
-     * @return class-string<Cargo>
+     * @return list<Campo>
      */
-    protected function modelClassLixeira(): string
+    protected function campos(): array
     {
-        return Cargo::class;
+        return [
+            Campo::texto('codigo_cbo', 'Código CBO')->placeholder('Filtrar por código'),
+            Campo::texto('descricao', 'Descrição'),
+            Campo::booleano('ativo', 'Ativo'),
+        ];
     }
 }

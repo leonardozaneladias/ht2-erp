@@ -4,106 +4,24 @@ declare(strict_types=1);
 
 namespace HT2ML\Rh\Livewire\Departamentos;
 
-use HT2ML\Core\DTOs\Admin\Export\ExportavelDTO;
-use HT2ML\Core\Livewire\Concerns\ComLixeira;
-use HT2ML\Core\Livewire\Concerns\ExportaPdf;
-use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;
+use HT2ML\Core\Livewire\Grid\Campo;
+use HT2ML\Core\Livewire\Grid\RecursoMultiEmpresa;
+use HT2ML\Core\Livewire\Grid\RecursoTable;
 use HT2ML\Rh\Enums\StatusDepartamento;
 use HT2ML\Rh\Models\Departamento;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Blade;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Components\Filters\FilterBase;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridComponent;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
-use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
-final class DepartamentoTable extends PowerGridComponent
+final class DepartamentoTable extends RecursoTable
 {
-    use ComLixeira;
-    use ExportaPdf;
-    use FiltraPorMultiEmpresa;
-    use WithExport;
+    use RecursoMultiEmpresa;
 
+    /**
+     * Declarado, e não derivado de recurso(): a key tem o prefixo do módulo
+     * ('rh.departamentos-table') e é a âncora dos eventos de confirmação e da
+     * persistência de colunas por usuário. Derivá-la agora renomearia o que já
+     * está gravado no navegador de quem usa o sistema.
+     */
     public string $tableName = 'rh.departamentos-table';
-
-    /**
-     * @return array<int, mixed>
-     */
-    public function setUp(): array
-    {
-        return [
-            PowerGrid::header()
-                ->showSearchInput()
-                ->showToggleColumns()
-                ->includeViewOnTop('rh::livewire.departamentos._lixeira-toggle'),
-            PowerGrid::footer()
-                ->showPerPage()
-                ->showRecordCount(),
-            PowerGrid::exportable('departamentos')
-                ->striped()
-                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-        ];
-    }
-
-    /**
-     * @return Builder<Departamento>
-     */
-    public function datasource(): Builder
-    {
-        return $this->aplicarLixeira($this->aplicarEscopoMultiEmpresa(Departamento::query()));
-    }
-
-    public function fields(): PowerGridFields
-    {
-        return $this->camposMultiEmpresa(PowerGrid::fields()
-            ->add('id')
-            ->add('nome')
-            ->add('sigla')
-            ->add('status_badge', fn (Departamento $registro): string => $this->renderStatus($registro)));
-    }
-
-    /**
-     * @return array<int, Column>
-     */
-    public function columns(): array
-    {
-        return [
-            ...$this->colunasMultiEmpresa(),
-            Column::make('Nome', 'nome')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('Sigla', 'sigla')
-                ->searchable()
-                ->sortable(),
-
-            Column::make('Status', 'status_badge', 'status')
-                ->sortable(),
-
-            Column::action('Ações'),
-        ];
-    }
-
-    /**
-     * @return array<int, FilterBase>
-     */
-    public function filters(): array
-    {
-        return [
-            ...$this->filtrosMultiEmpresa(),
-            Filter::inputText('nome')->placeholder('Filtrar por Nome'),
-            Filter::inputText('sigla')->placeholder('Filtrar por Sigla'),
-            Filter::multiSelect('status', 'status')
-                ->dataSource(StatusDepartamento::options())
-                ->optionValue('value')
-                ->optionLabel('label'),
-        ];
-    }
 
     public function actionsFromView(mixed $row): ?View
     {
@@ -115,53 +33,55 @@ final class DepartamentoTable extends PowerGridComponent
     }
 
     /**
+     * @return array<int, mixed>
+     */
+    public function setUp(): array
+    {
+        $setUp = parent::setUp();
+
+        // O RH tem toolbar de lixeira própria (rótulos do módulo).
+        $setUp[0]->includeViewOnTop('rh::livewire.departamentos._lixeira-toggle');
+
+        return $setUp;
+    }
+
+    /**
      * @return class-string<Departamento>
      */
-    protected function modelClassLixeira(): string
+    protected function model(): string
     {
         return Departamento::class;
     }
 
-    protected function permissaoListagem(): string
+    protected function recurso(): string
     {
-        // Derivado de permissaoBase(), nunca literal: as duas fórmulas já
-        // divergiram uma vez. O gerador emitia snakePlural().'.listar' e o
-        // catálogo usava permissaoBase().'.listar', então esta tabela exigia uma
-        // permissão inexistente — e empresasElegiveis() negava toda empresa a
-        // quem não fosse super-admin, desligando o filtro multiempresa em
-        // silêncio. Ver tests/Feature/Modules/PermissaoDeListagemTest.php.
-        return $this->permissaoBase() . '.listar';
+        return 'departamentos';
     }
 
-    /** Prefixo das permissões do recurso (ComLixeira). */
-    protected function permissaoBase(): string
+    protected function modulo(): string
     {
-        return 'rh.departamentos';
+        return 'rh';
+    }
+
+    protected function rotaBase(): string
+    {
+        return 'admin.rh.departamentos';
     }
 
     /**
-     * Dados da listagem para exportação em PDF (trait ExportaPdf).
+     * @return list<Campo>
      */
-    protected function dadosParaExportacao(): ExportavelDTO
+    protected function campos(): array
     {
-        $linhas = $this->linhasParaExportacao()
-            ->map(fn (Departamento $registro): array => [
-                ...$this->linhaMultiEmpresa($registro),
-                (string) $registro->nome,
-                (string) $registro->sigla,
-                $registro->status->label(),
-            ])
-            ->values()
-            ->all();
-
-        return new ExportavelDTO('Departamentos', [...$this->cabecalhosMultiEmpresa(), 'Nome', 'Sigla', 'Status'], $linhas);
+        return [
+            Campo::texto('nome', 'Nome')->obrigatorio(),
+            Campo::texto('sigla', 'Sigla'),
+            Campo::enum('status', 'Status', StatusDepartamento::class)->obrigatorio(),
+        ];
     }
 
-    protected function renderStatus(Departamento $registro): string
+    protected function tituloDaExportacao(): string
     {
-        return Blade::render(
-            '<x-shared.badge :variant="$v" size="sm">{{ $t }}</x-shared.badge>',
-            ['v' => $registro->status->variant(), 't' => $registro->status->label()],
-        );
+        return 'Departamentos';
     }
 }
