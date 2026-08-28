@@ -39,6 +39,7 @@ final class DoutorCommand extends Command
         $this->permissoesDosItens($permissoes);
         $this->rotasDosItens();
         $this->iconesDosItens();
+        $this->escoposComHospedeiro();
 
         if ($this->option('json')) {
             $this->line((string) json_encode($this->problemas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -47,7 +48,7 @@ final class DoutorCommand extends Command
         }
 
         if ($this->problemas === []) {
-            $this->components->info('Tudo fecha: áreas, seções, grupos, permissões, rotas e ícones.');
+            $this->components->info('Tudo fecha: áreas, seções, grupos, permissões, rotas, ícones e escopos.');
 
             return self::SUCCESS;
         }
@@ -79,6 +80,36 @@ final class DoutorCommand extends Command
                 'contribuição descartada',
                 $problema->alvo,
                 (string) $problema,
+            );
+        }
+    }
+
+    /**
+     * Todo escopo com contribuição precisa do arquivo de rota que o executa.
+     *
+     * Um módulo pode registrar um webhook num core antigo, que não tem
+     * routes/webhook.php: o callback fica no registry, ninguém o executa, e a
+     * rota simplesmente não existe. O gateway recebe 404, a aplicação não
+     * registra nada, e não há onde olhar. Aqui há.
+     */
+    private function escoposComHospedeiro(): void
+    {
+        foreach (ModuleRegistry::escoposComRotas() as $escopo) {
+            $arquivo = __DIR__ . "/../../../routes/{$escopo->value}.php";
+
+            if (is_file($arquivo)) {
+                continue;
+            }
+
+            $this->problema(
+                'escopo sem hospedeiro',
+                $escopo->value,
+                sprintf(
+                    'Há rotas de %s registradas, mas o core não tem routes/%s.php para executá-las. '
+                    . 'As rotas não existem — e o sintoma é 404 sem nada no log.',
+                    $escopo->rotulo(),
+                    $escopo->value,
+                ),
             );
         }
     }

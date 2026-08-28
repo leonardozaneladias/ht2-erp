@@ -142,15 +142,33 @@ final class ModuloBuilder
      * Aplicada NA HORA, ao contrário do resto: routes/admin.php é carregado no
      * boot do core, muito antes do booted() onde as contribuições são aplicadas.
      */
-    public function rotas(string|Closure $rotas): self
+    public function rotas(string|Closure $rotas, EscopoDeRota $escopo = EscopoDeRota::Admin): self
     {
         ModuleRegistry::routes($rotas instanceof Closure
             ? $rotas
             : static function () use ($rotas): void {
                 require $rotas;
-            });
+            }, $escopo);
 
         return $this;
+    }
+
+    /**
+     * Rotas públicas do módulo: stack `web`, sem login e sem prefixo.
+     *
+     * Açúcar sobre rotas(..., EscopoDeRota::Publico) porque a alternativa é o
+     * autor do módulo importar o enum para dizer uma coisa que o nome do método
+     * já diz.
+     */
+    public function rotasPublicas(string|Closure $rotas): self
+    {
+        return $this->rotas($rotas, EscopoDeRota::Publico);
+    }
+
+    /** Webhooks do módulo: sem sessão, sem CSRF, sob /webhooks. */
+    public function rotasDeWebhook(string|Closure $rotas): self
+    {
+        return $this->rotas($rotas, EscopoDeRota::Webhook);
     }
 
     /**
