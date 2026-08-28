@@ -123,7 +123,14 @@ final class RecursoBuilder
         return $this;
     }
 
-    /** Fecha o recurso e devolve o módulo, para encadear o próximo. */
+    /**
+     * Fecha o recurso e devolve o módulo, para encadear o próximo.
+     *
+     * Não empurra nada: quem coleta é `ModuloBuilder::recurso()`, pelo motivo
+     * documentado lá. O que este método faz é marcar, para quem lê a cadeia,
+     * onde ela volta do recurso para o módulo — sem essa marca, `->label()` no
+     * meio de uma cadeia longa não diria em qual dos dois objetos está mexendo.
+     */
     public function registrar(): ModuloBuilder
     {
         return $this->modulo;

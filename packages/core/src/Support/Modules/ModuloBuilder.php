@@ -153,6 +153,17 @@ final class ModuloBuilder
         return $this;
     }
 
+    /**
+     * Abre um recurso — e já o coleta.
+     *
+     * A coleta é aqui, e não em `registrar()`, de propósito. Nas duas ordens
+     * possíveis alguém uma hora esquece a chamada final; o que muda é o que se
+     * vê quando isso acontece. Coletando aqui, um builder abandonado vira um
+     * recurso com rótulo derivado da chave e ícone padrão: feio, visível na
+     * sidebar, corrigido em minutos. Coletando em `registrar()`, viraria um
+     * recurso que não existe — sem permissão, sem item de menu e sem erro,
+     * que é exatamente a falha silenciosa que esta base foi feita para acabar.
+     */
     public function recurso(string $chave): RecursoBuilder
     {
         return $this->recursos[] = new RecursoBuilder($this, $chave);
@@ -229,7 +240,8 @@ final class ModuloBuilder
                 $builder->semMenu();
             }
 
-            $builder->registrar();
+            // Sem `registrar()` no fim: `recurso()` já coletou, então a chamada
+            // não teria efeito nenhum aqui — e o PHPStan diz isso em voz alta.
         }
 
         return $this;

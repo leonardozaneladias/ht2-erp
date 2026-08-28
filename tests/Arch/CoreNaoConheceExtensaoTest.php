@@ -48,12 +48,30 @@ function namespacesDeExtensao(): array
  */
 function chavesExclusivasDeExtensao(): array
 {
-    $chavesDe = static function (array $config): array {
+    $chavesDe = static function (array $config, string $namespace): array {
         $chaves = [
             ...array_keys($config['permissoes'] ?? []),
             ...array_column($config['menu'] ?? [], 'key'),
             ...array_keys($config['grupos'] ?? []),
         ];
+
+        // Formato do ModuloBuilder: a extensão declara só a chave do recurso, e
+        // a permissão e a key do menu passam a existir apenas em runtime. Sem
+        // esta derivação o guard enfraqueceria a cada extensão migrada — o que
+        // era literal na config sairia da lista de chaves proibidas em silêncio,
+        // e o core voltaria a poder citar 'rh-funcionarios' sem ninguém ver.
+        // A chave do módulo é o nome do arquivo de config, que ADR-0021 fixa
+        // como igual à chave declarada e ao `extra.ht2ml.chave` do pacote.
+        foreach (array_keys($config['recursos'] ?? []) as $recurso) {
+            $chaves[] = "{$namespace}-{$recurso}";
+
+            // Superset de propósito: um recurso 'sem_lixeira' não tem as duas
+            // últimas, mas o core não pode citar nenhuma das seis de qualquer
+            // forma, e listar a mais nunca deixa um vazamento passar.
+            foreach (['listar', 'criar', 'editar', 'deletar', 'restaurar', 'excluir_permanente'] as $acao) {
+                $chaves[] = "{$namespace}.{$recurso}.{$acao}";
+            }
+        }
 
         // Formato do core: 'modules' => area => permissao => meta; menu é lista
         // de seções com items e grupos.
@@ -81,7 +99,7 @@ function chavesExclusivasDeExtensao(): array
     $doCore = [];
 
     foreach (['access', 'admin-menu'] as $nome) {
-        $doCore = [...$doCore, ...$chavesDe((array) require base_path("packages/core/config/{$nome}.php"))];
+        $doCore = [...$doCore, ...$chavesDe((array) require base_path("packages/core/config/{$nome}.php"), $nome)];
     }
 
     $deExtensao = [];
@@ -91,7 +109,7 @@ function chavesExclusivasDeExtensao(): array
             continue;
         }
 
-        $deExtensao = [...$deExtensao, ...$chavesDe((array) require $arquivo)];
+        $deExtensao = [...$deExtensao, ...$chavesDe((array) require $arquivo, basename($arquivo, '.php'))];
     }
 
     return array_values(array_unique(array_diff($deExtensao, $doCore)));
@@ -140,7 +158,15 @@ it('A2 — o core não cita chave de extensão nem como literal de string', func
 
     // Meta-checagem: sem ela, um bug na derivação (config vazia, glob errado)
     // faria o guard passar sem nunca ter procurado nada.
-    expect($chaves)->toContain('grupo-tab-rh', 'rh-funcionarios', 'cnaes.listar');
+    // Uma de cada origem: grupo declarado, key derivada de recurso, permissão
+    // derivada de recurso, e permissão ainda escrita à mão numa extensão não
+    // migrada. Se a derivação parar de funcionar, cai aqui e não no vazio.
+    expect($chaves)->toContain(
+        'grupo-tab-rh',
+        'rh-funcionarios',
+        'rh.funcionarios.listar',
+        'cnaes.listar',
+    );
 
     $literais = literaisDeString(base_path('packages/core/src'));
 

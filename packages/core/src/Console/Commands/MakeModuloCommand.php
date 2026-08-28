@@ -27,6 +27,18 @@ use Illuminate\Support\Str;
  */
 final class MakeModuloCommand extends Command
 {
+    /**
+     * O comentário que o gerador procura no config do pacote para saber onde
+     * inserir um recurso.
+     *
+     * Constante pública, e não literal repetido, porque o teste que verifica os
+     * marcadores nos pacotes já saiu de sincronia uma vez: ele pinava o texto
+     * antigo enquanto o gerador procurava o novo, e a divergência só apareceu na
+     * suíte. Com a constante, o teste não tem como afirmar um marcador que o
+     * gerador não usa.
+     */
+    public const MARCADOR_RECURSOS = '// make:recurso insere os recursos do módulo acima desta linha';
+
     protected $signature = 'make:modulo
         {nome : Nome do módulo no singular, PascalCase (ex.: Produto)}
         {--fields= : Lista "nome:tipo:modificador" separada por vírgula}
@@ -501,7 +513,7 @@ PHP;
         // mesmo. Resultado: 19 arquivos, uma rota, e uma tela INALCANÇÁVEL, sem
         // item de menu e com o gate negando porque a permissão nunca chegou ao
         // catálogo. Falha silenciosa.
-        $marcador = '        // make:recurso insere os recursos do módulo acima desta linha';
+        $marcador = '        ' . self::MARCADOR_RECURSOS;
 
         if (! str_contains($conteudo, $marcador)) {
             $this->error("O config {$pkg->dir}/config/{$pkg->slug}.php não tem o marcador de recursos.");

@@ -166,3 +166,23 @@ it('declarar duas vezes não duplica — o boot roda de novo sob config:cache', 
         // array_replace, não merge: 'label' => 'X' não pode virar ['X','X','X'].
         ->and(config('access.modules.escola')['escola.alunos.listar']['label'])->toBe('Listar alunos');
 });
+
+it('esquecer registrar() deixa o recurso feio, nunca invisível', function (): void {
+    $modulo = ModuleRegistry::modulo('escola')->label('Escola')->areaDeAcesso()->secaoDeMenu();
+
+    // Sem ->label(), sem ->icone(), sem ->registrar(): o builder é abandonado.
+    $modulo->recurso('alunos');
+
+    ModuleRegistry::aplicarContribuicoes();
+
+    $item = collect(collect((array) config('admin-menu'))->firstWhere('key', 'escola')['items'])
+        ->firstWhere('key', 'escola-alunos');
+
+    // A coleta mora em recurso(), não em registrar(). Se alguém mover a coleta
+    // para registrar() achando que o nome manda, este teste cai — e o que cai
+    // junto, em produção, é um recurso que some inteiro sem levantar erro.
+    expect($item)->not->toBeNull()
+        ->and($item['label'])->toBe('Alunos')
+        ->and($item['icon'])->toBe('tabler--folder')
+        ->and(config('access.modules.escola'))->toHaveCount(6);
+});
