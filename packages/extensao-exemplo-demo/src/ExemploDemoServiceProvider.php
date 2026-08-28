@@ -56,5 +56,7 @@ final class ExemploDemoServiceProvider extends ServiceProvider
         \Livewire\Livewire::addLocation(classNamespace: 'HT2ML\\ExemploDemo\\Livewire');
 
         Gate::policy(Models\Exemplo::class, Policies\ExemploPolicy::class);
+
+        // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha
     }
 }

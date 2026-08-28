@@ -34,3 +34,5 @@ Route::prefix('referencia')->name('referencia.')->group(function (): void {
         Route::get('/{ncm}/editar', HT2ML\FiscalBr\Livewire\FormNcm::class)->name('edit');
     });
 });
+
+// make:modulo insere as rotas do módulo abaixo desta linha

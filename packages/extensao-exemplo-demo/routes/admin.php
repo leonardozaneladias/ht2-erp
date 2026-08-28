@@ -15,3 +15,5 @@ Route::prefix('exemplos')->name('exemplos.')->group(function (): void {
     Route::get('/criar', FormExemplo::class)->name('create');
     Route::get('/{exemplo}/editar', FormExemplo::class)->name('edit');
 });
+
+// make:modulo insere as rotas do módulo abaixo desta linha

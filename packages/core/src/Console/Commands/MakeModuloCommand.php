@@ -27,17 +27,29 @@ use Illuminate\Support\Str;
  */
 final class MakeModuloCommand extends Command
 {
-    /**
-     * O comentário que o gerador procura no config do pacote para saber onde
-     * inserir um recurso.
-     *
-     * Constante pública, e não literal repetido, porque o teste que verifica os
-     * marcadores nos pacotes já saiu de sincronia uma vez: ele pinava o texto
-     * antigo enquanto o gerador procurava o novo, e a divergência só apareceu na
-     * suíte. Com a constante, o teste não tem como afirmar um marcador que o
-     * gerador não usa.
+    /*
+     * Os cinco comentários-marcador que o gerador procura para saber ONDE
+     * escrever. Constantes públicas, e não literais repetidos, porque o teste
+     * que verifica os marcadores já saiu de sincronia uma vez: pinava o texto
+     * antigo enquanto o gerador procurava o novo, e a divergência só apareceu
+     * na suíte. Com a constante, o teste não tem como afirmar um marcador que
+     * o gerador não usa.
      */
+
+    /** No config do pacote: uma entrada em 'recursos'. */
     public const MARCADOR_RECURSOS = '// make:recurso insere os recursos do módulo acima desta linha';
+
+    /** No config/access.php do produto (módulo fora de pacote). */
+    public const MARCADOR_PERMISSOES = '// make:modulo insere permissões de negócio acima desta linha';
+
+    /** No config/admin-menu.php do produto (módulo fora de pacote). */
+    public const MARCADOR_MENU = '// make:modulo insere itens de menu acima desta linha';
+
+    /** No routes/admin.php, do produto ou do pacote. */
+    public const MARCADOR_ROTAS = '// make:modulo insere as rotas do módulo abaixo desta linha';
+
+    /** No ServiceProvider do pacote: componentes Livewire e Gate::policy. */
+    public const MARCADOR_PROVIDER = '// make:modulo registra os componentes Livewire e as policies do módulo acima desta linha';
 
     protected $signature = 'make:modulo
         {nome : Nome do módulo no singular, PascalCase (ex.: Produto)}
@@ -57,6 +69,9 @@ final class MakeModuloCommand extends Command
 
     /** @var list<string> caminhos pulados por já existirem */
     private array $pulados = [];
+
+    /** @var list<string> injeções que não aconteceram por falta de marcador */
+    private array $naoLigados = [];
 
     public function handle(): int
     {
@@ -106,7 +121,28 @@ final class MakeModuloCommand extends Command
 
         $this->resumo($spec);
 
-        return self::SUCCESS;
+        // FAILURE quando algo não foi ligado: os arquivos existem, mas a tela
+        // não abre. Um script de setup que só olha o exit code precisa parar
+        // aqui — antes, ele seguia em frente com uma tela inalcançável.
+        return $this->naoLigados === [] ? self::SUCCESS : self::FAILURE;
+    }
+
+    /**
+     * Reporta uma injeção que não aconteceu por falta do comentário-marcador.
+     *
+     * Duas delas eram silenciosas, cada uma de um jeito, e ambas piores que um
+     * erro: registrarNoProviderPacote() voltava sem dizer nada, e as duas de
+     * rota chamavam str_replace sem casar coisa alguma, reescreviam o arquivo
+     * idêntico e AINDA anunciavam "criado (rotas)". O resultado é o mesmo dos
+     * dois jeitos — uma tela gerada e inalcançável —, e nada ficava vermelho.
+     */
+    private function marcadorAusente(string $arquivo, string $marcador, string $qual): void
+    {
+        $this->naoLigados[] = "{$arquivo} — marcador {$qual}";
+
+        $this->error("Falta o marcador {$qual} em {$arquivo}.");
+        $this->line('  Acrescente esta linha onde o bloco deve entrar:');
+        $this->line("  <fg=yellow>{$marcador}</>");
     }
 
     /**
@@ -279,6 +315,12 @@ final class MakeModuloCommand extends Command
 
         $marcador = '    // Adicione aqui as rotas do seu módulo de negócio';
 
+        if (! str_contains($conteudo, $marcador)) {
+            $this->marcadorAusente('routes/admin.php', $marcador, 'das rotas');
+
+            return;
+        }
+
         $bloco = <<<PHP
     Route::prefix('{$prefixo}')->name('{$nome}.')->group(function (): void {
         Route::get('/', App\\Livewire\\Admin\\{$studlyPlural}\\Index{$studly}::class)->name('index');
@@ -308,10 +350,10 @@ PHP;
             return;
         }
 
-        $marcador = '            // make:modulo insere permissões de negócio acima desta linha';
+        $marcador = '            ' . self::MARCADOR_PERMISSOES;
 
         if (! str_contains($conteudo, $marcador)) {
-            $this->warn('Âncora de permissões ausente em config/access.php — registre manualmente:');
+            $this->marcadorAusente('config/access.php', $marcador, 'das permissões');
             $this->line($this->snippetPermissoes($spec));
 
             return;
@@ -364,10 +406,10 @@ PHP;
             return;
         }
 
-        $marcador = '            // make:modulo insere itens de menu acima desta linha';
+        $marcador = '            ' . self::MARCADOR_MENU;
 
         if (! str_contains($conteudo, $marcador)) {
-            $this->warn("Seção 'negocio'/âncora ausente em config/admin-menu.php — adicione o item manualmente:");
+            $this->marcadorAusente('config/admin-menu.php', $marcador, 'do menu');
             $this->line($this->snippetMenu($spec));
 
             return;
@@ -481,7 +523,13 @@ PHP;
         $param = $spec->snake();
         $index = '\\' . $spec->nsLivewire() . '\\Index' . $spec->studly;
         $form = '\\' . $spec->nsLivewire() . '\\Form' . $spec->studly;
-        $marcador = '// make:modulo insere as rotas do módulo abaixo desta linha';
+        $marcador = self::MARCADOR_ROTAS;
+
+        if (! str_contains($conteudo, $marcador)) {
+            $this->marcadorAusente("{$pkg->dir}/routes/admin.php", $marcador, 'das rotas');
+
+            return;
+        }
 
         $bloco = implode("\n", [
             $marcador,
@@ -516,9 +564,7 @@ PHP;
         $marcador = '        ' . self::MARCADOR_RECURSOS;
 
         if (! str_contains($conteudo, $marcador)) {
-            $this->error("O config {$pkg->dir}/config/{$pkg->slug}.php não tem o marcador de recursos.");
-            $this->line('  Acrescente esta linha dentro do array \'recursos\':');
-            $this->line("  {$marcador}");
+            $this->marcadorAusente("{$pkg->dir}/config/{$pkg->slug}.php", $marcador, 'dos recursos');
 
             return;
         }
@@ -574,8 +620,21 @@ PHP;
         $nsLw = '\\' . $spec->nsLivewire();
         $table = $nsLw . '\\' . $spec->studly . 'Table';
 
-        $marcador = '        // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha';
-        if (str_contains($conteudo, "{$table}::class") || ! str_contains($conteudo, $marcador)) {
+        $marcador = '        ' . self::MARCADOR_PROVIDER;
+
+        if (str_contains($conteudo, "{$table}::class")) {
+            $this->pulados[] = "{$pkg->dir}/src/{$pkg->providerClass}.php (componentes já registrados)";
+
+            return;
+        }
+
+        if (! str_contains($conteudo, $marcador)) {
+            $this->marcadorAusente(
+                "{$pkg->dir}/src/{$pkg->providerClass}.php",
+                $marcador,
+                'dos componentes Livewire',
+            );
+
             return;
         }
 
@@ -605,6 +664,18 @@ PHP;
         }
         foreach ($this->pulados as $p) {
             $this->line("  <fg=yellow>pulado</>  {$p}");
+        }
+
+        if ($this->naoLigados !== []) {
+            $this->newLine();
+            $this->error('Os arquivos foram gerados, mas a tela NÃO está ligada:');
+
+            foreach ($this->naoLigados as $n) {
+                $this->line("  <fg=red>faltou</>  {$n}");
+            }
+
+            $this->line('  Sem isso a tela não tem rota, ou não tem componente registrado,');
+            $this->line('  ou não tem permissão no catálogo — e abre em 404 ou em 403.');
         }
 
         $this->newLine();
