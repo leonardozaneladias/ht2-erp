@@ -11,6 +11,31 @@ Mantido no padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ### Added
 
+- **Os geradores passam a nomear o que geram**
+  ([ADR-0021](docs/architecture/adrs/ADR-0021-taxonomia-modulo-recurso-area-secao.md)):
+  `make:recurso` gera o CRUD de uma entidade, `make:modulo` cria a área de negócio
+  (o pacote), e `make:regra` gera uma `ValidationRule` ao lado do domínio. A forma
+  antiga é **recusada com a mensagem certa** — alias silencioso que faz outra coisa
+  é pior que erro. Os dois geradores passam o Pint no que escrevem: um recurso
+  recém-gerado reprovava em 7 dos 19 arquivos, e o CI roda `pint --test`.
+- **`EscopoDeRota`** (`Admin`, `Publico`, `Webhook`): um módulo tinha um destino de
+  rota — o `/admin` autenticado — e agora tem três. Webhook nasce fora do grupo `web`
+  (sem sessão, sem CSRF), sob `/webhooks` e com `throttle:webhooks`; público ganha a
+  stack `web` sem login e sem prefixo imposto. Sem isto, um gateway de pagamento ou
+  uma página de matrícula obrigariam a editar o `routes/web.php` do produto.
+- **Guarda A4 no CI** — Laravel limpo, `composer require ht2ml/core`, migrate,
+  `access:sync`, `ht2ml:doutor`, e a sequência do primeiro dia de um produto:
+  `make:modulo` → `composer require` → `make:recurso` → tela alcançável. É o caminho
+  que o monorepo nunca exercita, e escrevê-lo já encontrou um defeito.
+- **`shipmonk/composer-dependency-analyser` no CI**, por pacote e bloqueando. Achou
+  seis declarações faltando, entre elas `ezyang/htmlpurifier` — que sustenta o
+  `HtmlSanitizer` e só estava instalado porque `maatwebsite/excel` o arrasta.
+- **Coerência do módulo**: `extra.ht2ml.chave` vira a fonte única, e um teste de
+  arquitetura cobre cinco convenções de uma vez — nome do pacote,
+  `ModuleRegistry::modulo()`, namespace de view, arquivo de config e prefixo de
+  permissão. A mesma checagem entrou no `ht2ml:doutor`, para valer num produto onde
+  não há suíte.
+
 - **Base declarativa de CRUD** (`HT2ML\Core\Livewire\Grid`): uma tabela declara model,
   recurso, rota e uma **lista de `Campo`**, e a base deriva `fields()`, `columns()`,
   `filters()`, a exportação, o eager-load e as regras de validação. Cinco tabelas
@@ -100,6 +125,20 @@ Mantido no padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ### Fixed
 
+- **Três injeções do gerador falhavam em silêncio**, e duas ainda anunciavam
+  `criado (rotas)` sem ter escrito nada: `str_replace` sem casar o marcador reescrevia
+  o arquivo idêntico. `fiscal-br` e `exemplo-demo` estavam sem os marcadores de rota e
+  de provider — gerar um recurso ali produzia dezenove arquivos e nenhuma tela.
+  Agora falta de marcador é erro vermelho, com o texto a colar, e exit 1.
+- **`make:recurso` sem `--modulo` escrevia dezenove arquivos e só então morria** com
+  `FileNotFoundException`. Era a forma impressa no TL;DR do guia, no `CLAUDE.md` e no
+  `CONTRIBUTING`. Ele liga a tela em `routes/admin.php`, `config/access.php` e
+  `config/admin-menu.php` do produto, e os três vivem dentro de `ht2ml/core` desde a
+  extração. Passa a recusar antes de escrever um byte, ensinando o caminho com módulo.
+- **`bin/release-module.sh` anunciava "Primeiro release." em todo release**: a faixa
+  de commits era calculada com uma tag que só existe no repo do pacote, `git log`
+  falhava com "unknown revision" e o `2>/dev/null` engolia. Passa a comparar a tag
+  buscada com o commit do split.
 - Sidebar rola até o item de menu ativo ao carregar a página (e após `wire:navigate`):
   os links navegam por full page load e o scroll do SimpleBar resetava a cada clique —
   em menus longos o item da tela atual ficava fora da área visível.
