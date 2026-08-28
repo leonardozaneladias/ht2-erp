@@ -220,6 +220,16 @@ final class MakeModuloCommand extends Command
                 'laravel' => [
                     'providers' => [$pkg->providerFqn()],
                 ],
+                // Fonte única da chave do módulo (ADR-0021). Daqui saem prefixo
+                // de permissão, key de seção de menu, namespace de view e
+                // prefixo de rota — e é contra ela que a coerência é conferida.
+                // Fica em extra, e não em composer.json->type: `type` seleciona
+                // installer, não documenta; sem plugin não faz nada, com plugin
+                // muda o caminho de instalação.
+                'ht2ml' => [
+                    'tipo' => 'modulo',
+                    'chave' => $pkg->slug,
+                ],
             ],
             'minimum-stability' => 'stable',
         ];

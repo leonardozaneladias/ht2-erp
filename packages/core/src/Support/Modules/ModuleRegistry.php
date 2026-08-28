@@ -160,6 +160,22 @@ final class ModuleRegistry
     }
 
     /**
+     * As chaves de módulo declaradas neste boot.
+     *
+     * Serve ao `ht2ml:doutor`: um pacote pode dizer no manifesto que carrega o
+     * módulo 'escola' e o ServiceProvider dele registrar 'escolas'. As duas
+     * grafias existem, nenhuma reclama, e o efeito é permissão num prefixo e
+     * menu em outro — o mesmo desencontro que o ADR-0021 foi escrito para
+     * acabar, agora entre o manifesto e o código.
+     *
+     * @return list<string>
+     */
+    public static function chavesDeModulo(): array
+    {
+        return array_keys(self::$modulos);
+    }
+
+    /**
      * A permissão de um recurso, perguntada em vez de recalculada.
      *
      * É a costura que mata a classe de bug: o componente consulta, e uma

@@ -1,29 +1,32 @@
 {
-  "name": "ht2ml/extensao-documentos",
-  "description": "Extensão Documentos.",
-  "type": "library",
-  "license": "proprietary",
-  "require": {
-    "php": "^8.4",
-    "ht2ml/core": "@dev",
-    "illuminate/support": "^13.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "HT2ML\\Documentos\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "HT2ML\\Documentos\\Tests\\": "tests/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "HT2ML\\Documentos\\DocumentosServiceProvider"
-      ]
-    }
-  },
-  "minimum-stability": "stable"
+    "name": "ht2ml/extensao-documentos",
+    "description": "Extensão Documentos.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "ht2ml/core": "@dev",
+        "illuminate/support": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HT2ML\\Documentos\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HT2ML\\Documentos\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HT2ML\\Documentos\\DocumentosServiceProvider"
+            ]
+        },
+        "ht2ml": {
+            "tipo": "biblioteca"
+        }
+    },
+    "minimum-stability": "stable"
 }

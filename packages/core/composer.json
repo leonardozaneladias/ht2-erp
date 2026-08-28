@@ -44,6 +44,9 @@
             "providers": [
                 "HT2ML\\Core\\CoreServiceProvider"
             ]
+        },
+        "ht2ml": {
+            "tipo": "core"
         }
     },
     "minimum-stability": "stable"

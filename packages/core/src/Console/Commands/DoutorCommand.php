@@ -40,6 +40,7 @@ final class DoutorCommand extends Command
         $this->rotasDosItens();
         $this->iconesDosItens();
         $this->escoposComHospedeiro();
+        $this->manifestosCoerentes();
 
         if ($this->option('json')) {
             $this->line((string) json_encode($this->problemas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -48,7 +49,7 @@ final class DoutorCommand extends Command
         }
 
         if ($this->problemas === []) {
-            $this->components->info('Tudo fecha: áreas, seções, grupos, permissões, rotas, ícones e escopos.');
+            $this->components->info('Tudo fecha: áreas, seções, grupos, permissões, rotas, ícones, escopos e manifestos.');
 
             return self::SUCCESS;
         }
@@ -80,6 +81,67 @@ final class DoutorCommand extends Command
                 'contribuição descartada',
                 $problema->alvo,
                 (string) $problema,
+            );
+        }
+    }
+
+    /**
+     * O manifesto do pacote e o código dele dizem a mesma chave?
+     *
+     * Um pacote pode declarar `extra.ht2ml.chave = escola` e o ServiceProvider
+     * registrar 'escolas'. As duas grafias existem, nenhuma reclama, e o efeito
+     * é permissão num prefixo e menu em outro. No monorepo isso é pego por
+     * tests/Arch/CoerenciaDoModuloTest; num PRODUTO, onde os pacotes chegam por
+     * Composer e não há suíte, quem pega é isto.
+     */
+    private function manifestosCoerentes(): void
+    {
+        $instalados = base_path('vendor/composer/installed.json');
+
+        if (! is_file($instalados)) {
+            return;
+        }
+
+        /** @var array{packages?: list<array<string, mixed>>} $dados */
+        $dados = (array) json_decode((string) file_get_contents($instalados), true);
+        $declaradas = ModuleRegistry::chavesDeModulo();
+
+        foreach ($dados['packages'] ?? [] as $pacote) {
+            /** @var array<string, string> $ht2ml */
+            $ht2ml = (array) ((($pacote['extra'] ?? [])['ht2ml']) ?? []);
+
+            if (($ht2ml['tipo'] ?? null) !== 'modulo') {
+                continue;
+            }
+
+            $chave = (string) ($ht2ml['chave'] ?? '');
+            $nome = (string) ($pacote['name'] ?? '?');
+
+            if ($chave === '') {
+                $this->problema(
+                    'manifesto incoerente',
+                    $nome,
+                    'Declara extra.ht2ml.tipo=modulo sem extra.ht2ml.chave. A chave é a fonte única '
+                    . 'de prefixo de permissão, seção de menu, namespace de view e rota (ADR-0021).',
+                );
+
+                continue;
+            }
+
+            if (in_array($chave, $declaradas, true)) {
+                continue;
+            }
+
+            $this->problema(
+                'manifesto incoerente',
+                $nome,
+                sprintf(
+                    'O manifesto diz que este pacote carrega o módulo \'%s\', mas nenhum '
+                    . 'ModuleRegistry::modulo(\'%s\') foi declarado no boot. Declaradas: %s.',
+                    $chave,
+                    $chave,
+                    $declaradas === [] ? 'nenhuma' : implode(', ', $declaradas),
+                ),
             );
         }
     }

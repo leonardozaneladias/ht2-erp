@@ -26,6 +26,10 @@
             "providers": [
                 "HT2ML\\Rh\\RhServiceProvider"
             ]
+        },
+        "ht2ml": {
+            "tipo": "modulo",
+            "chave": "rh"
         }
     },
     "minimum-stability": "stable"
