@@ -120,31 +120,53 @@ if command -v composer >/dev/null 2>&1; then
 fi
 echo -e "  ${GREEN}✓${NC} composer.json válido"
 
+# --- Split (idempotente: re-computado a cada release) ---
+# Feito ANTES das notas, e também no dry-run: a faixa de commits só pode ser
+# calculada no histórico do split. É local e não empurra nada.
+echo -e "  ${YELLOW}…${NC} git subtree split --prefix=${PREFIX}"
+# -q: sem ele o subtree imprime uma linha de progresso por commit — quatrocentas
+# e quarenta no core — e afoga a saída do release, inclusive as notas.
+SPLIT_SHA="$(git subtree split -q --prefix="${PREFIX}")"
+[[ -z "${SPLIT_SHA}" ]] && { echo -e "${RED}subtree split não retornou commit. Abortado.${NC}"; exit 1; }
+echo -e "  ${GREEN}✓${NC} split → ${SPLIT_SHA}"
+
 # --- Notas: commits que tocaram o prefixo desde a última tag publicada ---
+#
+# A faixa NÃO pode ser calculada com a tag direto: as tags vivem no repo do
+# PACOTE e apontam para commits do histórico do split, que não existem no
+# monorepo. `git log v0.1.3..HEAD` falhava com "unknown revision", o 2>/dev/null
+# engolia, e todo release depois do primeiro saía com a nota "Primeiro release."
+# — descoberto no dry-run do v0.2.0 do core, com quatro versões já publicadas.
+#
+# Buscar a tag antiga e compará-la com o split novo dá a faixa certa, com as
+# mensagens originais: o subtree split preserva o commit de cada mudança no
+# prefixo.
 ULTIMA="$(git ls-remote --tags "${REPO_URL}" 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)"
-FAIXA="HEAD"
-[[ -n "${ULTIMA}" ]] && FAIXA="${ULTIMA}..HEAD"
-NOTAS="$(git log --no-merges --format='- %s' "${FAIXA}" -- "${PREFIX}" 2>/dev/null | head -40 || true)"
+NOTAS=""
+
+if [[ -n "${ULTIMA}" ]]; then
+    if git fetch --quiet --no-tags "${REPO_URL}" "refs/tags/${ULTIMA}" 2>/dev/null; then
+        NOTAS="$(git log --no-merges --format='- %s' "FETCH_HEAD..${SPLIT_SHA}" 2>/dev/null | head -40 || true)"
+    else
+        echo -e "  ${YELLOW}!${NC} não consegui buscar ${ULTIMA} de ${ORG}/${REPO}; as notas sairão do histórico inteiro"
+    fi
+fi
+
+# Sem tag anterior (primeiro release) ou sem faixa: o histórico do prefixo.
+[[ -z "${NOTAS}" ]] && NOTAS="$(git log --no-merges --format='- %s' "${SPLIT_SHA}" 2>/dev/null | head -40 || true)"
 [[ -z "${NOTAS}" ]] && NOTAS="- Primeiro release."
 
 if $DRY_RUN; then
     echo ""
-    echo -e "  ${YELLOW}[dry-run]${NC} git subtree split --prefix=${PREFIX}  → <sha>"
-    echo -e "  ${YELLOW}[dry-run]${NC} git push ${REPO_URL} <sha>:refs/heads/main"
-    echo -e "  ${YELLOW}[dry-run]${NC} git push ${REPO_URL} <sha>:refs/tags/${VERSAO}"
+    echo -e "  ${YELLOW}[dry-run]${NC} git push ${REPO_URL} ${SPLIT_SHA}:refs/heads/main"
+    echo -e "  ${YELLOW}[dry-run]${NC} git push ${REPO_URL} ${SPLIT_SHA}:refs/tags/${VERSAO}"
     echo ""
-    echo -e "  ${YELLOW}Notas que iriam no release:${NC}"
+    echo -e "  ${YELLOW}Notas que iriam no release (desde ${ULTIMA:-o início}):${NC}"
     echo "${NOTAS}" | sed 's/^/    /'
     echo ""
     echo -e "${YELLOW} Dry-run concluído.${NC}"
     exit 0
 fi
-
-# --- Split (idempotente: re-computado a cada release) ---
-echo -e "  ${YELLOW}…${NC} git subtree split --prefix=${PREFIX}"
-SPLIT_SHA="$(git subtree split --prefix="${PREFIX}")"
-[[ -z "${SPLIT_SHA}" ]] && { echo -e "${RED}subtree split não retornou commit. Abortado.${NC}"; exit 1; }
-echo -e "  ${GREEN}✓${NC} split → ${SPLIT_SHA}"
 
 # --no-verify: estes pushes vão para o REPO DO PACOTE, não a base. O pre-push da
 # base bloqueia refs/heads/main em qualquer remote; aqui é intencional.
