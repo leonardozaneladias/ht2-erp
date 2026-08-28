@@ -30,18 +30,17 @@ Inspinia antes de escrever HTML).
 
 ## Criando um recurso
 
-Use o gerador — ele já produz tudo no padrão, e passa o Pint no que gera:
-
-```bash
-php artisan make:recurso Produto --fields="nome:string, preco:money, status:enum(ativo|inativo)" --tenant
-```
-
-Para um recurso dentro de um módulo (pacote), crie o módulo antes e passe a chave:
+Use o gerador — ele já produz tudo no padrão, e passa o Pint no que gera. Todo
+recurso pertence a um módulo, então crie o módulo primeiro:
 
 ```bash
 php artisan make:modulo escola
-php artisan make:recurso Aluno --modulo=escola --fields="nome:string"
+composer require ht2ml/extensao-escola:@dev
+php artisan make:recurso Aluno --modulo=escola --fields="nome:string, preco:money"
 ```
+
+Sem `--modulo` o comando recusa e explica: ele ligaria a tela em arquivos que hoje
+vivem dentro de `ht2ml/core`, e o produto não edita o core (ADR-0022).
 
 Guia completo: [`docs/criar-recurso.md`](docs/criar-recurso.md).
 

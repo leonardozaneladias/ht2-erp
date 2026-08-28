@@ -116,6 +116,10 @@ final class MakeRecursoCommand extends Command
             }
         }
 
+        if ($pacote === null && ! $this->produtoRecebeRecurso()) {
+            return self::FAILURE;
+        }
+
         $spec = new EspecificacaoModulo($nome, $campos, tenant: (bool) $this->option('tenant'), pacote: $pacote, softDelete: ! (bool) $this->option('sem-soft-delete'));
 
         // Os stubs viajam DENTRO do pacote; o produto sobrescreve arquivo a
@@ -145,6 +149,53 @@ final class MakeRecursoCommand extends Command
         // não abre. Um script de setup que só olha o exit code precisa parar
         // aqui — antes, ele seguia em frente com uma tela inalcançável.
         return $this->naoLigados === [] ? self::SUCCESS : self::FAILURE;
+    }
+
+    /**
+     * Sem --modulo, a tela é ligada em arquivos DO PRODUTO. Eles ainda existem?
+     *
+     * Depois da extração, não: routes/admin.php, config/access.php e
+     * config/admin-menu.php vivem dentro de ht2ml/core, e o produto não edita o
+     * core (ADR-0022). O que acontecia era pior que não funcionar — o comando
+     * escrevia os dezenove arquivos e SÓ ENTÃO morria com FileNotFoundException
+     * e stack trace, deixando o produto sujo e sem explicação. E este era o
+     * caminho impresso no TL;DR de docs/criar-recurso.md, de CLAUDE.md e do
+     * CONTRIBUTING: o primeiro comando que alguém digitaria.
+     *
+     * A checagem fica aqui, antes de escrever um byte, e o produto que de fato
+     * possua os três arquivos continua funcionando como antes.
+     */
+    private function produtoRecebeRecurso(): bool
+    {
+        $exigidos = ['routes/admin.php', 'config/access.php', 'config/admin-menu.php'];
+
+        $faltando = array_values(array_filter(
+            $exigidos,
+            static fn (string $arquivo): bool => ! File::isFile(base_path($arquivo)),
+        ));
+
+        if ($faltando === []) {
+            return true;
+        }
+
+        $this->error('Este recurso não teria onde ser ligado.');
+        $this->newLine();
+        $this->line('Sem <options=bold>--modulo</>, o gerador escreve em app/ e liga a tela em arquivos');
+        $this->line('do PRODUTO. Este produto não tem: ' . implode(', ', $faltando) . '.');
+        $this->newLine();
+        $this->line('Eles vivem dentro de ht2ml/core desde a extração, e o produto não edita');
+        $this->line('o core (ADR-0022). Um recurso pertence a um módulo — crie o módulo e');
+        $this->line('gere o recurso dentro dele:');
+        $this->newLine();
+        $this->line('  <fg=green>php artisan make:modulo escola</>');
+        $this->line('  <fg=green>composer require ht2ml/extensao-escola:@dev</>');
+        $this->line(sprintf(
+            '  <fg=green>php artisan make:recurso %s --modulo=escola --fields="%s"</>',
+            $this->argument('nome'),
+            (string) ($this->option('fields') ?: 'nome:string'),
+        ));
+
+        return false;
     }
 
     /**

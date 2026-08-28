@@ -56,3 +56,23 @@ it('make:recurso exige que o módulo exista, e diz como criá-lo', function (): 
         ->assertFailed()
         ->expectsOutputToContain('php artisan make:modulo inexistente');
 });
+
+it('sem --modulo, recusa ANTES de escrever qualquer arquivo', function (): void {
+    // O modo sem --modulo liga a tela em routes/admin.php, config/access.php e
+    // config/admin-menu.php do produto. Depois da extração eles vivem dentro de
+    // ht2ml/core, e o produto não edita o core (ADR-0022).
+    //
+    // O que acontecia era pior que não funcionar: o comando escrevia os dezenove
+    // arquivos e SÓ ENTÃO morria com FileNotFoundException e stack trace,
+    // deixando o produto sujo. E este era o caminho impresso no TL;DR do guia,
+    // do CLAUDE.md e do CONTRIBUTING — o primeiro comando que alguém digitaria.
+    $antes = glob(base_path('app/Models/*.php')) ?: [];
+
+    $this->artisan('make:recurso', ['nome' => 'SondaSemModulo', '--fields' => 'nome:string'])
+        ->assertFailed()
+        ->expectsOutputToContain('não teria onde ser ligado')
+        ->expectsOutputToContain('php artisan make:modulo');
+
+    expect(glob(base_path('app/Models/*.php')) ?: [])->toBe($antes)
+        ->and(is_file(base_path('app/Models/SondaSemModulo.php')))->toBeFalse();
+});

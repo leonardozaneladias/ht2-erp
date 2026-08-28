@@ -318,10 +318,11 @@ model, enum de status, DTO, FormRequests+Rules, actions, service, policy, Livewi
 Index/Form/Table, views, teste) e injeta rotas + permissões:
 
 ```bash
-php artisan make:recurso Cliente \
+php artisan make:modulo escola                    # uma vez por área de negócio
+composer require ht2ml/extensao-escola:@dev
+php artisan make:recurso Cliente --modulo=escola \
   --fields="nome:string, cnpj:cnpj, email:email:nullable, status:enum(ativo|inativo)" \
   --tenant
-npx prettier --write resources/views/livewire/admin/clientes/
 php artisan migrate && php artisan access:sync
 ```
 

@@ -13,16 +13,26 @@
 ## TL;DR
 
 ```bash
-php artisan make:recurso Cliente \
+php artisan make:modulo escola                    # uma vez por área de negócio
+composer require ht2ml/extensao-escola:@dev
+
+php artisan make:recurso Cliente --modulo=escola \
   --fields="nome:string, cnpj:cnpj, email:email:nullable, status:enum(ativo|inativo)" \
   --tenant
 
-npx prettier --write resources/views/livewire/admin/clientes/
+npx prettier --write packages/extensao-escola/resources/views/livewire/clientes/
 php artisan migrate
 php artisan access:sync
 ```
 
-Acesse `/admin/clientes`. Pronto: listagem (PowerGrid com busca/filtros/export), criar/editar, validação, DTO, Actions, Policy, auditoria automática e um teste Feature verde.
+**`--modulo` na prática é obrigatório.** Sem ele o gerador escreve em `app/` e liga
+a tela em `routes/admin.php`, `config/access.php` e `config/admin-menu.php` — três
+arquivos que, depois da extração, vivem dentro de `ht2ml/core`. O produto não edita
+o core ([ADR-0022](architecture/adrs/ADR-0022-dependencia-de-mao-unica.md)), então
+o comando recusa e diz isto. Um produto que de fato possua os três continua usando
+a forma sem `--modulo`.
+
+Acesse `/admin/escola/clientes`. Pronto: listagem (PowerGrid com busca/filtros/export), criar/editar, validação, DTO, Actions, Policy, auditoria automática e um teste Feature verde.
 
 ## O que é gerado
 
