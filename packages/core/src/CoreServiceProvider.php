@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace HT2ML\Core;
 
 use Illuminate\Auth\Events\Login;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -156,12 +159,18 @@ final class CoreServiceProvider extends ServiceProvider
     }
 
     /**
-     * As rotas do admin, dentro do grupo `web`.
+     * Os três hospedeiros de rota de módulo — um por EscopoDeRota.
      *
      * Saíram de bootstrap/app.php para cá: um app que instala ht2ml/core ganha
      * o /admin inteiro sem precisar declarar nada. O guard de cache é o mesmo
      * que o loadRoutesFrom() do Laravel faz — com as rotas em cache, o arquivo
      * não deve ser lido de novo.
+     *
+     * Os três são carregados sempre, mesmo vazios. A alternativa — carregar só
+     * o que tem contribuição — economizaria dois `require` e criaria uma ordem
+     * de boot relevante: o provider do core pode rodar ANTES dos providers dos
+     * módulos, então "tem contribuição?" seria respondido cedo demais e a rota
+     * simplesmente não existiria, sem erro nenhum.
      */
     private function registrarRotas(): void
     {
@@ -169,7 +178,14 @@ final class CoreServiceProvider extends ServiceProvider
             return;
         }
 
+        // 300/min por IP: um gateway reenviando em rajada depois de uma queda
+        // não pode ser barrado, e um endpoint público sem teto nenhum é um alvo.
+        // O produto substitui registrando o mesmo limiter depois do core.
+        RateLimiter::for('webhooks', static fn (Request $request): Limit => Limit::perMinute(300)->by($request->ip() ?? 'sem-ip'));
+
         Route::middleware('web')->group(__DIR__ . '/../routes/admin.php');
+        Route::middleware('web')->group(__DIR__ . '/../routes/publico.php');
+        Route::group([], __DIR__ . '/../routes/webhook.php');
     }
 
     /**
@@ -213,9 +229,11 @@ final class CoreServiceProvider extends ServiceProvider
      * Registro EXPLÍCITO, pelo mesmo motivo das policies.
      *
      * O Laravel descobre comandos sozinho em app/Console/Commands. Dentro de um
-     * pacote não há descoberta: sem esta chamada os cinco comandos do núcleo
-     * — access:sync, access:expirar, referencia:sync, make:modulo e
-     * make:extensao — simplesmente somem do artisan, sem erro nenhum.
+     * pacote não há descoberta: sem esta chamada os comandos do núcleo — os três
+     * de operação (access:sync, access:expirar, referencia:sync), os três de
+     * geração (make:modulo, make:recurso, make:regra), o diagnóstico
+     * (ht2ml:doutor) e a lápide do make:extensao — simplesmente somem do
+     * artisan, sem erro nenhum.
      *
      * Ver tests/Feature/Core/ComandosDoCoreTest.php, que falha se algum sumir.
      */
@@ -231,6 +249,8 @@ final class CoreServiceProvider extends ServiceProvider
             Console\Commands\DoutorCommand::class,
             Console\Commands\MakeExtensaoCommand::class,
             Console\Commands\MakeModuloCommand::class,
+            Console\Commands\MakeRecursoCommand::class,
+            Console\Commands\MakeRegraCommand::class,
             Console\Commands\ReferenciaSyncCommand::class,
         ]);
     }

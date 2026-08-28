@@ -71,8 +71,130 @@ jobs:
               run: composer audit --no-interaction
               continue-on-error: true
 
+            # Guard das dependências declaradas. Não dá para escrever em Pest:
+            # "esta classe vem de um pacote que este composer.json declara?"
+            # exige o mapa classe -> pacote que o Composer monta, e reimplementá-lo
+            # em teste seria reimplementar o Composer.
+            #
+            # O symlink existe porque a ferramenta procura o autoload ao lado do
+            # composer.json que analisa, e num monorepo com path repos os pacotes
+            # não têm vendor próprio. Instalar cinco vendors só para analisar
+            # custaria minutos de CI para responder a mesma pergunta.
+            - name: Cada pacote declara o que usa
+              run: |
+                  falhou=0
+                  for p in core extensao-rh extensao-fiscal-br extensao-exemplo-demo extensao-documentos; do
+                      echo "::group::$p"
+                      ln -sfn ../../vendor "packages/$p/vendor"
+                      ./vendor/bin/composer-dependency-analyser \
+                          --composer-json="packages/$p/composer.json" \
+                          --config=composer-dependency-analyser.php || falhou=1
+                      rm -f "packages/$p/vendor"
+                      echo "::endgroup::"
+                  done
+                  exit $falhou
+
             - name: Verificar formatação (Prettier)
               run: npx prettier --check "resources/**/*.{js,ts,tsx,css,json}" "*.{json,md,yaml,yml}" --ignore-path .prettierignore
+
+    core-sozinho:
+        # Guard A4 do plano de revisão arquitetural.
+        #
+        # O monorepo NUNCA exercita este caminho: aqui o core convive com o app,
+        # com as quatro extensões e com um vendor já povoado, então uma
+        # dependência que o core usa mas não declara, ou uma referência do core a
+        # algo do produto, passa despercebida. É exatamente o caminho do
+        # EduConecta, que instala ht2ml/core por Composer e mais nada.
+        #
+        # A receita está em docs/superficie-do-core.md e era manual — rodava
+        # quando alguém lembrava. Rodando aqui, para de depender de memória.
+        name: Core sozinho num Laravel limpo
+        runs-on: ubuntu-latest
+
+        env:
+            DB_CONNECTION: sqlite
+            DB_DATABASE: /tmp/prova/database/database.sqlite
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup PHP 8.4
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, fileinfo, bcmath, gd, zip
+                  coverage: none
+
+            - name: Criar um Laravel limpo
+              run: composer create-project laravel/laravel /tmp/prova --no-interaction --prefer-dist
+
+            - name: Instalar SÓ o ht2ml/core
+              working-directory: /tmp/prova
+              run: |
+                  composer config repositories.ht2ml path "$GITHUB_WORKSPACE/packages/*"
+                  composer config minimum-stability dev
+                  composer config prefer-stable true
+                  composer require ht2ml/core:@dev --no-interaction
+
+            - name: Migrar, sincronizar permissões e diagnosticar
+              working-directory: /tmp/prova
+              run: |
+                  touch database/database.sqlite
+                  php artisan migrate --force --no-interaction
+                  php artisan access:sync --no-interaction
+                  php artisan ht2ml:doutor
+
+            - name: A superfície prometida existe
+              working-directory: /tmp/prova
+              # Sem asserções, o job provaria só que o composer não quebrou. Estas
+              # três são o que o produto consome no primeiro dia: o painel, o
+              # catálogo de permissões e a sidebar.
+              run: |
+                  php artisan route:list --name=admin. > /tmp/rotas.txt
+                  test "$(grep -c 'admin\.' /tmp/rotas.txt)" -gt 50 \
+                    || { echo "::error::menos de 50 rotas admin.* — o painel não subiu"; cat /tmp/rotas.txt; exit 1; }
+                  # `tinker --execute` SEMPRE sai com 1, inclusive num exit(0)
+                  # explícito. Confiar no código de saída dele deixaria o job
+                  # vermelho por motivo errado — comparar a saída é o que funciona.
+                  areas=$(php artisan tinker --execute='echo count((array) config("access.modules"));')
+                  test "$areas" -gt 0 \
+                    || { echo "::error::config(access.modules) vazio — o catálogo de permissões não chegou"; exit 1; }
+                  secoes=$(php artisan tinker --execute='echo count((array) config("admin-menu"));')
+                  test "$secoes" -gt 0 \
+                    || { echo "::error::config(admin-menu) vazio — a sidebar não chegou"; exit 1; }
+
+            - name: O caminho do EduConecta — módulo, recurso, tela alcançável
+              working-directory: /tmp/prova
+              # É a sequência do primeiro dia de um produto novo, e o único lugar
+              # onde ela roda de verdade: no monorepo o gerador acha tudo pronto.
+              # Foi escrevendo este passo que apareceu o make:recurso sem --modulo
+              # estourando FileNotFoundException DEPOIS de escrever 19 arquivos.
+              run: |
+                  php artisan make:modulo sonda
+                  composer require ht2ml/extensao-sonda:@dev --no-interaction
+                  php artisan make:recurso Leitura --modulo=sonda --fields="nome:string, valor:money"
+                  php artisan migrate --force --no-interaction
+                  php artisan access:sync --no-interaction
+                  php artisan ht2ml:doutor
+                  php artisan route:list --name=sonda | grep -q 'admin.sonda.leituras.index' \
+                    || { echo "::error::a tela gerada não tem rota"; exit 1; }
+                  permissoes=$(php artisan tinker --execute='echo count(array_filter(array_keys((array) config("access.modules.negocio", [])), fn ($p) => str_starts_with($p, "sonda.")));')
+                  test "$permissoes" -eq 6 \
+                    || { echo "::error::esperava 6 permissões do recurso, veio $permissoes"; exit 1; }
+
+            - name: O gerador recusa o modo sem módulo, em vez de quebrar no meio
+              working-directory: /tmp/prova
+              # Sem --modulo o gerador ligaria a tela em três arquivos que hoje
+              # vivem dentro do core. Precisa recusar ANTES de escrever, e dizer
+              # o que fazer.
+              run: |
+                  if php artisan make:recurso Avulso --fields="nome:string" > /tmp/avulso.txt 2>&1; then
+                      echo "::error::make:recurso sem --modulo deveria falhar"; cat /tmp/avulso.txt; exit 1
+                  fi
+                  grep -q 'make:modulo' /tmp/avulso.txt \
+                    || { echo "::error::a recusa não ensina o caminho novo"; cat /tmp/avulso.txt; exit 1; }
+                  test ! -f app/Models/Avulso.php \
+                    || { echo "::error::recusou mas escreveu arquivos assim mesmo"; exit 1; }
 
     tests:
         name: Testes (Pest)

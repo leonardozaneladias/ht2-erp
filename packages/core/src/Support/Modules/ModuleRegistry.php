@@ -39,7 +39,7 @@ use Illuminate\Support\Facades\Log;
  */
 final class ModuleRegistry
 {
-    /** @var list<Closure> */
+    /** @var array<string, list<Closure>> escopo => callbacks */
     private static array $routeCallbacks = [];
 
     /** @var array{antes: list<class-string<\Illuminate\Database\Seeder>>, depois: list<class-string<\Illuminate\Database\Seeder>>} */
@@ -73,22 +73,45 @@ final class ModuleRegistry
     private static array $catalogos = [];
 
     /**
-     * Registra um callback que define rotas dentro do grupo autenticado /admin.
-     * Deve ser chamado no register() do ServiceProvider do pacote.
+     * Registra um callback que define rotas de um módulo.
+     *
+     * Deve ser chamado no register() do ServiceProvider do pacote: o callback
+     * precisa existir antes de o core carregar os arquivos de rota.
+     *
+     * O escopo decide onde as rotas entram — ver EscopoDeRota. O default é
+     * Admin porque é o que todo CRUD usa, e porque as chamadas que existiam
+     * antes do escopo existir significavam exatamente isso.
      */
-    public static function routes(Closure $callback): void
+    public static function routes(Closure $callback, EscopoDeRota $escopo = EscopoDeRota::Admin): void
     {
-        self::$routeCallbacks[] = $callback;
+        self::$routeCallbacks[$escopo->value][] = $callback;
     }
 
     /**
-     * Callbacks de rota acumulados, consumidos por routes/admin.php.
+     * Callbacks de rota de um escopo, consumidos pelos arquivos de rota do core.
      *
      * @return list<Closure>
      */
-    public static function routeCallbacks(): array
+    public static function routeCallbacks(EscopoDeRota $escopo = EscopoDeRota::Admin): array
     {
-        return self::$routeCallbacks;
+        return self::$routeCallbacks[$escopo->value] ?? [];
+    }
+
+    /**
+     * Escopos que têm ao menos um callback registrado.
+     *
+     * Serve ao `ht2ml:doutor`: um escopo com callback e sem hospedeiro — o
+     * arquivo de rota do core que o executa — é uma rota que ninguém carrega,
+     * e o sintoma disso é um 404 que não explica nada.
+     *
+     * @return list<EscopoDeRota>
+     */
+    public static function escoposComRotas(): array
+    {
+        return array_values(array_filter(
+            EscopoDeRota::cases(),
+            static fn (EscopoDeRota $e): bool => (self::$routeCallbacks[$e->value] ?? []) !== [],
+        ));
     }
 
     /**
@@ -134,6 +157,22 @@ final class ModuleRegistry
     public static function modulo(string $chave): ModuloBuilder
     {
         return self::$modulos[$chave] ??= new ModuloBuilder($chave);
+    }
+
+    /**
+     * As chaves de módulo declaradas neste boot.
+     *
+     * Serve ao `ht2ml:doutor`: um pacote pode dizer no manifesto que carrega o
+     * módulo 'escola' e o ServiceProvider dele registrar 'escolas'. As duas
+     * grafias existem, nenhuma reclama, e o efeito é permissão num prefixo e
+     * menu em outro — o mesmo desencontro que o ADR-0021 foi escrito para
+     * acabar, agora entre o manifesto e o código.
+     *
+     * @return list<string>
+     */
+    public static function chavesDeModulo(): array
+    {
+        return array_keys(self::$modulos);
     }
 
     /**

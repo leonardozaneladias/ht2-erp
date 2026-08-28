@@ -82,5 +82,7 @@ final class FiscalBrServiceProvider extends ServiceProvider
         Gate::policy(Models\Cnae::class, Policies\CnaePolicy::class);
         Gate::policy(Models\Cfop::class, Policies\CfopPolicy::class);
         Gate::policy(Models\Ncm::class, Policies\NcmPolicy::class);
+
+        // make:recurso registra os componentes Livewire e as policies do recurso acima desta linha
     }
 }

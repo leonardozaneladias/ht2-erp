@@ -30,7 +30,7 @@ Durante o desenvolvimento o pacote vive em `packages/exemplo-demo` do
 boilerplate (path repository, symlink). Para gerar recursos CRUD dentro dele:
 
 ```bash
-php artisan make:modulo Recurso --module=ExemploDemo --fields="..."
+php artisan make:recurso Recurso --modulo=exemplo-demo --fields="..."
 ```
 
 Ao estabilizar, promova a um repositório Git próprio e versione por tag (semver).

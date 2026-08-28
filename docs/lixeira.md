@@ -60,11 +60,11 @@ super-admin sem hard-code de papel. As policies mapeiam `restore` →
 
 **Fora da lixeira:** ACL (papéis/permissões) e Menu.
 
-## Gerador (`make:modulo`)
+## Gerador (`make:recurso`)
 
 Todo módulo novo nasce com a lixeira quando o soft-delete está ativo (padrão).
 `--sem-soft-delete` produz a saída antiga (sem lixeira). Ver
-[`criar-modulo.md`](criar-modulo.md).
+[`criar-recurso.md`](criar-recurso.md).
 
 > **Models de pacote:** o resolver de factory do Laravel assume `App\`; um model
 > em `HT2ML\…\Models` precisa de `protected static function newFactory()`

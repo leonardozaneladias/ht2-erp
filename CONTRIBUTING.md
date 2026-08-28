@@ -28,15 +28,21 @@ dinheiro em centavos, Enums backed, DTOs readonly, Services API-ready,
 `declare(strict_types=1)`, type hints) e §9 (componentes Blade do catálogo
 Inspinia antes de escrever HTML).
 
-## Criando um módulo de negócio
+## Criando um recurso
 
-Use o gerador — ele já produz tudo no padrão:
+Use o gerador — ele já produz tudo no padrão, e passa o Pint no que gera. Todo
+recurso pertence a um módulo, então crie o módulo primeiro:
 
 ```bash
-php artisan make:modulo Produto --fields="nome:string, preco:money, status:enum(ativo|inativo)" --tenant
+php artisan make:modulo escola
+composer require ht2ml/extensao-escola:@dev
+php artisan make:recurso Aluno --modulo=escola --fields="nome:string, preco:money"
 ```
 
-Guia completo: [`docs/criar-modulo.md`](docs/criar-modulo.md).
+Sem `--modulo` o comando recusa e explica: ele ligaria a tela em arquivos que hoje
+vivem dentro de `ht2ml/core`, e o produto não edita o core (ADR-0022).
+
+Guia completo: [`docs/criar-recurso.md`](docs/criar-recurso.md).
 
 ## Antes de commitar (gate de qualidade)
 

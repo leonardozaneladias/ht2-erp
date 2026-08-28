@@ -330,7 +330,7 @@ Decididos no fechamento da fase base. Todo CRUD/tela nova segue estas regras —
 - **Abas** = somente quando pelo menos um grupo tem ação de salvar própria ou só existe após persistência (modo edição). Exemplo: Form de Usuário (Empresas/Acessos salvam separado).
 - Com abas, todo `tab-trigger` recebe `:has-error="$errors->hasAny([...campos da aba...])"` — erro em aba inativa precisa de feedback visível.
 - Rodapé de form sempre via `<x-admin.form-footer :cancel-href="..." :label="..." />`.
-- Para salvar com **Enter**, envolva o corpo em `<form wire:submit="salvar" class="space-y-6">` e passe `submit` ao rodapé (`<x-admin.form-footer ... submit />`): isso torna o botão primário `type="submit"`, disparado pelo `<form>` (Enter ou clique). Sem `submit`, o rodapé mantém o disparo por `wire:click` (retrocompatível). O gerador `make:modulo` e o módulo Exemplo já nascem nesse padrão.
+- Para salvar com **Enter**, envolva o corpo em `<form wire:submit="salvar" class="space-y-6">` e passe `submit` ao rodapé (`<x-admin.form-footer ... submit />`): isso torna o botão primário `type="submit"`, disparado pelo `<form>` (Enter ou clique). Sem `submit`, o rodapé mantém o disparo por `wire:click` (retrocompatível). O gerador `make:recurso` e o módulo Exemplo já nascem nesse padrão.
 
 **Breadcrumbs**
 

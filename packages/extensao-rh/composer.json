@@ -1,29 +1,36 @@
 {
-  "name": "ht2ml/extensao-rh",
-  "description": "Extensão Rh.",
-  "type": "library",
-  "license": "proprietary",
-  "require": {
-    "php": "^8.4",
-    "ht2ml/core": "@dev"
-  },
-  "autoload": {
-    "psr-4": {
-      "HT2ML\\Rh\\": "src/",
-      "HT2ML\\Rh\\Database\\Factories\\": "database/factories/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "HT2ML\\Rh\\Tests\\": "tests/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "HT2ML\\Rh\\RhServiceProvider"
-      ]
-    }
-  },
-  "minimum-stability": "stable"
+    "name": "ht2ml/extensao-rh",
+    "description": "Extensão Rh.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "ht2ml/core": "@dev",
+        "illuminate/support": "^13.0",
+        "livewire/livewire": "^4.2",
+        "power-components/livewire-powergrid": "^6.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "HT2ML\\Rh\\": "src/",
+            "HT2ML\\Rh\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HT2ML\\Rh\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HT2ML\\Rh\\RhServiceProvider"
+            ]
+        },
+        "ht2ml": {
+            "tipo": "modulo",
+            "chave": "rh"
+        }
+    },
+    "minimum-stability": "stable"
 }

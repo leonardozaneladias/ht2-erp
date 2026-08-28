@@ -117,7 +117,7 @@ return [
         'title' => 'Negócio',
         'ordem' => 300,
         'items' => [
-            // make:modulo insere itens de menu acima desta linha
+            // make:recurso insere itens de menu acima desta linha
         ],
     ],
     [

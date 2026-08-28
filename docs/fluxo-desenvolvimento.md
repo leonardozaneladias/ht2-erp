@@ -136,8 +136,8 @@ Módulos de negócio que servem a vários clientes vivem **no base**, em `packag
 
 ```bash
 # no BASE:
-php artisan make:extensao Rh
-php artisan make:modulo Funcionario --module=Rh --fields="..." --tenant
+php artisan make:modulo rh
+php artisan make:recurso Funcionario --modulo=rh --fields="..." --tenant
 make release-modulo slug=rh versao=v0.1.0   # quando estabilizar (subtree split + tag)
 ```
 

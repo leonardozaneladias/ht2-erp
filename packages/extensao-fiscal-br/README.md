@@ -30,7 +30,7 @@ Durante o desenvolvimento o pacote vive em `packages/fiscal-br` do
 boilerplate (path repository, symlink). Para gerar recursos CRUD dentro dele:
 
 ```bash
-php artisan make:modulo Recurso --module=FiscalBr --fields="..."
+php artisan make:recurso Recurso --modulo=fiscal-br --fields="..."
 ```
 
 Ao estabilizar, promova a um repositório Git próprio e versione por tag (semver).

@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+use __NS_REGRAS__\__REGRA_STUDLY__;
+use Illuminate\Support\Facades\Validator;
+
+/*
+ * A regra nasce com o teste porque uma regra sem teste é uma condição que
+ * ninguém confere: ela passa a valer em toda tela que declarar o campo, e o
+ * jeito de descobrir que estava errada é o usuário reclamar.
+ *
+ * Os dois casos nascem como ->todo() — não rodam e não quebram a suíte — porque
+ * o gerador não tem como saber o que é válido no seu domínio. `pest --todos`
+ * lista o que falta. Preencha os dois e tire o ->todo().
+ */
+
+/** Roda o validador com a regra isolada. */
+function validaCom__REGRA_STUDLY__(mixed $valor): \Illuminate\Validation\Validator
+{
+    /** @var \Illuminate\Validation\Validator $validador */
+    $validador = Validator::make(
+        ['campo' => $valor],
+        ['campo' => [new __REGRA_STUDLY__()]],
+    );
+
+    return $validador;
+}
+
+it('aceita um valor válido', function (): void {
+    // TODO: troque pelo menor valor válido do seu domínio.
+    expect(validaCom__REGRA_STUDLY__('TODO')->passes())->toBeTrue();
+})->todo('implemente a condição em __REGRA_STUDLY__');
+
+it('recusa um valor inválido, com a mensagem certa', function (): void {
+    // TODO: troque por um valor que a regra deve recusar.
+    $validador = validaCom__REGRA_STUDLY__('TODO');
+
+    expect($validador->fails())->toBeTrue()
+        ->and($validador->errors()->first('campo'))->toBe('__REGRA_MENSAGEM_ATTR__');
+})->todo('implemente a condição em __REGRA_STUDLY__');

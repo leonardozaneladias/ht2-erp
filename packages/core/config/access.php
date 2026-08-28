@@ -257,7 +257,7 @@ return [
         | permissões para lá. Empilhar tudo aqui torna a tela innavegável.
         */
         ModuloAcesso::Negocio->value => [
-            // make:modulo insere permissões de negócio acima desta linha
+            // make:recurso insere permissões de negócio acima desta linha
         ],
 
         ModuloAcesso::Sistema->value => [

@@ -56,6 +56,6 @@ final class RhServiceProvider extends ServiceProvider
         \Livewire\Livewire::component('rh.departamentos.form', Livewire\Departamentos\FormDepartamento::class);
         \Livewire\Livewire::component('rh.departamentos.departamento-table', Livewire\Departamentos\DepartamentoTable::class);
         \Illuminate\Support\Facades\Gate::policy(Models\Departamento::class, Policies\DepartamentoPolicy::class);
-        // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha
+        // make:recurso registra os componentes Livewire e as policies do recurso acima desta linha
     }
 }

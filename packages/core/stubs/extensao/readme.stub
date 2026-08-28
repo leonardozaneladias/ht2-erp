@@ -30,7 +30,7 @@ Durante o desenvolvimento o pacote vive em `packages/__MODULO_SLUG__` do
 boilerplate (path repository, symlink). Para gerar recursos CRUD dentro dele:
 
 ```bash
-php artisan make:modulo Recurso --module=__MODULO_STUDLY__ --fields="..."
+php artisan make:recurso Recurso --modulo=__MODULO_SLUG__ --fields="..."
 ```
 
 Ao estabilizar, promova a um repositório Git próprio e versione por tag (semver).

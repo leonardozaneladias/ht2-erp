@@ -318,22 +318,26 @@ model, enum de status, DTO, FormRequests+Rules, actions, service, policy, Livewi
 Index/Form/Table, views, teste) e injeta rotas + permissões:
 
 ```bash
-php artisan make:modulo Cliente \
+php artisan make:modulo escola                    # uma vez por área de negócio
+composer require ht2ml/extensao-escola:@dev
+php artisan make:recurso Cliente --modulo=escola \
   --fields="nome:string, cnpj:cnpj, email:email:nullable, status:enum(ativo|inativo)" \
   --tenant
-./vendor/bin/pint && npx prettier --write resources/views/livewire/admin/clientes/
 php artisan migrate && php artisan access:sync
 ```
 
-Depois, atribua as permissões (`/admin/acesso`) e adicione o item ao menu lateral.
+O Pint já roda nos arquivos gerados. Depois, atribua as permissões
+(`/admin/acesso`); o item de menu já nasce com o recurso.
 Guia completo (tipos de campo, flags, customização dos stubs):
-[`docs/criar-modulo.md`](docs/criar-modulo.md). O módulo **Exemplo** (em
+[`docs/criar-recurso.md`](docs/criar-recurso.md). O módulo **Exemplo** (em
 `app/Livewire/Admin/Exemplos/`) é a referência viva — copie/apague à vontade. Os stubs ficam em
 `stubs/modulo/`.
 
-**Unidades de negócio reutilizáveis entre produtos** viram extensões (pacotes Composer):
-`php artisan make:extensao Rh` cria a casca e `make:modulo --module=Rh` gera o CRUD
-dentro do pacote, sem editar o core. Ver [`ADR-0015`](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
+**Unidades de negócio reutilizáveis entre produtos** viram **módulos**, distribuídos
+como pacotes Composer: `php artisan make:modulo rh` cria a casca e
+`make:recurso Funcionario --modulo=rh` gera o CRUD dentro dele, sem editar o core.
+A chave vai em kebab-case — é ela que vira prefixo de permissão, seção de menu,
+namespace de view e prefixo de rota (ver [`ADR-0021`](docs/architecture/adrs/ADR-0021-taxonomia-modulo-recurso-area-secao.md)). Ver [`ADR-0015`](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
 e o guia de [`distribuição e manutenção`](docs/distribuicao-manutencao.md).
 
 ---

@@ -1,39 +1,44 @@
 {
-  "name": "ht2ml/extensao-fiscal-br",
-  "description": "Catálogos de classificação fiscal brasileira: CNAE, CFOP e NCM.",
-  "type": "library",
-  "license": "proprietary",
-  "require": {
-    "php": "^8.4",
-    "ht2ml/core": "@dev",
-    "illuminate/contracts": "^13.0",
-    "illuminate/database": "^13.0",
-    "illuminate/support": "^13.0",
-    "illuminate/validation": "^13.0",
-    "livewire/livewire": "^4.2",
-    "power-components/livewire-powergrid": "^6.10"
-  },
-  "require-dev": {
-    "laravel/framework": "^13.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "HT2ML\\FiscalBr\\": "src/",
-      "HT2ML\\FiscalBr\\Database\\Factories\\": "database/factories/",
-      "HT2ML\\FiscalBr\\Database\\Seeders\\": "database/seeders/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "HT2ML\\FiscalBr\\Tests\\": "tests/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "HT2ML\\FiscalBr\\FiscalBrServiceProvider"
-      ]
-    }
-  },
-  "minimum-stability": "stable"
+    "name": "ht2ml/extensao-fiscal-br",
+    "description": "Catálogos de classificação fiscal brasileira: CNAE, CFOP e NCM.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "ext-mbstring": "*",
+        "ht2ml/core": "@dev",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/support": "^13.0",
+        "illuminate/validation": "^13.0",
+        "livewire/livewire": "^4.2",
+        "power-components/livewire-powergrid": "^6.10"
+    },
+    "require-dev": {
+        "laravel/framework": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HT2ML\\FiscalBr\\": "src/",
+            "HT2ML\\FiscalBr\\Database\\Factories\\": "database/factories/",
+            "HT2ML\\FiscalBr\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HT2ML\\FiscalBr\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HT2ML\\FiscalBr\\FiscalBrServiceProvider"
+            ]
+        },
+        "ht2ml": {
+            "tipo": "modulo",
+            "chave": "fiscal-br"
+        }
+    },
+    "minimum-stability": "stable"
 }

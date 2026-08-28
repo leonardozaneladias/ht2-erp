@@ -7,17 +7,19 @@ declare(strict_types=1);
 | Extensões
 |--------------------------------------------------------------------------
 |
-| Convenções de marca usadas pelo gerador `make:extensao` e pelo modo pacote
-| do `make:modulo` (ver ADR-0015, que usa o vocabulário anterior).
+| Convenções de marca usadas pelo `make:modulo` (que cria a casca) e pelo
+| `make:recurso --modulo=` (que gera o CRUD dentro dela).
 |
-| Vocabulário atual (ver CONTEXT-MAP.md): **módulo** vive dentro do produto;
-| **extensão** é a unidade de negócio distribuída como pacote, instalável em
-| qualquer produto; **pacote** é a forma de distribuição.
+| Vocabulário atual (ADR-0021 e CONTEXT-MAP.md): **módulo** é a área de negócio,
+| identificada por uma chave kebab; **extensão** é o envelope — o pacote que
+| carrega um módulo (extensão-módulo) ou só código sem UI (extensão-biblioteca);
+| **pacote** é a forma de distribuição. O prefixo do nome do pacote continua
+| `extensao-` porque os cinco já publicados usam esse nome: o envelope não
+| mudou, o vocabulário mudou.
 |
 | Exemplo (vendor=ht2ml, namespace=HT2ML, prefixo=extensao-):
-|   extensão "Rh"  ->  pacote ht2ml/extensao-rh  ·  namespace HT2ML\Rh\
-|                  ->  packages/extensao-rh  ·  views "rh::"
-|                  ->  repo GitHub do release: {org}/erp-module-rh
+|   módulo "rh"  ->  pacote ht2ml/extensao-rh  ·  namespace HT2ML\Rh\
+|                ->  packages/extensao-rh  ·  views "rh::"
 |
 */
 

@@ -117,7 +117,7 @@ O recurso aparece somente quando o usuário **tem a permissão global `listagens
    opções do multiselect são rotuladas como **"Empresa — Filial"** para desambiguar filiais
    homônimas em empresas diferentes.
 
-**Como aplicar numa tabela tenant** (o gerador `make:modulo --tenant` já injeta isto):
+**Como aplicar numa tabela tenant** (o gerador `make:recurso --tenant` já injeta isto):
 
 ```php
 use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;

@@ -98,16 +98,38 @@ seção e key da área. Uma coisa declarada, cinco convenções derivadas.
 | Antes | Depois |
 | --- | --- |
 | `make:modulo Funcionario --module=Rh` | `make:recurso Funcionario --modulo=escola` |
-| `make:extensao Rh` | `make:modulo escola --pacote` |
+| `make:extensao Rh` | `make:modulo escola` |
 | — | `make:regra MatriculaValida --modulo=escola` |
 
 `--modulo=escola` nomeia um **módulo**, não um caminho: o comando resolve onde
 `escola` mora lendo `extra.ht2ml.chave`. É isso que faz mover um módulo de `app/`
 para um pacote não quebrar nada.
 
-`make:modulo Funcionario` (PascalCase singular, sem `--pacote`) deve **falhar
-ensinando o nome novo**. Um alias silencioso que faz outra coisa é pior que um
-erro vermelho.
+`make:modulo Funcionario` (PascalCase singular) deve **falhar ensinando o nome
+novo**. Um alias silencioso que faz outra coisa é pior que um erro vermelho.
+
+### Como ficou na implementação (2026-08-28)
+
+Duas coisas saíram diferentes do que esta ADR previa, e ficam registradas aqui
+para não parecerem descuido.
+
+**Sem `--pacote`.** A flag existiria para distinguir "módulo como pacote" de
+"módulo dentro do produto", mas a segunda forma não existe: a topologia decidida
+para o EduConecta é monorepo com path repos, então todo módulo é pacote. Uma
+flag que não decide nada é superfície nova sem contrapartida — a mesma doença
+que esta revisão está tratando. Quando existir módulo fora de pacote, a flag
+entra com um sentido real.
+
+**O discriminante é a grafia, não a flag.** Sem `--pacote`, o que separa a forma
+antiga da nova é o argumento: chave de módulo é kebab-case, e o argumento antigo
+era uma entidade em PascalCase singular. `--fields` e `--tenant` seguem
+declarados no `make:modulo`, marcados REMOVIDO, só para poderem ser recusados
+com uma mensagem útil em vez de um erro de opção desconhecida do Symfony.
+
+**`make:extensao` virou lápide, não sumiu.** Some do artisan e o Symfony
+responde "Command is not defined" com uma sugestão por semelhança de nome que
+não chega em `make:modulo`. Como lápide, ele falha dizendo o nome novo. Pode ser
+apagado quando a transição for história.
 
 ## Alternativas consideradas
 
