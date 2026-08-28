@@ -30,7 +30,7 @@ Durante o desenvolvimento o pacote vive em `packages/extensao-rh` do
 monorepo (path repository, symlink). Para gerar recursos CRUD dentro dele:
 
 ```bash
-php artisan make:modulo Recurso --module=Rh --fields="..."
+php artisan make:recurso Recurso --modulo=rh --fields="..."
 ```
 
 Para cortar um release (extrai para `erp-module-rh` via `git subtree split` + tag semver):

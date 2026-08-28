@@ -1,17 +1,23 @@
-# Criar um módulo de negócio com `make:modulo`
+# Criar um recurso com `make:recurso`
 
 > Objetivo do boilerplate: você se preocupa apenas com **o negócio do cliente**.
 > O gerador entrega a stack CRUD inteira já no padrão do projeto; você preenche a
 > regra de negócio.
 
+> **O comando mudou de nome em 2026-08-28.** Era `make:modulo`; hoje é
+> `make:recurso`, e `make:modulo` cria o **módulo** (a área de negócio). Um
+> *recurso* é uma entidade com CRUD — aluno, turma, fatura; um *módulo* é a área
+> que reúne vários deles. A forma antiga falha ensinando a nova. Vocabulário
+> completo: [`ADR-0021`](architecture/adrs/ADR-0021-taxonomia-modulo-recurso-area-secao.md).
+
 ## TL;DR
 
 ```bash
-php artisan make:modulo Cliente \
+php artisan make:recurso Cliente \
   --fields="nome:string, cnpj:cnpj, email:email:nullable, status:enum(ativo|inativo)" \
   --tenant
 
-./vendor/bin/pint && npx prettier --write resources/views/livewire/admin/clientes/
+npx prettier --write resources/views/livewire/admin/clientes/
 php artisan migrate
 php artisan access:sync
 ```
@@ -20,7 +26,7 @@ Acesse `/admin/clientes`. Pronto: listagem (PowerGrid com busca/filtros/export),
 
 ## O que é gerado
 
-Para `make:modulo Cliente` o gerador cria (tudo com `declare(strict_types=1)`):
+Para `make:recurso Cliente` o gerador cria (tudo com `declare(strict_types=1)`):
 
 | Camada                | Arquivo                                                                                                          |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
@@ -116,7 +122,7 @@ Para formulários grandes, agrupe os campos em abas com o modificador
 (`x-shared.tab-nav` + `x-shared.tab-body`, sem o gap antigo).
 
 ```bash
-php artisan make:modulo Cliente --fields="\
+php artisan make:recurso Cliente --fields="\
   nome:string:aba(Identificação),\
   cnpj:cnpj:aba(Identificação),\
   email:email:aba(Contato),\
@@ -143,7 +149,7 @@ menu lateral sob **Negócio** (só para super-admin) e abre em `/admin/exemplos`
 é referência viva; recrie/edite à vontade. Este é o comando completo:
 
 ```bash
-php artisan make:modulo Exemplo --tenant --fields="\
+php artisan make:recurso Exemplo --tenant --fields="\
   nome:string:aba(Identificação),\
   slug:string:unique:aba(Identificação),\
   site:url:nullable:aba(Identificação),\
@@ -180,9 +186,9 @@ php artisan migrate && php artisan access:sync
 - `--skip-menu` — não injeta o item no menu lateral.
 - `--force` — sobrescreve arquivos existentes (re-geração). A migration é
   idempotente (pula/limpa pela tabela, não cria duplicada).
-- `--module=Rh` — gera o CRUD dentro de um módulo-pacote existente (ver
-  "Gerar dentro de um módulo-pacote" abaixo) em vez de `app/`.
-- `--sem-soft-delete` — desativa o soft-delete. **Por padrão** os módulos usam
+- `--modulo=rh` — gera o CRUD dentro de um módulo existente (ver "Gerar dentro
+  de um módulo" abaixo) em vez de `app/`. A chave vai em kebab-case.
+- `--sem-soft-delete` — desativa o soft-delete. **Por padrão** os recursos usam
   soft-delete (`deleted_at`): registros ficam recuperáveis em vez de apagados.
 
 O item de menu entra na seção **Negócio** de `config/admin-menu.php` com
@@ -221,23 +227,28 @@ Padrão completo (e como adotar em módulo legado): [`docs/visualizacao.md`](vis
    de bug documentada — em vinte telas com FK, era a diferença entre vinte N+1
    e nenhum.
 
-## Gerar dentro de um módulo-pacote (HT2 ERP)
+## Gerar dentro de um módulo (HT2 ERP)
 
-Por padrão o `make:modulo` gera em `app/` (monólito). Para criar um módulo de negócio
-**reutilizável entre clientes** como pacote Composer, gere dentro de um módulo-pacote:
+Sem `--modulo`, o recurso nasce em `app/` (monólito). Para um recurso
+**reutilizável entre clientes**, crie o módulo — que é um pacote Composer — e
+gere dentro dele:
 
 ```bash
-php artisan make:extensao Rh                  # casca do pacote em packages/extensao-rh
-composer require "ht2ml/extensao-rh:@dev"           # instala (symlink) p/ dev local
-php artisan make:modulo Funcionario --module=Rh --fields="..."   # CRUD dentro do pacote
+php artisan make:modulo rh                  # casca do pacote em packages/extensao-rh
+composer require "ht2ml/extensao-rh:@dev"   # instala (symlink) p/ dev local
+php artisan make:recurso Funcionario --modulo=rh --fields="..."
 ```
 
-O CRUD nasce com namespaces do pacote (`HT2ML\Rh\...`), views namespaced (`rh::`) e se
-integra ao core **sem editá-lo** (rotas via `ModuleRegistry`, permissões/menu via
-`config/rh.php` publicável, Livewire/Policy no provider do pacote). O pacote de RH
-registra a **própria seção** "Recursos Humanos" na sidebar (e o módulo
-`recursos_humanos` na matriz de acesso) em vez de cair em "Negócio". Sem `--module`, o
-comportamento é o atual (gera em `app/`).
+A chave do módulo vai em **kebab-case** porque é ela que vira prefixo de
+permissão (`rh.funcionarios.listar`), key de seção de menu, namespace de view
+(`rh::`) e prefixo de rota (`admin.rh.funcionarios`). Uma forma, um lugar — é o
+que impede a permissão de ser calculada por duas fórmulas que discordam, como já
+aconteceu.
+
+O CRUD nasce com namespaces do pacote (`HT2ML\Rh\...`), views namespaced e se
+integra ao core **sem editá-lo**: rotas via `ModuleRegistry`, permissões e menu
+DERIVADOS da chave do recurso pelo `ModuloBuilder`, Livewire e Policy no provider
+do pacote.
 
 Guia completo de distribuição e manutenção:
 [`distribuicao-manutencao.md`](distribuicao-manutencao.md) · decisão: [`ADR-0015`](architecture/adrs/ADR-0015-modulos-pacotes-composer.md).

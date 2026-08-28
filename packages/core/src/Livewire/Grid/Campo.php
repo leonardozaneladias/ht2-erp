@@ -134,7 +134,7 @@ final class Campo
     /**
      * Chave estrangeira exibida pelo atributo da relação.
      *
-     * O eager load é derivado daqui pela base. Hoje docs/criar-modulo.md manda
+     * O eager load é derivado daqui pela base. Hoje docs/criar-recurso.md manda
      * o desenvolvedor lembrar do `->with()` à mão — passo manual documentado é
      * fonte de bug documentada, e em vinte telas com FK é a diferença entre
      * vinte N+1 e nenhum.

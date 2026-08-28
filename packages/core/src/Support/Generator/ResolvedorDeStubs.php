@@ -14,7 +14,7 @@ use RuntimeException;
  * comando os lia com `base_path('stubs/modulo')`. Isso quebrava o gerador em
  * qualquer produto: os stubs não viajam no pacote (`find vendor/ht2ml/core -name
  * '*.stub'` devolvia vazio), então `make:modulo` no EduConecta morria antes de
- * escrever um byte. O caminho documentado em docs/criar-modulo.md estava morto
+ * escrever um byte. O caminho documentado em docs/criar-recurso.md estava morto
  * justamente no repositório onde as telas iam nascer.
  *
  * A precedência é POR ARQUIVO, não por diretório: um produto que queira mudar só

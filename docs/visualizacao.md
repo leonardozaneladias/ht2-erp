@@ -77,7 +77,7 @@ o tocam) e a Table não muda: o kebab só dispara um evento global namespaced.
 4. **`_ficha.blade.php`** — o conteúdo (ver o gabarito do Exemplo em
    `resources/views/livewire/admin/exemplos/_ficha.blade.php`).
 
-O `make:modulo` gera tudo isso automaticamente para módulos novos.
+O `make:recurso` gera tudo isso automaticamente para recursos novos.
 
 ## Referência viva e cobertura
 

@@ -10,7 +10,7 @@ use HT2ML\Core\Support\Generator\ResolvedorDeStubs;
  * Até 2026-08-24 eles viviam em `stubs/` na raiz do monorepo e o comando os lia
  * com base_path('stubs/modulo'). Num produto instalado por Composer,
  * `find vendor/ht2ml/core -name '*.stub'` devolvia VAZIO: o gerador morria
- * antes de escrever um byte. O caminho documentado em docs/criar-modulo.md
+ * antes de escrever um byte. O caminho documentado em docs/criar-recurso.md
  * estava morto exatamente onde as 20 telas do EduConecta iam nascer.
  *
  * Note que este teste roda no monorepo, onde base_path('stubs/modulo') NÃO

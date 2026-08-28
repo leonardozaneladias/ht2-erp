@@ -213,9 +213,11 @@ final class CoreServiceProvider extends ServiceProvider
      * Registro EXPLÍCITO, pelo mesmo motivo das policies.
      *
      * O Laravel descobre comandos sozinho em app/Console/Commands. Dentro de um
-     * pacote não há descoberta: sem esta chamada os cinco comandos do núcleo
-     * — access:sync, access:expirar, referencia:sync, make:modulo e
-     * make:extensao — simplesmente somem do artisan, sem erro nenhum.
+     * pacote não há descoberta: sem esta chamada os comandos do núcleo — os três
+     * de operação (access:sync, access:expirar, referencia:sync), os três de
+     * geração (make:modulo, make:recurso, make:regra), o diagnóstico
+     * (ht2ml:doutor) e a lápide do make:extensao — simplesmente somem do
+     * artisan, sem erro nenhum.
      *
      * Ver tests/Feature/Core/ComandosDoCoreTest.php, que falha se algum sumir.
      */

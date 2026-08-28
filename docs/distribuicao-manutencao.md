@@ -48,13 +48,13 @@ A marca de pacotes é configurável em [`config/extensoes.php`](../config/extens
 
 ```bash
 # 1. Cria a casca do pacote em packages/extensao-rh e registra o path repository
-php artisan make:extensao Rh
+php artisan make:modulo rh
 
 # 2. Instala o pacote local (symlink) para desenvolvê-lo dentro do monorepo
 composer require "ht2ml/extensao-rh:@dev"
 
 # 3. Gera um recurso CRUD DENTRO do pacote (namespaces HT2ML\Rh\..., views rh::)
-php artisan make:modulo Funcionario --module=Rh \
+php artisan make:recurso Funcionario --modulo=rh \
   --fields="nome:string, cargo:string, salario:money, status:enum(ativo|inativo)" --tenant
 
 # 4. Formata, migra, publica permissões e limpa caches
@@ -82,7 +82,7 @@ ao core é automática e **sem editar o core**:
 
 O pacote vive em `packages/` **versionado no monorepo da base** (core + `packages/modulo-*`,
 ver ADR-0016), instalado via **path repository** com `symlink: true` — editar
-`packages/extensao-rh/src/...` reflete na hora, igual a editar `app/`. O `make:extensao`
+`packages/extensao-rh/src/...` reflete na hora, igual a editar `app/`. O `make:modulo`
 adiciona o repository ao `composer.json` raiz:
 
 ```json
@@ -252,8 +252,8 @@ quando houver gatilho real:
 
 | Tarefa                         | Comando                                                                             |
 | ------------------------------ | ----------------------------------------------------------------------------------- |
-| Criar casca de pacote          | `php artisan make:extensao Rh`                                                      |
-| Gerar CRUD no pacote           | `php artisan make:modulo Funcionario --module=Rh --fields="..."`                    |
+| Criar módulo (casca do pacote) | `php artisan make:modulo rh`                                                        |
+| Gerar recurso no módulo        | `php artisan make:recurso Funcionario --modulo=rh --fields="..."`                   |
 | Cortar release de módulo       | `make release-modulo slug=rh versao=v0.1.0`                                         |
 | Novo cliente (clone+re-origin) | `make new-client` (após clone + re-origin)                                          |
 | Setup inicial do cliente       | `make setup-client` (sem dados demo → o Setup Wizard cria empresa/admin)            |

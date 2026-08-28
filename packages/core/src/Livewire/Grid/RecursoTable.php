@@ -115,7 +115,7 @@ abstract class RecursoTable extends PowerGridComponent
         )));
 
         if ($relacoes !== []) {
-            // O N+1 some por construção. Antes, docs/criar-modulo.md pedia o
+            // O N+1 some por construção. Antes, docs/criar-recurso.md pedia o
             // ->with() à mão — e passo manual documentado é fonte de bug
             // documentada.
             $query->with(array_unique($relacoes));
