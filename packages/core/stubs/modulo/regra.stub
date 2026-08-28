@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace __NS_REGRAS__;
+
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+
+/**
+ * __REGRA_STUDLY__.
+ *
+ * Regra reutilizável, para UMA condição. Use-a a partir da declaração do campo:
+ *
+ *     Campo::texto('campo', 'Rótulo')->regra(new __REGRA_STUDLY__())
+ *
+ * Validação CRUZADA — a que depende de mais de um campo, como "data de saída
+ * depois da entrada" — não cabe aqui: vai em {Recurso}Rules::regras(), que
+ * enxerga o conjunto.
+ */
+final class __REGRA_STUDLY__ implements ValidationRule
+{
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        // TODO: troque esta linha pela sua condição.
+        //
+        //     if (! $condicao) {
+        //         $fail('__REGRA_MENSAGEM__');
+        //     }
+        //
+        // Até lá a regra RECUSA tudo, de propósito. Uma regra recém-gerada que
+        // aceita tudo passa despercebida até alguém notar que o campo nunca
+        // valida nada; uma que recusa tudo é notada no primeiro uso.
+        $fail('__REGRA_MENSAGEM__');
+    }
+}

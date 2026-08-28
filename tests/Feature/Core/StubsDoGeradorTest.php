@@ -10,9 +10,8 @@ use HT2ML\Core\Support\Generator\ResolvedorDeStubs;
  * Até 2026-08-24 eles viviam em `stubs/` na raiz do monorepo e o comando os lia
  * com base_path('stubs/modulo'). Num produto instalado por Composer,
  * `find vendor/ht2ml/core -name '*.stub'` devolvia VAZIO: o gerador morria
- * em MakeModuloCommand.php:76 (hoje MakeRecursoCommand) antes de escrever um byte. O caminho documentado
- * em docs/criar-modulo.md estava morto exatamente onde as 20 telas do EduConecta
- * iam nascer.
+ * antes de escrever um byte. O caminho documentado em docs/criar-modulo.md
+ * estava morto exatamente onde as 20 telas do EduConecta iam nascer.
  *
  * Note que este teste roda no monorepo, onde base_path('stubs/modulo') NÃO
  * existe mais — ou seja, ele exercita o mesmo caminho de resolução que um
@@ -24,7 +23,7 @@ it('todos os stubs de módulo são encontrados dentro do pacote', function (): v
 
     $doPacote = glob(dirname(__DIR__, 3) . '/packages/core/stubs/modulo/*.stub') ?: [];
 
-    expect($doPacote)->toHaveCount(19);
+    expect($doPacote)->toHaveCount(21);
 
     foreach ($doPacote as $arquivo) {
         expect($stubs->existe(basename($arquivo)))->toBeTrue();
