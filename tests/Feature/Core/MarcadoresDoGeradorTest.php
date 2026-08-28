@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use HT2ML\Core\Console\Commands\MakeModuloCommand;
+use HT2ML\Core\Console\Commands\MakeRecursoCommand;
 
 /*
  * O gerador escreve nos arquivos do pacote procurando comentários-marcador: um
@@ -55,9 +55,9 @@ function marcadoresDePacote(): array
 function marcadorEsperado(): array
 {
     return [
-        'recursos (config)' => MakeModuloCommand::MARCADOR_RECURSOS,
-        'rotas (routes/admin.php)' => MakeModuloCommand::MARCADOR_ROTAS,
-        'provider (ServiceProvider)' => MakeModuloCommand::MARCADOR_PROVIDER,
+        'recursos (config)' => MakeRecursoCommand::MARCADOR_RECURSOS,
+        'rotas (routes/admin.php)' => MakeRecursoCommand::MARCADOR_ROTAS,
+        'provider (ServiceProvider)' => MakeRecursoCommand::MARCADOR_PROVIDER,
     ];
 }
 
@@ -81,7 +81,7 @@ it('os stubs entregam os três marcadores a um pacote novo', function (string $s
 
     expect($conteudo)->toContain($marcador);
 })->with([
-    ['config.stub', MakeModuloCommand::MARCADOR_RECURSOS],
-    ['routes.stub', MakeModuloCommand::MARCADOR_ROTAS],
-    ['service-provider.stub', MakeModuloCommand::MARCADOR_PROVIDER],
+    ['config.stub', MakeRecursoCommand::MARCADOR_RECURSOS],
+    ['routes.stub', MakeRecursoCommand::MARCADOR_ROTAS],
+    ['service-provider.stub', MakeRecursoCommand::MARCADOR_PROVIDER],
 ]);

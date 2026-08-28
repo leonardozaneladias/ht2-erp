@@ -13,7 +13,6 @@ use __NS_MODELS__\__MODULO_STUDLY__;
 final class __MODULO_STUDLY__Table extends RecursoTable
 {
     __TRAIT_MULTI_EMPRESA__
-
     /**
      * @return class-string<__MODULO_STUDLY__>
      */

@@ -35,4 +35,4 @@ Route::prefix('referencia')->name('referencia.')->group(function (): void {
     });
 });
 
-// make:modulo insere as rotas do módulo abaixo desta linha
+// make:recurso insere as rotas do recurso abaixo desta linha

@@ -231,6 +231,7 @@ final class CoreServiceProvider extends ServiceProvider
             Console\Commands\DoutorCommand::class,
             Console\Commands\MakeExtensaoCommand::class,
             Console\Commands\MakeModuloCommand::class,
+            Console\Commands\MakeRecursoCommand::class,
             Console\Commands\ReferenciaSyncCommand::class,
         ]);
     }

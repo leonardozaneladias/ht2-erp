@@ -57,6 +57,6 @@ final class ExemploDemoServiceProvider extends ServiceProvider
 
         Gate::policy(Models\Exemplo::class, Policies\ExemploPolicy::class);
 
-        // make:modulo registra os componentes Livewire e as policies do módulo acima desta linha
+        // make:recurso registra os componentes Livewire e as policies do recurso acima desta linha
     }
 }

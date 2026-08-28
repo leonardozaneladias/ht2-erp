@@ -24,6 +24,8 @@ it('mantém os comandos do core registrados no artisan', function (string $coman
     'access:expirar',
     'referencia:sync',
     'make:modulo',
+    'make:recurso',
+    // Lápide: falha ensinando make:modulo. Some do artisan = some o ensino.
     'make:extensao',
 ]);
 

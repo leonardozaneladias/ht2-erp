@@ -16,4 +16,4 @@ Route::prefix('exemplos')->name('exemplos.')->group(function (): void {
     Route::get('/{exemplo}/editar', FormExemplo::class)->name('edit');
 });
 
-// make:modulo insere as rotas do módulo abaixo desta linha
+// make:recurso insere as rotas do recurso abaixo desta linha

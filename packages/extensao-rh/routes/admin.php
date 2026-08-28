@@ -14,7 +14,7 @@ declare(strict_types=1);
 |
 */
 
-// make:modulo insere as rotas do módulo abaixo desta linha
+// make:recurso insere as rotas do recurso abaixo desta linha
 Illuminate\Support\Facades\Route::prefix('rh/departamentos')->name('rh.departamentos.')->group(function (): void {
     Illuminate\Support\Facades\Route::get('/', HT2ML\Rh\Livewire\Departamentos\IndexDepartamento::class)->name('index');
     Illuminate\Support\Facades\Route::get('/criar', HT2ML\Rh\Livewire\Departamentos\FormDepartamento::class)->name('create');

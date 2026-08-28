@@ -14,4 +14,4 @@ declare(strict_types=1);
 |
 */
 
-// make:modulo insere as rotas do módulo abaixo desta linha
+// make:recurso insere as rotas do recurso abaixo desta linha

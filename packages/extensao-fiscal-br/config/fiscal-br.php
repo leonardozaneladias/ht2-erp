@@ -37,7 +37,6 @@ return [
         'ncms.deletar' => ['label' => 'Excluir NCMs', 'descricao' => 'Mover NCMs para a lixeira.'],
         'ncms.restaurar' => ['label' => 'Restaurar NCMs', 'descricao' => 'Restaurar NCMs da lixeira.'],
         'ncms.excluir_permanente' => ['label' => 'Excluir NCMs permanentemente', 'descricao' => 'Remover NCMs definitivamente (irreversível).'],
-        // make:modulo insere as permissões do módulo acima desta linha
     ],
 
     'menu' => [
@@ -71,7 +70,6 @@ return [
             'grupo' => 'grupo-tab-cadastros',
             'ordem' => 1000,
         ],
-        // make:modulo insere os itens de menu do módulo acima desta linha
     ],
     // Grupos (submenus) declarados por esta extensão. Faixa das extensões: 500+.
     'grupos' => [
