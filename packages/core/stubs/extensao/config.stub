@@ -8,26 +8,36 @@ declare(strict_types=1);
 |--------------------------------------------------------------------------
 |
 | Publicável: php artisan vendor:publish --tag=__MODULO_SLUG__-config
-| É aqui que mora a customização por cliente (config-driven, ADR-0015): o
-| catálogo de permissões e os itens de menu do módulo. O make:modulo preenche
-| estas listas (entre as âncoras) ao gerar cada recurso CRUD.
+| É aqui que mora a customização por cliente (config-driven, ADR-0015).
+|
+| As PERMISSÕES e os ITENS DE MENU não estão aqui: saem da chave de cada
+| recurso, pelo ModuloBuilder (ADR-0021). Escrevê-los à mão é a chance de
+| divergir da fórmula do catálogo — e já divergiram uma vez, com o gerador
+| emitindo 'departamentos.listar' onde o catálogo dizia 'rh.departamentos.listar'.
+| O gate negava em silêncio e ninguém tinha onde olhar.
+|
+| O que fica aqui é decisão de quem instala: onde as contribuições entram, como
+| cada recurso é chamado e em que ordem aparece.
 |
 */
 
 return [
-    // Onde as contribuições desta extensão entram no core.
-    // 'modulo_acesso' precisa ser um caso de HT2ML\Core\Enums\ModuloAcesso; 'secao_menu',
-    // a key de uma seção existente em config/admin-menu.php.
+    // Área do catálogo de acesso e seção da sidebar onde as contribuições entram.
+    // 'modulo_acesso' é uma chave de config('access.areas') — uma das do core ou
+    // uma declarada pelo próprio módulo; 'secao_menu', a key de uma seção de
+    // config('admin-menu').
     'modulo_acesso' => 'negocio',
     'secao_menu' => 'negocio',
 
-    // Permissões do módulo, no formato do catálogo do core (config/access.php).
-    'permissoes' => [
-        // make:modulo insere as permissões do módulo acima desta linha
+    // Grupos (submenus) declarados por esta extensão.
+    // Faixa de ordem das extensões: 500+.
+    'grupos' => [
+        // 'grupo-__MODULO_SLUG__' => ['label' => '__MODULO_STUDLY__', 'icone' => 'tabler--folder', 'ordem' => 500],
     ],
 
-    // Itens de menu (seção "Negócio" da sidebar).
-    'menu' => [
-        // make:modulo insere os itens de menu do módulo acima desta linha
+    // Um recurso por entrada. Dele saem seis permissões, o item de menu, o nome
+    // da rota, a permissão que guarda o item e o padrão de `active`.
+    'recursos' => [
+        // make:recurso insere os recursos do módulo acima desta linha
     ],
 ];
