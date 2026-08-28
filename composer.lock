@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "02bb937ffea2e4d2cc352fb321da108d",
+    "content-hash": "790e09e217bfa04e64a73bdd6f5c4668",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1714,15 +1714,19 @@
         },
         {
             "name": "ht2ml/core",
-            "version": "dev-feat/ht2ml-skeleton",
+            "version": "dev-feat/comandos-e-guardas-fase-2",
             "dist": {
                 "type": "path",
                 "url": "packages/core",
-                "reference": "2647ce5956ba712e4aaabfef6f68c8a65dc89700"
+                "reference": "3827e7759c6050b9a82f3b84fb9a82182565f62b"
             },
             "require": {
                 "bacon/bacon-qr-code": "^3.1",
                 "barryvdh/laravel-dompdf": "^3.1",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "ext-pdo": "*",
+                "ezyang/htmlpurifier": "^4.19",
                 "illuminate/auth": "^13.0",
                 "illuminate/bus": "^13.0",
                 "illuminate/console": "^13.0",
@@ -1738,10 +1742,12 @@
                 "maatwebsite/excel": "^3.1",
                 "php": "^8.4",
                 "power-components/livewire-powergrid": "^6.10",
+                "pragmarx/google2fa": "^8.0",
                 "pragmarx/google2fa-laravel": "^3.0",
                 "spatie/laravel-activitylog": "^5.0",
                 "spatie/laravel-permission": "^8.0",
-                "spatie/laravel-settings": "^3.9"
+                "spatie/laravel-settings": "^3.9",
+                "symfony/http-foundation": "^8.0"
             },
             "type": "library",
             "extra": {
@@ -1769,7 +1775,7 @@
         },
         {
             "name": "ht2ml/extensao-documentos",
-            "version": "dev-feat/ht2ml-skeleton",
+            "version": "dev-feat/comandos-e-guardas-fase-2",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-documentos",
@@ -1809,7 +1815,7 @@
         },
         {
             "name": "ht2ml/extensao-exemplo-demo",
-            "version": "dev-feat/ht2ml-skeleton",
+            "version": "dev-feat/comandos-e-guardas-fase-2",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-exemplo-demo",
@@ -1852,13 +1858,14 @@
         },
         {
             "name": "ht2ml/extensao-fiscal-br",
-            "version": "dev-feat/ht2ml-skeleton",
+            "version": "dev-feat/comandos-e-guardas-fase-2",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-fiscal-br",
-                "reference": "e49795cc25bfe51702acf6aa51576964a590762f"
+                "reference": "89507f9e08f9810d8d9f01d0206768a570902ecf"
             },
             "require": {
+                "ext-mbstring": "*",
                 "ht2ml/core": "@dev",
                 "illuminate/contracts": "^13.0",
                 "illuminate/database": "^13.0",
@@ -1902,15 +1909,18 @@
         },
         {
             "name": "ht2ml/extensao-rh",
-            "version": "dev-feat/ht2ml-skeleton",
+            "version": "dev-feat/comandos-e-guardas-fase-2",
             "dist": {
                 "type": "path",
                 "url": "packages/extensao-rh",
-                "reference": "c649b5b228b27abea9017f358b3068b0fa874620"
+                "reference": "64e80a1a544f5b875b5f3a9d2dbb1b9d82d82025"
             },
             "require": {
                 "ht2ml/core": "@dev",
-                "php": "^8.4"
+                "illuminate/support": "^13.0",
+                "livewire/livewire": "^4.2",
+                "php": "^8.4",
+                "power-components/livewire-powergrid": "^6.10"
             },
             "type": "library",
             "extra": {
@@ -14326,6 +14336,72 @@
                 }
             ],
             "time": "2025-02-07T05:00:38+00:00"
+        },
+        {
+            "name": "shipmonk/composer-dependency-analyser",
+            "version": "1.8.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/shipmonk-rnd/composer-dependency-analyser.git",
+                "reference": "975e5873b519d5180b1017a5dfb43d80781abd45"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/shipmonk-rnd/composer-dependency-analyser/zipball/975e5873b519d5180b1017a5dfb43d80781abd45",
+                "reference": "975e5873b519d5180b1017a5dfb43d80781abd45",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-tokenizer": "*",
+                "php": "^7.2 || ^8.0"
+            },
+            "require-dev": {
+                "editorconfig-checker/editorconfig-checker": "^10.7.0",
+                "ergebnis/composer-normalize": "^2.19.0",
+                "ext-dom": "*",
+                "ext-libxml": "*",
+                "phpcompatibility/php-compatibility": "^9.3.5",
+                "phpstan/phpstan": "^1.12.26",
+                "phpstan/phpstan-phpunit": "^1.4.2",
+                "phpstan/phpstan-strict-rules": "^1.6.2",
+                "phpunit/phpunit": "^8.5.42 || ^9.6.23",
+                "shipmonk/name-collision-detector": "^2.1.1",
+                "slevomat/coding-standard": "^8.15.0"
+            },
+            "bin": [
+                "bin/composer-dependency-analyser"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ShipMonk\\ComposerDependencyAnalyser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Fast detection of composer dependency issues (dead dependencies, shadow dependencies, misplaced dependencies)",
+            "keywords": [
+                "analyser",
+                "composer",
+                "composer dependency",
+                "dead code",
+                "dead dependency",
+                "detector",
+                "dev",
+                "misplaced dependency",
+                "shadow dependency",
+                "static analysis",
+                "unused code",
+                "unused dependency"
+            ],
+            "support": {
+                "issues": "https://github.com/shipmonk-rnd/composer-dependency-analyser/issues",
+                "source": "https://github.com/shipmonk-rnd/composer-dependency-analyser/tree/1.8.4"
+            },
+            "time": "2025-11-25T14:38:16+00:00"
         },
         {
             "name": "staabm/side-effects-detector",

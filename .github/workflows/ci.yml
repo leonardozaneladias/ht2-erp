@@ -71,6 +71,29 @@ jobs:
               run: composer audit --no-interaction
               continue-on-error: true
 
+            # Guard das dependências declaradas. Não dá para escrever em Pest:
+            # "esta classe vem de um pacote que este composer.json declara?"
+            # exige o mapa classe -> pacote que o Composer monta, e reimplementá-lo
+            # em teste seria reimplementar o Composer.
+            #
+            # O symlink existe porque a ferramenta procura o autoload ao lado do
+            # composer.json que analisa, e num monorepo com path repos os pacotes
+            # não têm vendor próprio. Instalar cinco vendors só para analisar
+            # custaria minutos de CI para responder a mesma pergunta.
+            - name: Cada pacote declara o que usa
+              run: |
+                  falhou=0
+                  for p in core extensao-rh extensao-fiscal-br extensao-exemplo-demo extensao-documentos; do
+                      echo "::group::$p"
+                      ln -sfn ../../vendor "packages/$p/vendor"
+                      ./vendor/bin/composer-dependency-analyser \
+                          --composer-json="packages/$p/composer.json" \
+                          --config=composer-dependency-analyser.php || falhou=1
+                      rm -f "packages/$p/vendor"
+                      echo "::endgroup::"
+                  done
+                  exit $falhou
+
             - name: Verificar formatação (Prettier)
               run: npx prettier --check "resources/**/*.{js,ts,tsx,css,json}" "*.{json,md,yaml,yml}" --ignore-path .prettierignore
 

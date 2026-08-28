@@ -1,44 +1,50 @@
 {
-  "name": "ht2ml/core",
-  "description": "Núcleo da plataforma HT2ML: os pontos de extensão que todo módulo-pacote consome.",
-  "type": "library",
-  "license": "proprietary",
-  "require": {
-    "php": "^8.4",
-    "bacon/bacon-qr-code": "^3.1",
-    "barryvdh/laravel-dompdf": "^3.1",
-    "illuminate/auth": "^13.0",
-    "illuminate/bus": "^13.0",
-    "illuminate/console": "^13.0",
-    "illuminate/contracts": "^13.0",
-    "illuminate/database": "^13.0",
-    "illuminate/http": "^13.0",
-    "illuminate/notifications": "^13.0",
-    "illuminate/queue": "^13.0",
-    "illuminate/support": "^13.0",
-    "illuminate/validation": "^13.0",
-    "illuminate/view": "^13.0",
-    "livewire/livewire": "^4.2",
-    "maatwebsite/excel": "^3.1",
-    "power-components/livewire-powergrid": "^6.10",
-    "pragmarx/google2fa-laravel": "^3.0",
-    "spatie/laravel-activitylog": "^5.0",
-    "spatie/laravel-permission": "^8.0",
-    "spatie/laravel-settings": "^3.9"
-  },
-  "autoload": {
-    "psr-4": {
-      "HT2ML\\Core\\": "src/",
-      "HT2ML\\Core\\Database\\Factories\\": "database/factories/",
-      "HT2ML\\Core\\Database\\Seeders\\": "database/seeders/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "HT2ML\\Core\\CoreServiceProvider"
-      ]
-    }
-  },
-  "minimum-stability": "stable"
+    "name": "ht2ml/core",
+    "description": "Núcleo da plataforma HT2ML: os pontos de extensão que todo módulo-pacote consome.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "bacon/bacon-qr-code": "^3.1",
+        "barryvdh/laravel-dompdf": "^3.1",
+        "ezyang/htmlpurifier": "^4.19",
+        "illuminate/auth": "^13.0",
+        "illuminate/bus": "^13.0",
+        "illuminate/console": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/http": "^13.0",
+        "illuminate/notifications": "^13.0",
+        "illuminate/queue": "^13.0",
+        "illuminate/support": "^13.0",
+        "illuminate/validation": "^13.0",
+        "illuminate/view": "^13.0",
+        "livewire/livewire": "^4.2",
+        "maatwebsite/excel": "^3.1",
+        "power-components/livewire-powergrid": "^6.10",
+        "pragmarx/google2fa": "^8.0",
+        "pragmarx/google2fa-laravel": "^3.0",
+        "spatie/laravel-activitylog": "^5.0",
+        "spatie/laravel-permission": "^8.0",
+        "spatie/laravel-settings": "^3.9",
+        "symfony/http-foundation": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HT2ML\\Core\\": "src/",
+            "HT2ML\\Core\\Database\\Factories\\": "database/factories/",
+            "HT2ML\\Core\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HT2ML\\Core\\CoreServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable"
 }
