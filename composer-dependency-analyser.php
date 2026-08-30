@@ -51,13 +51,29 @@ $config->disableReportingUnmatchedIgnores();
 // --- Artefato 1: o pacote referencia as próprias classes. -------------------
 // Óbvio para um humano, invisível para a ferramenta: ela vê HT2ML\Core\... e
 // pergunta por que ht2ml/core não está no require de ht2ml/core.
-$config->ignoreErrorsOnPackages([
-    'ht2ml/core',
-    'ht2ml/extensao-rh',
-    'ht2ml/extensao-fiscal-br',
-    'ht2ml/extensao-exemplo-demo',
-    'ht2ml/extensao-documentos',
-], [ErrorType::SHADOW_DEPENDENCY, ErrorType::DEV_DEPENDENCY_IN_PROD]);
+//
+// Por pacote **E CAMINHO**, nunca por pacote só. A primeira versão deste arquivo
+// ignorava shadow-dependency dos cinco globalmente — e com isso apagava a
+// checagem entre pacotes: uma extensão usando classe de OUTRA extensão sem
+// declarar passaria batido. Medido no repositório do EduConecta, que copiou este
+// arranjo: um `use` de outro módulo saiu com EXIT=0 e nenhuma linha de saída.
+// Um guard vazio é pior que nenhum, porque parece cobertura.
+//
+// O guard A1 cobre core -> extensão; este cobre extensão -> extensão, que
+// nenhum outro cobria.
+foreach ([
+    'ht2ml/core' => 'packages/core',
+    'ht2ml/extensao-rh' => 'packages/extensao-rh',
+    'ht2ml/extensao-fiscal-br' => 'packages/extensao-fiscal-br',
+    'ht2ml/extensao-exemplo-demo' => 'packages/extensao-exemplo-demo',
+    'ht2ml/extensao-documentos' => 'packages/extensao-documentos',
+] as $pacote => $caminho) {
+    $config->ignoreErrorsOnPackageAndPath(
+        $pacote,
+        __DIR__ . '/' . $caminho,
+        [ErrorType::SHADOW_DEPENDENCY, ErrorType::DEV_DEPENDENCY_IN_PROD],
+    );
+}
 
 // --- Artefato 2: monólito instalado, splits declarados. ---------------------
 // O vendor da raiz tem laravel/framework, não os illuminate/* separados. Então
