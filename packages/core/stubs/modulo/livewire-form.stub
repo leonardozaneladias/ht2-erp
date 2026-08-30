@@ -63,7 +63,7 @@ __FORM_MOUNT_LOAD__
     public function render(): View
     {
         return view('__VIEW_PREFIX__.form-__MODULO_SNAKE__', [
-            'modo' => $this->__MODULO_CAMEL__Id === null ? 'criar' : 'editar',
+            'modo' => $this->__MODULO_CAMEL__Id === null ? 'criar' : 'editar',__FORM_RELACAO_OPTIONS__
         ])->title($this->__MODULO_CAMEL__Id === null ? 'Novo registro' : 'Editar registro');
     }
 

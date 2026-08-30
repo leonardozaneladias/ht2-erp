@@ -147,6 +147,121 @@ final class EspecificacaoModulo
         return $this->pacote !== null ? $this->nsBase() . '\\Database\\Factories' : 'Database\\Factories';
     }
 
+    /**
+     * Os `belongsTo()` de cada campo de relação.
+     *
+     * Sem eles a coluna `turma_id` existe e `$aluno->turma` não: a base
+     * declarativa emite o eager load a partir do nome da relação, e um
+     * `->with('turma')` sobre relação inexistente estoura na renderização da
+     * primeira linha — não no deploy.
+     */
+    public function modelRelacoes(): string
+    {
+        $blocos = [];
+
+        foreach ($this->campos as $campo) {
+            if (! $campo->ehRelacao()) {
+                continue;
+            }
+
+            $fqcn = $campo->relacaoFqcn($this->nsModels());
+
+            $blocos[] = sprintf(
+                "\n    /**\n"
+                . "     * @return BelongsTo<\\%s, \$this>\n"
+                . "     */\n"
+                . "    public function %s(): BelongsTo\n"
+                . "    {\n"
+                . "        return \$this->belongsTo(\\%s::class);\n"
+                . "    }\n",
+                $fqcn,
+                $campo->relacaoMetodo(),
+                $fqcn,
+            );
+        }
+
+        return implode('', $blocos);
+    }
+
+    /**
+     * As opções de cada select de relação, montadas no COMPONENTE.
+     *
+     * No componente e não no blade porque é aqui que o escopo por empresa vale:
+     * o global scope do BelongsToEmpresa filtra a query, e uma consulta feita
+     * na view escaparia dele e ofereceria registros de outra empresa num
+     * select — vazamento que a tela não denuncia, porque a lista parece normal.
+     */
+    public function formRelacaoOptions(): string
+    {
+        $linhas = [];
+
+        foreach ($this->campos as $campo) {
+            if (! $campo->ehRelacao()) {
+                continue;
+            }
+
+            $linhas[] = sprintf(
+                "\n            '%sOptions' => \\%s::query()->orderBy('%s')->pluck('%s', 'id')->all(),",
+                Str::camel($campo->relacaoMetodo()),
+                $campo->relacaoFqcn($this->nsModels()),
+                $campo->relacaoAtributo,
+                $campo->relacaoAtributo,
+            );
+        }
+
+        return implode('', $linhas);
+    }
+
+    /** O import de BelongsTo, só quando há relação. */
+    public function modelUseBelongsTo(): string
+    {
+        foreach ($this->campos as $campo) {
+            if ($campo->ehRelacao()) {
+                return "use Illuminate\\Database\\Eloquent\\Relations\\BelongsTo;\n";
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * O `newFactory()` que um model DENTRO DE PACOTE precisa ter.
+     *
+     * O Laravel adivinha a fábrica trocando `App\Models\X` por
+     * `Database\Factories\XFactory`. Num pacote o model é
+     * `EduConecta\Escola\Models\Aluno`, o palpite vira
+     * `Database\Factories\AlunoFactory`, e essa classe não existe: o
+     * `Factory::factoryForModel()` estoura.
+     *
+     * Medido: um recurso gerado dentro de um pacote nascia com 3 dos 5 testes
+     * dele mesmo vermelhos. A guarda A4 não pegava — ela gera a tela e confere
+     * rota e permissão, mas nunca roda o teste gerado.
+     *
+     * Fora de pacote o palpite do Laravel acerta, e o método seria ruído.
+     */
+    public function modelNewFactory(): string
+    {
+        if ($this->pacote === null) {
+            return '';
+        }
+
+        return sprintf(
+            "\n    /**\n"
+            . "     * O palpite do Laravel (Database\\Factories\\%sFactory) não existe\n"
+            . "     * para um model de pacote — sem isto, factory() estoura.\n"
+            . "     */\n"
+            . "    protected static function newFactory(): \\%s\\%sFactory\n"
+            . "    {\n"
+            . "        return \\%s\\%sFactory::new();\n"
+            . "    }\n",
+            $this->studly,
+            $this->nsFactories(),
+            $this->studly,
+            $this->nsFactories(),
+            $this->studly,
+        );
+    }
+
     public function viewPrefix(): string
     {
         return $this->pacote !== null
@@ -258,6 +373,10 @@ final class EspecificacaoModulo
             '__NS_REQUESTS__' => $this->nsRequests(),
             '__NS_LIVEWIRE__' => $this->nsLivewire(),
             '__NS_FACTORIES__' => $this->nsFactories(),
+            '__MODEL_NEW_FACTORY__' => $this->modelNewFactory(),
+            '__MODEL_RELACOES__' => $this->modelRelacoes(),
+            '__MODEL_USE_BELONGS_TO__' => $this->modelUseBelongsTo(),
+            '__FORM_RELACAO_OPTIONS__' => $this->formRelacaoOptions(),
             '__VIEW_PREFIX__' => $this->viewPrefix(),
             '__LW_TAG__' => $this->lwTag(),
             // Soft-delete: tokens com quebra embutida (nada quando ausente, p/ não deixar linha vazia).
@@ -265,7 +384,13 @@ final class EspecificacaoModulo
             '__MODEL_USE_SOFT_DELETE__' => $this->softDelete ? "\nuse Illuminate\\Database\\Eloquent\\SoftDeletes;" : '',
             '__MODEL_TRAIT_SOFT_DELETE__' => $this->softDelete ? "\n    use SoftDeletes;" : '',
             '__MODEL_USE_TENANT__' => $this->tenant ? 'use HT2ML\Core\Models\Concerns\BelongsToEmpresa;' : '',
-            '__MODEL_TRAIT_TENANT__' => $this->tenant ? 'use BelongsToEmpresa;' : '',
+            // Traz a própria quebra e indentação: quando o token era só o texto
+            // e o stub punha a linha, um recurso SEM tenant deixava uma linha
+            // com quatro espaços e nada mais. O Pint precisava de DUAS passadas
+            // para limpar aquilo — e o gerador dá uma —, então todo model saía
+            // reprovando class_attributes_separation enquanto o comando dizia
+            // "Pint já passou nos arquivos gerados".
+            '__MODEL_TRAIT_TENANT__' => $this->tenant ? "\n    use BelongsToEmpresa;" : '',
             // Filtro multi-empresa nas listagens (só faz sentido em módulos tenant).
             '__USE_MULTI_EMPRESA__' => $this->tenant ? 'use HT2ML\Core\Livewire\Grid\RecursoMultiEmpresa;' : '',
             '__TRAIT_MULTI_EMPRESA__' => $this->tenant ? 'use RecursoMultiEmpresa;' : '',
@@ -293,7 +418,7 @@ final class EspecificacaoModulo
         }
 
         foreach ($this->campos as $campo) {
-            $linhas[] = $campo->colunaMigration();
+            $linhas[] = $campo->colunaMigration($campo->ehRelacao() ? $campo->relacaoFqcn($this->nsModels()) : null);
         }
 
         // status (enum gravado como string)
@@ -461,6 +586,11 @@ final class EspecificacaoModulo
             // precisam virar string no formato do input antes de cair na prop.
             $col = "\$registro->{$campo->nome}";
             $rhs = match ($campo->tipo) {
+                // FK: a prop é ?int mesmo quando o campo é obrigatório, porque
+                // o formulário nasce com nada selecionado. Um (string) aqui
+                // atribuía texto a ?int e o form explodia ao ABRIR a edição —
+                // e só ali, porque criar não passa por este caminho.
+                'relacao' => $col,
                 // MoneyCast devolve o VO — a prop do form guarda centavos (int).
                 'money' => $campo->nullable ? "{$col}?->centavos() ?? 0" : "{$col}->centavos()",
                 'integer' => "(int) {$col}",
@@ -484,7 +614,7 @@ final class EspecificacaoModulo
         $linhas = [];
 
         foreach ($this->campos as $campo) {
-            $itens = $campo->regras();
+            $itens = $campo->regras(null, $campo->ehRelacao() ? $campo->relacaoFqcn($this->nsModels()) : null);
             if ($campo->unique) {
                 $itens[] = $this->regraUnique($campo);
             }
@@ -537,7 +667,9 @@ final class EspecificacaoModulo
         }
 
         foreach ($this->campos as $campo) {
-            $linhas[] = $campo->fragmentoFactory();
+            $linhas[] = $campo->fragmentoFactory(
+                relacaoFqcn: $campo->ehRelacao() ? $campo->relacaoFqcn($this->nsModels()) : null,
+            );
         }
         $linhas[] = "'status' => fake()->randomElement({$this->statusEnumShort()}::cases()),";
 
@@ -738,7 +870,10 @@ final class EspecificacaoModulo
         $linhas = [];
 
         foreach ($this->campos as $campo) {
-            $linhas[] = "->set('{$campo->nome}', {$campo->valorTeste()})";
+            $valor = $campo->valorTeste(
+                $campo->ehRelacao() ? $campo->relacaoFqcn($this->nsModels()) : null,
+            );
+            $linhas[] = "->set('{$campo->nome}', {$valor})";
         }
         $linhas[] = "->set('status', '{$this->statusValueDefault()}')";
 
@@ -907,6 +1042,21 @@ final class EspecificacaoModulo
             return '<x-shared.select-search name="status" label="Status" wire:model="status" :options="\\' . $this->nsEnums() . '\\' . $this->statusEnumShort() . '::options()" required />';
         }
 
+        if ($campo->ehRelacao()) {
+            // select-search e não select simples: uma turma entre trezentas não
+            // se acha rolando lista. As opções vêm do componente Livewire, que
+            // é onde o escopo por empresa já está aplicado — montá-las no blade
+            // faria a query fugir do escopo e listar registros de outra empresa.
+            return sprintf(
+                '<x-shared.select-search name="%s" label="%s" wire:model="%s" :options="$%s"%s />',
+                $campo->nome,
+                $campo->label(),
+                $campo->nome,
+                Str::camel($campo->relacaoMetodo()) . 'Options',
+                $campo->nullable ? '' : ' required',
+            );
+        }
+
         return $campo->componenteBlade();
     }
 
@@ -932,6 +1082,10 @@ final class EspecificacaoModulo
         $prop = $campo->camel();
 
         return match ($campo->tipo) {
+            // FK: null quando ausente, int quando presente. `(int) ?? 0` viraria
+            // 0 — um id que não existe — e a falha só apareceria na FK do banco,
+            // longe do lugar onde o valor se perdeu.
+            'relacao' => "{$prop}: isset(\$data['{$chave}']) ? (int) \$data['{$chave}'] : null,",
             'integer', 'money' => "{$prop}: (int) (\$data['{$chave}'] ?? 0),",
             'boolean' => "{$prop}: (bool) (\$data['{$chave}'] ?? false),",
             'multiselect' => "{$prop}: (array) (\$data['{$chave}'] ?? []),",

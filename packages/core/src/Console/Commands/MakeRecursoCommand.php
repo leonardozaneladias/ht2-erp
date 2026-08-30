@@ -228,9 +228,35 @@ final class MakeRecursoCommand extends Command
             return;
         }
 
-        $resultado = Process::path(base_path())->run([$pint, ...$this->escritos]);
+        // DIRETÓRIOS, não arquivos — e são só os diretórios em que o gerador
+        // escreveu.
+        //
+        // Medido, no mesmo arquivo e com o mesmo pint.json: `pint --test <dir>`
+        // reprova e `pint --test <arquivo>` aprova. Com caminho de arquivo o
+        // Pint deixa de aplicar parte das regras, e o comando anunciava "Pint já
+        // passou nos arquivos gerados" enquanto o model reprovava no
+        // `pint --test` do CI — que roda sobre diretórios.
+        //
+        // Duas passadas porque uma não converge: o Pint reordena os traits
+        // (ordered_class_elements) e só então a separação entre eles e o
+        // docblock passa a valer (class_attributes_separation).
+        $diretorios = array_values(array_unique(array_map(
+            static fn (string $arquivo): string => dirname($arquivo),
+            $this->escritos,
+        )));
 
-        $this->formatado = $resultado->successful();
+        $tudoLimpo = true;
+
+        foreach ($diretorios as $diretorio) {
+            Process::path(base_path())->run([$pint, $diretorio]);
+            Process::path(base_path())->run([$pint, $diretorio]);
+
+            if (! Process::path(base_path())->run([$pint, '--test', $diretorio])->successful()) {
+                $tudoLimpo = false;
+            }
+        }
+
+        $this->formatado = $tudoLimpo;
     }
 
     /**
