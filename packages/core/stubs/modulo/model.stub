@@ -10,16 +10,16 @@ __MODEL_USE_LIXEIRA__
 __MODEL_USE_TENANT__
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+__MODEL_USE_BELONGS_TO__
 
 /**
  * @property __STATUS_ENUM__ $status__MODEL_DATE_PROPERTIES____MODEL_DELETED_AT_PROPERTY__
  */
 class __MODULO_STUDLY__ extends Model__MODEL_IMPLEMENTS_LIXEIRA__
 {
-    use Auditavel;__MODEL_TRAIT_SOFT_DELETE__
-    __MODEL_TRAIT_TENANT__
+    use Auditavel;__MODEL_TRAIT_SOFT_DELETE____MODEL_TRAIT_TENANT__
 
-    /** @use HasFactory<\Database\Factories\__MODULO_STUDLY__Factory> */
+    /** @use HasFactory<\__NS_FACTORIES__\__MODULO_STUDLY__Factory> */
     use HasFactory;
 
     protected $table = '__MODULO_TABELA__';
@@ -40,4 +40,4 @@ __MODEL_FILLABLE__
 __MODEL_CASTS__
         ];
     }
-}
+__MODEL_RELACOES____MODEL_NEW_FACTORY__}

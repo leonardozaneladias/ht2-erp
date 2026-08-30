@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace HT2ML\Core\Support\Generator;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
@@ -35,6 +36,10 @@ final class CampoModulo
         public readonly bool $unique = false,
         public readonly array $enumValores = [],
         public readonly ?string $aba = null,
+        /** Model relacionado quando $tipo === 'relacao' (curto ou FQCN). */
+        public readonly ?string $relacaoModel = null,
+        /** Atributo exibido do relacionado (coluna, select, ficha). */
+        public readonly string $relacaoAtributo = 'nome',
     ) {}
 
     /**
@@ -48,7 +53,10 @@ final class CampoModulo
         $partes = array_values(array_filter(array_map('trim', explode(':', trim($token))), static fn (string $valor): bool => $valor !== ''));
 
         $nome = Str::snake((string) ($partes[0] ?? ''));
-        $tipoBruto = strtolower($partes[1] ?? 'string');
+        // O tipo cru preserva a caixa: `relacao(Turma)` precisa do Studly, e
+        // strtolower() o destruiria antes do parse.
+        $tipoCru = $partes[1] ?? 'string';
+        $tipoBruto = strtolower($tipoCru);
 
         // Modificadores em caixa original (para preservar o rótulo da aba) e a
         // versão lower (para checar flags como nullable/unique).
@@ -67,6 +75,27 @@ final class CampoModulo
             ));
         }
 
+        // relacao(Model) ou relacao(Model:atributo). O Model pode ser curto — e
+        // aí vive no mesmo namespace do recurso — ou FQCN, para apontar para
+        // outro pacote (ex.: \HT2ML\Core\Models\Filial).
+        $relacaoModel = null;
+        $relacaoAtributo = 'nome';
+
+        if (preg_match('/^relacao\((.+)\)$/i', trim($tipoCru), $mr) === 1) {
+            $tipo = 'relacao';
+            $alvo = trim($mr[1]);
+
+            // Barra vertical separa o atributo, e não dois-pontos: o token já
+            // foi quebrado por ':' lá em cima, então `relacao(Turma:descricao)`
+            // chegaria aqui partido ao meio. É a mesma razão de enum(a|b|c).
+            if (preg_match('/^(.+?)\|([A-Za-z_][A-Za-z0-9_]*)$/', $alvo, $ma) === 1) {
+                $alvo = trim($ma[1]);
+                $relacaoAtributo = $ma[2];
+            }
+
+            $relacaoModel = ltrim($alvo, '\\');
+        }
+
         // aba(Rótulo): agrupa o campo numa aba do formulário (case preservado).
         $aba = null;
         foreach ($modificadoresOriginais as $mod) {
@@ -82,6 +111,8 @@ final class CampoModulo
             unique: in_array('unique', $modificadores, true),
             enumValores: $enumValores,
             aba: $aba,
+            relacaoModel: $relacaoModel,
+            relacaoAtributo: $relacaoAtributo,
         );
     }
 
@@ -95,9 +126,63 @@ final class CampoModulo
         return $this->tipo === 'enum';
     }
 
+    public function ehRelacao(): bool
+    {
+        return $this->tipo === 'relacao' && $this->relacaoModel !== null;
+    }
+
+    /** Nome curto do model relacionado: 'Turma' em \Pacote\Models\Turma. */
+    public function relacaoModelCurto(): string
+    {
+        return Str::afterLast((string) $this->relacaoModel, '\\');
+    }
+
+    /** O método da relação: `turma_id` -> `turma`. */
+    public function relacaoMetodo(): string
+    {
+        return Str::camel(Str::beforeLast($this->nome, '_id') ?: $this->nome);
+    }
+
+    /**
+     * A tabela apontada pela FK.
+     *
+     * O palpite é o pluralizador do Laravel, que é INGLÊS: 'Filial' vira
+     * 'filials' e a FK aponta para uma tabela que não existe — medido ao gerar
+     * a primeira relação. Quando o model já existe, quem responde é ele
+     * (getTable()), que conhece o próprio `$table`; o palpite só vale para um
+     * model que ainda vai ser gerado, e aí o gerador nomeia a tabela com a
+     * mesma regra.
+     */
+    public function relacaoTabela(?string $fqcn = null): string
+    {
+        if ($fqcn !== null && class_exists($fqcn) && is_subclass_of($fqcn, Model::class)) {
+            /** @var Model $instancia */
+            $instancia = new $fqcn;
+
+            return $instancia->getTable();
+        }
+
+        return Str::snake(Str::pluralStudly($this->relacaoModelCurto()));
+    }
+
+    /**
+     * FQCN do relacionado. Nome curto resolve no namespace de models do próprio
+     * recurso; com barra, o autor já disse onde ele mora.
+     */
+    public function relacaoFqcn(string $nsModelsDoRecurso): string
+    {
+        $model = (string) $this->relacaoModel;
+
+        return str_contains($model, '\\') ? $model : $nsModelsDoRecurso . '\\' . $model;
+    }
+
     public function label(): string
     {
-        return Str::ucfirst(str_replace('_', ' ', $this->nome));
+        // Numa relação o rótulo é o do RELACIONADO, não o da coluna: quem lê a
+        // tela vê "Turma", não "Turma id".
+        $base = $this->ehRelacao() ? Str::beforeLast($this->nome, '_id') : $this->nome;
+
+        return Str::ucfirst(str_replace('_', ' ', $base ?: $this->nome));
     }
 
     public function camel(): string
@@ -128,8 +213,23 @@ final class CampoModulo
 
     // ---- Migration --------------------------------------------------------
 
-    public function colunaMigration(): string
+    /**
+     * @param  string|null  $tabelaFqcn  FQCN do relacionado, para perguntar a tabela a ele
+     */
+    public function colunaMigration(?string $tabelaFqcn = null): string
     {
+        if ($this->ehRelacao()) {
+            // foreignId + constrained: a integridade fica no banco, não no
+            // combinado. nullOnDelete quando o campo aceita nulo, cascade não —
+            // apagar uma turma não pode apagar os alunos dela em silêncio.
+            $fk = "\$table->foreignId('{$this->nome}')";
+            $fk .= $this->nullable ? '->nullable()' : '';
+            $fk .= "->constrained('{$this->relacaoTabela($tabelaFqcn)}')";
+            $fk .= $this->nullable ? '->nullOnDelete()' : '->restrictOnDelete()';
+
+            return $fk . ';';
+        }
+
         $coluna = match ($this->tipo) {
             'text', 'richtext' => "\$table->text('{$this->nome}')",
             'integer', 'money' => "\$table->integer('{$this->nome}')",
@@ -185,12 +285,19 @@ final class CampoModulo
     public function tipoPhp(?string $enumShort = null): string
     {
         $base = match ($this->tipo) {
-            'integer', 'money' => 'int',
+            'relacao', 'integer', 'money' => 'int',
             'boolean' => 'bool',
             'multiselect' => 'array',
             'enum' => $enumShort ?? 'string',
             default => 'string',
         };
+
+        // FK é sempre anulável: a propriedade nasce nula ("nada selecionado")
+        // mesmo quando o campo é obrigatório, e o `required` cobra a escolha.
+        // Um `int` sem `?` estouraria TypeError ao abrir o formulário de criar.
+        if ($this->ehRelacao()) {
+            return '?' . $base;
+        }
 
         // Enum de status nunca e nullable; multiselect e sempre array (default []);
         // os demais respeitam o modificador.
@@ -203,6 +310,7 @@ final class CampoModulo
     {
         return match (true) {
             $this->ehStatus() => '', // tratado a parte (enum default)
+            $this->ehRelacao() => ' = null',
             $this->tipo === 'boolean' => ' = false',
             $this->tipo === 'multiselect' => ' = []',
             $this->nullable => ' = null',
@@ -216,6 +324,9 @@ final class CampoModulo
     public function defaultLivewire(): string
     {
         return match (true) {
+            // FK não tem valor neutro: 0 não existe na tabela e '' não é int.
+            // Nasce nula — "nada selecionado" — e o `required` cobra a escolha.
+            $this->ehRelacao() => 'null',
             $this->tipo === 'boolean' => 'false',
             $this->tipo === 'integer' || $this->tipo === 'money' => '0',
             $this->tipo === 'multiselect' => '[]',
@@ -227,11 +338,17 @@ final class CampoModulo
     public function tipoLivewire(): string
     {
         $base = match ($this->tipo) {
-            'integer', 'money' => 'int',
+            'relacao', 'integer', 'money' => 'int',
             'boolean' => 'bool',
             'multiselect' => 'array',
             default => 'string',
         };
+
+        // Sempre anulável numa FK: a propriedade nasce nula (nada selecionado),
+        // então o tipo precisa aceitar isso mesmo quando o campo é obrigatório.
+        if ($this->ehRelacao()) {
+            return '?' . $base;
+        }
 
         return ($this->nullable && ! in_array($this->tipo, ['boolean', 'multiselect'], true)) ? '?' . $base : $base;
     }
@@ -242,9 +359,19 @@ final class CampoModulo
      * @param  string|null  $enumShort  nome curto do Enum (para Rule::enum)
      * @return list<string> itens da regra (renderizados como array PHP)
      */
-    public function regras(?string $enumShort = null): array
+    /**
+     * @param  string|null  $tabelaFqcn  FQCN do relacionado, para o `exists`
+     * @return list<string>
+     */
+    public function regras(?string $enumShort = null, ?string $tabelaFqcn = null): array
     {
         $obrig = $this->nullable ? "'nullable'" : "'required'";
+
+        if ($this->ehRelacao()) {
+            // `exists` e não só `integer`: sem ele, um id de outra empresa
+            // passa na validação e a FK só reclama se existir no banco inteiro.
+            return [$obrig, "'integer'", "'exists:{$this->relacaoTabela($tabelaFqcn)},id'"];
+        }
 
         return match ($this->tipo) {
             'text', 'richtext' => [$this->nullable ? "'nullable'" : "'required'", "'string'"],
@@ -276,8 +403,18 @@ final class CampoModulo
 
     // ---- Factory ----------------------------------------------------------
 
-    public function fragmentoFactory(?string $enumShort = null): string
+    /**
+     * @param  string|null  $relacaoFqcn  FQCN do model relacionado, quando houver
+     */
+    public function fragmentoFactory(?string $enumShort = null, ?string $relacaoFqcn = null): string
     {
+        if ($this->ehRelacao() && $relacaoFqcn !== null) {
+            // A fábrica CRIA o relacionado. Um id inventado passaria no
+            // `integer` e morreria na FK — e o teste gerado falharia por um
+            // motivo que não tem nada a ver com o que ele testa.
+            return "'{$this->nome}' => \\{$relacaoFqcn}::factory(),";
+        }
+
         $valor = match ($this->tipo) {
             'text', 'richtext' => 'fake()->sentence()',
             'integer' => 'fake()->numberBetween(1, 1000)',
@@ -305,8 +442,15 @@ final class CampoModulo
      * Valor literal PHP válido para preencher este campo num teste Livewire
      * (`->set('campo', <valor>)`), respeitando as regras geradas.
      */
-    public function valorTeste(): string
+    public function valorTeste(?string $relacaoFqcn = null): string
     {
+        if ($this->ehRelacao() && $relacaoFqcn !== null) {
+            // Cria o relacionado e usa o id dele. Um literal aqui reprovaria no
+            // `exists:` — e o teste gerado falharia por causa do próprio valor
+            // de exemplo, não do que ele se propõe a verificar.
+            return "\\{$relacaoFqcn}::factory()->create()->id";
+        }
+
         return match ($this->tipo) {
             'integer' => '1',
             'money' => '1990',
@@ -352,6 +496,20 @@ final class CampoModulo
     public function campoDeclarativo(?string $enumShort = null): string
     {
         $rotulo = $this->label();
+
+        // Campo::relacao já traz o eager load: a base coleta as relações e emite
+        // o ->with() sozinha. Era passo manual documentado — e passo manual
+        // documentado é fonte de bug documentada, uma consulta N+1 por tela.
+        if ($this->ehRelacao()) {
+            return sprintf(
+                "Campo::relacao('%s', '%s', '%s', '%s')%s,",
+                $this->nome,
+                $this->label(),
+                $this->relacaoMetodo(),
+                $this->relacaoAtributo,
+                $this->nullable ? '' : '->obrigatorio()',
+            );
+        }
 
         $declaracao = match ($this->tipo) {
             'money' => "Campo::dinheiro('{$this->nome}', '{$rotulo}')",
