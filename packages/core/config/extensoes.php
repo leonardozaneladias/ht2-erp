@@ -39,6 +39,25 @@ return [
     // Diretório onde as extensões em desenvolvimento vivem (path repository).
     'path' => 'packages',
 
+    /*
+    | Idioma da inflexão usada PELOS GERADORES para derivar singular e plural do
+    | nome de um recurso (classe, tabela, rota, namespace de view).
+    |
+    | O default do Laravel é inglês, e num domínio em português ele erra feio:
+    | `Materia` vira a classe `Materium` e a tabela `materia`; `Nota` vira
+    | `Notum`; `Frequencia` vira `Frequencium`; `Responsavel` pluraliza como
+    | `Responsavels` e `Avaliacao` como `Avaliacaos`. Medido em doze nomes de um
+    | domínio escolar: CINCO saíam errados. Renomear depois é migração de dados.
+    |
+    | Vale só durante a geração — o Eloquent continua resolvendo tabela como
+    | sempre resolveu, porque os models gerados declaram `$table` explicitamente
+    | e um produto já instalado não pode mudar de nome de tabela por causa disto.
+    |
+    | null mantém o inglês. Valores aceitos pelo Illuminate\Support\Pluralizer:
+    | english, french, norwegian-bokmal, portuguese, spanish, turkish.
+    */
+    'idioma_inflexao' => null,
+
     // Prefixo do nome do pacote Composer: {vendor}/{prefixo}{slug}.
     'prefixo_pacote' => 'extensao-',
 
