@@ -11,6 +11,7 @@ use HT2ML\Core\Support\Generator\ResolvedorDeStubs;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
 
 /**
@@ -87,6 +88,16 @@ final class MakeRecursoCommand extends Command
 
     public function handle(): int
     {
+        // A inflexão do Laravel é inglesa por default, e num domínio em
+        // português ela erra o singular e o plural de um em cada quatro nomes
+        // — `Materia` vira `Materium`, `Nota` vira `Notum`. Ver o porquê em
+        // config/extensoes.php; vale só aqui, durante a geração.
+        $idioma = config('extensoes.idioma_inflexao');
+
+        if (is_string($idioma) && $idioma !== '') {
+            Pluralizer::useLanguage($idioma);
+        }
+
         if ((string) $this->option('module') !== '') {
             $this->error('A opção --module não existe mais. Use --modulo, com a chave kebab-case do módulo:');
             $this->line('  php artisan make:recurso ' . $this->argument('nome') . ' --modulo=rh');
@@ -633,6 +644,93 @@ PHP;
         $this->injetarRotasPacote($spec);
         $this->injetarConfigPacote($spec);
         $this->registrarNoProviderPacote($spec);
+        $this->declararLivewireNoPacote($spec);
+    }
+
+    /**
+     * O módulo passa a usar Livewire — então passa a declará-lo.
+     *
+     * O gerador escreve três componentes Livewire dentro do pacote e não tocava
+     * o composer.json dele. Funcionava porque ht2ml/core arrasta o Livewire, e
+     * quebraria no dia em que o núcleo parasse de arrastar. O
+     * composer-dependency-analyser acusou isso na primeira execução dentro de um
+     * produto — "shadow dependency: livewire/livewire".
+     *
+     * O PowerGrid NÃO entra: quem o estende é a RecursoTable, do núcleo. Um
+     * módulo que usa a base declarativa nunca toca uma classe dele, e declarar
+     * seria dizer que usa algo que não usa.
+     */
+    private function declararLivewireNoPacote(EspecificacaoModulo $spec): void
+    {
+        $pkg = $spec->pacote;
+
+        if ($pkg === null) {
+            return;
+        }
+
+        $arquivo = base_path("{$pkg->dir}/composer.json");
+
+        if (! File::isFile($arquivo)) {
+            return;
+        }
+
+        $original = (string) File::get($arquivo);
+
+        /** @var array<string, mixed> $composer */
+        $composer = (array) json_decode($original, true);
+
+        /** @var array<string, string> $require */
+        $require = (array) ($composer['require'] ?? []);
+
+        if (isset($require['livewire/livewire'])) {
+            return;
+        }
+
+        $require['livewire/livewire'] = MakeModuloCommand::constraintInstalada('livewire/livewire');
+
+        // php primeiro, ext-* depois, o resto alfabético: a ordem que o Composer
+        // usa e que os manifestos do repositório já seguiam.
+        $ordenado = [];
+
+        if (isset($require['php'])) {
+            $ordenado['php'] = $require['php'];
+            unset($require['php']);
+        }
+
+        foreach (array_filter(array_keys($require), static fn (string $k): bool => str_starts_with($k, 'ext-')) as $k) {
+            $ordenado[$k] = $require[$k];
+            unset($require[$k]);
+        }
+
+        ksort($require);
+
+        $composer['require'] = [...$ordenado, ...$require];
+
+        File::put($arquivo, $this->encodeJsonPreservandoIndentacao($composer, $original));
+        $this->criados[] = "{$pkg->dir}/composer.json (livewire)";
+    }
+
+    /**
+     * json_encode usa 4 espaços fixos; preserva a indentação do arquivo original
+     * para não gerar um diff de reformatação inteira.
+     *
+     * @param  array<string, mixed>  $dados
+     */
+    private function encodeJsonPreservandoIndentacao(array $dados, string $original): string
+    {
+        $json = (string) json_encode($dados, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        $indent = preg_match('/\n([ \t]+)"/', $original, $m) === 1 ? $m[1] : '    ';
+
+        if ($indent !== '    ') {
+            $json = (string) preg_replace_callback(
+                '/^( +)/m',
+                static fn (array $grupo): string => str_repeat($indent, intdiv(strlen($grupo[1]), 4)),
+                $json,
+            );
+        }
+
+        return $json . "\n";
     }
 
     private function injetarRotasPacote(EspecificacaoModulo $spec): void

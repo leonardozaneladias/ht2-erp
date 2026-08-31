@@ -9,6 +9,7 @@ use HT2ML\Core\Support\Generator\ResolvedorDeStubs;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
 
 /**
@@ -49,6 +50,16 @@ final class MakeModuloCommand extends Command
 
     public function handle(): int
     {
+        // A inflexão do Laravel é inglesa por default, e num domínio em
+        // português ela erra o singular e o plural de um em cada quatro nomes
+        // — `Materia` vira `Materium`, `Nota` vira `Notum`. Ver o porquê em
+        // config/extensoes.php; vale só aqui, durante a geração.
+        $idioma = config('extensoes.idioma_inflexao');
+
+        if (is_string($idioma) && $idioma !== '') {
+            Pluralizer::useLanguage($idioma);
+        }
+
         $chave = trim((string) $this->argument('chave'));
 
         if ($chave === '') {
@@ -106,6 +117,35 @@ final class MakeModuloCommand extends Command
         $this->resumo($pkg);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * A constraint de um pacote a partir do que está INSTALADO.
+     *
+     * Antes era '@dev' fixo. O Composer avisa que constraint sem teto deve ser
+     * evitada, e o aviso está certo: '@dev' aceita qualquer versão futura,
+     * inclusive uma 1.0 com quebras. No monorepo da plataforma o core é um path
+     * repository e '@dev' é o certo; num produto ele vem por VCS numa versão —
+     * e o módulo gerado tem de pedir aquela.
+     */
+    public static function constraintInstalada(string $pacote): string
+    {
+        if (! class_exists(\Composer\InstalledVersions::class)
+            || ! \Composer\InstalledVersions::isInstalled($pacote)) {
+            return '@dev';
+        }
+
+        $versao = (string) \Composer\InstalledVersions::getPrettyVersion($pacote);
+
+        // Path repository e branch de trabalho reportam 'dev-<branch>'. Não há
+        // versão a fixar: '@dev' é a resposta honesta.
+        if ($versao === '' || str_starts_with($versao, 'dev-')) {
+            return '@dev';
+        }
+
+        $partes = explode('.', ltrim($versao, 'v'));
+
+        return '^' . $partes[0] . '.' . ($partes[1] ?? '0');
     }
 
     /**
@@ -202,7 +242,7 @@ final class MakeModuloCommand extends Command
             // docs/superficie-do-core.md.
             'require' => [
                 'php' => '^8.4',
-                'ht2ml/core' => '@dev',
+                'ht2ml/core' => self::constraintInstalada('ht2ml/core'),
                 'illuminate/support' => '^13.0',
             ],
             'autoload' => [
