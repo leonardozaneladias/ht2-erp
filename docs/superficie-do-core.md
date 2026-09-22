@@ -159,46 +159,52 @@ Ao mover qualquer coisa nova para o pacote, a pergunta é sempre a mesma: _o
 framework encontrava isso sozinho?_ Se sim, agora é preciso declarar — ou
 ensinar a convenção ao namespace novo, quando houver como.
 
-## A prova de instalação — passa
+## A prova completa: um produto novo, do zero
 
-O plano definia sucesso assim: _instalar num Laravel limpo, fora do monorepo. Se
-não funcionar fora, a extração não aconteceu — só mudamos pastas de lugar._
-
-**Passa.** Receita para repetir:
+O plano definia sucesso como _instalar num Laravel limpo, fora do monorepo_. O
+teste ficou mais forte que isso — hoje um produto **nasce de um comando**:
 
 ```bash
-composer create-project laravel/laravel /tmp/prova
-cd /tmp/prova
-# repositório path apontando para packages/* do monorepo
-composer config repositories.ht2ml path ../caminho/para/ht2-erp/packages/*
-composer config minimum-stability dev
-composer require ht2ml/core:@dev
-php artisan migrate --force
+composer create-project ht2ml/skeleton meu-produto
+cd meu-produto
+cp .env.example .env && php artisan key:generate
+php artisan migrate --seed
+npm install && npm run build
 ```
 
-Resultado medido num Laravel 13.26.1 limpo:
+Medido num diretório vazio, com os pacotes vindo dos repositórios privados por
+Composer (`Extracting archive`, não symlink):
 
-| Verificação                                                                                                            | Resultado                                                                    |
-| ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Tabelas do pacote (`admin_users`, `empresas`, `filiais`, `activity_log`, `permission_grants`, `estados`, `municipios`) | criadas pelas 42 migrations do pacote                                        |
-| Permissões vindas da config do pacote                                                                                  | **83** — exatamente 113 − 18 (fiscal-br) − 12 (RH), que não estão instaladas |
-| Seções de menu                                                                                                         | 4                                                                            |
-| Rotas `admin.*`                                                                                                        | 124                                                                          |
-| `<x-shared.button>`                                                                                                    | renderiza                                                                    |
-| `HT2ML\Core\Models\AdminUser`                                                                                          | carrega                                                                      |
-| `access:sync`                                                                                                          | registrado no artisan                                                        |
+| Verificação                                       | Resultado                    |
+| ------------------------------------------------- | ---------------------------- |
+| `ht2ml/core` instalado e descoberto               | ✅                           |
+| Migrations do pacote                              | 62 passos                    |
+| `municipios` semeados do pacote                   | **5.571**                    |
+| Perfis e usuários administrativos                 | 2 e 2                        |
+| Permissões no banco                               | 77                           |
+| Rotas `admin.*`                                   | 124                          |
+| `GET /admin/login`                                | **HTTP 200**, com formulário |
+| Classes Tailwind de blades em `vendor/ht2ml/core` | presentes no CSS             |
 
-### Dois defeitos que só a instalação limpa revelou
+A última linha fecha o ciclo da correção do `@source`: o Tailwind varreu os
+blades **dentro de `vendor/`**, que é o cenário que o monorepo não reproduz.
 
-**Rotas do pacote referenciando o app.** `routes/admin.php` foi para o pacote
-levando junto o bloco do módulo de exemplo, que aponta para
-`App\Livewire\Admin\Exemplos\*` — classes do app consumidor. No monorepo
-funcionava, porque a classe existe lá. Fora, `Invalid route action`. É a
-inversão de dependência que o ADR-0015 proíbe, e nenhum teste do monorepo
-poderia tê-la pego. Corrigido: o app contribui as próprias rotas pelo canal do
-`ModuleRegistry`, o mesmo que uma extensão usa.
+### Cinco defeitos que só esta prova revelou
 
-**Migration de vendor sem a dependência.** `create_pulse_tables` importa
-`Laravel\Pulse\Support\PulseMigration`, e o core não declara `laravel/pulse` —
-nem usa Pulse em nenhuma linha de código. Era uma migration publicada de uma
-ferramenta opcional de observabilidade que veio na carona. Voltou para o app.
+Nenhum deles era detectável de dentro do monorepo — não por falta de cobertura,
+por impossibilidade lógica: lá, tudo está instalado.
+
+1. **Rotas do pacote referenciando o app.** `routes/admin.php` levou junto o
+   bloco do módulo de exemplo, apontando para `App\Livewire\...`. Dentro do
+   monorepo a classe existe; fora, `Invalid route action`.
+2. **Migration de vendor sem a dependência.** `create_pulse_tables` importava
+   `Laravel\Pulse`, que o core não declara — nem usa.
+3. **Os CSVs dos catálogos ficaram no app.** Os seeders foram para o pacote e
+   resolviam o caminho em `database_path()`. Só semeavam porque o monorepo por
+   acaso tinha os arquivos.
+4. **O core não declarava seis pacotes que usa** — PowerGrid (88 usos),
+   `maatwebsite/excel`, o QR do 2FA, o dompdf. Funcionava porque o app
+   declarava.
+5. **`RolePermissionSeeder` concedia permissão de extensão ausente**, guardado
+   por um flag de env em vez da realidade. O primeiro `migrate --seed` de
+   qualquer produto novo morria.
