@@ -200,9 +200,19 @@ mude no monorepo e corte um release novo.
 ```bash
 composer create-project ht2ml/skeleton meu-produto
 cd meu-produto
+
 cp .env.example .env && php artisan key:generate
 php artisan migrate --seed
+
+# Os assets NÃO vêm prontos: o Composer não carrega dependência npm, e o
+# Tailwind precisa gerar o CSS varrendo os blades — inclusive os que vivem
+# dentro de vendor/ht2ml/core. Sem este passo, toda tela devolve 500 com
+# "Vite manifest not found".
+npm install && npm run build
 ```
+
+Depois disso, `/admin/login` responde. Os seeders criam `admin@example.com` /
+`password` (super-admin) e `gestor@example.com` / `password`.
 
 O que vem: um app Laravel que **instala** `ht2ml/core` por Composer — auth com
 2FA, multiempresa, perfis e permissões, auditoria, configurações, menu, design
