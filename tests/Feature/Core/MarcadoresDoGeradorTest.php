@@ -28,8 +28,10 @@ use HT2ML\Core\Console\Commands\MakeRecursoCommand;
  * a divergência de quando os marcadores mudaram e o teste continuou pinando os
  * nomes velhos.
  *
- * Pacote SEM config é extensão-biblioteca (ex.: documentos): não carrega
- * módulo, não tem tela, não precisa de marcador nenhum.
+ * Extensão-biblioteca (`extra.ht2ml.tipo: biblioteca`, ADR-0021) não carrega
+ * módulo, não tem tela, não precisa de marcador nenhum — mesmo quando tem config
+ * própria, como a extensao-api. O critério é o manifesto, não a presença de
+ * config/: "sem config = biblioteca" valeu até a primeira biblioteca configurável.
  */
 
 /** @return list<array{0: string, 1: string, 2: string}> [pacote, o que é, caminho] */
@@ -41,6 +43,13 @@ function marcadoresDePacote(): array
     foreach (glob($raiz . '/packages/extensao-*/config/*.php') ?: [] as $config) {
         $dir = dirname($config, 2);
         $pacote = basename($dir);
+
+        $manifesto = json_decode((string) file_get_contents($dir . '/composer.json'), true);
+
+        if (($manifesto['extra']['ht2ml']['tipo'] ?? null) !== 'modulo') {
+            continue;
+        }
+
         $providers = glob($dir . '/src/*ServiceProvider.php') ?: [];
 
         $linhas[] = [$pacote, 'recursos (config)', $config];
