@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a68402ccb30edbad0b0d57e6a045499c",
+    "content-hash": "daa8386cb10b14fb24790857672adcb3",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2051,6 +2051,50 @@
                 "proprietary"
             ],
             "description": "Catálogos de classificação fiscal brasileira: CNAE, CFOP e NCM.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ht2ml/extensao-ia",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/extensao-ia",
+                "reference": "ad6c9b00f29638459fb6a5e737d474450fe10100"
+            },
+            "require": {
+                "illuminate/database": "^13.0",
+                "illuminate/http": "^13.0",
+                "illuminate/support": "^13.0",
+                "php": "^8.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HT2ML\\Ia\\IaServiceProvider"
+                    ]
+                },
+                "ht2ml": {
+                    "tipo": "biblioteca"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HT2ML\\Ia\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "HT2ML\\Ia\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Extensão IA: contratos de tradução, resumo e assistente, fakes, cache de tradução e limites por custo para produtos HT2ML.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -14951,6 +14995,7 @@
         "ht2ml/extensao-documentos": 20,
         "ht2ml/extensao-exemplo-demo": 20,
         "ht2ml/extensao-fiscal-br": 20,
+        "ht2ml/extensao-ia": 20,
         "ht2ml/extensao-rh": 20
     },
     "prefer-stable": true,

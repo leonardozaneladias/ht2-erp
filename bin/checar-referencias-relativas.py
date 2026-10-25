@@ -25,6 +25,7 @@ BASES = (
     'packages/extensao-exemplo-demo/database/seeders',
     'packages/extensao-documentos/src',
     'packages/extensao-api/src',
+    'packages/extensao-ia/src',
 )
 
 conhecidas = set()
