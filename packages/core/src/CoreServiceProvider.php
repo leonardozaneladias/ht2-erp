@@ -174,14 +174,18 @@ final class CoreServiceProvider extends ServiceProvider
      */
     private function registrarRotas(): void
     {
-        if ($this->app->routesAreCached()) {
-            return;
-        }
-
         // 300/min por IP: um gateway reenviando em rajada depois de uma queda
         // não pode ser barrado, e um endpoint público sem teto nenhum é um alvo.
         // O produto substitui registrando o mesmo limiter depois do core.
+        //
+        // Fica ANTES do guard de cache: o route:cache guarda o nome
+        // `throttle:webhooks`, não o limiter. Sem este registro a cada boot,
+        // toda rota de webhook em produção estoura no primeiro request.
         RateLimiter::for('webhooks', static fn (Request $request): Limit => Limit::perMinute(300)->by($request->ip() ?? 'sem-ip'));
+
+        if ($this->app->routesAreCached()) {
+            return;
+        }
 
         Route::middleware('web')->group(__DIR__ . '/../routes/admin.php');
         Route::middleware('web')->group(__DIR__ . '/../routes/publico.php');

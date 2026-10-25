@@ -28,6 +28,9 @@ final class ExemploDemoServiceProvider extends ServiceProvider
             ->label('Exemplo Demo')
             ->deConfig('exemplo-demo');
 
+        // Depois dos seeders do core: o perfil `gestor` precisa já existir.
+        ModuleRegistry::seeder(Database\Seeders\PermissoesDoGestorSeeder::class);
+
         ModuleRegistry::routes(function (): void {
             $rotas = __DIR__ . '/../routes/admin.php';
 

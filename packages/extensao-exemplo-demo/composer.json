@@ -13,7 +13,8 @@
     "autoload": {
         "psr-4": {
             "HT2ML\\ExemploDemo\\": "src/",
-            "HT2ML\\ExemploDemo\\Database\\Factories\\": "database/factories/"
+            "HT2ML\\ExemploDemo\\Database\\Factories\\": "database/factories/",
+            "HT2ML\\ExemploDemo\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {

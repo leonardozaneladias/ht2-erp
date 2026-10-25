@@ -28,7 +28,7 @@ migrate:
 	ddev artisan migrate
 
 fresh:
-	ddev artisan migrate:fresh --seed && ddev artisan db:seed --class=DevelopmentSeeder
+	ddev artisan migrate:fresh --seed
 
 seed:
 	ddev artisan db:seed
