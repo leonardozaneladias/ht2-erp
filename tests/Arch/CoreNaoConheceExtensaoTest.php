@@ -168,7 +168,12 @@ it('A2 — o core não cita chave de extensão nem como literal de string', func
         'cnaes.listar',
     );
 
-    $literais = literaisDeString(base_path('packages/core/src'));
+    // Não só src/: um seeder ou uma config do core citando permissão de
+    // extensão é o mesmo vazamento — e o RolePermissionSeeder já fez isso.
+    $literais = array_merge_recursive(...array_map(
+        static fn (string $dir): array => literaisDeString(base_path("packages/core/{$dir}")),
+        ['src', 'database', 'config', 'routes'],
+    ));
 
     $vazamentos = [];
 
@@ -182,5 +187,63 @@ it('A2 — o core não cita chave de extensão nem como literal de string', func
         '',
         'A extensão declara o que é dela (permissão, item de menu, grupo, ordem)',
         'na própria config. O core aplica sem saber de quem é. Ver ADR-0022.',
+    ]));
+});
+
+it('A2 — as views do core não citam extensão', function (): void {
+    // literaisDeString() só lê .php puro, e um blade é texto: as views escaparam
+    // do guard até 2026-10, quando o dashboard e duas páginas de /admin/dev
+    // ainda chamavam \HT2ML\ExemploDemo\… atrás de um class_exists().
+    $namespaces = namespacesDeExtensao();
+
+    // A chave do módulo é o nome da config e também o namespace das views
+    // (`rh::`, `fiscal-br::`), pela mesma regra do ADR-0021.
+    $namespacesDeView = [];
+
+    foreach (glob(base_path('packages/*/config/*.php')) ?: [] as $arquivo) {
+        if (! str_contains($arquivo, '/packages/core/')) {
+            $namespacesDeView[] = basename($arquivo, '.php');
+        }
+    }
+
+    $chaves = chavesExclusivasDeExtensao();
+
+    $vazamentos = [];
+
+    $views = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(base_path('packages/core/resources/views')));
+
+    foreach ($views as $view) {
+        if (! $view instanceof SplFileInfo || ! str_ends_with($view->getFilename(), '.blade.php')) {
+            continue;
+        }
+
+        $conteudo = (string) file_get_contents($view->getPathname());
+        $relativo = str_replace(base_path() . '/', '', $view->getPathname());
+
+        foreach ($namespaces as $namespace) {
+            if (str_contains($conteudo, $namespace . '\\')) {
+                $vazamentos[] = "{$namespace} → {$relativo}";
+            }
+        }
+
+        foreach ($namespacesDeView as $namespaceDeView) {
+            if (preg_match('/[\'"]' . preg_quote($namespaceDeView, '/') . '::/', $conteudo) === 1) {
+                $vazamentos[] = "{$namespaceDeView}:: → {$relativo}";
+            }
+        }
+
+        foreach ($chaves as $chave) {
+            if (preg_match('/[\'"]' . preg_quote($chave, '/') . '[\'"]/', $conteudo) === 1) {
+                $vazamentos[] = "{$chave} → {$relativo}";
+            }
+        }
+    }
+
+    expect($vazamentos)->toBe([], implode("\n", [
+        'Views do core citam extensões:',
+        ...$vazamentos,
+        '',
+        'Uma extensão que precisa aparecer numa tela do core entra por canal',
+        '(menu, rota, seeder), não por class_exists() no blade. Ver ADR-0022.',
     ]));
 });

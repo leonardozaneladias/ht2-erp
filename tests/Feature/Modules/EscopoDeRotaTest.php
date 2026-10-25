@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use HT2ML\Core\CoreServiceProvider;
 use HT2ML\Core\Support\Modules\EscopoDeRota;
 use HT2ML\Core\Support\Modules\ModuleRegistry;
 use Illuminate\Support\Facades\RateLimiter;
@@ -121,4 +122,29 @@ it('o limiter de webhooks existe antes de qualquer módulo registrar um', functi
     // Um throttle apontando para limiter inexistente estoura no primeiro
     // request do gateway, não no deploy — e aí já é produção.
     expect(RateLimiter::limiter('webhooks'))->not->toBeNull();
+});
+
+it('o limiter de webhooks existe também com as rotas em cache', function (): void {
+    // O deploy roda route:cache. Com as rotas em cache, o core não lê os
+    // hospedeiros de novo — mas o throttle:webhooks gravado no cache continua
+    // apontando para o limiter, e o limiter é registrado em tempo de boot, não
+    // em tempo de leitura de rota. Se ele ficasse atrás do guard de cache, todo
+    // webhook em produção estouraria no primeiro request.
+    //
+    // O Laravel memoriza a resposta de routesAreCached() neste binding; é o
+    // mesmo estado que o boot de produção enxerga depois de um route:cache.
+    app()->instance('routes.cached', true);
+
+    try {
+        app()->instance(Illuminate\Cache\RateLimiter::class, new Illuminate\Cache\RateLimiter(app('cache')->store()));
+        RateLimiter::clearResolvedInstances();
+        expect(RateLimiter::limiter('webhooks'))->toBeNull();
+
+        (new ReflectionMethod(CoreServiceProvider::class, 'registrarRotas'))
+            ->invoke(new CoreServiceProvider(app()));
+
+        expect(RateLimiter::limiter('webhooks'))->not->toBeNull();
+    } finally {
+        app()->instance('routes.cached', false);
+    }
 });

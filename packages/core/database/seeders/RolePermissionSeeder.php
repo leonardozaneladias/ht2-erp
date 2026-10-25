@@ -45,9 +45,8 @@ class RolePermissionSeeder extends Seeder
             'dashboard.view',
             'usuarios.listar',
             'listagens.multi_empresa',
-            // De extensão: existe só se ht2ml/extensao-exemplo-demo estiver
-            // instalada. Não é caso especial — o filtro abaixo trata qualquer uma.
-            'exemplos.listar',
+            // Permissões de extensão não entram aqui: quem concede é a própria
+            // extensão, por um seeder no canal do ModuleRegistry (ADR-0022).
         ];
 
         $gestor->syncPermissions($this->somenteExistentes($permissoesGestor));

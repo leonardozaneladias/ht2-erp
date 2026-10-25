@@ -33,8 +33,8 @@
         />
     </div>
 
-    <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <div class="lg:col-span-2">
+    <div class="mt-5 grid grid-cols-1 gap-5">
+        <div>
             <x-admin.chart-line
                 title="Novos usuários"
                 subtitle="Últimos 6 meses"
@@ -43,13 +43,5 @@
                 :colors="['--color-primary']"
             />
         </div>
-        @if (class_exists(\HT2ML\ExemploDemo\Livewire\ExemploCounter::class))
-            {{-- Componente da extensão de demonstração: o núcleo NÃO depende dela.
-                 Sem ht2ml/extensao-exemplo-demo instalada, este bloco some em vez
-                 de estourar "Unable to find component". --}}
-            <div>
-                <livewire:exemplo-counter />
-            </div>
-        @endif
     </div>
 </x-admin.layout>
