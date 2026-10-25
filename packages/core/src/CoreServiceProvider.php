@@ -52,6 +52,11 @@ final class CoreServiceProvider extends ServiceProvider
             'core-config',
         );
 
+        // Antes das rotas: um hospedeiro que use o alias precisa encontrá-lo.
+        // No provider e não no bootstrap/app.php do produto, para que todo
+        // produto que instala o core ganhe o alias sem editar nada.
+        $this->app['router']->aliasMiddleware('webhook.assinatura', Http\Middleware\ValidarAssinaturaWebhook::class);
+
         $this->registrarRotas();
 
         // As 43 migrations do núcleo. loadMigrationsFrom() as inclui no
@@ -159,14 +164,14 @@ final class CoreServiceProvider extends ServiceProvider
     }
 
     /**
-     * Os três hospedeiros de rota de módulo — um por EscopoDeRota.
+     * Os hospedeiros de rota de módulo — um por EscopoDeRota.
      *
      * Saíram de bootstrap/app.php para cá: um app que instala ht2ml/core ganha
      * o /admin inteiro sem precisar declarar nada. O guard de cache é o mesmo
      * que o loadRoutesFrom() do Laravel faz — com as rotas em cache, o arquivo
      * não deve ser lido de novo.
      *
-     * Os três são carregados sempre, mesmo vazios. A alternativa — carregar só
+     * Todos são carregados sempre, mesmo vazios. A alternativa — carregar só
      * o que tem contribuição — economizaria dois `require` e criaria uma ordem
      * de boot relevante: o provider do core pode rodar ANTES dos providers dos
      * módulos, então "tem contribuição?" seria respondido cedo demais e a rota
@@ -190,6 +195,7 @@ final class CoreServiceProvider extends ServiceProvider
         Route::middleware('web')->group(__DIR__ . '/../routes/admin.php');
         Route::middleware('web')->group(__DIR__ . '/../routes/publico.php');
         Route::group([], __DIR__ . '/../routes/webhook.php');
+        Route::group([], __DIR__ . '/../routes/api.php');
     }
 
     /**

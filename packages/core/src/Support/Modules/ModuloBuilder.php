@@ -171,6 +171,12 @@ final class ModuloBuilder
         return $this->rotas($rotas, EscopoDeRota::Webhook);
     }
 
+    /** Rotas de API do módulo: grupo `api`, sem sessão, sob /api. */
+    public function rotasDeApi(string|Closure $rotas): self
+    {
+        return $this->rotas($rotas, EscopoDeRota::Api);
+    }
+
     /**
      * Abre um recurso — e já o coleta.
      *

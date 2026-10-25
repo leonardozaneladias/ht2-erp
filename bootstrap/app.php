@@ -23,7 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // estático, estourando RouteNotFoundException antes do handler de exceções.
         $middleware->redirectGuestsTo(fn (): string => route('admin.login'));
 
-        $middleware->statefulApi();
+        // Sem statefulApi(): ele pendura o middleware do Sanctum no grupo `api`, e
+        // a plataforma não instala o Sanctum. Com o canal EscopoDeRota::Api, a
+        // primeira rota de API de um módulo estouraria "class not found". Quem
+        // precisa de SPA com cookie liga isso pela ht2ml/extensao-api.
         $middleware->encryptCookies(except: ['appearance', 'admin-mode']);
         $middleware->alias([
             'admin.auth' => HT2ML\Core\Http\Middleware\AdminAuthenticate::class,

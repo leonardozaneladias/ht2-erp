@@ -118,6 +118,40 @@ it('a rota pública nasce com a stack web e sem prefixo imposto', function (): v
         ->and($rota->gatherMiddleware())->not->toContain('admin.auth');
 });
 
+it('a rota de api nasce sob /api, no grupo api e sem sessão', function (): void {
+    ModuleRegistry::modulo('sonda')->rotasDeApi(function (): void {
+        Route::get('/v1/ping', fn (): array => ['ok' => true])->name('sonda.ping');
+    });
+
+    Route::group([], dirname(__DIR__, 3) . '/packages/core/routes/api.php');
+
+    $rota = collect(Route::getRoutes()->getRoutes())
+        ->first(fn ($r): bool => $r->getName() === 'api.sonda.ping');
+
+    expect($rota)->not->toBeNull('a rota de api do módulo não foi registrada')
+        // Prefixo e name impostos; a versão é do módulo.
+        ->and($rota->uri())->toBe('api/v1/ping')
+        ->and($rota->gatherMiddleware())->toContain('api')
+        // Sem a stack web: uma API chamada por app não tem cookie para mandar.
+        ->and($rota->gatherMiddleware())->not->toContain('web')
+        ->and($rota->gatherMiddleware())->not->toContain('admin.auth');
+});
+
+it('a rota de api responde pelo grupo api, com o throttle que o produto pendura nele', function (): void {
+    ModuleRegistry::routes(function (): void {
+        Route::post('/v1/eco', fn (Illuminate\Http\Request $r): array => $r->all())->name('eco');
+    }, EscopoDeRota::Api);
+
+    Route::group([], dirname(__DIR__, 3) . '/packages/core/routes/api.php');
+
+    // O cabeçalho só existe se o throttle:api do grupo rodou: é a prova de que
+    // a rota entrou no grupo `api` do produto, e não num grupo vazio.
+    $this->postJson('/api/v1/eco', ['a' => 1])
+        ->assertOk()
+        ->assertExactJson(['a' => 1])
+        ->assertHeader('X-RateLimit-Limit');
+});
+
 it('o limiter de webhooks existe antes de qualquer módulo registrar um', function (): void {
     // Um throttle apontando para limiter inexistente estoura no primeiro
     // request do gateway, não no deploy — e aí já é produção.
