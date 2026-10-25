@@ -67,6 +67,7 @@ foreach ([
     'ht2ml/extensao-fiscal-br' => 'packages/extensao-fiscal-br',
     'ht2ml/extensao-exemplo-demo' => 'packages/extensao-exemplo-demo',
     'ht2ml/extensao-documentos' => 'packages/extensao-documentos',
+    'ht2ml/extensao-api' => 'packages/extensao-api',
 ] as $pacote => $caminho) {
     $config->ignoreErrorsOnPackageAndPath(
         $pacote,
@@ -112,9 +113,22 @@ $config->ignoreErrorsOnPackages([
     'pestphp/pest-plugin-arch',
 ], [ErrorType::SHADOW_DEPENDENCY, ErrorType::DEV_DEPENDENCY_IN_PROD]);
 
+// Pelo mesmo motivo, o autoload-dev de um pacote (tests/Fixtures) não está no
+// autoloader da raiz: os testes carregam as fixtures com require_once, e o
+// analisador não tem como resolvê-las.
+$config->ignoreUnknownClassesRegex('~^HT2ML\\\\[A-Za-z]+\\\\Tests\\\\~');
+
 // --- Real, mas fora do alcance de um pacote: -------------------------------
 // pragmarx/google2fa-laravel entra pelo ServiceProvider e pela config, não por
 // referência de classe. É uso por integração, que nenhuma análise estática vê.
 $config->ignoreErrorsOnPackage('pragmarx/google2fa-laravel', [ErrorType::UNUSED_DEPENDENCY]);
+
+// laravel/sanctum na extensao-api: o guard `sanctum` é resolvido por nome
+// (`$request->user('sanctum')`, `auth:sanctum`) e a extensão entrega a migração
+// de personal_access_tokens. Nenhuma referência de classe em src/, e mesmo
+// assim sem o pacote a extensão não funciona.
+// Por pacote e não por caminho: o analisador não aceita ignorar este tipo de
+// erro num caminho. Só a extensao-api declara o Sanctum.
+$config->ignoreErrorsOnPackage('laravel/sanctum', [ErrorType::PROD_DEPENDENCY_ONLY_IN_DEV]);
 
 return $config;

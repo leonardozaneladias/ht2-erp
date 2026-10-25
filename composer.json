@@ -17,6 +17,7 @@
     "barryvdh/laravel-dompdf": "^3.1",
     "guzzlehttp/guzzle": "^7.10",
     "ht2ml/core": "@dev",
+    "ht2ml/extensao-api": "@dev",
     "ht2ml/extensao-documentos": "@dev",
     "ht2ml/extensao-exemplo-demo": "@dev",
     "ht2ml/extensao-fiscal-br": "@dev",
