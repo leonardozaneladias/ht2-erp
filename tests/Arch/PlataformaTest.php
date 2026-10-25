@@ -27,6 +27,7 @@ use HT2ML\Core\Models\Activity;
 use HT2ML\Core\Models\Concerns\Auditavel;
 use HT2ML\Core\Models\LoginHistory;
 use HT2ML\Documentos\Models\DocumentSequence;
+use HT2ML\Ia\Models\TraducaoEmCache;
 use Illuminate\Database\Eloquent\Model;
 
 /** @var list<string> Namespaces raiz de todo pacote da plataforma, sem allowlist: extensão nova entra sozinha. */
@@ -68,6 +69,7 @@ arch('models usam Auditavel ou estão na whitelist consciente')
         Activity::class,          // o log em si (append-only)
         LoginHistory::class,      // histórico append-only (já é trilha)
         DocumentSequence::class,  // contador técnico de infra, não entidade de negócio
+        TraducaoEmCache::class,   // cache de tradução, apagável sem perda
     ]);
 
 // Models de Referência são catálogos globais, não dados de cliente: aplicar

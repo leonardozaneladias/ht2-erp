@@ -21,6 +21,7 @@
     "ht2ml/extensao-documentos": "@dev",
     "ht2ml/extensao-exemplo-demo": "@dev",
     "ht2ml/extensao-fiscal-br": "@dev",
+    "ht2ml/extensao-ia": "@dev",
     "ht2ml/extensao-rh": "@dev",
     "laravel/framework": "^13.0",
     "laravel/horizon": "^5.0",

@@ -68,6 +68,7 @@ foreach ([
     'ht2ml/extensao-exemplo-demo' => 'packages/extensao-exemplo-demo',
     'ht2ml/extensao-documentos' => 'packages/extensao-documentos',
     'ht2ml/extensao-api' => 'packages/extensao-api',
+    'ht2ml/extensao-ia' => 'packages/extensao-ia',
 ] as $pacote => $caminho) {
     $config->ignoreErrorsOnPackageAndPath(
         $pacote,

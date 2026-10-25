@@ -83,7 +83,7 @@ jobs:
             - name: Cada pacote declara o que usa
               run: |
                   falhou=0
-                  for p in core extensao-rh extensao-fiscal-br extensao-exemplo-demo extensao-documentos extensao-api; do
+                  for p in core extensao-rh extensao-fiscal-br extensao-exemplo-demo extensao-documentos extensao-api extensao-ia; do
                       echo "::group::$p"
                       ln -sfn ../../vendor "packages/$p/vendor"
                       ./vendor/bin/composer-dependency-analyser \

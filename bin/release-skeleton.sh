@@ -141,7 +141,7 @@ php -r '
     $d["type"] = "project";
     $org = $argv[2];
     $d["repositories"] = [];
-    foreach (["core", "extensao-rh", "extensao-fiscal-br", "extensao-exemplo-demo", "extensao-documentos", "extensao-api"] as $slug) {
+    foreach (["core", "extensao-rh", "extensao-fiscal-br", "extensao-exemplo-demo", "extensao-documentos", "extensao-api", "extensao-ia"] as $slug) {
         // no-api: o Composer usa GIT em vez da API do GitHub para estes
         // repositórios. Sem isso ele baixa um zipball de api.github.com, que
         // exige o token ter permissão na API — caminho que falha com
@@ -228,6 +228,7 @@ composer require ht2ml/extensao-fiscal-br   # CNAE, CFOP, NCM
 composer require ht2ml/extensao-documentos  # numeração sequencial
 composer require ht2ml/extensao-exemplo-demo # vitrine do design system
 composer require ht2ml/extensao-api         # API REST: envelope, idioma, erros, Sanctum
+composer require ht2ml/extensao-ia          # contratos de IA, fakes, cache de tradução
 ```
 
 Os repositórios já estão declarados no `composer.json`.
