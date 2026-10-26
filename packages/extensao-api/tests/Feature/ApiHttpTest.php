@@ -137,3 +137,31 @@ it('usuário desativado é barrado na requisição seguinte, no envelope', funct
 
     $this->getJson('/api/ativa')->assertOk();
 });
+
+it('o envelope entra no Handler mesmo que o contrato seja decorado antes do boot', function (): void {
+    // A ordem real do Collision em console: o Handler é resolvido, e um
+    // provider o embrulha num adaptador ANTES do boot() desta extensão. A
+    // primeira versão registrava o envelope no boot(), pedindo o contrato —
+    // recebia o adaptador, que não é Handler, e não registrava nada: sob
+    // Octane ou num script, /api respondia o 404 do Laravel em HTML.
+    $app = new Illuminate\Foundation\Application(base_path());
+    $app->instance('config', new Illuminate\Config\Repository([]));
+    $app->singleton(Illuminate\Contracts\Debug\ExceptionHandler::class, Illuminate\Foundation\Exceptions\Handler::class);
+
+    $provider = new HT2ML\Api\ApiServiceProvider($app);
+    $provider->register();
+
+    $interno = $app->make(Illuminate\Contracts\Debug\ExceptionHandler::class);
+
+    $app->extend(Illuminate\Contracts\Debug\ExceptionHandler::class, fn ($h) => new class($h)
+    {
+        public function __construct(public readonly object $interno) {}
+    });
+
+    $callbacks = (new ReflectionProperty(Illuminate\Foundation\Exceptions\Handler::class, 'renderCallbacks'))->getValue($interno);
+
+    expect(collect($callbacks)->contains(
+        fn (Closure $cb): bool => (new ReflectionFunction($cb))->getClosureThis() instanceof HT2ML\Api\Excecoes\RenderizadorDeErroApi
+            || str_contains((string) (new ReflectionFunction($cb))->getFileName(), 'RenderizadorDeErroApi'),
+    ))->toBeTrue('o envelope não foi registrado no Handler interno');
+});
