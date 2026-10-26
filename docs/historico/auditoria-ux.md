@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve a revisão de usabilidade do painel admin feita em 2026-06-12 (Playwright, DDEV); não reflete o estado atual. Arquivado em 2026-10-25 — ver não há documento atual que a substitua; o estado real da interface está no código e no [catálogo de componentes](../template/INSPINIA/CATALOGO-COMPONENTES.md).
+
 # Auditoria de Usabilidade — Painel Admin
 
 > Revisão geral de UI/UX conduzida em 2026-06-12 via Playwright (navegador real)

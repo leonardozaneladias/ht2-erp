@@ -1,7 +1,7 @@
 # Infraestrutura Local
 
 **Ambiente oficial:** [DDEV](https://docs.ddev.com/) · provider **OrbStack** (macOS).
-**Stack:** PHP 8.4 · PostgreSQL 16 · Redis · Nginx · Horizon · Pulse · Mailpit · Vite 7.
+**Stack:** PHP 8.4 · PostgreSQL 16 · Redis · Nginx · Horizon · Pulse · Mailpit · Vite 8 (`^8.2` no `package.json`) · Node 22.
 
 A configuração vive versionada em `.ddev/` — qualquer pessoa que clone obtém o
 mesmo ambiente. Em Windows/Linux o mesmo `.ddev/` roda com Docker Desktop/WSL2;
@@ -17,8 +17,11 @@ brew install ddev/ddev/ddev
 ```
 
 OrbStack assume o contexto Docker automaticamente (não precisa de `docker context use`).
-`performance_mode` fica no default do macOS (Mutagen) — OrbStack + Mutagen é a
-combinação mais rápida nos benchmarks oficiais.
+O `.ddev/config.yaml` deste repositório fixa `performance_mode: none` (bind mounts
+diretos, sem Mutagen): o Mutagen falha com `permission denied` quando o diretório
+pai do projeto não é gravável, como em `/Users/Shared`. Numa pasta do seu usuário,
+dá para remover a linha e voltar ao default do macOS (Mutagen). Ver
+[`ddev-setup.md` §4](ddev-setup.md#4-o-que-fica-versionado-em-ddev).
 
 ---
 
@@ -75,15 +78,21 @@ Esperado: `200` (ou `302` para rotas autenticadas).
 | `make npm <cmd>`      | `ddev npm <cmd>`                           |
 | `make dev`            | Vite dev server (`ddev npm run dev`)       |
 | `make migrate`        | `ddev artisan migrate`                     |
-| `make fresh`          | `migrate:fresh --seed` + DevelopmentSeeder |
+| `make fresh`          | `ddev artisan migrate:fresh --seed`        |
 | `make seed`           | `ddev artisan db:seed`                     |
 | `make horizon`        | Reinicia o daemon Horizon (supervisorctl)  |
-| `make test`           | `ddev artisan test`                        |
+| `make test`           | `ddev artisan test --parallel --testsuite=Unit,Feature,Extensoes,Arch` |
+| `make test-e2e`       | `npm run build` + `pest --group=browser` (no host, fora do container) |
 | `make lint`           | Pint + Prettier                            |
-| `make quality`        | Lint + PHPStan + Test                      |
+| `make quality`        | `ddev npm run quality` (Pint + ESLint + Prettier + PHPStan + testes) |
+| `make doutor`         | `ddev exec php artisan ht2ml:doutor`       |
 | `make logs`           | `ddev logs -f`                             |
 | `make status`         | `ddev describe`                            |
 | `make setup`          | Setup inicial (key, seed, assets, build)   |
+| `make setup-client`   | Setup de instância de cliente: sem dados demo, só `RolePermissionSeeder`; o Setup Wizard faz o resto |
+| `make new-client`     | `./bin/new-client.sh` (no host)            |
+| `make release-modulo` | `./bin/release-module.sh $(pacote) $(versao)` — ex.: `make release-modulo pacote=core versao=v0.1.0` |
+| `make update-base`    | `./bin/update-from-upstream.sh` (no cliente) |
 
 ---
 
@@ -167,8 +176,8 @@ ddev start && make setup
 
 ## Referências
 
-- `docs/01-ARCHITECTURE-GUIDE.md` — estrutura de pastas do projeto
-- `docs/02-CONVENTIONS.md §9` — padrões de cache Redis
-- `docs/02-CONVENTIONS.md §10` — filas do Horizon
-- `CLAUDE.md §15` — resumo rápido do ambiente
+- [`../architecture/index.md`](../architecture/index.md) e [`CONTEXT-MAP.md`](../../CONTEXT-MAP.md) — arquitetura e organização do monorepo
+- [`conventions.md` §9](conventions.md#9-cache-redis) — padrões de cache Redis
+- [`conventions.md` §10](conventions.md#10-filas-horizon) — filas do Horizon
+- [`CLAUDE.md`](../../CLAUDE.md), seção "Ambiente de Desenvolvimento" — resumo rápido do ambiente
 - [docs.ddev.com](https://docs.ddev.com/) — documentação oficial do DDEV

@@ -10,7 +10,7 @@ Relacionados: [00-prd.md](00-prd.md) · [05-organograma-acl-hierarquica.md](05-o
 
 ## 0. Convenções herdadas do core (aplicadas a TODAS as tabelas do módulo)
 
-Verificadas no código real (`app/Models/Exemplo.php`, `app/Models/Concerns/*`, `app/Models/Anexo.php`, migrations e ADRs):
+Verificadas no código real (hoje em `packages/extensao-exemplo-demo/src/Models/Exemplo.php`, `packages/core/src/Models/Concerns/*`, `packages/core/src/Models/Anexo.php`, migrations e ADRs):
 
 - **Tenancy** — trait `HT2ML\Core\Models\Concerns\BelongsToEmpresa`: toda tabela de negócio tem `empresa_id BIGINT NOT NULL`, global scope `empresa` automático e auto-fill no `creating`. `filial_id BIGINT NULL` onde a lotação física importa.
 - **Soft delete** — contrato `HT2ML\Core\Models\Contracts\UsaSoftDeletes` + trait `SoftDeletes`: `deleted_at` em toda tabela de negócio e nos catálogos tenant. Lixeira via `HT2ML\Core\Livewire\Concerns\ComLixeira` (3 permissões: `deletar`→lixeira, `restaurar`, `excluir_permanente`→force-delete).
@@ -25,7 +25,7 @@ Verificadas no código real (`app/Models/Exemplo.php`, `app/Models/Concerns/*`, 
 
 ### Catálogos de **referência global** já existentes — REAPROVEITADOS (não recriar)
 
-Confirmados em `app/Models/Referencia/` (+ seeders em `database/seeders/Referencia/`): `Pais`, `Estado`, `Municipio`, `TipoLogradouro`, `Banco`, `Moeda`, `Cargo`, `Cnae`, `Cfop`, `Ncm`. São globais (sem `empresa_id`), com seed nacional. O RH referencia:
+Confirmados em `packages/core/src/Models/Referencia/` (+ seeders em `packages/core/database/seeders/Referencia/`): `Pais`, `Estado`, `Municipio`, `TipoLogradouro`, `Banco`, `Moeda`, `Cargo`; `Cnae`, `Cfop` e `Ncm` saíram do core para a extensão `ht2ml/extensao-fiscal-br` (`packages/extensao-fiscal-br/src/Models/`). São globais (sem `empresa_id`), com seed nacional. O RH referencia:
 
 | Conceito no RH                    | Tabela de referência          | Uso                                                                               |
 | --------------------------------- | ----------------------------- | --------------------------------------------------------------------------------- |
@@ -709,7 +709,7 @@ Backed `string`, com `label()`/`options()` e **CHECK** na coluna, como os demais
 
 ## 5. Seeds padrão (catálogos) — por empresa, idempotentes
 
-Catálogos tenant são semeados **na criação da empresa** por uma Action `ProvisionarCatalogosRh` (análoga a `AplicarMenuPadraoAction`), com `firstOrCreate` por `(empresa_id, codigo|nome)`. Enums não têm seed (vivem no código). Referências globais (`cargos`, `bancos`, `paises`…) já têm seed no core.
+Catálogos tenant são semeados **na criação da empresa** por uma Action `ProvisionarCatalogosRh`, com `firstOrCreate` por `(empresa_id, codigo|nome)`. Enums não têm seed (vivem no código). Referências globais (`cargos`, `bancos`, `paises`…) já têm seed no core.
 
 - **`tipos_documento`**: RG, CPF, CTPS, PIS/PASEP, Título de Eleitor, Reservista, CNH (`exige_validade`), Comprovante de Escolaridade, Comprovante de Residência (`exige_arquivo`), Carteira de Vacinação, ASO/Exame Admissional (`exige_validade`), Foto 3x4.
 - **`tipos_afastamento`** (códigos eSocial tab. 18): Férias, Atestado ≤15d (`exige_atestado`), Auxílio-doença INSS >15d (`suspende_contrato`), Acidente de trabalho, Licença-maternidade (`remunerado`), Licença-paternidade, Licença não remunerada (`!remunerado`,`suspende_contrato`), Falta justificada, Falta injustificada (`conta_como_falta`), Suspensão disciplinar, Serviço militar, Gala (núpcias), Nojo (luto), Doação de sangue.
@@ -772,7 +772,7 @@ Esta é a **lista canônica** de tudo que é sensível no módulo: o que é, ond
 
 - **PII fora de auditoria** — `atributosNaoAuditados()` por model (acima). Reforça a regra do core "dados sensíveis nunca em logs".
 - **Retenção trabalhista** — guarda legal longa (eSocial/FGTS): soft-delete + append-only de eventos atende; **não expurgar** `funcionario_eventos`.
-- **Anonimização** — alinhar ao fluxo LGPD do core (`anonimizado_em` no `AdminUser`; plano `docs/superpowers/plans/2026-06-05-lgpd.md`). Funcionário desligado pode ser anonimizado mascarando PII e mantendo o esqueleto para obrigações legais; chamar `disableLogging()` antes do save.
+- **Anonimização** — alinhar ao fluxo LGPD do core (`anonimizado_em` no `AdminUser`; plano histórico `docs/historico/superpowers/plans/2026-06-05-lgpd.md`; o código vive em `packages/core/src/Actions/Admin/Lgpd/`). Funcionário desligado pode ser anonimizado mascarando PII e mantendo o esqueleto para obrigações legais; chamar `disableLogging()` antes do save.
 
 ---
 
@@ -792,12 +792,12 @@ Esta é a **lista canônica** de tudo que é sensível no módulo: o que é, ond
 
 ## 10. Permissões canônicas (`rh.*`) — fonte de verdade
 
-Esta é a lista **canônica** das permissões do módulo. README, [02](02-fase-1-blueprint.md), specs [03](03-cadastro-pessoa-documentos.md)–[09](09-roadmap-fases.md) e os ADRs referenciam **estes** slugs; **divergência de vocabulário corrige-se aqui primeiro**. O que `php artisan access:sync` publica na tabela `permissions` é exatamente esta lista (mesclada em `config('access.modules')['negocio']` pelo `RhServiceProvider` — [ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)).
+Esta é a lista **canônica** das permissões do módulo. README, [02](02-fase-1-blueprint.md), specs [03](03-cadastro-pessoa-documentos.md)–[09](09-roadmap-fases.md) e os ADRs referenciam **estes** slugs; **divergência de vocabulário corrige-se aqui primeiro**. Esta lista é o **alvo**: hoje (2026-10-25) o `php artisan access:sync` publica só as permissões CRUD de `departamentos` e `funcionarios`, derivadas pelo `ModuloBuilder` a partir de `recursos` em `config/rh.php` e postas na área `negocio` ([ADR-0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)). Os verbos especiais entram à mão por `ModuleRegistry::permissoes()`.
 
 **Convenções de slug** (confirmadas no gerador real `HT2ML\Core\Support\Generator\EspecificacaoModulo::permissaoBase()` = `"{slug}.{snakePlural}"`):
 
 - Slug = **`rh.<recurso_snake_plural>.<acao>`** — prefixo `rh.` obrigatório (anti-colisão); recurso em **`snake_case` plural** (= nome da tabela); ação em `snake_case`. (Atenção: a chave de **menu** usa `rh-<recurso>` e a **URL** usa kebab-case — só a **permissão** usa `snake_case`; não confundir com o slug kebab de [04](04-catalogos-configuraveis.md), que se alinha a esta tabela.)
-- **CRUD padrão** (gerado por `make:modulo` para recurso tenant): `listar`, `criar`, `editar`, `deletar`, `restaurar`, `excluir_permanente` (as três últimas = fluxo `ComLixeira`).
+- **CRUD padrão** (gerado por `make:recurso --modulo=rh` para recurso com lixeira): `listar`, `criar`, `editar`, `deletar`, `restaurar`, `excluir_permanente` (as três últimas = fluxo `ComLixeira`).
 - **Especiais** (escritas à mão em `config/rh.php`, fora das âncoras CRUD): coluna "Especiais" abaixo.
 - **Verbo semântico de UI** (`registrar`/`encerrar` em afastamentos; `ver` individual de funcionário) é **rótulo** mapeado a um slug CRUD registrado — o slug que `access:sync` publica é o desta tabela.
 

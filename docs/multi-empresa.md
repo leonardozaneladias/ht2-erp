@@ -8,11 +8,11 @@
 
 ## 1. Conceitos
 
-| Conceito          | Onde vive                                                                                                                                           |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Conceito          | Onde vive                                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Empresa (tenant)  | tabela `empresas` (`HT2ML\Core\Models\Empresa`)                                                                                                            |
 | Filial            | tabela `filiais` (`HT2ML\Core\Models\Filial`), `belongsTo` empresa; toda empresa nasce com a **Matriz**                                                    |
-| Acesso do usuário | pivots `admin_user_empresa` (com `todas_filiais`) e `admin_user_filial`                                                                             |
+| Acesso do usuário | pivots `admin_user_empresa` (com `todas_filiais`) e `admin_user_filial`                                                                                    |
 | Contexto ativo    | `HT2ML\Core\Support\Tenancy\TenantContext` (sessão: `tenant.empresa_id` / `tenant.filial_id`) + colunas `admin_users.empresa_ativa_id` / `filial_ativa_id` |
 
 O contexto ativo é hidratado a cada requisição admin autenticada pelo middleware
@@ -47,9 +47,11 @@ class Cliente extends Model
 }
 ```
 
-> `Auditavel` é **obrigatório** (arch test). Opcional: defina `rotuloAuditoria(): string`
-> no model para um rótulo humano na tela de auditoria (default: `nome`/`name`/`titulo`/`email`).
-> Detalhes em `docs/devops/conventions.md` §7.2.
+> `Auditavel` é **obrigatório**: o arch test `models usam Auditavel ou estão na whitelist
+consciente`, em `tests/Arch/PlataformaTest.php`, reprova model de qualquer pacote que não o use.
+> Opcional: defina `rotuloAuditoria(): string` no model para um rótulo humano na tela de
+> auditoria (default: `nome`/`name`/`titulo`/`email`). Detalhes em
+> [`devops/conventions.md`](devops/conventions.md) §7.2.
 
 Com isso:
 
@@ -117,7 +119,33 @@ O recurso aparece somente quando o usuário **tem a permissão global `listagens
    opções do multiselect são rotuladas como **"Empresa — Filial"** para desambiguar filiais
    homônimas em empresas diferentes.
 
-**Como aplicar numa tabela tenant** (o gerador `make:recurso --tenant` já injeta isto):
+**Como aplicar numa tabela tenant.** Numa tabela que estende a base declarativa
+`RecursoTable`, é uma linha — e é o que o `make:recurso --modulo=… --tenant` gera:
+
+```php
+use HT2ML\Core\Livewire\Grid\RecursoMultiEmpresa;
+use HT2ML\Core\Livewire\Grid\RecursoTable;
+
+final class ClienteTable extends RecursoTable
+{
+    use RecursoMultiEmpresa;   // as seis composições de uma vez: escopo, campos,
+                               // colunas, filtros e as duas da exportação PDF
+
+    protected function modulo(): string { return 'escola'; }   // ver nota abaixo
+    // model(), recurso(), rotaBase(), campos() …
+}
+```
+
+`RecursoMultiEmpresa` existe porque, com o trait cru, uma tabela precisava lembrar de
+seis chamadas espalhadas — e esquecer só a do escopo produz uma tela que passa em todos
+os testes com um tenant e vaza linhas de outra empresa no dia em que a segunda for
+cadastrada. A permissão de listagem que decide a elegibilidade sai de
+`permissaoListagem()`, que a `RecursoTable` deriva como `{modulo}.{recurso}.listar`
+quando a tabela declara `modulo()`. O stub atual do gerador **não** declara `modulo()`;
+acrescente-o à mão (lacuna registrada em [`criar-recurso.md`](criar-recurso.md)).
+
+**Tabela legada, sem `RecursoTable`** (ex.: `packages/extensao-exemplo-demo/src/Livewire/Exemplos/ExemploTable.php`),
+compõe o trait `FiltraPorMultiEmpresa` à mão:
 
 ```php
 use HT2ML\Core\Livewire\Concerns\FiltraPorMultiEmpresa;
@@ -146,8 +174,11 @@ adicionadas via os helpers `cabecalhosMultiEmpresa()`/`linhaMultiEmpresa()` quan
 ativo, alinhadas às colunas da tela.
 
 A permissão `listagens.multi_empresa` é única e global (libera o recurso em todas as listagens) —
-concedida ao `gestor` no seeder, que recebe também `exemplos.listar` e acesso às
-2 empresas de demonstração (assim o filtro fica de fato demonstrável); super-admin já bypassa.
+concedida ao `gestor` pelo `RolePermissionSeeder` do core; o `AdminUserSeeder` dá a ele acesso
+às empresas de demonstração (assim o filtro fica de fato demonstrável); super-admin já bypassa. A permissão
+`exemplos.listar` do gestor é concedida pela própria extensão `exemplo-demo`
+(`PermissoesDoGestorSeeder`, registrado com `ModuleRegistry::seeder()`): o core não cita
+permissão de extensão, e o guard A2 garante isso.
 
 ---
 
@@ -157,7 +188,7 @@ concedida ao `gestor` no seeder, que recebe também `exemplos.listar` e acesso �
 
 1. Empresa ativa (logo, favicon, cores em `empresas`);
 2. Settings da instância (`BrandingSettings`);
-3. Fallback estático (`config/branding.php`).
+3. Fallback estático (`packages/core/config/branding.php`, sobrescrevível pelo produto).
 
 Login e Setup Wizard (sem empresa ativa) usam o branding da instância. As cores são
 emitidas como CSS custom properties no `<head>` (sem rebuild).
@@ -191,6 +222,6 @@ cliente, cria a empresa e o primeiro super-admin já com acesso.
 
 ## 6. Gestão de Empresas/Filiais
 
-Módulo em `/admin/empresas` (`App\Livewire\Admin\Empresas\*`), permissões `empresas.*`
-(catálogo em `config/access.php`). O CRUD de empresa inclui dados cadastrais e a paleta de
+Módulo em `/admin/empresas` (`HT2ML\Core\Livewire\Admin\Empresas\*`), permissões `empresas.*`
+(catálogo em `packages/core/config/access.php`). O CRUD de empresa inclui dados cadastrais e a paleta de
 cores de branding; toda empresa criada nasce com a filial Matriz.

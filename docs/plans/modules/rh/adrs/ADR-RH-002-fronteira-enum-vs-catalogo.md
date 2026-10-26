@@ -26,7 +26,7 @@ Tratar os três do mesmo jeito é um erro caro nas duas pontas:
 
 - Type-safety e lógica no valor onde a **regra de negócio acompanha o domínio** ([ADR-0010](../../../../architecture/adrs/ADR-0010-enums-php-backed.md)): `match` exaustivo, CHECK no Postgres, `label()`/`variant()`, métodos de comportamento.
 - Configurabilidade real (sem deploy) onde o **cliente** precisa adicionar linhas, **por empresa** (`BelongsToEmpresa`).
-- Não recriar listas oficiais BR/ISO que o core já semeia em `app/Models/Referencia/` (`cargos`, `bancos`, `paises`, `municipios`, `estados`, `tipos_logradouro`).
+- Não recriar listas oficiais BR/ISO que o core já semeia em `packages/core/src/Models/Referencia/` (`cargos`, `bancos`, `paises`, `municipios`, `estados`, `tipos_logradouro`).
 - Uma regra **memorizável** para decidir a categoria de qualquer campo novo.
 
 ## Alternativas consideradas

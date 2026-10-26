@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o design do endurecimento de segurança: lockout, limites de tentativa, alertas e conta ativa (Épico 2, Fase C-2), escrito em 2026-06-05. O trabalho foi entregue; não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Services/Admin/Security/`](../../../../packages/core/src/Services/Admin/Security/) e [`Http/Middleware/GarantirContaAtiva.php`](../../../../packages/core/src/Http/Middleware/GarantirContaAtiva.php).
+
 # Endurecimento adicional de segurança (Épico 2 — Fase C · subsistema 2)
 
 > **Status:** design aprovado (brainstorming), aguardando plano de implementação.

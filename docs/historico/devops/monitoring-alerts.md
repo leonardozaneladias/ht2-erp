@@ -7,6 +7,8 @@ stack: Laravel Pulse · Horizon · Sentry · Monolog JSON · Grafana
 publico: DevOps, SRE, Engenharia
 ---
 
+> **Histórico.** Este documento descreve uma estratégia de observabilidade planejada em 2026-04-18 (rascunho; Sentry não foi instalado); não reflete o estado atual. Arquivado em 2026-10-25 — ver não há documento atual que o substitua; Horizon e Pulse estão instalados (`config/horizon.php`, `config/pulse.php`).
+
 # Monitoramento e Alertas
 
 Documento que define a estratégia de observabilidade: logs estruturados, métricas, dashboards, alertas, tracing funcional e SLO/SLI.
@@ -14,7 +16,7 @@ Documento que define a estratégia de observabilidade: logs estruturados, métri
 Base normativa:
 
 - [`runbook-deploy.md`](runbook-deploy.md) — resposta aos alertas durante/após deploy
-- [`conventions.md`](conventions.md) — padrões de código
+- [`conventions.md`](../../devops/conventions.md) — padrões de código
 
 ---
 
@@ -603,7 +605,7 @@ A cada 5 min (canary Lambda ou script em instância dedicada), executar um fluxo
 ## 10. Referências
 
 - [`runbook-deploy.md`](runbook-deploy.md) — procedimentos de deploy.
-- [`conventions.md`](conventions.md) — padrões de código.
+- [`conventions.md`](../../devops/conventions.md) — padrões de código.
 - [`ci-cd.md`](ci-cd.md) — release tracking no Sentry.
 
 ---

@@ -6,7 +6,7 @@ quando aplicável, corpo em slot (o partial `_ficha.blade.php` do módulo) e
 rodapé com meta de criação/atualização + botões Fechar e Editar (gated por
 `can('update')`, oculto para registro na lixeira). Consome o trait
 `HT2ML\Core\Livewire\Concerns\ComFicha` no Index — fluxo completo em
-[`docs/visualizacao.md`](../../../visualizacao.md).
+[`docs/visualizacao.md`](../../../../visualizacao.md).
 
 ## API
 

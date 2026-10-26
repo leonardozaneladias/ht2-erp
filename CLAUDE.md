@@ -1,4 +1,4 @@
-# Laravel Admin Boilerplate — Inspinia + Livewire
+# HT2ML Platform — Inspinia + Livewire
 
 > Este arquivo é lido automaticamente pelo Claude Code ao abrir o projeto.
 > Contém todo o contexto necessário para entender, desenvolver e manter o sistema.
@@ -7,7 +7,7 @@
 
 ## 1. O Que É Este Projeto
 
-**Starter kit** para sistemas administrativos com Laravel + Blade + Inspinia + Livewire.
+**Plataforma de backoffice administrativo** em Laravel + Blade + Inspinia + Livewire. Ela é abstrata: nenhum produto vive dentro dela ([ADR-0019](docs/architecture/adrs/ADR-0019-plataforma-abstrata-sem-produto.md)). O código da plataforma é o pacote `ht2ml/core`, em `packages/core/`; o que é de um domínio de negócio vai para extensões em `packages/extensao-*`. A raiz deste repositório é o app de desenvolvimento e vitrine, que instala esses pacotes por path repository. Vocabulário em [`CONTEXT-MAP.md`](CONTEXT-MAP.md).
 
 **Um único ambiente admin** — painel backoffice desktop-first (1366×768 mín).
 Template: **Inspinia** (Tailwind CSS 4) + **Livewire 4** para componentes reativos.
@@ -21,18 +21,19 @@ Toda a UI é server-side: Blade + Livewire + Alpine.js.
 
 | Camada                | Tecnologia                             | Versão |
 | --------------------- | -------------------------------------- | ------ |
-| Framework             | Laravel                                | 13.x   |
+| Framework             | Laravel                                | ^13    |
 | PHP                   | PHP                                    | 8.4    |
 | Banco de Dados        | PostgreSQL                             | 16     |
 | Cache / Sessão / Fila | Redis                                  | latest |
-| Frontend Admin        | Livewire 4 + Inspinia + Tailwind CSS 4 | —      |
+| Frontend Admin        | Livewire 4 + Inspinia + Tailwind CSS 4 | ^4.2   |
 | Auth                  | Guard `admin` (AdminUser)              | —      |
-| ACL                   | spatie/laravel-permission              | ^7.0   |
+| ACL                   | spatie/laravel-permission              | ^8.0   |
 | Auditoria             | spatie/laravel-activitylog             | ^5.0   |
 | Filas                 | Laravel Horizon                        | ^5.0   |
 | Monitoramento         | Laravel Pulse                          | ^1.0   |
-| Build                 | Vite                                   | latest |
-| Testes                | Pest                                   | ^4.0   |
+| Grid / CRUD           | power-components/livewire-powergrid    | ^6.10  |
+| Build                 | Vite                                   | ^8.2   |
+| Testes                | Pest                                   | ^4.4   |
 | Ambiente              | DDEV + OrbStack (macOS)                | —      |
 
 ---
@@ -44,17 +45,33 @@ Toda a UI é server-side: Blade + Livewire + Alpine.js.
 ```
 Guard:      admin (AdminUser)
 Tabela:     admin_users
-Rotas:      routes/admin.php
+Rotas:      packages/core/routes/admin.php
 Prefixo:    /admin/*
-Layout:     resources/views/components/admin/layout.blade.php
+Layout:     packages/core/resources/views/components/admin/layout.blade.php
 Middleware: admin.auth (AdminAuthenticate)
-Controllers: App\Http\Controllers\Admin
-Livewire:   App\Livewire\Admin
+Controllers: HT2ML\Core\Http\Controllers\Admin
+Livewire:   HT2ML\Core\Livewire\Admin
 CSS/JS:     resources/css/admin.css / resources/js/admin.js
 ```
 
 Rotas web: `routes/web.php` → redireciona `/` para `/admin/dashboard`.
-Rotas admin: `routes/admin.php` → auth + dashboard + módulos + dev/components.
+Rotas admin: `packages/core/routes/admin.php` → auth + dashboard + telas do core + dev/components.
+
+Um módulo nunca edita as rotas do core. Ele declara as suas no ServiceProvider, pelo
+`ModuleRegistry::modulo('{chave}')` (um `ModuloBuilder`), e escolhe o canal com o enum
+`EscopoDeRota`:
+
+| Escopo    | Atalho no builder    | Onde a rota entra                                                      |
+| --------- | -------------------- | ---------------------------------------------------------------------- |
+| `Admin`   | `->rotas()` (padrão) | grupo autenticado `/admin`, name `admin.`, todo o middleware do painel |
+| `Publico` | `->rotasPublicas()`  | stack `web`, sem login e sem prefixo                                   |
+| `Webhook` | `->rotasDeWebhook()` | sem sessão e sem CSRF, sob `/webhooks`, com `throttle:webhooks`        |
+| `Api`     | `->rotasDeApi()`     | grupo `api`, sob `/api`, name `api.`; auth e versão ficam com o módulo |
+
+Os hospedeiros são `packages/core/routes/{admin,publico,webhook,api}.php`. Para webhook,
+o core oferece o middleware `webhook.assinatura:{chave_de_config}[,{header}]` (HMAC-SHA256
+do corpo bruto). Sanctum e o resto da camada de API ficam na extensão `ht2ml/extensao-api`
+([ADR-0023](docs/architecture/adrs/ADR-0023-api-rest-como-extensao.md)).
 
 ### 3.2 Vite — Entry Points
 
@@ -130,14 +147,15 @@ por empresa ativa. Regras essenciais:
 
 ## 8. Formatadores e Qualidade
 
-| Ferramenta          | O Que Faz                        | Comando                           |
-| ------------------- | -------------------------------- | --------------------------------- |
-| Laravel Pint        | Formata PHP (PSR-12 + Laravel)   | `./vendor/bin/pint`               |
-| Prettier            | Formata Blade, JS, CSS, JSON, MD | `npx prettier --write resources/` |
-| PHPStan/Larastan    | Análise estática PHP (level 6)   | `./vendor/bin/phpstan analyse`    |
-| Pest                | Testes (unit/feature)            | `php artisan test`                |
-| Pest Browser        | Testes E2E (Playwright)          | `make test-e2e`                   |
-| Husky + lint-staged | Roda tudo no git commit          | Automático                        |
+| Ferramenta          | O Que Faz                               | Comando                           |
+| ------------------- | --------------------------------------- | --------------------------------- |
+| Laravel Pint        | Formata PHP (PSR-12 + Laravel)          | `./vendor/bin/pint`               |
+| Prettier            | Formata Blade, JS, CSS, JSON, MD        | `npx prettier --write resources/` |
+| ESLint              | Lint de JS                              | `npm run lint:js`                 |
+| PHPStan/Larastan    | Análise estática PHP (level 6)          | `./vendor/bin/phpstan analyse`    |
+| Pest                | Testes (Unit, Feature, Extensoes, Arch) | `php artisan test`                |
+| Pest Browser        | Testes E2E (Playwright)                 | `make test-e2e`                   |
+| Husky + lint-staged | Roda tudo no git commit                 | Automático                        |
 
 **Verificação completa:** `npm run quality`
 
@@ -161,10 +179,13 @@ npx playwright install chromium   # 1x, baixa o browser
 ### Onde ficam
 
 ```
-resources/views/components/
+packages/core/resources/views/components/
 ├── admin/      ← Componentes exclusivos do admin (Inspinia)
 └── shared/     ← Componentes compartilhados
 ```
+
+Os componentes vêm do core. Um produto pode sobrescrever um deles criando o arquivo
+de mesmo nome em `resources/views/components/` da raiz, mas não deve editar o pacote.
 
 ### Fluxo antes de escrever qualquer HTML admin
 
@@ -181,12 +202,11 @@ Exemplos de uso comum:
 - Layout / chrome: `x-admin.layout`, `x-admin.auth-layout`, `x-admin.sidebar`, `x-admin.topbar`, `x-admin.page-header`, `x-admin.drawer`
 - Tabelas / dashboards: `x-admin.data-table`, `x-admin.kpi-card`, `x-admin.chart-*`
 - Formulários: `x-shared.input`, `x-shared.select-search`, `x-shared.toggle`, `x-shared.money-input`, `x-shared.cpf-input`, `x-shared.password-input`
-- Feedback: `x-shared.alert`, `x-shared.toast`, `x-shared.modal`, `x-shared.empty-state`
+- Feedback: `x-shared.alert`, `x-shared.toast-container`, `x-shared.modal`, `x-shared.empty-state`
 
 ### Showcase interativo (só em local)
 
 Acesse `/admin/dev/components` para ver todos os componentes com exemplos ao vivo.
-Rota Livewire de exemplo: `/admin/dev/livewire`
 
 ### Outras regras
 
@@ -200,12 +220,13 @@ Rota Livewire de exemplo: `/admin/dev/livewire`
 ## 10. Livewire — Regras
 
 ```
-app/Livewire/Admin/      ← Componentes Livewire do admin
-resources/views/livewire/admin/  ← Views dos componentes
+packages/core/src/Livewire/Admin/              ← Componentes Livewire do admin (core)
+packages/core/resources/views/livewire/admin/  ← Views dos componentes
+packages/extensao-*/src/Livewire/              ← Componentes de cada módulo
 ```
 
-- Componente de exemplo: `app/Livewire/Admin/ExemploCounter.php`
-- Use como tag: `<livewire:admin.exemplo-counter />`
+- Componente de exemplo: `packages/extensao-exemplo-demo/src/Livewire/ExemploCounter.php`
+- Use como tag: `<livewire:exemplo-counter />` (a extensão registra o namespace com `Livewire::addLocation()`)
 - O layout já inclui `@livewireScripts` quando `$withLivewire` é true (passado via `<x-admin.layout :withLivewire="true">`)
 - Ou inclua `@livewireScripts` manualmente na view se necessário
 
@@ -222,10 +243,15 @@ resources/views/livewire/admin/  ← Views dos componentes
 
 ### Migrations de infra disponíveis (não alterar)
 
+Na raiz (`database/migrations/`), só as do app Laravel:
+
 - `create_users_table` — tabela users padrão Laravel
-- `create_cache_table` — cache Redis-backed
+- `create_cache_table` — tabela do driver de cache `database` (o `.env.example` usa Redis)
 - `create_jobs_table` — filas
 - `create_pulse_tables` — Pulse monitoring
+
+O resto vem do core, em `packages/core/database/migrations/` (42 arquivos, contados em 2026-10-25), entre elas:
+
 - `create_permission_tables` — Spatie Permission
 - `create_activity_log_table` — Spatie Activitylog
 - `create_admin_users_table` — auth admin
@@ -243,12 +269,16 @@ resources/views/livewire/admin/  ← Views dos componentes
 - `spatie/laravel-settings` — configurações tipadas do sistema (tela de Configurações)
 - `laravel/horizon` — dashboard de filas
 - `laravel/pulse` — monitoramento de performance
+- `power-components/livewire-powergrid` — tabelas das listagens (base `RecursoTable`)
 - `barryvdh/laravel-dompdf` — PDFs
-- `maatwebsite/excel` — exports CSV/Excel
+- `maatwebsite/excel` + `openspout/openspout` — exports CSV/Excel
+- `spatie/laravel-backup` — backups
+- `pragmarx/google2fa-laravel` + `bacon/bacon-qr-code` — 2FA (TOTP e QR code)
+- `guzzlehttp/guzzle` — cliente HTTP
 
 **NPM (plugins Inspinia):**
-ApexCharts · DataTables · Flatpickr · Choices.js · Inputmask · SortableJS · Dropzone ·
-SweetAlert2 · TinyMCE · Quill · FullCalendar · Leaflet · Preline
+ApexCharts · Flatpickr · Choices.js · Inputmask · SortableJS · Dropzone · SweetAlert2 ·
+Quill · Cropper.js · SimpleBar · Preline (fonte: `package.json`)
 
 ---
 
@@ -265,7 +295,7 @@ Cria:
 
 O seed também marca o sistema como **instalado** (`GeneralSettings::instalado = true`), pulando o Setup Wizard. Em uma instalação limpa (`migrate` sem `--seed`), `instalado` é `false` e o primeiro acesso ao painel é redirecionado para `/admin/setup`.
 
-Veja [`docs/configuracoes-sistema.md`](docs/configuracoes-sistema.md) para a arquitetura de configurações, branding dinâmico e como adicionar um novo grupo/aba.
+Veja [`docs/configuracoes-sistema.md`](docs/configuracoes-sistema.md) para a arquitetura de configurações e o branding dinâmico. O enum de grupos e a tela de Configurações vivem no core; hoje um módulo não tem canal para acrescentar um grupo ou aba.
 
 ---
 
@@ -276,7 +306,11 @@ Fila default  → Jobs gerais
 Fila emails   → E-mails transacionais
 Fila exports  → Relatórios CSV/Excel
 Fila pdf      → PDFs
+Fila gateway  → Integrações com gateways (supervisor de alta prioridade)
+Fila webhooks → Processamento de webhooks recebidos (supervisor de alta prioridade)
 ```
+
+Supervisores em `config/horizon.php`.
 
 Dashboard: `/horizon`
 
@@ -293,29 +327,49 @@ make setup       # 1x: key, migrate --seed, assets Horizon/Pulse, build
 make bash        # Shell no container web (ddev ssh)
 make fresh       # migrate:fresh --seed
 make dev         # Vite dev server (HMR)
-make test        # Rodar testes
+make test        # Unit, Feature, Extensoes e Arch, em paralelo
+make test-e2e    # Testes de browser (no host)
 make lint        # Pint + Prettier
-make quality     # Lint + PHPStan + Test
+make quality     # Pint, ESLint, Prettier, PHPStan e testes (só confere)
+make doutor      # ht2ml:doutor — diagnóstico das contribuições dos módulos
 ```
+
+A lista completa de alvos está no `Makefile` e no [README](README.md).
 
 URLs locais: App `https://ht2ml-platform.ddev.site`, Horizon `/horizon`, Pulse `/pulse`, Mailpit `ddev mailpit`.
 
 ---
 
-## 16. Iniciando um Novo Projeto com Este Boilerplate
+## 16. Produto Novo e Módulos de Negócio
 
-1. Copiar este repositório
-2. Rodar `./bin/init-project.sh` (renomeia marca/slug; ajuste o `name` do `.ddev/config.yaml`)
-3. `cp .env.example .env`
-4. `ddev start` (instala deps e roda migrate via hooks)
-5. `make setup` (key, seed, assets Horizon/Pulse, build)
-6. Acessar `https://<slug>.ddev.site/admin` → login com `admin@example.com` / `password`
+Um produto novo **não** é cópia deste repositório: ele nasce do skeleton por Composer
+([ADR-0017](docs/architecture/adrs/ADR-0017-produto-novo-via-skeleton.md)). O `bin/init-project.sh`
+está aposentado. Skeleton e pacotes `ht2ml/*` são privados: o `create-project` precisa do
+`--repository` e de credencial com leitura nos repositórios `ht2ml-*`.
+
+```bash
+composer create-project ht2ml/skeleton meu-produto \
+  --repository='{"type":"vcs","url":"git@github.com:leonardozaneladias/ht2ml-skeleton.git","no-api":true}'
+cd meu-produto
+cp .env.example .env && php artisan key:generate
+php artisan migrate --seed
+npm install && npm run build
+```
+
+Detalhes, extensões opcionais e atualização (`composer update ht2ml/core` → `migrate` →
+`access:sync` → `ht2ml:doutor`): [`docs/guias/produto-via-skeleton.md`](docs/guias/produto-via-skeleton.md).
+Instância de cliente (mesmo produto, outro cliente) é outro caminho: clone + re-origin
+([ADR-0016](docs/architecture/adrs/ADR-0016-instancias-por-cliente.md)).
 
 ### Adicionando um módulo de negócio
 
-**Use o gerador** — ele cria a stack CRUD inteira já no padrão (migration, factory,
-model, enum de status, DTO, FormRequests+Rules, actions, service, policy, Livewire
-Index/Form/Table, views, teste) e injeta rotas + permissões:
+**Use o gerador.** Todo recurso vive dentro de um módulo; sem `--modulo`, o `make:recurso`
+recusa antes de escrever qualquer arquivo. Ele cria a stack CRUD inteira já no padrão
+(migration, factory, model, enum de status, DTO, FormRequests+Rules, actions, service,
+policy, Livewire Index/Form/Table, views, teste), insere a rota no `routes/admin.php` do
+pacote e o recurso em `recursos` de `config/{modulo}.php`. Permissões, item de menu, nome
+de rota e padrão de `active` são **derivados** dessa entrada pelo `ModuloBuilder`
+(`{modulo}.{recurso}.listar` etc.), não escritos à mão:
 
 ```bash
 php artisan make:modulo escola                    # uma vez por área de negócio
@@ -324,20 +378,26 @@ php artisan make:recurso Cliente --modulo=escola \
   --fields="nome:string, cnpj:cnpj, email:email:nullable, status:enum(ativo|inativo)" \
   --tenant
 php artisan migrate && php artisan access:sync
+php artisan ht2ml:doutor                          # área, seção, permissões, rotas e ícones fecham?
 ```
 
 O Pint já roda nos arquivos gerados. Depois, atribua as permissões
-(`/admin/acesso`); o item de menu já nasce com o recurso.
+(`/admin/acesso`); o item de menu já nasce com o recurso. Para uma regra de validação
+ao lado do domínio, `php artisan make:regra MatriculaValida --modulo=escola`.
 Guia completo (tipos de campo, flags, customização dos stubs):
-[`docs/criar-recurso.md`](docs/criar-recurso.md). O módulo **Exemplo** (em
-`app/Livewire/Admin/Exemplos/`) é a referência viva — copie/apague à vontade. Os stubs ficam em
-`stubs/modulo/`.
+[`docs/criar-recurso.md`](docs/criar-recurso.md). O recurso **Exemplo** (em
+`packages/extensao-exemplo-demo/src/Livewire/Exemplos/`) é a referência viva. Os stubs ficam em
+`packages/core/stubs/modulo/`; um produto pode sobrescrever um stub criando o arquivo de mesmo
+nome em `stubs/modulo/` da raiz.
 
-**Unidades de negócio reutilizáveis entre produtos** viram **módulos**, distribuídos
-como pacotes Composer: `php artisan make:modulo rh` cria a casca e
-`make:recurso Funcionario --modulo=rh` gera o CRUD dentro dele, sem editar o core.
-A chave vai em kebab-case — é ela que vira prefixo de permissão, seção de menu,
-namespace de view e prefixo de rota (ver [`ADR-0021`](docs/architecture/adrs/ADR-0021-taxonomia-modulo-recurso-area-secao.md)). Ver [`ADR-0015`](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md)
+O módulo é distribuído como pacote Composer (`ht2ml/extensao-{chave}`, em
+`packages/extensao-{chave}/`), sem editar o core. A chave vai em kebab-case — é ela que
+vira prefixo de permissão, seção de menu, namespace de view e prefixo de rota (ver
+[`ADR-0021`](docs/architecture/adrs/ADR-0021-taxonomia-modulo-recurso-area-secao.md)). O core
+nunca conhece uma extensão, nem por classe nem por literal de string
+([`ADR-0022`](docs/architecture/adrs/ADR-0022-dependencia-de-mao-unica.md)). Ver
+[`ADR-0015`](docs/architecture/adrs/ADR-0015-modulos-pacotes-composer.md), o guia
+[`criar uma extensão`](docs/guias/criar-extensao.md), a lista de [`comandos`](docs/comandos.md)
 e o guia de [`distribuição e manutenção`](docs/distribuicao-manutencao.md).
 
 ---
@@ -364,7 +424,7 @@ Implementar em batches pequenos e controlados. Não componentizar tudo de uma ve
 1. Rodar `./vendor/bin/pint` (PHP format)
 2. Rodar `npx prettier --write` nos arquivos Blade/JS/CSS alterados
 3. Rodar `./vendor/bin/phpstan analyse` (corrigir warnings)
-4. Rodar `php artisan test` (testes passando)
+4. Rodar `php artisan test` (testes passando) e, se mexeu em módulo, `php artisan ht2ml:doutor`
 5. Commit seguindo Conventional Commits: `tipo(escopo): descrição`
 
 ---
@@ -405,4 +465,4 @@ Issues e specs vivem no **GitHub Issues** de `leonardozaneladias/ht2-erp`, opera
 
 ### Domain docs
 
-Layout **multi-context**: `CONTEXT-MAP.md` na raiz aponta para um `CONTEXT.md` por contexto (core em `app/`, módulos em `packages/modulo-*/`); ADRs do sistema em `docs/architecture/adrs/`. Ver [`docs/agents/domain.md`](docs/agents/domain.md).
+Layout **multi-context**: `CONTEXT-MAP.md` na raiz aponta para um `CONTEXT.md` por contexto (o glossário do core está em `app/CONTEXT.md`, embora o código do core viva em `packages/core/`; extensões em `packages/extensao-*/`); ADRs do sistema em `docs/architecture/adrs/`. Ver [`docs/agents/domain.md`](docs/agents/domain.md).

@@ -1,24 +1,29 @@
 # __PKG_NAME__
 
-Extensão **__MODULO_STUDLY__**.
+Módulo **__MODULO_STUDLY__** (chave `__MODULO_SLUG__`).
 
 Pacote Composer instalável que adiciona o módulo __MODULO_STUDLY__ a qualquer
-instalação de qualquer produto, sem editar o core (ver ADR-0015).
+produto da plataforma HT2ML, sem editar o core (ver ADR-0015 e ADR-0021).
 
-## Instalar em um cliente
+## Instalar num produto
 
 ```bash
 composer require __PKG_NAME__
 php artisan migrate --force
 php artisan access:sync
 php artisan cache:clear
+php artisan ht2ml:doutor
 ```
 
-Depois, atribua as permissões do módulo aos perfis em `/admin/acesso`.
+Depois, atribua as permissões do módulo (`__MODULO_SLUG__.{recurso}.*`) aos perfis
+em `/admin/acesso`.
 
 ## Customização por cliente
 
-Publique a config e ajuste permissões/menu sem tocar no pacote:
+As permissões e os itens de menu não são escritos à mão: o `ModuloBuilder` os deriva
+da chave de cada recurso em `config/__MODULO_SLUG__.php`. A config decide onde as
+contribuições entram (`modulo_acesso`, `secao_menu`), os grupos, e o rótulo, ícone,
+grupo e ordem de cada recurso. Para mudar isso sem tocar no pacote:
 
 ```bash
 php artisan vendor:publish --tag=__MODULO_SLUG__-config
@@ -26,11 +31,17 @@ php artisan vendor:publish --tag=__MODULO_SLUG__-config
 
 ## Desenvolvimento
 
-Durante o desenvolvimento o pacote vive em `packages/__MODULO_SLUG__` do
-boilerplate (path repository, symlink). Para gerar recursos CRUD dentro dele:
+O `make:modulo` criou este pacote em `packages/`, numa pasta com o prefixo de
+`config('extensoes.prefixo_pacote')` (por padrão, `packages/extensao-__MODULO_SLUG__`),
+e registrou o path repository com symlink no `composer.json` da raiz. Para instalá-lo
+e gerar recursos CRUD dentro dele:
 
 ```bash
+composer require __PKG_NAME__:@dev
 php artisan make:recurso Recurso --modulo=__MODULO_SLUG__ --fields="..."
+php artisan make:regra NomeDaRegra --modulo=__MODULO_SLUG__
+php artisan migrate && php artisan access:sync && php artisan ht2ml:doutor
 ```
 
-Ao estabilizar, promova a um repositório Git próprio e versione por tag (semver).
+Para publicar, o pacote ganha um repositório Git próprio e versões por tag semver.
+No monorepo da plataforma isso é `make release-modulo pacote=<pasta-em-packages> versao=vX.Y.Z`.

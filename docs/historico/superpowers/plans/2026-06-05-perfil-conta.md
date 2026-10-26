@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o plano de implementação da área "Minha conta" (perfil, segurança, preferências; Épico 3), escrito em 2026-06-05. O trabalho foi entregue (os checkboxes nunca foram marcados); não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Livewire/Admin/Conta/`](../../../../packages/core/src/Livewire/Admin/Conta/).
+
 # Perfil & Conta — Plano de Implementação
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

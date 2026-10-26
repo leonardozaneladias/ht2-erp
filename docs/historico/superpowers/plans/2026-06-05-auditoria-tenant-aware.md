@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o plano de implementação da auditoria ciente de empresa/filial (Épico 2, Fase C-1), escrito em 2026-06-05. O trabalho foi entregue (os checkboxes nunca foram marcados); não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Models/Activity.php`](../../../../packages/core/src/Models/Activity.php), [`Support/Audit/CarimbarContextoNaAtividade.php`](../../../../packages/core/src/Support/Audit/CarimbarContextoNaAtividade.php) e [`Services/Admin/AuditoriaSeguranca.php`](../../../../packages/core/src/Services/Admin/AuditoriaSeguranca.php).
+
 # Auditoria tenant-aware — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

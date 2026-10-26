@@ -230,7 +230,7 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 
 ### 7.1 Premissas
 
-- O **core já provê**: tenancy (`BelongsToEmpresa`/`TenantContext`), RBAC de 2 níveis (`AccessResolver` + `admin_user_empresa_role`), auditoria (`Auditavel`), upload polimórfico (`HT2ML\Core\Models\Anexo`), lixeira (`ComLixeira`/`UsaSoftDeletes`), registro de módulos-pacote (`ModuleRegistry`, ADR-0015) e o gerador `make:modulo --module=Rh`.
+- O **core já provê**: tenancy (`BelongsToEmpresa`/`TenantContext`), RBAC de 2 níveis (`AccessResolver` + `admin_user_empresa_role`), auditoria (`Auditavel`), upload polimórfico (`HT2ML\Core\Models\Anexo`), lixeira (`ComLixeira`/`UsaSoftDeletes`), registro de módulos-pacote (`ModuleRegistry` + `ModuloBuilder`, ADR-0015/ADR-0021) e os geradores `make:modulo rh` / `make:recurso <Recurso> --modulo=rh`.
 - Referências globais já semeadas no core: `cargos` (CBO), `bancos`, `paises`, `estados`, `municipios`, `tipos_logradouro`.
 - `AdminUser` (guard `admin`) já tem `encrypted` cast (padrão `two_factor_secret`) e coluna LGPD `anonimizado_em` — reaproveitados pelo RH.
 - Greenfield: a Fase 1 cria as tabelas já completas; evoluções futuras seguem migrations aditivas (`add_<coluna>_to_<tabela>`).
@@ -254,7 +254,7 @@ Itens deliberadamente **fora** da Fase 1, com destino mapeado no roadmap → [09
 - `HT2ML\Core\Models\Concerns\BelongsToEmpresa` + `HT2ML\Core\Support\Tenancy\TenantContext`.
 - `HT2ML\Core\Livewire\Concerns\ComLixeira` + `HT2ML\Core\Models\Contracts\UsaSoftDeletes`.
 - `HT2ML\Core\Models\Concerns\Auditavel` (spatie/activitylog).
-- Gerador `make:modulo` com flag de pacote (`--module=Rh`) e `make:extensao` (casca do pacote).
+- Geradores `make:modulo rh` (casca do pacote) e `make:recurso <Recurso> --modulo=rh` (CRUD de cada recurso dentro do pacote).
 - ADRs aplicáveis: [0004](../../../architecture/adrs/ADR-0004-ulid-publico-bigint-interno.md) (ULID aspiracional — RH usa `id`/`slug`/`matricula`), [0009](../../../architecture/adrs/ADR-0009-snapshots-jsonb-imutaveis.md) (snapshots JSONB), [0010](../../../architecture/adrs/ADR-0010-enums-php-backed.md) (enums backed), [0014](../../../architecture/adrs/ADR-0014-money-integer-centavos.md) (dinheiro em centavos), [0015](../../../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) (módulos-pacote).
 
 ---

@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o design da área "Minha conta" (perfil, segurança, preferências; Épico 3), escrito em 2026-06-05. O trabalho foi entregue; não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Livewire/Admin/Conta/`](../../../../packages/core/src/Livewire/Admin/Conta/).
+
 # Perfil & Conta (Épico 3 — subsistema 1)
 
 > **Status:** design aprovado (brainstorming), aguardando plano de implementação.

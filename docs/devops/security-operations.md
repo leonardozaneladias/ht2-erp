@@ -14,7 +14,7 @@ Documento operacional de segurança. Cobre checklist periódico, rotação de se
 Base normativa:
 
 - [`conventions.md`](conventions.md) — padrões de código seguros
-- [`ci-cd.md`](ci-cd.md) — secrets do pipeline
+- [`ci-cd.md`](ci-cd.md) — o CI real (não há pipeline de deploy nem secrets de deploy no repositório)
 
 ---
 
@@ -150,6 +150,8 @@ Staging:
 
 `APP_KEY` é usado para criptografar dados com cast `encrypted` no DB. Rotacionar quebra acesso a esses dados.
 
+Não existe comando de re-encriptação no projeto (o `encrypt:rotate` citado em versões anteriores deste documento nunca foi criado). O caminho disponível é o do próprio Laravel: `config/app.php` lê `APP_PREVIOUS_KEYS`, e o framework tenta as chaves antigas ao descriptografar.
+
 Procedimento (somente em janela de manutenção):
 
 ```bash
@@ -159,13 +161,13 @@ php artisan down --secret="$MAINT_BYPASS"
 # 2. Gerar nova chave (não aplicar ainda)
 php artisan key:generate --show  # copiar output
 
-# 3. Script que re-encripta dados (comando custom):
-php artisan encrypt:rotate --from=$OLD_KEY --to=$NEW_KEY --dry-run
-
-# 4. Atualizar .env com nova chave
-# 5. Rodar rotação real
-# 6. artisan up
+# 3. No .env: mover a chave atual para APP_PREVIOUS_KEYS (lista separada por vírgula)
+#    e colocar a nova em APP_KEY
+# 4. Limpar o cache de config (php artisan config:clear) e conferir o login
+# 5. php artisan up
 ```
+
+Dados gravados com a chave antiga continuam legíveis enquanto ela estiver em `APP_PREVIOUS_KEYS`. Eles só passam para a chave nova quando forem gravados de novo; não há rotina que re-encripte tudo.
 
 ### 3.2 AWS access keys → OIDC (roadmap)
 
@@ -184,7 +186,7 @@ aws iam update-access-key --access-key-id AKIA_OLD --status Inactive
 aws iam delete-access-key --access-key-id AKIA_OLD
 ```
 
-Roadmap: migrar para OIDC federado (ver [`ci-cd.md §4.5`](ci-cd.md#45-migração-recomendada-para-oidc-aws)).
+Roadmap: migrar para OIDC federado (proposta no rascunho arquivado [`historico/devops/ci-cd.md §4.5`](../historico/devops/ci-cd.md#45-migração-recomendada-para-oidc-aws); hoje não há deploy pelo Actions).
 
 ### 3.3 Sentry DSN e auth token
 
@@ -258,12 +260,7 @@ Garantir que ninguém tem permissão acima do necessário (princípio do menor p
 
 **Passo 1** — exportar snapshot:
 
-```bash
-ssh deploy@prod-host 'cd /var/www/app/current && \
-    php artisan permission:audit-export --output=/tmp/permissions-$(date +%Y%m).json'
-```
-
-Comando custom cria JSON com: users x roles x permissions + data de criação.
+Não existe comando de exportação (o `permission:audit-export` citado em versões anteriores deste documento nunca foi criado). Até existir, o snapshot é montado à mão, em JSON, com: usuários × perfis × permissões + data de criação. Ele precisa cobrir, além das tabelas do Spatie (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions`), os perfis por empresa (`admin_user_empresa_role`) e as concessões diretas com validade (`permission_grants`). As concessões vencidas são revogadas por `php artisan access:expirar`.
 
 **Passo 2** — revisar diffs vs mês anterior:
 
@@ -469,36 +466,13 @@ make quality
 
 ### 7.3 Scheduled check no CI
 
-[`ci-cd.md §3.4`](ci-cd.md#34-githubworkflowsscheduled-checksyml) tem workflow semanal `scheduled-checks.yml` que roda:
+Não há workflow agendado. O `scheduled-checks.yml` descrito no rascunho arquivado ([`historico/devops/ci-cd.md`](../historico/devops/ci-cd.md)) nunca foi criado.
 
-- `composer audit`
-- `npm audit --audit-level=high`
-
-Falha envia alerta Slack `#alerts`.
+O que existe: o job `quality` do CI roda `composer audit` em todo push e PR, de forma informativa (não reprova o build). `npm audit` não roda no CI. Ver [`ci-cd.md`](ci-cd.md).
 
 ### 7.4 Dependabot
 
-`.github/dependabot.yml`:
-
-```yaml
-version: 2
-updates:
-    - package-ecosystem: composer
-      directory: /
-      schedule: { interval: weekly }
-      open-pull-requests-limit: 5
-      labels: [dependencies, area:backend]
-
-    - package-ecosystem: npm
-      directory: /
-      schedule: { interval: weekly }
-      open-pull-requests-limit: 5
-      labels: [dependencies, area:frontend]
-
-    - package-ecosystem: github-actions
-      directory: /
-      schedule: { interval: monthly }
-```
+[`.github/dependabot.yml`](../../.github/dependabot.yml) abre PRs semanais para `composer`, `npm` e `github-actions`, com limite de 10 PRs abertos (composer e npm), dependências agrupadas (`php-deps`, `js-deps`) e prefixos `chore(deps)` / `ci(deps)`. O major do `cropperjs` é ignorado de propósito. Resumo em [`ci-cd.md`](ci-cd.md#dependabot).
 
 ---
 
@@ -604,7 +578,7 @@ DPO (Data Protection Officer) coordena a comunicação externa.
 ```bash
 # 1. Isolar endpoint (WAF block ou feature flag)
 # 2. Revisar queries raw: grep -r "whereRaw\|DB::raw" app/
-# 3. Fix + deploy emergencial (runbook-deploy.md §6)
+# 3. Fix + deploy emergencial (não há runbook de deploy vigente)
 # 4. Verificar integridade DB: checksums em tabelas críticas
 # 5. Rotacionar DB password
 # 6. Pós-mortem
@@ -719,8 +693,8 @@ Relatório consolidado à liderança.
 
 ## 11. Referências
 
-- [`runbook-deploy.md`](runbook-deploy.md) — procedimentos de deploy.
-- [`monitoring-alerts.md`](monitoring-alerts.md) — alertas relacionados.
+- [`ci-cd.md`](ci-cd.md) — o CI real.
+- [`historico/devops/runbook-deploy.md`](../historico/devops/runbook-deploy.md) e [`historico/devops/monitoring-alerts.md`](../historico/devops/monitoring-alerts.md) — rascunhos de abril de 2026, arquivados; não descrevem o estado atual.
 - [`conventions.md`](conventions.md) — padrões de código seguros.
 
 ---
@@ -730,3 +704,4 @@ Relatório consolidado à liderança.
 | Versão | Data       | Autor  | Resumo                                              |
 | ------ | ---------- | ------ | --------------------------------------------------- |
 | 1.0.0  | 2026-04-18 | DevOps | Operações de segurança inicial — draft para revisão |
+| 1.0.1  | 2026-10-25 | Docs   | Remove comandos inexistentes (`encrypt:rotate`, `permission:audit-export`) e o workflow agendado que nunca existiu; Dependabot conforme o arquivo real |

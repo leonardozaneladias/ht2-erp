@@ -1,6 +1,19 @@
 # Memória Automática e Hooks — Claude Code
 
-**Versão:** 1.0.0
+**Versão:** 1.1.0 · revisado em 2026-10-25
+
+> **Estado no repositório.** Não existe `.claude/` versionado: a pasta está no
+> `.gitignore` ("memórias e logs de sessão — dados locais do desenvolvedor").
+> Os slash commands e hooks das seções 3 a 6 são **exemplos** para quem quiser
+> configurá-los na própria máquina; nenhum deles vem com o clone.
+>
+> O que o repositório versiona para agentes de IA:
+>
+> - `CLAUDE.md` e `AGENTS.md` — contexto e regras do projeto.
+> - `.mcp.json` — servidor MCP `laravel-boost` (`php artisan boost:mcp`).
+> - `boost.json` — configuração do Laravel Boost (agentes, guidelines e skills).
+> - `.ai/skills/`, `.github/skills/`, `.agents/skills/` e `skills/` — skills
+>   instaladas.
 
 ---
 
@@ -20,7 +33,7 @@
 ├─────────────────────────────────────────────┤
 │  Hooks — Automação determinística            │
 │  Shell scripts que rodam automaticamente     │
-│  Configurados em .claude/settings.json       │
+│  Configurados em .claude/settings.json local │
 │  Rodam em TODA edição, commit ou ferramenta  │
 └─────────────────────────────────────────────┘
 ```
@@ -46,7 +59,9 @@ Essas regras ficam persistentes e são carregadas automaticamente em toda sessã
 
 ## 3. Custom Slash Commands
 
-O projeto inclui alguns slash commands em `.claude/commands/` para automatizar workflows. Adapte o conteúdo conforme as necessidades da sua aplicação.
+O repositório **não** traz slash commands. Os três abaixo são exemplos: crie-os em `.claude/commands/` na sua máquina, se quiser, e adapte o conteúdo.
+
+Para implementar um módulo, prefira os geradores reais: `php artisan make:modulo <slug>` e `php artisan make:recurso <Nome> --modulo=<slug>` (ver [`../criar-recurso.md`](../criar-recurso.md)).
 
 ### 3.1 Comando: `/modulo` — Implementar módulo
 
@@ -70,7 +85,7 @@ Implemente:
 - Service(s) / Action(s) com lógica de negócio
 - Controller(s) magros (máx 5-7 linhas por método)
 - Views Blade usando componentes do catálogo
-- Rotas em routes/admin.php
+- Rotas no arquivo de rotas do módulo (registrado pelo ModuloBuilder)
 - Factory para testes
 - Pelo menos 1 teste para cada Service
 
@@ -139,7 +154,7 @@ Não invente informação — documente apenas o que existe no código.
 
 ## 4. Hooks Automáticos
 
-Adicionar ao `.claude/settings.json`:
+Exemplo de `.claude/settings.json` local (o repositório não traz hooks do Claude Code; os hooks versionados são os do Husky — `pre-commit` roda o `lint-staged` com Pint e Prettier):
 
 ```json
 {
@@ -221,14 +236,13 @@ Esse hook usa `type: "prompt"` em vez de `command` — ou seja, ele pede ao pró
 
 ```
 <projeto>/
-├── CLAUDE.md                          ← Contexto principal (raiz)
-├── .claude/
-│   ├── settings.json                  ← Hooks e configurações
-│   ├── commands/                      ← Slash commands customizados
-│   │   ├── modulo.md                  ← /modulo nome
-│   │   ├── review.md                  ← /review
-│   │   └── docs.md                    ← /docs nome
-│   └── memory-log.md                  ← Log automático de sessões (gerado pelo hook)
+├── CLAUDE.md                          ← Contexto principal (versionado)
+├── AGENTS.md                          ← Contexto para outros agentes (versionado)
+├── .mcp.json                          ← MCP laravel-boost (versionado)
+├── .claude/                           ← NÃO versionado (.gitignore) — só local
+│   ├── settings.json                  ← Hooks e configurações (se você criar)
+│   ├── commands/                      ← Slash commands (se você criar)
+│   └── memory-log.md                  ← Log de sessões (se usar o hook da §4.1)
 └── docs/                              ← Documentação do projeto
 ```
 
@@ -255,9 +269,7 @@ mkdir -p .claude/commands
 #   # ao terminar módulo, atualizar a doc do módulo
 #   # commits: tipo(escopo): descrição
 
-# 5. Commitar tudo
-git add .claude/
-git commit -m "chore(infra): configurar Claude Code (hooks, commands, memória)"
+# 5. Não commitar: .claude/ está no .gitignore e é configuração pessoal
 ```
 
 ---
@@ -269,19 +281,19 @@ Manhã:
   → Abrir Claude Code no projeto
   → Claude lê CLAUDE.md automaticamente (contexto completo)
   → Claude lê auto-memory (aprendizados de sessões anteriores)
-  → Claude lê .claude/memory-log.md (histórico do que foi feito)
+  → Claude lê .claude/memory-log.md, se você configurou o hook da §4.1
 
 Durante o dia:
   → Trabalhar normalmente
-  → Hook roda Pint em todo .php editado (automático)
-  → Hook roda Prettier em todo .blade.php editado (automático)
+  → Hook local (se configurado) roda Pint/Prettier no arquivo editado
+  → No commit, o Husky roda o lint-staged (Pint e Prettier) de qualquer forma
   → # (hashtag) para registrar novas regras quando surgir
 
 Fim do dia:
   → Encerrar sessão
-  → Hook Stop grava resumo em .claude/memory-log.md (automático)
+  → Hook Stop (se configurado) grava resumo em .claude/memory-log.md
 
 Ao concluir um módulo:
-  → /docs clientes  (atualiza doc do módulo trabalhado)
-  → /review         (revisa os arquivos alterados)
+  → /docs clientes  (se você criou o comando da §3.3)
+  → /review         (se você criou o comando da §3.2)
 ```
