@@ -7,6 +7,8 @@ stack: Laravel 13 · Horizon · PostgreSQL 16 · Envoy
 publico: DevOps, SRE, Tech Lead de plantão
 ---
 
+> **Histórico.** Este documento descreve um runbook de deploy planejado em 2026-04-18 (rascunho, com Docker Compose, jobs e comandos que nunca existiram); não reflete o estado atual. Arquivado em 2026-10-25 — ver não existe workflow de deploy no repositório; o CI real está em [ci-cd.md](../../devops/ci-cd.md).
+
 # Runbook de Deploy
 
 Documento operacional para execução de deploys. Toda operação aqui descrita é **passo a passo, copy/paste friendly**, com critérios de verificação explícitos em cada etapa.
@@ -427,7 +429,7 @@ gh pr create --label hotfix --reviewer <tech-lead>,<devops>
 
 **Passo 6** — monitoramento intensivo por 60 min pós-deploy (não 15).
 
-**Passo 7** — pós-mortem obrigatório em 48h em [`docs/postmortems/YYYY-MM-DD-<nome>.md`](../postmortems/).
+**Passo 7** — pós-mortem obrigatório em 48h em `docs/postmortems/YYYY-MM-DD-<nome>.md` (pasta nunca criada).
 
 ### 6.2 Cherry-pick de hotfix
 
@@ -714,7 +716,7 @@ Qualquer mudança nesse script:
 
 - [`ci-cd.md`](ci-cd.md) — pipeline automatizado.
 - [`monitoring-alerts.md`](monitoring-alerts.md) — alertas e observabilidade.
-- [`security-operations.md`](security-operations.md) — rotação de segredos.
+- [`security-operations.md`](../../devops/security-operations.md) — rotação de segredos.
 
 ---
 

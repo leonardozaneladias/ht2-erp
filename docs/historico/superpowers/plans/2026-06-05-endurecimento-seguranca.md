@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o plano de implementação do endurecimento de segurança: lockout, limites de tentativa, alertas e conta ativa (Épico 2, Fase C-2), escrito em 2026-06-05. O trabalho foi entregue (os checkboxes nunca foram marcados); não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Services/Admin/Security/`](../../../../packages/core/src/Services/Admin/Security/) e [`Http/Middleware/GarantirContaAtiva.php`](../../../../packages/core/src/Http/Middleware/GarantirContaAtiva.php).
+
 # Endurecimento de segurança — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

@@ -4,7 +4,7 @@
 
 ## Projeto
 
-Boilerplate Laravel admin server-side. Guard `admin` único; Blade + Livewire 4 + Inspinia + Tailwind 4; PostgreSQL 16, Redis, Horizon, Pulse; ambiente via DDEV + OrbStack.
+HT2ML Platform: plataforma de backoffice administrativo, server-side e abstrata (nenhum produto vive nela; ADR-0019). O código da plataforma é o pacote `ht2ml/core` em `packages/core/` (namespace `HT2ML\Core\`); extensões em `packages/extensao-*`; a raiz é o app de desenvolvimento. Guard `admin` único; Blade + Livewire 4 + Inspinia + Tailwind 4; PostgreSQL 16, Redis, Horizon, Pulse; ambiente via DDEV + OrbStack.
 
 ## Setup
 
@@ -12,10 +12,12 @@ Boilerplate Laravel admin server-side. Guard `admin` único; Blade + Livewire 4 
 
 ## Comandos
 
-- `make test` — Pest
+- `make test` — Pest (suítes Unit, Feature, Extensoes e Arch, em paralelo)
 - `make lint` — Pint + Prettier
-- `make quality` — Pint + PHPStan + Prettier + Pest
+- `make quality` — `npm run quality`: Pint, ESLint, Prettier, PHPStan e Pest (só confere)
 - `make fresh` — `migrate:fresh --seed`
+- `make doutor` — `ht2ml:doutor`, diagnóstico das contribuições dos módulos
+- Geradores: `make:modulo {chave}`, `make:recurso Nome --modulo={chave}`, `make:regra Nome --modulo={chave}`. Ver `CLAUDE.md` §16.
 
 ## Convenções
 
@@ -23,7 +25,7 @@ PT-BR para mensagens de UI, mensagens de commit e nomes de domínio. Inglês par
 
 ## Quality gates
 
-Pint (PSR-12 + preset Laravel), PHPStan/Larastan nível 6, Prettier (Blade + JS + CSS), Pest.
+Pint (PSR-12 + preset Laravel), PHPStan/Larastan nível 6, ESLint (JS), Prettier (Blade + JS + CSS), Pest, `ht2ml:doutor` no CI.
 
 ## Catálogo de componentes
 
@@ -32,6 +34,10 @@ Pint (PSR-12 + preset Laravel), PHPStan/Larastan nível 6, Prettier (Blade + JS 
 ## Skill auxiliar
 
 `skills/laravel-blade-componentization` orienta o processo de componentizar HTML existente do Inspinia.
+
+## Nota sobre as skills listadas abaixo
+
+O bloco `<laravel-boost-guidelines>` é gerado pelo Laravel Boost a partir de `boost.json`; não edite à mão. Ele lista `fluxui-development` e `laravel-inertia-react`, mas **Flux e Inertia não estão instalados** neste projeto (a UI é Blade + Livewire + Inspinia). Ignore essas duas skills.
 
 ===
 

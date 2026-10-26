@@ -1,36 +1,58 @@
 # ht2ml/extensao-documentos
 
-Extensão **Documentos**.
+Extensão-biblioteca **Documentos**: numeração sequencial de documentos por empresa,
+tipo e ano, sem buracos nem duplicatas.
 
-Pacote Composer instalável que adiciona o módulo Documentos a qualquer
-instalação de qualquer produto, sem editar o core (ver ADR-0015).
+Não tem tela, rota, menu nem permissão. É código consumido por quem numera
+documentos (um módulo ou o próprio produto). Saiu do core porque o mecanismo é
+genérico, mas o vocabulário (matrícula, contrato, protocolo, recibo) é de domínio
+([ADR-0019](../../docs/architecture/adrs/ADR-0019-plataforma-abstrata-sem-produto.md)).
 
-## Instalar em um cliente
+## Instalar
+
+O pacote é privado e vem por VCS do repositório
+`leonardozaneladias/ht2ml-extensao-documentos`. Depende de `ht2ml/core` (a tabela
+referencia `empresas`).
 
 ```bash
 composer require ht2ml/extensao-documentos
-php artisan migrate --force
-php artisan access:sync
-php artisan cache:clear
+php artisan migrate --force   # cria document_sequences
 ```
 
-Depois, atribua as permissões do módulo aos perfis em `/admin/acesso`.
+## O que entrega
 
-## Customização por cliente
+| Símbolo | Papel |
+| --- | --- |
+| `HT2ML\Documentos\Support\GeradorNumeroDocumento` | `gerar(int $empresaId, TipoDocumento $tipo, int $ano, ?string $template = null): string`. Registrado como singleton |
+| `HT2ML\Documentos\Enums\TipoDocumento` | `Matricula`, `Contrato`, `Protocolo`, `Recibo`, cada um com `label()` e `template()` padrão |
+| `HT2ML\Documentos\Models\DocumentSequence` | O contador: uma linha por empresa + tipo + ano (`document_sequences`, índice único nos três) |
 
-Publique a config e ajuste permissões/menu sem tocar no pacote:
+```php
+use HT2ML\Documentos\Enums\TipoDocumento;
+use HT2ML\Documentos\Support\GeradorNumeroDocumento;
 
-```bash
-php artisan vendor:publish --tag=documentos-config
+$numero = app(GeradorNumeroDocumento::class)->gerar($empresaId, TipoDocumento::Matricula, 2026);
+// "MAT-2026-000001"
+
+app(GeradorNumeroDocumento::class)->gerar($empresaId, TipoDocumento::Recibo, 2026, 'R{SEQ:4}/{ANO}');
+// "R0001/2026"
 ```
+
+Placeholders do template: `{ANO}` (ano com 4 dígitos) e `{SEQ:N}` (sequencial com N
+dígitos, completado com zeros).
+
+## Por que é assim
+
+- **Transação + `lockForUpdate`.** Duas requisições simultâneas não recebem o mesmo
+  número, e um número não é pulado.
+- **`DocumentSequence` não usa `BelongsToEmpresa`.** O global scope por empresa ativa
+  quebraria o `lockForUpdate` em transações concorrentes; por isso `gerar()` recebe
+  `$empresaId` explícito.
+- **Sem auditoria.** É contador técnico, não entidade de negócio.
+- **Os tipos são um enum fechado.** Um tipo novo exige versão nova do pacote.
 
 ## Desenvolvimento
 
-Durante o desenvolvimento o pacote vive em `packages/documentos` do
-boilerplate (path repository, symlink). Para gerar recursos CRUD dentro dele:
-
-```bash
-php artisan make:recurso Recurso --modulo=documentos --fields="..."
-```
-
-Ao estabilizar, promova a um repositório Git próprio e versione por tag (semver).
+No monorepo da plataforma o pacote vive em `packages/extensao-documentos`. Release:
+`make release-modulo pacote=extensao-documentos versao=vX.Y.Z` (ver
+[`docs/devops/release.md`](../../docs/devops/release.md)).

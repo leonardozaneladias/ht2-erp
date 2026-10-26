@@ -33,16 +33,16 @@ Refs: #issue-number
 
 ### 1.3 Escopos
 
-| Escopo   | Área                                    |
-| -------- | --------------------------------------- |
-| `admin`  | Backoffice administrativo               |
-| `auth`   | Autenticação (guard admin)              |
-| `infra`  | DDEV, Docker, CI, deploy                |
-| `models` | Models, migrations, seeders             |
-| `rh`     | Módulo de RH (`ht2ml/extensao-rh`)       |
-| `docs`   | Documentação                            |
-| `ui`     | Interface, componentes visuais          |
-| `skills` | Skills e automações `.claude`/`.agents` |
+Lista fechada, definida no `scope-enum` do [`commitlint.config.cjs`](../../commitlint.config.cjs). O escopo é obrigatório (`scope-empty: never`). Escopo fora da lista reprova o commit.
+
+| Grupo                        | Escopos                                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Plataforma e áreas do core   | `plataforma`, `core`, `admin`, `auth`, `acesso`, `ui`, `grid`, `export`, `models`, `referencia`, `gerador`, `guardas` |
+| Extensões                    | `api`, `ia`, `webhook`, `rh`, `fiscal`                                                                       |
+| Distribuição e operação      | `skeleton`, `distribuicao`, `infra`, `ci`, `deps`                                                            |
+| Documentação e ferramentas   | `docs`, `arquitetura`, `skills`                                                                              |
+
+Migrations, schema e seeders usam `models` — nunca `database` (o hook `prepare-commit-msg` reescreve `database`, `db` e `sql` para `models`).
 
 ### 1.4 Regras
 
@@ -85,25 +85,33 @@ A sugestão _Generate Commit Message_ do Cursor (ou de extensões Git) **não va
 
 ---
 
-## 2. Branching Strategy (Git Flow Simplificado)
+## 2. Branches
+
+Não há branch `develop`. Todo trabalho sai da `main` e volta para a `main` por Pull Request.
 
 ```
-main                    ← produção, sempre estável
-  └── develop           ← desenvolvimento, base para features
-       ├── feature/descricao   ← feature ou funcionalidade
-       ├── fix/descricao-do-bug          ← correção de bugs
-       └── hotfix/descricao-critica      ← correção urgente em produção
+main                       ← sempre estável; protegida
+  ├── feat/descricao       ← funcionalidade
+  ├── fix/descricao        ← correção
+  ├── chore/descricao      ← manutenção, dependências, tooling
+  ├── docs/descricao       ← só documentação
+  └── refactor/descricao   ← refatoração sem mudar comportamento
 ```
+
+O prefixo da branch segue o tipo do commit (§1.2). Branches `dependabot/...` são abertas pelo Dependabot.
 
 ### Fluxo
 
-1. Criar branch a partir de `develop`: `git checkout -b feature/listagem-clientes`
+1. Criar branch a partir da `main`: `git switch -c feat/listagem-clientes main`
 2. Desenvolver e commitar seguindo as convenções
-3. Abrir PR para `develop` com descrição do que foi feito
-4. Após review, merge com squash (se muitos commits) ou merge regular
-5. Ao concluir uma entrega, merge `develop` → `main` com tag de versão (SemVer)
+3. Abrir PR para `main` com descrição do que foi feito
+4. O CI precisa passar (ver [`ci-cd.md`](ci-cd.md)); após review, merge do PR
+
+O hook `.husky/pre-push` bloqueia push direto para a `main`. Instâncias de cliente podem desligar o bloqueio localmente com `touch .husky/allow-main-push`.
 
 ### Tags de Versão
+
+Tags não são cortadas no monorepo. Cada pacote de `packages/` tem repositório próprio, e o release cria a tag lá: `make release-modulo pacote=<diretório> versao=vX.Y.Z` (ex.: `pacote=core`, `pacote=extensao-rh`), que chama `bin/release-module.sh`.
 
 Seguir [SemVer](https://semver.org/lang/pt-BR/): `MAJOR.MINOR.PATCH`.
 
@@ -156,8 +164,12 @@ parameters:
     level: 6
     paths:
         - app/
-    ignoreErrors: []
+        - packages/core/src/
+        - packages/extensao-rh/src/
+        # ... uma linha por pacote em packages/
 ```
+
+O `phpstan.neon` real também lista as migrations de cada pacote em `databaseMigrationsPath` (o Larastan infere as colunas dos models por elas). Pacote novo entra nas duas listas.
 
 ### 3.3 Naming Conventions
 
@@ -349,7 +361,7 @@ Decididos no fechamento da fase base. Todo CRUD/tela nova segue estas regras —
 
 O menu do admin tem duas camadas, mescladas pelo `HT2ML\Core\Services\Admin\Menu\MenuService` (cache de 10 min, invalidado nas Actions de menu):
 
-- **Registro** (`config/admin-menu.php`) — fonte de verdade dos módulos, sempre **FLAT**. Toda seção e item exigem uma **`key` estável** (o serviço lança `LogicException` sem ela); o item declara `label`, `icon` (tabler), `route`, `permission` e `active`. Módulo novo = item novo aqui — ele aparece automaticamente na sidebar e na tela de gestão.
+- **Registro** (`config('admin-menu')`) — fonte de verdade dos itens, sempre **FLAT**. A base é o `packages/core/config/admin-menu.php`, que traz só os itens do core; não se edita para adicionar módulo. Toda seção e item exigem uma **`key` estável** (o serviço lança `LogicException` sem ela); o item declara `label`, `icon` (tabler), `route`, `permission` e `active`. Módulo novo **não** escreve aqui: declara os itens pelo `ModuloBuilder` (em geral `ModuleRegistry::modulo('x')->deConfig('x')`, que deriva os itens de `recursos` em `config/x.php`), e o `ModuleRegistry::aplicarContribuicoes()` os mescla no registro. Eles aparecem automaticamente na sidebar e na tela de gestão.
 - **Personalizações** (`menu_personalizacoes`, tela `/admin/menus`, permissão `configuracoes.menus`) — ordem, label, ícone, container e `ativo` por cima do registro, além de **seções custom** e **grupos (submenus)** criados pela tela (`e_custom = true`, keys `secao-*`/`grupo-*` geradas por slug). Valores iguais ao padrão viram `null` (linha 100% padrão é removida); key que sumiu do config vira personalização **órfã** (ignorada na sidebar, listada na gestão para limpeza) — customs nunca são órfãs.
 - **Grupos** são apresentação pura: sem rota/permissão, só aparecem na sidebar quando têm filho visível ao usuário; inativo esconde o grupo e os filhos. Excluir grupo/seção custom devolve os registros ao fallback natural. Um item pertence a `grupo_key` (prioridade) > `secao_key` > seção natural do config.
 - **Disposição padrão**: **declarada, não aplicada**. Cada seção do registro pode trazer `ordem` e um mapa `grupos` (`label`, `icone`, `ordem`), e cada item, `ordem` e `grupo`. Faixas: core 100–499, extensões e módulos do produto 500+. A extensão declara os seus por `ModuleRegistry::secaoDeMenu()` e `::grupoDeMenu()`. **O declarado é sugestão; o banco é a decisão de quem instalou** — a mesma semântica que `label` e `icone` já tinham.
@@ -445,7 +457,7 @@ atributos** (created/updated/deleted/restored com diff em `attribute_changes`);
 Actions só logam **eventos de domínio** que o diff não expressa (sync de
 pivôs/roles, settings, auth, resumos de operação em massa).
 
-- **Todo model novo usa `Auditavel`** — o arch test em `tests/Arch.php` quebra a
+- **Todo model novo usa `Auditavel`** — o arch test em `tests/Arch/PlataformaTest.php` quebra a
   suíte até o model usar o trait ou entrar na whitelist com justificativa.
 - O trait usa `logAll()` + `logOnlyDirty()`; sensíveis globais (password, tokens,
   segredos 2FA) ficam em `activitylog.default_except_attributes`. Overrides por

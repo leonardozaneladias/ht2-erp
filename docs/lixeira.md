@@ -36,11 +36,18 @@ soft-delete do Eloquent; o `ativo` é regra de negócio.
 | `bloqueioRestauracao(Model): ?string`   | antes do restore        | colisão de e-mail de usuário (D3)                 |
 | `textoExcluirDefinitivo(Model): string` | confirm do force-delete | aviso de cascata física (Empresa)                 |
 
-## Permissões — 3 níveis por módulo
+## Permissões — 3 níveis por recurso
 
-- `{modulo}.deletar` → mover para a lixeira (soft-delete);
-- `{modulo}.restaurar` → restaurar da lixeira;
-- `{modulo}.excluir_permanente` → exclusão definitiva (force-delete).
+A base da permissão é `{modulo}.{recurso}` para recurso de módulo (ex.: `rh.departamentos`),
+derivada pelo `RecursoBuilder`. Os recursos do core e os legados de extensão usam só
+`{recurso}` (ex.: `empresas`, `cargos`, `cnaes`, `exemplos`).
+
+- `{base}.deletar` → mover para a lixeira (soft-delete);
+- `{base}.restaurar` → restaurar da lixeira;
+- `{base}.excluir_permanente` → exclusão definitiva (force-delete).
+
+Um recurso declarado com `'sem_lixeira' => true` (ou gerado com `--sem-soft-delete`) tem só
+`deletar`, sem as outras duas.
 
 `excluir_permanente` **não é atribuída a nenhum perfil por padrão**; como o
 super-admin tem bypass no `Gate::before`, o force-delete fica de fato só para
@@ -49,23 +56,29 @@ super-admin sem hard-code de papel. As policies mapeiam `restore` →
 
 ## Entidades com lixeira
 
-| Entidade                      | Observações                                                                                                                                                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Exemplo                       | piloto/gabarito de referência                                                                                                                                                                                |
-| Empresa                       | guardas: não exclui a **ativa** nem a **última**; force-delete cascateia fisicamente para filiais/acessos/vínculos (aviso no confirm)                                                                        |
-| Filial                        | lixeira gerida **dentro de Empresas** (no `FormEmpresa`), reusando `empresas.*`; a Matriz não é excluível                                                                                                    |
-| AdminUser                     | login do excluído bloqueado pelo `SoftDeletingScope`; anti-self-delete + hierarquia; e-mail liberado enquanto na lixeira (índice unique **parcial** `WHERE deleted_at IS NULL`); a restauração checa colisão |
-| Anexo                         | soft-delete **técnico** (retenção/auditoria): mantém o arquivo físico; o binário só some no force-delete (evento `forceDeleted`)                                                                             |
-| RH: Departamento, Funcionario | no pacote `ht2ml/extensao-rh`                                                                                                                                                                                 |
+Medido em 2026-10-25: todo model que implementa `UsaSoftDeletes` em `packages/*/src/Models`
+(17 models).
+
+| Entidade                                                                                      | Observações                                                                                                                                                                                                  |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Empresa                                                                                       | guardas: não exclui a **ativa** nem a **última**; force-delete cascateia fisicamente para filiais/acessos/vínculos (aviso no confirm)                                                                        |
+| Filial                                                                                        | lixeira gerida **dentro de Empresas** (no `FormEmpresa`), reusando `empresas.*`; a Matriz não é excluível                                                                                                    |
+| AdminUser                                                                                     | login do excluído bloqueado pelo `SoftDeletingScope`; anti-self-delete + hierarquia; e-mail liberado enquanto na lixeira (índice unique **parcial** `WHERE deleted_at IS NULL`); a restauração checa colisão |
+| Anexo                                                                                         | soft-delete **técnico** (retenção/auditoria): mantém o arquivo físico; o binário só some no force-delete (evento `forceDeleted`)                                                                             |
+| Catálogos de referência do core: Banco, Cargo, Estado, Moeda, Município, País, TipoLogradouro | `HT2ML\Core\Models\Referencia\*`; globais (sem empresa). Linhas de origem `sync` são protegidas contra escrita pela policy (`ProtegeRegistroSincronizado`)                                                   |
+| Fiscal: Cnae, Cfop, Ncm                                                                       | no pacote `ht2ml/extensao-fiscal-br`; mesmo padrão dos catálogos do core                                                                                                                                     |
+| RH: Departamento, Funcionario                                                                 | no pacote `ht2ml/extensao-rh`                                                                                                                                                                                |
+| Exemplo                                                                                       | piloto/gabarito de referência, no pacote `ht2ml/extensao-exemplo-demo`                                                                                                                                       |
 
 **Fora da lixeira:** ACL (papéis/permissões) e Menu.
 
 ## Gerador (`make:recurso`)
 
-Todo módulo novo nasce com a lixeira quando o soft-delete está ativo (padrão).
+Todo recurso novo nasce com a lixeira quando o soft-delete está ativo (padrão).
 `--sem-soft-delete` produz a saída antiga (sem lixeira). Ver
 [`criar-recurso.md`](criar-recurso.md).
 
 > **Models de pacote:** o resolver de factory do Laravel assume `App\`; um model
 > em `HT2ML\…\Models` precisa de `protected static function newFactory()`
-> apontando a factory do pacote (ver os models do `extensao-rh`).
+> apontando a factory do pacote. O `make:recurso --modulo=…` já gera esse método
+> (ver os models do `extensao-rh`).

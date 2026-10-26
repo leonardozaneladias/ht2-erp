@@ -308,10 +308,10 @@ Catálogos são fundação de cadastros, então a exclusão é defensiva:
 
 Toda empresa nova precisa nascer **já configurada** com o padrão — esse é o coração do requisito "padrão pronto, editável depois".
 
-- **Action idempotente** `HT2ML\Rh\Actions\ProvisionarCatalogosRh` (análoga ao `HT2ML\Core\Actions\Admin\Menu\AplicarMenuPadraoAction` do core, que usa exatamente este padrão), semeia os catálogos tenant via `firstOrCreate` por chave estável: `(empresa_id, codigo)` para `tipos_documento`/`tipos_afastamento`/`rubricas`; `(empresa_id, nome)` para `departamentos`/`funcoes`/`escalas`. Rodar duas vezes é **no-op** — nunca duplica nem sobrescreve o que o cliente já editou.
+- **Action idempotente** `HT2ML\Rh\Actions\ProvisionarCatalogosRh`, semeia os catálogos tenant via `firstOrCreate` por chave estável: `(empresa_id, codigo)` para `tipos_documento`/`tipos_afastamento`/`rubricas`; `(empresa_id, nome)` para `departamentos`/`funcoes`/`escalas`. Rodar duas vezes é **no-op** — nunca duplica nem sobrescreve o que o cliente já editou.
 - **Gatilho:** chamada **na criação da empresa** (no fluxo de cadastro de empresa / listener do core), dentro de uma transação. Greenfield e reexecutável.
 - **O que NÃO entra aqui:** enums (vivem no código) e referências globais (`cargos`, `bancos`, `paises`… já semeados pelo core). A Action cuida só dos seis catálogos tenant (+ as filhas `escala_dias` e o conjunto de `funcionario_funcao`/`escala_funcionario` permanecem vazios — são preenchidos por atribuição). O catálogo **opcional** `centros_custo` (§7.1) **não** faz parte dos seis: nasce **vazio** por padrão e só é semeado (mínimo idempotente) se o cliente adotar centro de custo.
-- **Empacotamento (ADR-0015):** a Action e seus dados-semente vivem no pacote `packages/extensao-rh`; o core não é editado. O item de menu do RH já é contribuído pelo pacote (visto em `AplicarMenuPadraoAction`: grupo `grupo-tab-rh`).
+- **Empacotamento (ADR-0015):** a Action e seus dados-semente vivem no pacote `packages/extensao-rh`; o core não é editado. O item de menu do RH já é contribuído pelo pacote: o `ModuloBuilder` deriva os itens de `recursos` em `packages/extensao-rh/config/rh.php` e os põe no grupo `grupo-tab-rh` da seção `tabelas-auxiliares`.
 
 Resultado: a empresa abre o módulo de RH e encontra departamentos, funções, tipos de documento, tipos de afastamento, escalas e rubricas **prontos** — e livres para editar.
 

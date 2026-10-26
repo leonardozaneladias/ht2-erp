@@ -69,7 +69,7 @@ O `make:modulo` ganha modo pacote (`--module=`) com namespaces/paths dinâmicos;
 
 - [ADR-0002: Monólito modular](ADR-0002-monolito-modular.md) — esta decisão concretiza a "extração de módulos" lá prevista.
 - [ADR-0016: Instâncias por cliente via clone + re-origin](ADR-0016-instancias-por-cliente.md) — **refina** (não revoga) esta decisão; ver addendum abaixo.
-- Plano-mestre do épico: `docs/superpowers/specs/` / plano de produtização.
+- Plano-mestre do épico: `docs/historico/superpowers/specs/` (arquivado em 2026-10-25) / plano de produtização.
 
 ## Refinamento (2026-06-17)
 

@@ -7,7 +7,7 @@ repo ao explorar o código.
 
 - **`CONTEXT-MAP.md`** na raiz: aponta para um `CONTEXT.md` por contexto. Leia cada um que for relevante ao tema.
 - O **`CONTEXT.md`** de cada contexto tocado pela tarefa.
-- **`docs/architecture/adrs/`**: leia os ADRs que tocam a área em que você vai mexer. Este repo é multi-context, então cheque também `packages/<módulo>/docs/adr/` para decisões de escopo do módulo.
+- **`docs/architecture/adrs/`**: leia os ADRs que tocam a área em que você vai mexer. Este repo é multi-context, então cheque também as decisões de escopo do módulo. Hoje só o RH tem ADRs próprios, e eles ficam em `docs/plans/modules/rh/adrs/` (`ADR-RH-001` a `ADR-RH-010`), não dentro do pacote.
 
 Se algum desses arquivos não existir, **siga em silêncio**. Não sinalize a
 ausência; não sugira criá-los de antemão. O skill `/domain-modeling` (alcançado
@@ -21,19 +21,21 @@ Repo **multi-context** (a presença de `CONTEXT-MAP.md` na raiz é o sinal):
 ```
 /
 ├── CONTEXT-MAP.md                     ← índice dos contextos
-├── docs/architecture/adrs/            ← decisões do sistema (ADR-0002…ADR-0016)
+├── docs/architecture/adrs/            ← decisões do sistema (ADR-0002…ADR-0022, com lacunas na numeração)
+├── docs/plans/modules/rh/adrs/        ← decisões do módulo de RH (ADR-RH-001…ADR-RH-010)
 ├── app/
-│   └── CONTEXT.md                     ← contexto core (monólito modular)
+│   └── CONTEXT.md                     ← glossário do contexto core (o código vive em packages/core)
 └── packages/
-    └── extensao-rh/
-        ├── CONTEXT.md                 ← contexto do módulo de RH
-        └── docs/adr/                  ← decisões do próprio módulo
+    ├── core/                          ← ht2ml/core
+    └── extensao-rh/                   ← módulo de RH (ainda sem CONTEXT.md; glossário não escrito)
 ```
 
-Cada módulo de negócio novo (`packages/modulo-*`, ver
-[ADR-0015](../architecture/adrs/ADR-0015-modulos-pacotes-composer.md)) entra
+Cada módulo de negócio novo (`packages/extensao-*`, ver
+[ADR-0015](../architecture/adrs/ADR-0015-modulos-pacotes-composer.md) e
+[ADR-0021](../architecture/adrs/ADR-0021-taxonomia-modulo-recurso-area-secao.md)) entra
 como um contexto próprio: um `CONTEXT.md` na raiz do pacote, uma linha nova no
-`CONTEXT-MAP.md` e, se tiver decisões próprias, um `docs/adr/` local.
+`CONTEXT-MAP.md` e, se tiver decisões próprias, ADRs próprios. Nenhum pacote
+tem `CONTEXT.md` ou `docs/adr/` hoje.
 
 > Atenção ao caminho dos ADRs: aqui é **`docs/architecture/adrs/`** (plural, sob
 > `architecture/`), não o `docs/adr/` que os templates genéricos assumem.

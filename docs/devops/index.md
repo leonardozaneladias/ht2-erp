@@ -16,7 +16,7 @@ publico: DevOps, SRE, Engenharia
 ### ⭐ [`ddev-setup.md`](ddev-setup.md) — Guia DDEV + OrbStack (começe por aqui)
 
 Guia rápido e copiável para **instalar, configurar e rodar** o ambiente com DDEV +
-OrbStack — neste projeto e em projetos novos criados a partir do boilerplate. Inclui
+OrbStack — neste projeto e em produtos criados a partir do skeleton. Inclui
 pré-requisitos, primeiro boot, HTTPS (mkcert), o que fica versionado em `.ddev/` e
 troubleshooting dos problemas reais (troca de provider, portas, Mutagen, banco por provider).
 
@@ -60,30 +60,25 @@ URLs e serviços do ambiente DDEV, comandos do Makefile, primeiro boot, acessos 
 - Ao subir/derrubar o ambiente.
 - Ao diagnosticar problemas de containers.
 
-### 5. [`claude-code-memory.md`](claude-code-memory.md) — Memória automática e hooks (Claude Code)
+### 5. [`claude-code-memory.md`](claude-code-memory.md) — Memória e contexto (Claude Code)
 
-Os 3 mecanismos de memória do Claude Code, memórias rápidas com `#`, custom slash commands (`/modulo`, `/review`, `/docs`), hooks automáticos (Pint/Prettier/Stop), estrutura de arquivos `.claude/` e workflow diário integrado.
+Os mecanismos de memória do Claude Code e o que este repositório versiona para agentes (`CLAUDE.md`, `AGENTS.md`, `.ai/skills/`, `.github/skills/`). O repositório não versiona `.claude/`: slash commands e hooks, se usados, ficam na máquina de cada um.
 
 **Quando consultar:**
 
 - Ao configurar o Claude Code no projeto.
-- Ao criar novos slash commands ou hooks.
 
-### 6. [`ci-cd.md`](ci-cd.md) — Integração e Entrega Contínuas
+### 6. [`ci-cd.md`](ci-cd.md) — CI
 
-Workflows de CI/CD, secrets, matriz de ambientes, estratégia de deploy e rollback.
+O workflow real (`.github/workflows/ci.yml`): gatilhos, concorrência, os jobs `quality`, `core-sozinho`, `tests` e `browser`, e o Dependabot. Não existe workflow de deploy.
 
-### 7. [`runbook-deploy.md`](runbook-deploy.md) — Runbook de Deploy
-
-Procedimentos de deploy, migrations, rollback e janelas de manutenção.
-
-### 8. [`monitoring-alerts.md`](monitoring-alerts.md) — Monitoramento e Alertas
-
-Logs estruturados, dashboards (Horizon, Pulse), alertas e SLO/SLI.
-
-### 9. [`security-operations.md`](security-operations.md) — Operações de Segurança
+### 7. [`security-operations.md`](security-operations.md) — Operações de Segurança
 
 Checklists de segurança, rotação de segredos, auditoria de permissões e resposta a incidentes.
+
+### Arquivados
+
+O rascunho de CI/CD, o runbook de deploy e o documento de monitoramento e alertas, todos de abril de 2026, descreviam ferramentas que nunca foram instaladas. Estão em [`../historico/devops/`](../historico/README.md).
 
 ---
 
@@ -93,15 +88,15 @@ Checklists de segurança, rotação de segredos, auditoria de permissões e resp
 
 ```bash
 # Ambiente
-make up                              # sobe containers
-make bash                            # entra no workspace
-make fresh                           # recria banco com seeds
+make up                              # ddev start
+make bash                            # ddev ssh
+make fresh                           # ddev artisan migrate:fresh --seed
 
 # Qualidade
+make quality                         # Pint + ESLint + Prettier + PHPStan + testes
+make test                            # Unit, Feature, Extensoes, Arch (em paralelo)
+make doutor                          # ht2ml:doutor
 vendor/bin/pint --dirty --format agent
-vendor/bin/phpstan analyse --memory-limit=512M
-php artisan test --compact
-npx prettier --write resources/
 ```
 
 ### Links operacionais (dev)

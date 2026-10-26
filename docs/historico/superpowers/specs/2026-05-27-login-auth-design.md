@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o design das telas de autenticação em Livewire (login, esqueci a senha, redefinir senha), escrito em 2026-05-27. O trabalho foi entregue; não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`src/Livewire/Admin/Auth/`](../../../../packages/core/src/Livewire/Admin/Auth/) e [`auth-form-card`](../../../../packages/core/resources/views/components/admin/auth-form-card.blade.php).
+
 # Spec: Telas de Auth com Inspinia + Livewire
 
 **Data:** 2026-05-27

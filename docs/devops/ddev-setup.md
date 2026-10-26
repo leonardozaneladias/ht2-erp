@@ -9,8 +9,8 @@ status: aprovado
 # Guia DDEV + OrbStack
 
 Este é o guia **prático e copiável** para instalar, configurar e rodar o ambiente
-de desenvolvimento deste projeto — e de qualquer projeto novo criado a partir
-deste boilerplate. O ambiente oficial é o **[DDEV](https://docs.ddev.com/)**, com
+de desenvolvimento deste projeto — e de qualquer produto novo criado a partir
+do skeleton. O ambiente oficial é o **[DDEV](https://docs.ddev.com/)**, com
 **OrbStack** como provider Docker no macOS.
 
 > Toda a configuração do ambiente vive versionada em `.ddev/`. Quem clona o repo
@@ -22,7 +22,7 @@ Sumário:
 2. [Rodar este projeto (do clone ao login)](#2-rodar-este-projeto)
 3. [HTTPS confiável (mkcert)](#3-https-confiável-mkcert)
 4. [O que fica versionado em `.ddev/`](#4-o-que-fica-versionado-em-ddev)
-5. [Iniciar um projeto novo a partir do boilerplate](#5-iniciar-um-projeto-novo)
+5. [Iniciar um produto novo (skeleton)](#5-iniciar-um-produto-novo)
 6. [Comandos do dia a dia](#6-comandos-do-dia-a-dia)
 7. [Troubleshooting (problemas reais já encontrados)](#7-troubleshooting)
 
@@ -143,34 +143,28 @@ Principais escolhas em `config.yaml` (e o porquê):
 | Campo                                                  | Valor                            | Motivo                                                                                                                                                                                                                                                                                                                          |
 | ------------------------------------------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `type` / `php_version` / `database` / `nodejs_version` | laravel / 8.4 / postgres 16 / 22 | Stack do projeto                                                                                                                                                                                                                                                                                                                |
-| `performance_mode`                                     | `none`                           | O projeto vive em `/Users/Shared`; o Mutagen tenta criar um diretório de staging no diretório **pai** (`/Users/Shared/projects/GDF`), que não é gravável → `permission denied`. Bind mounts diretos evitam isso. Se mover o projeto para uma pasta do seu usuário, pode remover esta linha e usar o Mutagen (default no macOS). |
+| `performance_mode`                                     | `none`                           | O projeto foi criado numa pasta compartilhada (`/Users/Shared/...`); o Mutagen tenta criar um diretório de staging no diretório **pai** do projeto, que lá não é gravável → `permission denied`. Bind mounts diretos evitam isso. Se mover o projeto para uma pasta do seu usuário, pode remover esta linha e usar o Mutagen (default no macOS). |
 | `web_extra_daemons`                                    | `php artisan horizon`            | Horizon roda como daemon persistente no container web                                                                                                                                                                                                                                                                           |
 | `web_extra_exposed_ports`                              | vite 5173                        | Expõe o Vite dev server (HMR) em `…ddev.site:5173`                                                                                                                                                                                                                                                                              |
 | `hooks.post-start`                                     | composer/migrate/npm             | Automatiza deps + schema a cada `ddev start` (sem seed — não é idempotente)                                                                                                                                                                                                                                                     |
 
 ---
 
-## 5. Iniciar um projeto novo
+## 5. Iniciar um produto novo
 
-A partir deste boilerplate, para começar um projeto novo:
+Produto novo não nasce de clone deste repositório. Ele nasce do skeleton
+(`ht2ml/skeleton`), com `composer create-project`, e recebe o `ht2ml/core` por
+Composer ([ADR-0017](../architecture/adrs/ADR-0017-produto-novo-via-skeleton.md)).
+O skeleton é privado e não está no Packagist: o `create-project` precisa do
+repositório VCS informado com `--repository` e de um token de acesso ao GitHub.
+Depois, `npm install && npm run build`.
 
-```bash
-./bin/init-project.sh        # interativo: pergunta nome, slug e domínio de e-mail
-```
+O `bin/init-project.sh`, que renomeava marca e slug num clone, ainda existe no
+repositório, mas está **aposentado** pelo ADR-0017. Não use.
 
-O script renomeia marca/slug em `composer.json`, `package.json`, `.env.example`,
-**`.ddev/config.yaml`** (`name: <slug>` → define `https://<slug>.ddev.site`),
-`README.md`, `CLAUDE.md`, `AGENTS.md`, e ajusta `APP_URL`. Depois:
-
-```bash
-cp .env.example .env
-ddev start && make setup
-mkcert -install              # se ainda não fez nesta máquina
-ddev launch                  # https://<slug>.ddev.site
-```
-
-> Para fazer manualmente sem o script: edite `name:` em `.ddev/config.yaml` e
-> `APP_URL` no `.env` para o mesmo slug, e rode `ddev restart`.
+Para o ambiente DDEV do produto novo, o que importa é o nome: edite `name:` em
+`.ddev/config.yaml` e `APP_URL` no `.env` para o mesmo slug, e rode
+`ddev restart` (o projeto passa a responder em `https://<slug>.ddev.site`).
 
 ---
 
@@ -184,9 +178,10 @@ make down        # ddev stop
 make bash        # shell no container web (ddev ssh)
 make dev         # Vite dev server (HMR)
 make fresh       # migrate:fresh --seed (recria o banco)
-make test        # php artisan test
+make test        # suítes Unit, Feature, Extensoes, Arch (--parallel)
 make lint        # Pint + Prettier
-make quality     # Lint + PHPStan + Test
+make quality     # Pint + ESLint + Prettier + PHPStan + testes
+make doutor      # ht2ml:doutor
 make horizon     # reinicia o daemon do Horizon
 make setup       # setup inicial (key, seed, assets, build)
 ```
@@ -234,7 +229,7 @@ Falta instalar a CA do mkcert: `mkcert -install && ddev restart`. Para Firefox:
 
 ### Mutagen falhando ("permission denied" criando staging)
 
-O projeto está numa pasta cujo **diretório pai** não é gravável (ex.: `/Users/Shared`).
+O projeto está numa pasta cujo **diretório pai** não é gravável (ex.: dentro de `/Users/Shared`).
 Mantenha `performance_mode: none` em `.ddev/config.yaml` (já é o default deste repo).
 
 ### Horizon não processa jobs / mudei `config/horizon.php`

@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o plano de implementação das telas de autenticação em Livewire (login, esqueci a senha, redefinir senha), escrito em 2026-05-27. O trabalho foi entregue (os checkboxes nunca foram marcados); não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`src/Livewire/Admin/Auth/`](../../../../packages/core/src/Livewire/Admin/Auth/) e [`auth-form-card`](../../../../packages/core/resources/views/components/admin/auth-form-card.blade.php).
+
 # Auth Screens (Login/ForgotPassword/ResetPassword) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

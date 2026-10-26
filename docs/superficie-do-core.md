@@ -5,47 +5,89 @@ Este documento é **medido, não projetado**. Ele nasceu da primeira extração 
 que ele importa de fora de si mesmo, sai a lista exata do que o core precisa
 exportar para que uma extensão instale **fora do monorepo**.
 
-Enquanto essa superfície viver em `App\...`, nenhuma extensão instala em outro
-projeto — ela depende de classes que o Composer não sabe entregar. É esse o
-conteúdo de `ht2ml/core` previsto na Fase 2 do plano.
-
-> **Estado:** `ht2ml/core` **existe** e já entrega 9 dos 13 símbolos. As quatro
-> pendências e os 11 componentes Blade estão marcadas na tabela abaixo.
+Quando a medição começou, essa superfície vivia em `App\...`, e nenhuma extensão
+instalava em outro projeto — dependia de classes que o Composer não sabia entregar.
+Hoje tudo isso está em `ht2ml/core` (namespace `HT2ML\Core\...`), publicado em
+`leonardozaneladias/ht2ml-core` (última tag v0.5.0, medido em 2026-10-25). O que
+segue é o retrato do que as extensões de fato usam.
 
 ## Como reproduzir a medição
 
 ```bash
-cd packages/<extensao>
-grep -rhoE '^use +[A-Za-z0-9_\\]+' --include='*.php' . | sort -u   # símbolos PHP
-grep -rhoE '<x-[a-z0-9.-]+' --include='*.blade.php' . | sort -u    # componentes Blade
+# símbolos PHP do core usados em código de produção das extensões (use + FQN inline)
+grep -rnoE '\\?HT2ML\\Core\\[A-Za-z0-9_\\]+' --include='*.php' \
+  packages/extensao-*/src packages/extensao-*/database packages/extensao-*/routes \
+  packages/extensao-*/config packages/extensao-*/resources \
+  | sed -E 's/^([^:]+):[0-9]+:\\?/\1 /' | awk '{split($1,a,"/"); print $2, a[2]}' | sort -u
+
+# componentes Blade
+grep -rhoE '<x-[a-z0-9.-]+' --include='*.blade.php' packages/extensao-*/ | grep -v '^<x-slot' | sort -u
 ```
 
-Tudo que não começar com o namespace do próprio pacote é superfície do core ou
-dependência de vendor.
+Contar só linhas `use` subestima: há símbolos citados por nome completo, sem
+`use` (`\HT2ML\Core\Casts\MoneyCast::class` num cast, por exemplo). Por isso o
+padrão casa as duas formas. `tests/` fica de fora: o que importa é o que o pacote
+precisa em produção.
 
-## 13 símbolos PHP, todos exigidos em produção
+## 30 símbolos PHP, todos em `ht2ml/core`
 
-**Os quinze vivem em `ht2ml/core`.** A medição original está satisfeita.
+Medido em 2026-10-25, sobre a branch `feat/extensao-ia` (main `40ae228` + as
+extensões `api` e `ia`, ainda em PR). Sete extensões varridas; as duas últimas não
+usam símbolo nenhum do core (ver abaixo).
 
-| Símbolo                                                    | Onde vive       | Papel para a extensão                                                                                                |
-| ---------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `Support\Modules\ModuleRegistry`                           | ✅ `ht2ml/core` | **O canal.** Rotas, seeders, permissões, itens de menu e catálogos de referência                                     |
-| `Support\Referencia\CsvReferenceSeeder`                    | ✅ `ht2ml/core` | Base dos seeders de catálogo mantidos por CSV                                                                        |
-| `Enums\ModuloAcesso`                                       | ✅ `ht2ml/core` | Os módulos de acesso do core                                                                                         |
-| `Enums\Referencia\OrigemRegistro`                          | ✅ `ht2ml/core` | `sync` \| `manual` — separa linha do sync de linha do cliente                                                        |
-| `Exceptions\Referencia\ImportacaoReferenciaException`      | ✅ `ht2ml/core` | Faz o seed falhar alto em vez de gravar catálogo vazio                                                               |
-| `Models\Concerns\TemOrigem`                                | ✅ `ht2ml/core` | Trait que aplica o default de origem                                                                                 |
-| `Models\Contracts\TemOrigemDeclarada`                      | ✅ `ht2ml/core` | Torna a trait visível ao PHPStan                                                                                     |
-| `Models\Contracts\UsaSoftDeletes`                          | ✅ `ht2ml/core` | Mesmo padrão, para soft delete                                                                                       |
-| `Policies\Referencia\Concerns\ProtegeRegistroSincronizado` | ✅ `ht2ml/core` | Bloqueia escrita em linha `sync`                                                                                     |
-| `Models\Concerns\Auditavel`                                | ✅ `ht2ml/core` | Registro no activity log                                                                                             |
-| `Models\AdminUser`                                         | ✅ `ht2ml/core` | Usuário administrativo. **168 arquivos** o referenciam; arrasta `Empresa`, `Filial`, a config de auth e as factories |
-| `Livewire\Concerns\ComAcoesCrud`                           | ✅ `ht2ml/core` | Ações de linha padronizadas                                                                                          |
-| `Livewire\Concerns\ComFicha`                               | ✅ `ht2ml/core` | Drawer de visualização                                                                                               |
-| `Livewire\Concerns\ComLixeira`                             | ✅ `ht2ml/core` | Lixeira, restauração e exclusão definitiva                                                                           |
-| `Livewire\Concerns\EmiteNotificacoes`                      | ✅ `ht2ml/core` | Toasts padronizados                                                                                                  |
+| Símbolo (`HT2ML\Core\…`)                                   | Extensões que usam           | Papel para a extensão                                            |
+| ---------------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------- |
+| `Support\Modules\ModuleRegistry`                           | rh, fiscal-br, exemplo-demo  | **O canal.** Módulo, rotas, seeders, permissões, menu, catálogos |
+| `Models\AdminUser`                                         | rh, fiscal-br, exemplo-demo  | Usuário administrativo, nas policies                             |
+| `Models\Concerns\Auditavel`                                | rh, fiscal-br, exemplo-demo  | Registro no activity log (obrigatório — guard de arquitetura)    |
+| `Models\Contracts\UsaSoftDeletes`                          | rh, fiscal-br, exemplo-demo  | Torna o soft delete visível ao type-system da lixeira            |
+| `Livewire\Concerns\ComLixeira`                             | rh, fiscal-br, exemplo-demo  | Lixeira, restauração e exclusão definitiva                       |
+| `Livewire\Concerns\EmiteNotificacoes`                      | rh, fiscal-br, exemplo-demo  | Toasts padronizados                                              |
+| `Models\Empresa`                                           | rh, documentos, exemplo-demo | O tenant                                                         |
+| `Models\Concerns\BelongsToEmpresa`                         | rh, exemplo-demo             | Escopo por empresa ativa + preenchimento de `empresa_id`         |
+| `Support\Tenancy\TenantContext`                            | rh, exemplo-demo             | Empresa/filial ativa                                             |
+| `Livewire\Concerns\FiltraPorMultiEmpresa`                  | rh, exemplo-demo             | Filtro multiempresa das listagens                                |
+| `Livewire\Concerns\ExportaPdf`                             | rh, exemplo-demo             | Exportação PDF das listagens                                     |
+| `DTOs\Admin\Export\ExportavelDTO`                          | rh, exemplo-demo             | Contrato da exportação                                           |
+| `Support\Money\Money`                                      | rh, exemplo-demo             | Formatação de dinheiro (centavos)                                |
+| `Livewire\Grid\RecursoTable`                               | rh, fiscal-br                | Base declarativa das tabelas                                     |
+| `Livewire\Grid\Campo`                                      | rh, fiscal-br                | Declaração de campo da `RecursoTable`                            |
+| `Livewire\Concerns\ComFicha`                               | fiscal-br, exemplo-demo      | Drawer de visualização                                           |
+| `Livewire\Grid\RecursoMultiEmpresa`                        | rh                           | As seis composições multiempresa de uma vez                      |
+| `Livewire\Grid\RecursoIndex`                               | fiscal-br                    | Base declarativa da página de listagem                           |
+| `Livewire\Concerns\ComAcoesCrud`                           | fiscal-br                    | Ações de linha padronizadas                                      |
+| `Casts\MoneyCast`                                          | rh                           | Cast de coluna em centavos                                       |
+| `Rules\Cpf`                                                | rh                           | Validação de CPF                                                 |
+| `Models\Referencia\Cargo`                                  | rh                           | Catálogo de cargos                                               |
+| `Models\Filial`                                            | exemplo-demo                 | Filial do tenant                                                 |
+| `Support\Html\HtmlSanitizer`                               | exemplo-demo                 | Sanitização de `richtext`                                        |
+| `Enums\ModuloAcesso`                                       | exemplo-demo                 | Semente das áreas de acesso do core (`ModuloAcesso::Negocio`)    |
+| `Support\Referencia\CsvReferenceSeeder`                    | fiscal-br                    | Base dos seeders de catálogo mantidos por CSV                    |
+| `Enums\Referencia\OrigemRegistro`                          | fiscal-br                    | `sync` \| `manual` — separa linha do sync de linha do cliente    |
+| `Models\Concerns\TemOrigem`                                | fiscal-br                    | Trait que aplica o default de origem                             |
+| `Models\Contracts\TemOrigemDeclarada`                      | fiscal-br                    | Torna a trait visível ao PHPStan                                 |
+| `Policies\Referencia\Concerns\ProtegeRegistroSincronizado` | fiscal-br                    | Bloqueia escrita em linha `sync`                                 |
 
-Só em teste: `HT2ML\Core\Database\Seeders\RolePermissionSeeder`.
+Só em teste: `HT2ML\Core\Database\Seeders\RolePermissionSeeder`, além de
+`AdminUser`, `Empresa` e `TenantContext`.
+
+Três observações sobre a lista:
+
+- **`ModuloBuilder`, `RecursoBuilder`, `EscopoDeRota` e `AreaDeAcesso` não aparecem.**
+  Não porque não sejam usados: o builder chega como retorno de
+  `ModuleRegistry::modulo()`, e nenhuma extensão de hoje declara rotas fora do
+  escopo Admin nem área própria. São superfície do core mesmo assim — o
+  [guia de extensão](guias/criar-extensao.md) os documenta.
+- **`ModuloAcesso` é semente, não catálogo.** O enum lista as onze áreas do core. O
+  conjunto de áreas é aberto (`config('access.areas')` +
+  `ModuleRegistry::areaDeAcesso()`), e uma extensão nova não precisa do enum.
+- **`ht2ml/extensao-api` e `ht2ml/extensao-ia` não usam nenhum símbolo do core**
+  (conferido com `grep -rn 'HT2ML\\Core' packages/extensao-api packages/extensao-ia`,
+  zero resultados) e não declaram `ht2ml/core` no `composer.json`. São bibliotecas
+  que só dependem do Laravel. A `extensao-api` depende do **canal** de API do core
+  em tempo de execução (`EscopoDeRota::Api`, rotas sob `/api`), mas sem referência
+  de classe; por isso o README dela pede `ht2ml/core` ≥ 0.5 (a v0.4.x não tem o
+  escopo `Api`).
 
 ## Design system Blade — resolvido, e não era o que parecia
 
@@ -59,15 +101,15 @@ Blade::anonymousComponentPath(__DIR__ . '/../resources/views/components');
 ```
 
 Sem prefixo, o componente do pacote atende o nome que o consumidor já escreve.
-Nenhum dos ~200 blades consumidores muda uma linha, e o app hospedeiro continua
+Nenhum dos blades consumidores muda uma linha, e o app hospedeiro continua
 vencendo: um componente em `resources/views/components` sobrescreve o do pacote,
 então dá para customizar um por vez.
 
-**68 componentes `shared/` e o `admin/row-actions` já estão em `ht2ml/core`.** Os
-30 `admin/` restantes ficam para a fatia de branding/menu/settings, porque
-dependem de `BrandingService`, `AppearanceService`, `MenuService`,
-`LoginSettings`, `SegurancaSettings`, `NotificacaoService` e
-`ImpersonationContext`.
+**Os 68 componentes `shared/` e os 31 `admin/` estão em
+`packages/core/resources/views/components/`** (contados em 2026-10-25). As extensões
+usam 26 deles (fora `x-slot`): 21 `x-shared.*` mais `x-admin.ficha-drawer`,
+`x-admin.ficha-section`, `x-admin.form-footer`, `x-admin.page-header` e
+`x-admin.row-actions`.
 
 ## A metade que o Composer não carrega
 
@@ -102,33 +144,41 @@ Provado nos dois sentidos: com o import a classe aparece; sem ele, e com
 
 ### Em aberto: o tema e as dependências npm
 
-Os 37 arquivos de CSS (tema Inspinia, temas de cor, componentes) e os 18 de JS
-continuam em `resources/` no app. Movê-los para o pacote esbarra num limite
-real: **o Composer não carrega dependências npm.** A cadeia atual importa
-`choices.js`, `dropzone`, `flatpickr`, `quill`, `preline`, `simplebar`,
+Os 40 arquivos de CSS (tema Inspinia, temas de cor, componentes) e os 18 de JS
+continuam em `resources/` no app (contados em 2026-10-25). Movê-los para o pacote
+esbarra num limite real: **o Composer não carrega dependências npm.** A cadeia atual
+importa `choices.js`, `dropzone`, `flatpickr`, `quill`, `preline`, `simplebar`,
 `moment`, mais os plugins `@tailwindcss/typography`, `@tailwindcss/forms` e
 `@iconify/tailwind4`.
 
 Um pacote Composer com design system resolve isso publicando o CSS/JS e
 documentando as dependências npm que o consumidor precisa declarar — é o que
 Filament e afins fazem. É uma decisão de design própria, não uma movimentação
-de arquivos, e por isso não entrou nesta fatia.
+de arquivos, e por isso não entrou nesta fatia. Na prática, o skeleton leva
+`resources/` e `package.json` do app, e o produto roda `npm install && npm run build`.
 
 Só três componentes Alpine são nomeados em JS (`afRowActions`, `afDatePicker`,
 `comboBox`); todo o resto usa `x-data` inline e viaja no próprio blade.
 
 ## Dependências de vendor
 
-`ht2ml/extensao-fiscal-br` passou a declará-las (PR desta medição). As demais
-extensões ainda não — `packages/extensao-rh/composer.json` declara apenas
-`php: ^8.4`, embora use Livewire e PowerGrid.
+Toda extensão declara o que usa. O CI prova isso a cada PR: o passo "Cada pacote
+declara o que usa" roda o `composer-dependency-analyser` em cada pacote
+(ver [`testes-e-guardas.md`](testes-e-guardas.md)). `require` de cada uma, lido dos
+`composer.json` em 2026-10-25:
 
-| Pacote                                                                                       | Por quê                              |
-| -------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `illuminate/contracts`, `illuminate/database`, `illuminate/support`, `illuminate/validation` | Model, migration, facades, `Rule`    |
-| `livewire/livewire`                                                                          | Componentes e atributos              |
-| `power-components/livewire-powergrid`                                                        | As tabelas                           |
-| `laravel/framework` (dev)                                                                    | Os testes bootam a aplicação inteira |
+| Extensão                | `extra.ht2ml.tipo` | `require` (além de `php`)                                                                                                                      |
+| ----------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extensao-rh`           | `modulo`           | `ht2ml/core`, `illuminate/support`, `livewire/livewire`, `power-components/livewire-powergrid`                                                 |
+| `extensao-fiscal-br`    | `modulo`           | `ext-mbstring`, `ht2ml/core`, `illuminate/{contracts,database,support,validation}`, `livewire/livewire`, `power-components/livewire-powergrid` |
+| `extensao-exemplo-demo` | `modulo`           | `ht2ml/core`, `illuminate/support`, `livewire/livewire`, `power-components/livewire-powergrid`, `spatie/laravel-permission`                    |
+| `extensao-documentos`   | `biblioteca`       | `ht2ml/core`, `illuminate/support`                                                                                                             |
+| `extensao-api`          | `biblioteca`       | `dedoc/scramble`, `illuminate/{contracts,http,support}`, `laravel/sanctum`, `symfony/http-foundation`, `symfony/http-kernel`                   |
+| `extensao-ia`           | `biblioteca`       | `illuminate/{database,http,support}`                                                                                                           |
+
+No monorepo, `ht2ml/core` aparece como `@dev` (path repository). O `make:modulo`
+escreve a restrição a partir da versão **instalada** do core (`^0.4` num produto
+com a v0.4.x), e `@dev` só quando o core vem de path repository.
 
 ## As quatro descobertas automáticas que morrem dentro de um pacote
 
@@ -139,14 +189,18 @@ erro nenhum. O comportamento simplesmente deixa de acontecer.
 | Descoberta                              | O que sumiu ao mover                                                                  | Como se manifesta                                          |
 | --------------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `App\Models\X` → `App\Policies\XPolicy` | `EmpresaPolicy`                                                                       | Autorização **desligada**; `getPolicyFor()` devolve `null` |
-| `app/Console/Commands`                  | Os 5 comandos do core, incluindo `access:sync` e `referencia:sync` — passos de deploy | Somem do `artisan`                                         |
+| `app/Console/Commands`                  | Os 8 comandos do core, incluindo `access:sync` e `referencia:sync` — passos de deploy | Somem do `artisan`                                         |
 | `app/Listeners`                         | `RegistrarLoginAdmin`                                                                 | Histórico de login **para de gravar**                      |
-| `App\Livewire` → alias por convenção    | As 64 telas do admin                                                                  | 500 com "Unable to find component"                         |
+| `App\Livewire` → alias por convenção    | As telas do admin                                                                     | 500 com "Unable to find component"                         |
+
+Os 8 comandos são as classes de `packages/core/src/Console/Commands`: `access:sync`,
+`access:expirar`, `referencia:sync`, `make:modulo`, `make:recurso`, `make:regra`,
+`ht2ml:doutor` e a lápide `make:extensao`. Referência: [`comandos.md`](comandos.md).
 
 Três delas exigem **substituir** a descoberta por declaração explícita. A quarta
 é a exceção: `Livewire::addLocation(classNamespace: 'HT2ML\Core\Livewire')`
 **restaura** a mesma convenção para o namespace do pacote, então os aliases
-seguem idênticos e nenhum blade consumidor muda. Uma linha no lugar de 64
+seguem idênticos e nenhum blade consumidor muda. Uma linha no lugar de dezenas de
 chamadas `Livewire::component()` — e continua valendo para todo componente novo.
 
 O `CoreServiceProvider` cuida das quatro, e cada uma tem teste de guarda em
@@ -155,25 +209,38 @@ se algo sumir do registro, ou se houver classe no pacote que ninguém registra.
 Foi essa segunda direção que pegou a `RolePolicy` migrada com a declaração
 esquecida para trás.
 
-Ao mover qualquer coisa nova para o pacote, a pergunta é sempre a mesma: _o
-framework encontrava isso sozinho?_ Se sim, agora é preciso declarar — ou
-ensinar a convenção ao namespace novo, quando houver como.
+**A mesma regra vale para toda extensão.** O ServiceProvider dela registra
+`Gate::policy()` para cada model (o `make:recurso` escreve essa linha),
+`$this->commands([...])` para os comandos (a `extensao-api` faz isso com
+`api:openapi`), `Event::listen()` para listeners, e `Livewire::component()` ou
+`Livewire::addLocation()` para os componentes. Ao mover qualquer coisa para um
+pacote, a pergunta é sempre a mesma: _o framework encontrava isso sozinho?_ Se sim,
+agora é preciso declarar — ou ensinar a convenção ao namespace novo, quando houver
+como.
 
 ## A prova completa: um produto novo, do zero
 
 O plano definia sucesso como _instalar num Laravel limpo, fora do monorepo_. O
-teste ficou mais forte que isso — hoje um produto **nasce de um comando**:
+teste ficou mais forte que isso — hoje um produto **nasce de um comando**. Os
+pacotes são privados e não estão no Packagist, então o `create-project` precisa
+apontar o repositório do skeleton e ter credencial de GitHub (chave SSH com acesso
+aos repositórios `ht2ml-*`, ou token):
 
 ```bash
-composer create-project ht2ml/skeleton meu-produto
+composer create-project ht2ml/skeleton meu-produto \
+  --repository='{"type":"vcs","url":"git@github.com:leonardozaneladias/ht2ml-skeleton.git","no-api":true}'
 cd meu-produto
 cp .env.example .env && php artisan key:generate
 php artisan migrate --seed
 npm install && npm run build
 ```
 
-Medido num diretório vazio, com os pacotes vindo dos repositórios privados por
-Composer (`Extracting archive`, não symlink):
+Passo a passo, com o que fazer quando a máquina não tem chave SSH:
+[`guias/produto-via-skeleton.md`](guias/produto-via-skeleton.md).
+
+Medição original, de 2026-08-24, num diretório vazio, com os pacotes vindo dos
+repositórios privados por Composer (`Extracting archive`, não symlink). Não foi
+repetida em 2026-10-25:
 
 | Verificação                                       | Resultado                    |
 | ------------------------------------------------- | ---------------------------- |
@@ -188,6 +255,11 @@ Composer (`Extracting archive`, não symlink):
 
 A última linha fecha o ciclo da correção do `@source`: o Tailwind varreu os
 blades **dentro de `vendor/`**, que é o cenário que o monorepo não reproduz.
+
+A parte "core sozinho num Laravel limpo" deixou de ser manual: o job `core-sozinho`
+do CI (guard A4) cria um `laravel/laravel`, instala só o `ht2ml/core`, migra, roda
+`access:sync` e `ht2ml:doutor`, gera um módulo e um recurso e confere a rota e as
+seis permissões. Ver [`testes-e-guardas.md`](testes-e-guardas.md).
 
 ### Cinco defeitos que só esta prova revelou
 
@@ -207,4 +279,6 @@ por impossibilidade lógica: lá, tudo está instalado.
    declarava.
 5. **`RolePermissionSeeder` concedia permissão de extensão ausente**, guardado
    por um flag de env em vez da realidade. O primeiro `migrate --seed` de
-   qualquer produto novo morria.
+   qualquer produto novo morria. Hoje a permissão `exemplos.listar` do gestor é
+   concedida pela própria extensão (`PermissoesDoGestorSeeder`, registrado com
+   `ModuleRegistry::seeder()`).

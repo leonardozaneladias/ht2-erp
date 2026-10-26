@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o design da impersonation de usuário admin (Épico 2, Fase B), escrito em 2026-06-05. O trabalho foi entregue; não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Support/Impersonation/ImpersonationContext.php`](../../../../packages/core/src/Support/Impersonation/ImpersonationContext.php) e [`Actions/Admin/Impersonation/IniciarImpersonationAction.php`](../../../../packages/core/src/Actions/Admin/Impersonation/IniciarImpersonationAction.php).
+
 # Impersonation de usuário (Épico 2 — Segurança & Acesso, Fase B)
 
 > **Status:** design aprovado (brainstorming), aguardando plano de implementação.

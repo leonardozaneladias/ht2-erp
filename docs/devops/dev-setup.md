@@ -142,15 +142,17 @@ O `make setup` complementa o que não é idempotente (chave, seed, publicação 
 ### 2.4 Passo 4 — Seeders de desenvolvimento
 
 ```bash
-make fresh       # ddev artisan migrate:fresh --seed + DevelopmentSeeder
+make fresh       # ddev artisan migrate:fresh --seed
 ```
+
+O `--seed` roda o `database/seeders/DatabaseSeeder.php`: dados de referência, os seeders do core (`RolePermissionSeeder`, `EmpresaSeeder`, `AdminUserSeeder`) e os seeders que as extensões registram por `ModuleRegistry::seeder()`. Não existe `DevelopmentSeeder`.
 
 O seed cria os usuários de desenvolvimento:
 
 - `admin@example.com` / `password` — role `super-admin`.
 - `gestor@example.com` / `password` — role `gestor`.
 
-Para adicionar novos cenários, estender os seeders em `database/seeders/` — nunca rodar `migrate:fresh` em produção.
+Para adicionar novos cenários: no produto, chame o seeder novo no `DatabaseSeeder` da raiz; numa extensão, registre-o por `ModuleRegistry::seeder()`. Os seeders do core (`packages/core/database/seeders/`) não se editam. Nunca rode `migrate:fresh` em produção.
 
 ### 2.5 Passo 5 — Horizon e workers
 
@@ -208,15 +210,21 @@ Todos os comandos abaixo são wrappers do `ddev` e os atalhos oficiais. Novos al
 | `make npm <cmd>`      | `ddev npm <cmd>`                                 |
 | `make dev`            | Vite dev server (`ddev npm run dev`)             |
 | `make migrate`        | `ddev artisan migrate`                           |
-| `make fresh`          | `migrate:fresh --seed` + DevelopmentSeeder (dev) |
+| `make fresh`          | `ddev artisan migrate:fresh --seed`              |
 | `make seed`           | `ddev artisan db:seed`                           |
-| `make test`           | `ddev artisan test`                              |
+| `make test`           | `ddev artisan test --parallel` (Unit, Feature, Extensoes, Arch) |
+| `make test-e2e`       | `npm run build` + testes de browser (no host)    |
+| `make doutor`         | `ht2ml:doutor` — diagnóstico das contribuições dos módulos |
 | `make horizon`        | Reinicia o daemon Horizon (supervisorctl)        |
 | `make logs`           | `ddev logs -f`                                   |
 | `make status`         | `ddev describe`                                  |
 | `make lint`           | Pint + Prettier                                  |
-| `make quality`        | Lint + PHPStan + Test                            |
+| `make quality`        | Pint + ESLint + Prettier + PHPStan + testes      |
 | `make setup`          | Setup inicial (key, seed, assets, build)         |
+| `make setup-client`   | Setup de instância de cliente (sem dados demo)   |
+| `make new-client`     | `bin/new-client.sh` — provisiona um cliente      |
+| `make release-modulo` | `bin/release-module.sh` — `pacote=<dir> versao=vX.Y.Z` |
+| `make update-base`    | `bin/update-from-upstream.sh` — no cliente, traz a base |
 
 ---
 
@@ -426,7 +434,7 @@ gh pr create --base main --fill
 R: Não suportado. O DDEV (sobre OrbStack/Docker) é a via oficial — garante PHP 8.4, PostgreSQL 16 e Redis idênticos para todo o time.
 
 **P: Posso mudar a URL/nome do projeto?**
-R: Sim, editando `name:` em `.ddev/config.yaml` (e `APP_URL` no `.env`), depois `ddev restart`. O `bin/init-project.sh` faz isso a partir do slug ao iniciar um projeto novo.
+R: Sim, editando `name:` em `.ddev/config.yaml` (e `APP_URL` no `.env`), depois `ddev restart`. O `bin/init-project.sh`, que fazia isso a partir do slug, está aposentado (ADR-0017): produto novo nasce do skeleton.
 
 **P: Como reseto TUDO?**
 R: `ddev delete -O && ddev start && make setup`. O `delete -O` apaga volumes — **cuidado com dados locais**.
@@ -442,4 +450,4 @@ R: `ddev artisan test --parallel --processes=4`.
 
 ---
 
-Última atualização: 2026-06-02 · Responsável por manter: time DevOps.
+Última atualização: 2026-10-25 · Responsável por manter: time DevOps.

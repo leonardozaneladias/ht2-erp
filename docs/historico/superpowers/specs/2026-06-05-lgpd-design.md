@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o design dos direitos LGPD: exportação, anonimização e retenção de logs (Épico 2, Fase C-3), escrito em 2026-06-05. O trabalho foi entregue; não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Actions/Admin/Lgpd/`](../../../../packages/core/src/Actions/Admin/Lgpd/) e [`Http/Controllers/Admin/LgpdController.php`](../../../../packages/core/src/Http/Controllers/Admin/LgpdController.php).
+
 # LGPD (Épico 2 — Fase C · subsistema 3, último)
 
 > **Status:** design aprovado (brainstorming), aguardando plano de implementação.

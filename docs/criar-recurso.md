@@ -1,12 +1,12 @@
 # Criar um recurso com `make:recurso`
 
-> Objetivo do boilerplate: você se preocupa apenas com **o negócio do cliente**.
+> Objetivo da plataforma: você se preocupa apenas com **o negócio do cliente**.
 > O gerador entrega a stack CRUD inteira já no padrão do projeto; você preenche a
 > regra de negócio.
 
 > **O comando mudou de nome em 2026-08-28.** Era `make:modulo`; hoje é
 > `make:recurso`, e `make:modulo` cria o **módulo** (a área de negócio). Um
-> *recurso* é uma entidade com CRUD — aluno, turma, fatura; um *módulo* é a área
+> _recurso_ é uma entidade com CRUD — aluno, turma, fatura; um _módulo_ é a área
 > que reúne vários deles. A forma antiga falha ensinando a nova. Vocabulário
 > completo: [`ADR-0021`](architecture/adrs/ADR-0021-taxonomia-modulo-recurso-area-secao.md).
 
@@ -23,37 +23,97 @@ php artisan make:recurso Cliente --modulo=escola \
 npx prettier --write packages/extensao-escola/resources/views/livewire/clientes/
 php artisan migrate
 php artisan access:sync
+php artisan ht2ml:doutor                          # confere se tudo o que foi declarado fecha
 ```
 
 **`--modulo` na prática é obrigatório.** Sem ele o gerador escreve em `app/` e liga
 a tela em `routes/admin.php`, `config/access.php` e `config/admin-menu.php` — três
 arquivos que, depois da extração, vivem dentro de `ht2ml/core`. O produto não edita
 o core ([ADR-0022](architecture/adrs/ADR-0022-dependencia-de-mao-unica.md)), então
-o comando recusa e diz isto. Um produto que de fato possua os três continua usando
-a forma sem `--modulo`.
+o comando recusa **antes de escrever qualquer arquivo** e mostra o caminho com
+módulo. Um produto que de fato possua os três arquivos continua usando a forma sem
+`--modulo`. O job `core-sozinho` do CI prova a recusa a cada PR.
 
-Acesse `/admin/escola/clientes`. Pronto: listagem (PowerGrid com busca/filtros/export), criar/editar, validação, DTO, Actions, Policy, auditoria automática e um teste Feature verde.
+Acesse `/admin/escola/clientes`. Pronto: listagem (PowerGrid com busca/filtros/export),
+criar/editar, validação, DTO, Actions, Policy, auditoria automática e um teste Feature
+verde.
+
+> O resumo impresso pelo comando ainda diz `Acesse /admin/clientes` (sem o prefixo do
+> módulo). A rota real é `/admin/{modulo}/{recurso}`, como acima.
+
+## Nomes em português: `idioma_inflexao`
+
+O gerador deriva singular, plural, tabela e rota com a inflexão do Laravel, que é
+inglesa por padrão. Num domínio em português ela erra: `Materia` vira `Materium`,
+`Nota` vira `Notum`, `Avaliacao` pluraliza como `Avaliacaos`. Renomear depois é
+migração de dados.
+
+A chave `extensoes.idioma_inflexao` (em
+[`packages/core/config/extensoes.php`](../packages/core/config/extensoes.php)) troca o
+idioma **só durante a geração**. O default é `null` (inglês). Os valores aceitos são os
+do `Illuminate\Support\Pluralizer`: `english`, `french`, `norwegian-bokmal`,
+`portuguese`, `spanish`, `turkish`. Num produto, crie `config/extensoes.php` só com
+`'idioma_inflexao' => 'portuguese'` — o core usa `mergeConfigFrom`, então as chaves
+ausentes continuam vindo do pacote — e faça isso **antes** de gerar o primeiro
+recurso. (`php artisan vendor:publish --tag=core-config` publica as cinco configs do
+core inteiras, se preferir.)
+Os models gerados declaram `$table` explicitamente, então mudar o idioma depois não
+renomeia tabela existente.
 
 ## O que é gerado
 
-Para `make:recurso Cliente` o gerador cria (tudo com `declare(strict_types=1)`):
+Para `make:recurso Cliente --modulo=escola`, com o pacote em
+`packages/extensao-escola`, o gerador cria 19 arquivos (todos com
+`declare(strict_types=1)`; caminhos lidos de `MakeRecursoCommand::mapaArquivosPacote()`):
 
-| Camada                | Arquivo                                                                                                          |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Migration + Factory   | `database/migrations/*_create_clientes_table.php`, `database/factories/ClienteFactory.php`                       |
-| Model                 | `app/Models/Cliente.php` (traits `Auditavel` + `BelongsToEmpresa` se `--tenant`)                                 |
-| Enum de status (§5.4) | `app/Enums/StatusCliente.php` (backed, `label()`/`variant()`/`options()`)                                        |
-| DTO readonly (§5.5)   | `app/DTOs/Admin/ClienteDTO.php` (`fromArray()` / `paraModel()`)                                                  |
-| Validação (§5.2)      | `app/Http/Requests/Admin/ClienteRules.php` + `Store/UpdateClienteRequest.php`                                    |
-| Actions (§6)          | `app/Actions/Admin/Create                                                                                        | UpdateClienteAction.php` (`execute()` + transação) |
-| Service (§5.6)        | `app/Services/Admin/ClienteService.php`                                                                          |
-| Policy                | `app/Policies/ClientePolicy.php` (auto-descoberta por convenção)                                                 |
-| Livewire              | `app/Livewire/Admin/Clientes/{IndexCliente,FormCliente,ClienteTable}.php` (Index e Table declarativos — ver abaixo) |
-| Views                 | `resources/views/livewire/admin/clientes/{index-clientes,form-cliente,_acoes,_ficha}.blade.php`                  |
-| Teste Feature         | `tests/Feature/Admin/Clientes/ClienteCrudTest.php`                                                               |
-| Rotas                 | injetadas em `routes/admin.php` (`admin.clientes.{index,create,edit}`)                                           |
-| Permissões            | injetadas em `config/access.php` (`clientes.{listar,criar,editar,deletar,restaurar,excluir_permanente}`)         |
-| Menu lateral          | item injetado em `config/admin-menu.php` (seção **Negócio**), visível só p/ super-admin até atribuir a permissão |
+| Camada         | Arquivo (relativo a `packages/extensao-escola/`)                                                           |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
+| Migration      | `database/migrations/<timestamp>_create_clientes_table.php`                                                |
+| Factory        | `database/factories/ClienteFactory.php`                                                                    |
+| Model          | `src/Models/Cliente.php` (`Auditavel`; `BelongsToEmpresa` com `--tenant`; `newFactory()`)                  |
+| Enum de status | `src/Enums/StatusCliente.php` (backed, `label()`/`variant()`/`options()`)                                  |
+| DTO readonly   | `src/DTOs/ClienteDTO.php` (`fromArray()` / `paraModel()`)                                                  |
+| Validação      | `src/Http/Requests/ClienteRules.php`, `StoreClienteRequest.php`, `UpdateClienteRequest.php`                |
+| Actions        | `src/Actions/CreateClienteAction.php`, `src/Actions/UpdateClienteAction.php`                               |
+| Service        | `src/Services/ClienteService.php`                                                                          |
+| Policy         | `src/Policies/ClientePolicy.php`                                                                           |
+| Livewire       | `src/Livewire/Clientes/IndexCliente.php`, `FormCliente.php`, `ClienteTable.php`                            |
+| Views          | `resources/views/livewire/clientes/index-clientes.blade.php`, `form-cliente.blade.php`, `_ficha.blade.php` |
+| Teste Feature  | `tests/Feature/Clientes/ClienteCrudTest.php`                                                               |
+
+E edita quatro arquivos do próprio pacote, sempre num comentário-marcador:
+
+| Arquivo do pacote               | O que entra                                                                               |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `routes/admin.php`              | grupo `escola/clientes` com as rotas `admin.escola.clientes.{index,create,edit}`          |
+| `config/escola.php`             | uma entrada em `recursos` (`'clientes' => ['label' => …, 'singular' => …, 'icone' => …]`) |
+| `src/EscolaServiceProvider.php` | `Livewire::component()` dos três componentes e `Gate::policy()` do model                  |
+| `composer.json`                 | `livewire/livewire` no `require`, se ainda não estiver                                    |
+
+Os namespaces são os do pacote (`HT2ML\Escola\...`) e as views usam o namespace do
+módulo (`escola::livewire.clientes._ficha`).
+
+Se faltar um marcador, o comando gera os arquivos, diz qual marcador falta e onde, e
+sai com código de falha. A tela existe, mas não está ligada — e um script que só olha
+o exit code para ali.
+
+O gerador passa o Pint nos diretórios que escreveu. O Prettier nas views fica com você
+(o resumo imprime o comando).
+
+### Permissões e menu: derivados, não escritos
+
+A entrada em `config/escola.php` é tudo. O `ModuloBuilder` lê essa entrada no boot
+(`->deConfig('escola')` no ServiceProvider) e deriva dela:
+
+- as permissões `escola.clientes.{listar,criar,editar,deletar,restaurar,excluir_permanente}`
+  (as duas últimas só com lixeira);
+- o item de menu com key `escola-clientes`, rota `admin.escola.clientes.index`,
+  permissão `escola.clientes.listar` e `active` em `admin.escola.clientes.*`.
+
+Antes, o gerador escrevia vinte linhas de permissão e sete de menu, e cada linha era
+uma chance de divergir da fórmula do catálogo. Já divergiu: o gerador emitia
+`departamentos.listar` enquanto o catálogo dizia `rh.departamentos.listar`, e o gate
+negava em silêncio.
 
 ### A tabela e a listagem são declarativas
 
@@ -86,18 +146,36 @@ Quando o desenho não couber, a fuga é graduada: **por campo**
 **por método** (sobrescreva e chame `parent::`), ou **não estenda** — a base é
 opt-in, nunca obrigatória.
 
+O kebab de cada linha (Ver, Editar, lixeira) vem da `RecursoTable`. Recurso gerado
+hoje não tem `_acoes.blade.php`; esse arquivo só existe nas telas antigas.
+
 `--tenant` traz `use RecursoMultiEmpresa;`, que liga as seis composições da
 dimensão multiempresa de uma vez. Não há como pegar cinco e esquecer a do
 escopo, que é a que vaza linha de outra empresa.
 
+> **Lacuna conhecida (medida em 2026-10-25):** o stub da tabela não declara
+> `modulo()`, então a `RecursoTable` calcula as checagens internas dela
+> (CTA "Novo registro", restaurar da lixeira, elegibilidade do filtro multiempresa)
+> com `clientes.*` em vez de `escola.clientes.*`. O super-admin não percebe, porque
+> tem bypass. Até o stub ser corrigido, acrescente na tabela gerada:
+>
+> ```php
+> protected function modulo(): string
+> {
+>     return 'escola';
+> }
+> ```
+>
+> É o que `packages/extensao-rh/src/Livewire/Departamentos/DepartamentoTable.php` faz.
+
 ## Lixeira (soft-delete)
 
-Por padrão, todo módulo nasce com **lixeira**: o model usa `SoftDeletes` (coluna
+Por padrão, todo recurso nasce com **lixeira**: o model usa `SoftDeletes` (coluna
 `deleted_at`) e implementa `UsaSoftDeletes`, a Table ganha o toggle "Ver lixeira"
 e as ações excluir → restaurar → excluir definitivamente (trait `ComLixeira`), e
 as permissões `restaurar` + `excluir_permanente` entram no catálogo. Use
-`--sem-soft-delete` para a saída antiga (sem lixeira). Detalhes em
-[`lixeira.md`](lixeira.md).
+`--sem-soft-delete` para a saída sem lixeira (a entrada no config ganha
+`'sem_lixeira' => true`). Detalhes em [`lixeira.md`](lixeira.md).
 
 ## Gramática de `--fields`
 
@@ -120,7 +198,7 @@ centavos, `decimal`→input `step=0.01`, `cnpj`→`x-shared.cnpj-input`,
 > `multiselect(a|b|c)` grava `json` (cast `array`). `richtext` é sanitizado com
 > `HtmlSanitizer` no DTO antes de persistir.
 
-**Status:** todo módulo nasce com um **Enum de status backed**. Declare
+**Status:** todo recurso nasce com um **Enum de status backed**. Declare
 `status:enum(rascunho|publicado|arquivado)` ou omita para o default
 `ativo|inativo`.
 
@@ -132,7 +210,7 @@ Para formulários grandes, agrupe os campos em abas com o modificador
 (`x-shared.tab-nav` + `x-shared.tab-body`, sem o gap antigo).
 
 ```bash
-php artisan make:recurso Cliente --fields="\
+php artisan make:recurso Cliente --modulo=escola --fields="\
   nome:string:aba(Identificação),\
   cnpj:cnpj:aba(Identificação),\
   email:email:aba(Contato),\
@@ -151,15 +229,26 @@ Regras de agrupamento:
 - Cada aba ganha um indicador de erro (`:has-error`) que acende quando algum campo
   dela falha na validação, mesmo com a aba inativa.
 
-## Módulo `Exemplo` — referência viva (todos os tipos + abas)
+## Recurso `Exemplo` — referência viva (todos os tipos + abas)
 
-Para entender o gerador na prática, o módulo **Exemplo** foi criado pelo próprio
-comando, exercitando **todos os tipos suportados** divididos em 4 abas. Aparece no
-menu lateral sob **Negócio** (só para super-admin) e abre em `/admin/exemplos` —
-é referência viva; recrie/edite à vontade. Este é o comando completo:
+O recurso **Exemplo** exercita **todos os tipos suportados** divididos em 4 abas.
+Ele vive na extensão `ht2ml/extensao-exemplo-demo`
+(`packages/extensao-exemplo-demo/`), aparece no menu sob **Negócio** e abre em
+`/admin/exemplos`.
+
+Ele foi gerado antes do modo `--modulo` existir, e por isso mantém as chaves
+antigas: rota `admin.exemplos.*`, permissões `exemplos.*` sem prefixo de módulo e
+item de menu escrito à mão na config. São exceção consciente
+(`tests/Arch/CoerenciaDoModuloTest.php` lista o legado); renomear invalidaria
+permissões já atribuídas a perfis.
+
+Para ver o gerador produzir o mesmo recurso hoje, use um módulo de rascunho:
 
 ```bash
-php artisan make:recurso Exemplo --tenant --fields="\
+php artisan make:modulo rascunho
+composer require ht2ml/extensao-rascunho:@dev
+
+php artisan make:recurso Exemplo --modulo=rascunho --tenant --fields="\
   nome:string:aba(Identificação),\
   slug:string:unique:aba(Identificação),\
   site:url:nullable:aba(Identificação),\
@@ -180,56 +269,110 @@ php artisan make:recurso Exemplo --tenant --fields="\
   publicado_em:datetime:nullable:aba(Datas e status),\
   status:enum(rascunho|publicado|arquivado):aba(Datas e status)"
 
-./vendor/bin/pint && npx prettier --write resources/views/livewire/admin/exemplos/
-php artisan migrate && php artisan access:sync
+npx prettier --write packages/extensao-rascunho/resources/views/livewire/exemplos/
+php artisan migrate && php artisan access:sync && php artisan ht2ml:doutor
 ```
+
+O resultado abre em `/admin/rascunho/exemplos`, com permissões
+`rascunho.exemplos.*`.
 
 ## Flags
 
+Lidas da assinatura do comando (`php artisan help make:recurso`):
+
+- `--modulo=escola` — chave do módulo que recebe o recurso, em kebab-case. O
+  módulo precisa existir em `packages/extensao-<chave>`; se não existir, o comando
+  manda criar com `make:modulo`.
 - `--tenant` — vincula à empresa ativa (trait `BelongsToEmpresa`: global scope por
-  empresa + auto-preenche `empresa_id`). Use em quase todo módulo de negócio. Também
-  injeta na Table o trait `FiltraPorMultiEmpresa` (filtro multi-empresa nas listagens —
-  veja `docs/multi-empresa.md`); o recurso só aparece para quem tem a permissão
-  `listagens.multi_empresa` e acesso a 2+ empresas.
-- `--menu="Rótulo"` — rótulo do item de menu (default: nome no plural, ex.: "Produtos").
+  empresa + auto-preenche `empresa_id`). Use em quase todo recurso de negócio.
+  Também traz na Table o trait `RecursoMultiEmpresa`, que compõe
+  `FiltraPorMultiEmpresa` (filtro multiempresa nas listagens — veja
+  [`multi-empresa.md`](multi-empresa.md)); o filtro só aparece para quem tem a
+  permissão `listagens.multi_empresa` e acesso a 2+ empresas.
+- `--menu="Rótulo"` — rótulo do recurso (vira `label` na entrada do config; default:
+  nome no plural).
 - `--menu-icon="tabler--..."` — ícone do item de menu (default `tabler--folder`).
-- `--skip-menu` — não injeta o item no menu lateral.
-- `--force` — sobrescreve arquivos existentes (re-geração). A migration é
-  idempotente (pula/limpa pela tabela, não cria duplicada).
-- `--modulo=rh` — gera o CRUD dentro de um módulo existente (ver "Gerar dentro
-  de um módulo" abaixo) em vez de `app/`. A chave vai em kebab-case.
+- `--skip-menu` — o recurso entra sem item de menu (`'sem_menu' => true` no config).
+  As permissões continuam existindo.
 - `--sem-soft-delete` — desativa o soft-delete. **Por padrão** os recursos usam
   soft-delete (`deleted_at`): registros ficam recuperáveis em vez de apagados.
+- `--force` — sobrescreve arquivos existentes (re-geração).
+- `--module=` — removida em 2026-08-28. Passá-la falha e mostra a forma com `--modulo`.
 
-O item de menu entra na seção **Negócio** de `config/admin-menu.php` com
-`permission => '{modulo}.listar'` — **visível só para o super-admin** (bypass) até
-você atribuir a permissão a outros perfis em `/admin/acesso`.
+O item de menu entra na seção indicada por `secao_menu` em `config/{modulo}.php`
+(o `make:modulo` gera `'negocio'`), protegido por `{modulo}.{recurso}.listar` —
+**visível só para o super-admin** (bypass) até você atribuir a permissão a outros
+perfis em `/admin/acesso`.
 
-## Permissões e o enum `ModuloAcesso`
+## Permissões e áreas de acesso
 
-As permissões do módulo entram em `config/access.php` sob a seção **Negócio**
-(`ModuloAcesso::Negocio`). Depois de `php artisan access:sync`, atribua-as aos
-perfis na tela de Controle de Acesso (`/admin/acesso`) — ou use `super-admin`, que
-tem bypass.
+As permissões do recurso entram na **área de acesso** indicada por `modulo_acesso`
+em `config/{modulo}.php`. A casca gerada pelo `make:modulo` usa `'negocio'`. Depois
+de `php artisan access:sync`, atribua-as aos perfis na tela de Controle de Acesso
+(`/admin/acesso`) — ou use `super-admin`, que tem bypass.
 
-Quer dar ao módulo a **própria seção** na matriz (em vez de cair em "Negócio")?
-Crie um case em `app/Enums/ModuloAcesso.php` (com os braços de `match`
-correspondentes) e mova as permissões do módulo para a chave dele em
-`config/access.php`.
+Quer dar ao módulo a **própria área** na matriz, em vez de empilhar tudo em
+"Negócio"? **Não** edite o enum `HT2ML\Core\Enums\ModuloAcesso`: ele vive no core e
+é só a semente das onze áreas do núcleo. O conjunto de áreas é aberto, e há duas
+formas de acrescentar uma:
+
+- **No pacote**, no ServiceProvider: `ModuleRegistry::modulo('escola')->areaDeAcesso('Descrição da área')`
+  declara a área `escola` (com o rótulo do módulo). Para uma área com outra chave, há
+  o canal direto `ModuleRegistry::areaDeAcesso($chave, $label, $descricao, $icone, $variant)`.
+  Depois aponte `modulo_acesso` para essa chave em `config/escola.php` — ou remova a
+  chave, e a área efetiva passa a ser a do próprio módulo.
+- **No produto**, publicando a config de acesso do core e acrescentando a chave em
+  `config('access.areas')`. Uma área que o produto já descreve ali vence a
+  declaração do pacote: o pacote sugere, quem instala decide.
+
+O mesmo vale para a sidebar: `->secaoDeMenu()` declara a seção do módulo, e
+`secao_menu` aponta onde os itens entram. Se a área ou a seção apontada não existir,
+`ht2ml:doutor` diz qual e de onde veio a declaração.
 
 ## Ficha "Ver" (visualização em drawer)
 
-O módulo já nasce com a opção **Ver** no kebab: drawer largo read-only
-(`x-admin.ficha-drawer` + trait `ComFicha` no Index), com os campos formatados
-por tipo em `_ficha.blade.php`. Sem permissão nova — a ability `view` mapeia
-`{modulo}.listar`, então um perfil só com `.listar` consulta sem editar/excluir.
-Padrão completo (e como adotar em módulo legado): [`docs/visualizacao.md`](visualizacao.md).
+O recurso já nasce com a opção **Ver** no kebab: drawer largo read-only
+(`x-admin.ficha-drawer` + trait `ComFicha`, que a `RecursoIndex` já traz), com os
+campos formatados por tipo em `_ficha.blade.php`. Sem permissão nova — a ability
+`view` da Policy gerada mapeia `{modulo}.{recurso}.listar`, então um perfil só com
+`.listar` consulta sem editar/excluir. Padrão completo:
+[`visualizacao.md`](visualizacao.md).
+
+## Regras de validação reutilizáveis: `make:regra`
+
+Uma regra de **uma condição** que vários recursos usam (matrícula válida, código
+interno) vira classe própria:
+
+```bash
+php artisan make:regra MatriculaValida --modulo=escola --mensagem="Matrícula inválida."
+```
+
+Gera `packages/extensao-escola/src/Rules/MatriculaValida.php` (um `ValidationRule`)
+e `packages/extensao-escola/tests/Unit/Rules/MatriculaValidaTest.php`. Use-a no
+campo com `Campo::...->regra(new MatriculaValida)`. Sem `--modulo`, a regra nasce em
+`app/Rules/` e o teste em `tests/Unit/Rules/`.
+
+Validação **cruzada** — a que depende de mais de um campo — não cabe numa regra
+isolada: ela mora em `{Recurso}Rules::regras()`, onde o conjunto está visível. O core
+já traz `HT2ML\Core\Rules\{Cpf,Cnpj,Pis,TituloEleitor}`.
+
+## Depois de gerar: `ht2ml:doutor`
+
+```bash
+php artisan ht2ml:doutor
+```
+
+Confere se o que os módulos declararam fecha: áreas de acesso, seções e grupos de
+menu, permissões dos itens, rotas, ícones, escopos de rota com hospedeiro e
+`extra.ht2ml.chave` do pacote contra a chave declarada no ServiceProvider. Sai com
+código 1 se algo não fecha. É o mesmo comando que o CI roda. Referência:
+[`comandos.md`](comandos.md).
 
 ## O que você ainda faz (a regra de negócio)
 
 1. **Migration:** ajuste colunas, índices e relacionamentos específicos.
 2. **Regras de negócio:** Actions/Service (cálculos, eventos, integrações).
-3. **Validação fina:** `ProdutoRules::regras()` (reutilizada por Livewire e
+3. **Validação fina:** `ClienteRules::regras()` (reutilizada por Livewire e
    FormRequests).
 4. **Relacionamentos no Model.** O eager-load NÃO é mais passo manual: declare
    o campo com `Campo::relacao('turma_id', 'Turma', 'turma')` e a
@@ -237,11 +380,10 @@ Padrão completo (e como adotar em módulo legado): [`docs/visualizacao.md`](vis
    de bug documentada — em vinte telas com FK, era a diferença entre vinte N+1
    e nenhum.
 
-## Gerar dentro de um módulo (HT2 ERP)
+## Por que o recurso nasce num módulo
 
-Sem `--modulo`, o recurso nasce em `app/` (monólito). Para um recurso
-**reutilizável entre clientes**, crie o módulo — que é um pacote Composer — e
-gere dentro dele:
+Um recurso pertence a um módulo, e o módulo é um pacote Composer. Por isso o
+fluxo começa em `make:modulo`:
 
 ```bash
 php artisan make:modulo rh                  # casca do pacote em packages/extensao-rh
@@ -260,20 +402,30 @@ integra ao core **sem editá-lo**: rotas via `ModuleRegistry`, permissões e men
 DERIVADOS da chave do recurso pelo `ModuloBuilder`, Livewire e Policy no provider
 do pacote.
 
-Guia completo de distribuição e manutenção:
-[`distribuicao-manutencao.md`](distribuicao-manutencao.md) · decisão: [`ADR-0015`](architecture/adrs/ADR-0015-modulos-pacotes-composer.md).
+Como montar uma extensão de ponta a ponta (biblioteca ou módulo, canais de rota,
+seeders, testes, publicação): [`guias/criar-extensao.md`](guias/criar-extensao.md).
+Distribuição e manutenção: [`distribuicao-manutencao.md`](distribuicao-manutencao.md) ·
+decisão: [`ADR-0015`](architecture/adrs/ADR-0015-modulos-pacotes-composer.md).
 
 ## Limitações conhecidas (v1)
 
-- Pluralização/derivação de nomes usa o inflector (inglês). Para nomes que ele
-  erra, ajuste tabela/rota/namespace após gerar.
+- A inflexão é inglesa por padrão; ver `idioma_inflexao` acima. Para nomes que nem
+  o idioma configurado acerta, ajuste tabela/rota/namespace após gerar.
 - `money` usa input numérico (centavos) para ficar correto ponta a ponta; troque
   por `x-shared.money-input` quando adicionar um caster string→centavos no form.
 - **Upload de arquivo/imagem não é scaffoldado**: exige `WithFileUploads`, prop
   não-tipada e disco configurado. Adicione manualmente seguindo o padrão de
   `AbaLogin`/`PerfilConta` (`->store()` + `x-shared.file-upload`).
+- A tabela gerada não declara `modulo()` (ver a lacuna em "A tabela e a listagem
+  são declarativas").
 
 ## Customizar os stubs
 
-Os templates ficam em `stubs/modulo/*.stub` (tokens `__UPPER_SNAKE__`). Edite-os
-para mudar o que todo módulo novo passa a gerar.
+Os templates ficam em `packages/core/stubs/modulo/*.stub` (tokens `__UPPER_SNAKE__`);
+a casca do `make:modulo` sai de `packages/core/stubs/extensao/`. Eles viajam dentro de
+`ht2ml/core`, então não edite a cópia em `vendor/`.
+
+Para mudar o que o seu produto gera, crie `stubs/modulo/<nome>.stub` na raiz do
+projeto. A precedência é **por arquivo** (`ResolvedorDeStubs`): o stub do produto vence
+o do core, e os demais continuam vindo do core. Mudar só a tabela, por exemplo, é pôr
+`stubs/modulo/livewire-table.stub` e herdar os outros 18.

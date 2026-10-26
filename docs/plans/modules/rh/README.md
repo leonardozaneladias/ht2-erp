@@ -102,7 +102,7 @@ Detalhe das fases e dos eixos satélites em [09-roadmap-fases.md](09-roadmap-fas
 
 > **Fonte de verdade: [01 §10 — Permissões canônicas](01-modelo-de-dominio.md).** Esta tabela é um **resumo**; o que `access:sync` publica e os slugs exatos (snake_case, `rh.<recurso>.<acao>`) estão em 01 §10. Divergência de vocabulário corrige-se **lá primeiro**. A **matriz de atribuição por perfil** (quem recebe cada permissão) está em [01 §10.1](01-modelo-de-dominio.md).
 
-O `make:modulo` gera o CRUD padrão `listar/criar/editar/deletar/restaurar/excluir_permanente`; recursos especiais têm verbos próprios. Mescladas em `config('access.modules')['negocio']` pelo `RhServiceProvider` (ADR-0015) e sincronizadas por `php artisan access:sync`.
+O `make:recurso <Recurso> --modulo=rh` acrescenta o recurso em `recursos` de `config/rh.php`, e o `ModuloBuilder` (`ModuleRegistry::modulo('rh')->deConfig('rh')` no `RhServiceProvider`) deriva dele o CRUD padrão `listar/criar/editar/deletar/restaurar/excluir_permanente`, na área `negocio`; recursos especiais têm verbos próprios, declarados à mão por `ModuleRegistry::permissoes()`. Tudo é sincronizado por `php artisan access:sync`.
 
 | Recurso                                                                                                                     | Permissões (slugs canônicos — 01 §10)                                                                                   |
 | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -147,7 +147,7 @@ Prefixo `rh.` obrigatório (anti-colisão, ADR-0015). Convivem com o RBAC de doi
 Pontos onde a documentação encontra o código existente — decididos aqui para o time não tropeçar:
 
 - **Departamento vs Setor** — adotado `Departamento` (`HT2ML\Rh\Models\Departamento`, tabela `departamentos`), alinhado ao teste `tests/Feature/Rh/RhLixeiraTest.php` e ao item de menu `rh-departamentos`. "Setor" é sinônimo de UI.
-- **Menu** — os itens do RH ficam no grupo **RH** da seção **Tabelas Auxiliares** (ver `AplicarMenuPadraoAction`), não na seção "Negócio" do stub padrão.
+- **Menu** — os itens do RH ficam no grupo **RH** (`grupo-tab-rh`) da seção **Tabelas Auxiliares** (`secao_menu => 'tabelas-auxiliares'` em `packages/extensao-rh/config/rh.php`), não na seção "Negócio" do stub padrão.
 - **Cargo** — reaproveita a referência global `cargos` (CBO), satisfazendo `tests/Feature/Rh/FuncionarioCargoTest.php` (`cargosDisponiveis`); cargos próprios por empresa ficam como evolução ([ADR-RH-002](adrs/ADR-RH-002-fronteira-enum-vs-catalogo.md)).
 - **Upload seguro** — o `GerenciadorAnexos` do core hoje grava no disco `public`; para documentos de RH (PII) deve-se parametrizar o disco para **privado** (`rh_privado`) + URL assinada + download por Policy ([03 §8.3](03-cadastro-pessoa-documentos.md) · [ADR-RH-009](adrs/ADR-RH-009-armazenamento-seguro-documentos.md)). O multi-upload/ZIP e a detecção por tag reusam o mesmo `Anexo`/Dropzone ([03 §8.5/§8.6](03-cadastro-pessoa-documentos.md)).
 - **Linha do tempo (UI)** — `x-admin.timeline-table` existe mas é especializado em "programações" (períodos); a decisão registrada é **criar `x-admin.event-timeline`** (eventos pontuais), não generalizar o existente ([06 §6.1](06-linha-do-tempo.md)).

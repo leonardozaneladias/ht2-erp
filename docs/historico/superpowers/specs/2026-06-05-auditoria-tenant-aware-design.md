@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o design da auditoria ciente de empresa/filial (Épico 2, Fase C-1), escrito em 2026-06-05. O trabalho foi entregue; não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Models/Activity.php`](../../../../packages/core/src/Models/Activity.php), [`Support/Audit/CarimbarContextoNaAtividade.php`](../../../../packages/core/src/Support/Audit/CarimbarContextoNaAtividade.php) e [`Services/Admin/AuditoriaSeguranca.php`](../../../../packages/core/src/Services/Admin/AuditoriaSeguranca.php).
+
 # Auditoria tenant-aware (Épico 2 — Segurança & Acesso, Fase C · subsistema 1)
 
 > **Status:** design aprovado (brainstorming), aguardando plano de implementação.

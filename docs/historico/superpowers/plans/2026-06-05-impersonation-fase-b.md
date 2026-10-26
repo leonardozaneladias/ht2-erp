@@ -1,3 +1,5 @@
+> **Histórico.** Este documento descreve o plano de implementação da impersonation de usuário admin (Épico 2, Fase B), escrito em 2026-06-05. O trabalho foi entregue (os checkboxes nunca foram marcados); não reflete o estado atual. Arquivado em 2026-10-25. O código vive hoje em `packages/core` — [`Support/Impersonation/ImpersonationContext.php`](../../../../packages/core/src/Support/Impersonation/ImpersonationContext.php) e [`Actions/Admin/Impersonation/IniciarImpersonationAction.php`](../../../../packages/core/src/Actions/Admin/Impersonation/IniciarImpersonationAction.php).
+
 # Impersonation de usuário — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
