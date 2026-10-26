@@ -31,7 +31,10 @@ final class OpenApiCommand extends Command
         $arquivo = base_path((string) config('api.openapi.arquivo', 'docs/openapi.json'));
 
         if (! $this->option('verificar')) {
-            Artisan::call('scramble:export', ['--path' => $arquivo]);
+            if (! $this->exportar($arquivo)) {
+                return self::FAILURE;
+            }
+
             $this->components->info("OpenAPI gravado em {$arquivo}.");
 
             return self::SUCCESS;
@@ -46,7 +49,9 @@ final class OpenApiCommand extends Command
         $gerado = (string) tempnam(sys_get_temp_dir(), 'openapi-');
 
         try {
-            Artisan::call('scramble:export', ['--path' => $gerado]);
+            if (! $this->exportar($gerado)) {
+                return self::FAILURE;
+            }
 
             $iguais = self::normalizar((string) file_get_contents($arquivo))
                 === self::normalizar((string) file_get_contents($gerado));
@@ -67,6 +72,26 @@ final class OpenApiCommand extends Command
         $this->components->info('OpenAPI em dia com o código.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * O export do Scramble pode falhar — um model cuja tabela ele não consegue
+     * inspecionar (banco fora do ar), por exemplo. Sem conferir o código de
+     * saída, o comando anunciava "gravado" com o arquivo velho no lugar, ou
+     * comparava contra um documento parcial.
+     */
+    private function exportar(string $caminho): bool
+    {
+        $codigo = Artisan::call('scramble:export', ['--path' => $caminho]);
+
+        if ($codigo !== self::SUCCESS) {
+            $this->components->error("scramble:export falhou (código {$codigo}). O Scramble inspeciona as tabelas dos models: confira a conexão com o banco.");
+            $this->line(Artisan::output());
+
+            return false;
+        }
+
+        return true;
     }
 
     /** @throws JsonException */
