@@ -36,6 +36,9 @@ final class ApiServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/api.php', 'api');
+
+        // No register(), não no boot(): ver registrarEnvelopeDeErro().
+        $this->registrarEnvelopeDeErro();
     }
 
     public function boot(): void
@@ -47,7 +50,6 @@ final class ApiServiceProvider extends ServiceProvider
 
         $this->registrarMiddlewares();
         $this->registrarLimiter();
-        $this->registrarEnvelopeDeErro();
 
         // O OpenAPI descreve o envelope de erro de verdade, não o do Laravel.
         Scramble::afterOpenApiGenerated(new OpenApi\DocumentarEnvelope);
@@ -112,14 +114,34 @@ final class ApiServiceProvider extends ServiceProvider
             ->by(self::chaveDoChamador($request)));
     }
 
+    /**
+     * O envelope entra no Handler do Laravel, pelo tipo concreto, e cedo.
+     *
+     * Pelo tipo concreto (Handler) e não pelo contrato (ExceptionHandler): fora
+     * do HTTP clássico o contrato pode chegar decorado. O Collision, em
+     * console, devolve um adaptador que repassa render() ao Handler de dentro;
+     * esperar o contrato e checar `instanceof Handler` via o adaptador e não
+     * registrava nada — e um kernel HTTP rodando em console (Octane, um
+     * script) respondia o 404 do Laravel, em HTML, sob /api.
+     *
+     * Cedo (register) porque o Handler pode ser resolvido antes do boot desta
+     * extensão; um afterResolving registrado tarde não dispararia mais. O
+     * resolved() cobre o caso de ele já existir sem decorador.
+     */
     private function registrarEnvelopeDeErro(): void
     {
-        // afterResolving cobre os dois casos: o handler já resolvido (o
-        // bootstrap/app.php do produto o resolve cedo) e o que ainda vai ser.
-        $this->callAfterResolving(ExceptionHandler::class, static function (ExceptionHandler $handler): void {
+        $registrar = static function (Handler $handler): void {
+            $handler->renderable(new RenderizadorDeErroApi);
+        };
+
+        $this->app->afterResolving(Handler::class, $registrar);
+
+        if ($this->app->resolved(ExceptionHandler::class)) {
+            $handler = $this->app->make(ExceptionHandler::class);
+
             if ($handler instanceof Handler) {
-                $handler->renderable(new RenderizadorDeErroApi);
+                $registrar($handler);
             }
-        });
+        }
     }
 }
