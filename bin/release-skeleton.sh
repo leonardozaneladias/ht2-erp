@@ -198,7 +198,10 @@ Gerado a partir do monorepo da base (`bin/release-skeleton.sh`). Não edite aqui
 mude no monorepo e corte um release novo.
 
 ```bash
-composer create-project ht2ml/skeleton meu-produto
+# O pacote é privado e não está no Packagist: o Composer precisa saber onde
+# buscá-lo, e a máquina precisa de acesso SSH (ou token) ao repositório.
+composer create-project ht2ml/skeleton meu-produto \
+    --repository='{"type":"vcs","url":"git@github.com:__ORG__/ht2ml-skeleton.git","no-api":true}'
 cd meu-produto
 
 cp .env.example .env && php artisan key:generate
@@ -233,6 +236,9 @@ composer require ht2ml/extensao-ia          # contratos de IA, fakes, cache de t
 
 Os repositórios já estão declarados no `composer.json`.
 MD
+# O heredoc é literal (<<'MD', para não expandir os $ e crases do markdown);
+# a organização entra por substituição depois.
+perl -pi -e "s/__ORG__/${ORG}/g" "${TMP}/README.md"
 
 # O produto não pode nascer reprovando o próprio job de qualidade. Os JSON que
 # este script reescreve saem com formatação diferente da que o Prettier espera.
@@ -275,4 +281,4 @@ cd "${ROOT_DIR}"
 echo -e "  ${GREEN}✓${NC} ${VERSAO} publicada em ${ORG}/${REPO}"
 echo ""
 echo -e " Uso:"
-echo -e "   ${YELLOW}composer create-project ht2ml/skeleton meu-produto${NC}"
+echo -e "   ${YELLOW}composer create-project ht2ml/skeleton meu-produto --repository='{\"type\":\"vcs\",\"url\":\"git@github.com:${ORG}/ht2ml-skeleton.git\",\"no-api\":true}'${NC}"

@@ -87,7 +87,7 @@ setup:
 setup-client:
 	ddev artisan key:generate
 	ddev artisan migrate --force
-	ddev artisan db:seed --class=RolePermissionSeeder
+	ddev artisan db:seed --class='HT2ML\Core\Database\Seeders\RolePermissionSeeder'
 	ddev artisan horizon:install
 	ddev artisan vendor:publish --tag=pulse-dashboard
 	ddev npm run build
