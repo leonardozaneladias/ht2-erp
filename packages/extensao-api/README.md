@@ -80,6 +80,8 @@ O idioma da resposta segue esta ordem: `Accept-Language`, depois `idiomaPreferid
   run: php artisan api:openapi --verificar
 ```
 
+O comando precisa de banco migrado: o Scramble inspeciona as tabelas dos models para inferir os campos. No CI, um SQLite basta. Se o export falhar, o comando falha também.
+
 A comparação ignora `servers`, que o Scramble deriva do `APP_URL`. Assim, o arquivo gerado na máquina de quem escreveu e o gerado no CI não divergem por um motivo que não é contrato.
 
 ## O que não está aqui (ainda)

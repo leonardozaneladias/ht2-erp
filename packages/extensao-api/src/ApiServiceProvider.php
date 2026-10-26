@@ -54,6 +54,16 @@ final class ApiServiceProvider extends ServiceProvider
         // O OpenAPI descreve o envelope de erro de verdade, não o do Laravel.
         Scramble::afterOpenApiGenerated(new OpenApi\DocumentarEnvelope);
 
+        // O Scramble não lê o corpo de classes em vendor/ — e num produto é lá
+        // que estas moram. Sem isto, todo `return ApiResponse::sucesso(...)`
+        // vira `{"type": "object"}` no OpenAPI, e os schemas dos Resources
+        // somem (medido no EduConecta: 26 schemas viraram 9). No monorepo não
+        // aparece: o path repository é symlink, e o caminho real não tem vendor/.
+        Scramble::infer()->configure()->buildDefinitionsUsingAstFor([
+            Support\ApiResponse::class,
+            Support\PaginacaoApi::class,
+        ]);
+
         if ($this->app->runningInConsole()) {
             $this->commands([Console\OpenApiCommand::class]);
         }

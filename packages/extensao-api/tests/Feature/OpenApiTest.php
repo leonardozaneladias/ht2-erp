@@ -78,3 +78,25 @@ it('as respostas de erro documentadas são o envelope, não o formato do Laravel
     $validacao = collect($respostas)->first(fn (array $r): bool => str_contains(json_encode($r), 'Validation'));
     expect($validacao['content']['application/json']['schema']['properties']['errors']['type'] ?? null)->toBe('object');
 });
+
+it('pede ao Scramble que analise as classes do pacote, que num produto moram em vendor/', function (): void {
+    // O Scramble não lê o corpo de classes em vendor/: sem o pedido, todo
+    // `return ApiResponse::sucesso(...)` de um produto vira `{"type":"object"}`.
+    $config = Dedoc\Scramble\Scramble::infer()->configure();
+    $matchers = (new ReflectionProperty($config, 'forcedAstSourcedDefinitionsMatchers'))->getValue($config);
+
+    foreach ([ApiResponse::class, HT2ML\Api\Support\PaginacaoApi::class] as $classe) {
+        expect(collect($matchers)->contains(fn ($m): bool => $m->matches($classe)))->toBeTrue($classe);
+    }
+});
+
+it('falha quando o export do Scramble falha, em vez de anunciar sucesso', function (): void {
+    // Um export que quebra (banco fora do ar, por exemplo) deixava o arquivo
+    // velho no lugar e o comando dizia "gravado".
+    Illuminate\Support\Facades\Artisan::command('scramble:export {--path=}', fn (): int => 1);
+
+    $this->artisan('api:openapi')->assertFailed();
+
+    file_put_contents(base_path($this->arquivo), '{}');
+    $this->artisan('api:openapi', ['--verificar' => true])->assertFailed();
+});
