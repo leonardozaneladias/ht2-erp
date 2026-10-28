@@ -15,7 +15,7 @@
     "php": "^8.4",
     "bacon/bacon-qr-code": "^3.1",
     "barryvdh/laravel-dompdf": "^3.1",
-    "guzzlehttp/guzzle": "^7.10",
+    "guzzlehttp/guzzle": "^8.3",
     "ht2ml/core": "@dev",
     "ht2ml/extensao-api": "@dev",
     "ht2ml/extensao-documentos": "@dev",
