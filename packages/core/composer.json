@@ -23,7 +23,7 @@
         "illuminate/validation": "^13.0",
         "illuminate/view": "^13.0",
         "livewire/livewire": "^4.2",
-        "maatwebsite/excel": "^3.1",
+        "maatwebsite/excel": "^3.1 || ^4.0",
         "power-components/livewire-powergrid": "^6.10",
         "pragmarx/google2fa": "^8.0",
         "pragmarx/google2fa-laravel": "^3.0",
@@ -51,3 +51,4 @@
     },
     "minimum-stability": "stable"
 }
+
